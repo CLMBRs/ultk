@@ -60,7 +60,7 @@ def generate_languages(
             if verbose:
                 print(
                     f"Enumerating {word_amt_sample_size} languages of size {word_amount}"
-                )            
+                )
             languages = extend_languages_by_enumeration(
                 language_class,
                 languages,
@@ -112,7 +112,7 @@ def generate_languages(
             languages = languages.union(rlangs)
             additional_sample = sample_size - len(languages)
             print(additional_sample)
-        
+
     return list(languages)[:sample_size]
 
 
@@ -321,14 +321,14 @@ def random_combination_vocabulary(
         languages: the extended list of input languages.
     """
     while True:
-        nat_sample_indices = tuple(sorted(
-            random.sample(range(len(natural_terms)), num_natural)
-        ))
+        nat_sample_indices = tuple(
+            sorted(random.sample(range(len(natural_terms)), num_natural))
+        )
         unnat_sample_indices = ()
         if unnatural_terms:
-            unnat_sample_indices = tuple(sorted(
-                random.sample(range(len(unnatural_terms)), num_unnatural)
-            ))
+            unnat_sample_indices = tuple(
+                sorted(random.sample(range(len(unnatural_terms)), num_unnatural))
+            )
         sample_indices = (nat_sample_indices, unnat_sample_indices)
         if sample_indices not in seen:
             # keep track of languages chosen
