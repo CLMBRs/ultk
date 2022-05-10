@@ -32,43 +32,56 @@ def pareto_optimal_languages(languages: list[Language]) -> list[Language]:
     return list(set(dominating_languages))
 
 
-def pareto_min_distances(languages: list[Language], pareto_points: list):
+def pareto_min_distances(points: list[tuple], pareto_points: list[tuple]):
     """Measure the Pareto optimality of each language by measuring its Euclidean closeness to the frontier."""
-    comm_cost = []
-    comp = []
     print("Measuring min distance to frontier ...")
-    for lang in tqdm(languages):
-        comm_cost.append(1 - lang.informativity)
-        comp.append(lang.complexity)
-    points = np.array(list(zip(comm_cost, comp)))
+
+    # Scale complexity
+    points = np.array(points)
+    pareto_points = np.array(pareto_points)
+    max_cost, max_complexity = points.max(axis=0)
+
+    points[:, 1] = points[:, 1] / max_complexity
+    pareto_points[:, 1] = pareto_points[:, 1] / max_complexity
+
+    # Interpolate to get smooth frontier
+    pareto_points = interpolate_data(
+        [tuple(p) for p in pareto_points], max_cost=max_cost
+    )
 
     # Measure closeness of each language to any frontier point
     distances = cdist(points, pareto_points)
     min_distances = np.min(distances, axis=1)
-    min_distances = min_distances / np.sqrt(2)  # max distance is sqrt(1 + 1)
+
+    # Normalize to 0, 1 because optimality is defined in terms of 1 - dist
+    min_distances /= np.sqrt(2)
     return min_distances
 
 
-def interpolate_data(dominating_languages: list[Language]) -> np.ndarray:
+def interpolate_data(points: list, min_cost=0.0, max_cost=1.0, num=5000) -> np.ndarray:
     """Interpolate the points yielded by the pareto optimal languages into a continuous (though not necessarily smooth) curve.
 
     Args:
-        dominating_languages: the list of Language objects representing the Pareto frontier.
+        points: an array of size [dominating_languages], a possibly non-smooth set of solutions to the trade-off.
+
+        num: the number of x-axis points (cost) to interpolate. Controls smoothness of curve.
+
+    Returns:
+        interpolated_points: an array of size [num, num]
     """
-    dom_cc = []
-    dom_comp = []
-    for lang in dominating_languages:
-        dom_cc.append(1 - lang.informativity)
-        dom_comp.append(lang.complexity)
+    if max_cost == 1:
+        # hack to get end of pareto curve
+        points.append((1, 0))
 
-    values = list(set(zip(dom_cc, dom_comp)))
-    pareto_x, pareto_y = list(zip(*values))
-
+    # warning: interp1d requires no duplicates.
+    points = list(set(points))
+    pareto_x, pareto_y = list(zip(*points))
     interpolated = interpolate.interp1d(pareto_x, pareto_y, fill_value="extrapolate")
-    pareto_costs = np.linspace(0, 1.0, num=5000)
+
+    pareto_costs = np.linspace(min_cost, max_cost, num=num)
     pareto_complexities = interpolated(pareto_costs)
-    pareto_points = np.array(list(zip(pareto_costs, pareto_complexities)))
-    return pareto_points
+    interpolated_points = np.array(list(zip(pareto_costs, pareto_complexities)))
+    return interpolated_points
 
 
 ##############################################################################
@@ -104,21 +117,23 @@ def tradeoff(
         dominating_languages: a list of the Pareto optimal languages in the simplicity/informativeness tradeoff.
     """
     # measure simplicity, informativity, and semantic universals
+    # and convert languages to (cost, complexity) points.
     print("Measuring languages for simplicity and informativeness...")
+    points = []
     for lang in tqdm(languages):
         lang.complexity = comp_measure.language_complexity(lang)
         lang.informativity = inf_measure.language_informativity(lang)
         lang.naturalness = degree_naturalness(lang)
+        points.append((1 - lang.informativity, lang.complexity))
 
     dominating_languages = pareto_optimal_languages(languages)
-    min_distances = pareto_min_distances(
-        languages, interpolate_data(dominating_languages)
-    )
+    dominant_points = [
+        (1 - lang.informativity, lang.complexity) for lang in dominating_languages
+    ]
 
-    # TODO: is optimality ever not min_distance?
+    min_distances = pareto_min_distances(points, dominant_points)
     print("Setting optimality ...")
     for i, lang in enumerate(tqdm(languages)):
         # warning: yaml that saves lang must use float, not numpy.float64 !
         lang.optimality = 1 - float(min_distances[i])
-
     return languages, dominating_languages
