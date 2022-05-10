@@ -18,7 +18,7 @@ def generate_languages(
     criterion: Callable = lambda *_: True,
     fixed_wordcount=False,
     dummy_name="sampled_lang_id",
-    exact_sample=True,
+    exact_sample=False,
     verbose=False,
 ) -> list[Language]:
     """Generate languages by randomly sampling bags of expressions.
@@ -51,12 +51,16 @@ def generate_languages(
     word_amt_sample_size = int(sample_size / lang_size)
 
     expressions_indices = list(range(total_word_amount))
-    languages = []
+    languages = set()
 
     # For each language size
     for word_amount in word_amounts:
         # If sample size > all possible languages (of any degree), just generate the latter.
         if word_amt_sample_size > comb(total_word_amount, word_amount):
+            if verbose:
+                print(
+                    f"Enumerating {word_amt_sample_size} languages of size {word_amount}"
+                )            
             languages = extend_languages_by_enumeration(
                 language_class,
                 languages,
@@ -81,11 +85,13 @@ def generate_languages(
                 dummy_name=dummy_name,
                 verbose=verbose,
             )
-            languages.extend(rlangs)
+            languages = languages.union(rlangs)
 
     if exact_sample:
         # Randomly choose a lang size and continue sampling until sample_size achieveds
         additional_sample = sample_size - len(languages)
+        if verbose:
+            print(f"Sampled {len(languages)} out of {sample_size} languages.")
         while additional_sample > 0:
 
             word_amount = random.choice(word_amounts)
@@ -103,12 +109,11 @@ def generate_languages(
                 dummy_name=dummy_name,
                 verbose=verbose,
             )
-            languages.extend(rlangs)
+            languages = languages.union(rlangs)
             additional_sample = sample_size - len(languages)
+            print(additional_sample)
         
-        languages = languages[:sample_size]
-
-    return languages
+    return list(languages)[:sample_size]
 
 
 ##############################################################################
@@ -166,7 +171,7 @@ def sample_quasi_natural(
 
         sample_size: how many languages to sample.
     """
-    languages = []
+    languages = set()
 
     natural_indices = list(range(len(natural_terms)))
     unnatural_indices = list(range(len(unnatural_terms)))
@@ -216,7 +221,7 @@ def sample_quasi_natural(
                 )
 
             # Sample unique languages
-            seen = []
+            seen = set()
             for _ in range(degree_sample_size):
                 vocabulary = random_combination_vocabulary(
                     seen,
@@ -228,7 +233,7 @@ def sample_quasi_natural(
                 language = language_class(
                     vocabulary, name=f"{dummy_name.replace('id', '')}{len(languages)}"
                 )
-                languages.append(language)
+                languages.add(language)
 
     assert len(languages) == len(set(languages))
     return languages
@@ -241,7 +246,7 @@ def sample_quasi_natural(
 
 def extend_languages_by_enumeration(
     language_class: Type,
-    languages: list[Language],
+    languages: set[Language],
     natural_terms: list[Expression],
     natural_indices: list[int],
     num_natural: int,
@@ -251,7 +256,7 @@ def extend_languages_by_enumeration(
     dummy_name="sampled_lang_id",
     verbose=False,
 ) -> list[Language]:
-    """When the sample size requested is greater than the size of all possible languages, just enumerate all the possible languages and extend the input list of languages with result.
+    """When the sample size requested is greater than the size of all possible languages, just enumerate all the possible languages and extend the input set of languages with result.
 
     Args:
         language_class:
@@ -271,8 +276,9 @@ def extend_languages_by_enumeration(
         unnatural_terms: list[Expression]=[]
 
     Returns:
-        languages: the extended list of input languages.
+        languages: the enlarged set of input languages.
     """
+    # combinations is invariant to order
     natural_subsets = list(combinations(natural_indices, num_natural))
     unnatural_subsets = list(combinations(unnatural_indices, num_unnatural))
 
@@ -287,12 +293,12 @@ def extend_languages_by_enumeration(
             language = language_class(
                 vocabulary, name=f"{dummy_name.replace('id', '')}{len(languages)}"
             )
-            languages.append(language)
+            languages.add(language)
     return languages
 
 
 def random_combination_vocabulary(
-    seen: list,
+    seen: set,
     num_natural: int,
     natural_terms: list[Expression],
     num_unnatural: int = 0,
@@ -315,18 +321,18 @@ def random_combination_vocabulary(
         languages: the extended list of input languages.
     """
     while True:
-        nat_sample_indices = sorted(
+        nat_sample_indices = tuple(sorted(
             random.sample(range(len(natural_terms)), num_natural)
-        )
-        unnat_sample_indices = []
+        ))
+        unnat_sample_indices = ()
         if unnatural_terms:
-            unnat_sample_indices = sorted(
+            unnat_sample_indices = tuple(sorted(
                 random.sample(range(len(unnatural_terms)), num_unnatural)
-            )
+            ))
         sample_indices = (nat_sample_indices, unnat_sample_indices)
         if sample_indices not in seen:
             # keep track of languages chosen
-            seen.append(sample_indices)
+            seen.add(sample_indices)
 
         # Add language
         vocabulary = [natural_terms[idx] for idx in nat_sample_indices] + [
