@@ -58,7 +58,7 @@ def pareto_min_distances(points: list[tuple], pareto_points: list[tuple]):
     return min_distances
 
 
-def interpolate_data(points: list, min_cost: float=0.0, max_cost: float=1.0, num=5000, round: int=4) -> np.ndarray:
+def interpolate_data(points: list, min_cost: float=0.0, max_cost: float=1.0, num=5000) -> np.ndarray:
     """Interpolate the points yielded by the pareto optimal languages into a continuous (though not necessarily smooth) curve.
 
     Args:
@@ -69,8 +69,6 @@ def interpolate_data(points: list, min_cost: float=0.0, max_cost: float=1.0, num
         max_cost: the maximum communicative cost value possible to interpolate from. A natural assumption is to let complexity=0.0 if max_cost=1.0, which will result in a Pareto curve that spans the entire 2d space, and consequently the plot with x and y limits both ranging [0.0, 1.0].
 
         num: the number of x-axis points (cost) to interpolate. Controls smoothness of curve.
-
-        round: the number of decimal places to round the interpolated costs and complexities to.
 
     Returns:
         interpolated_points: an array of size [num, num]
@@ -87,8 +85,8 @@ def interpolate_data(points: list, min_cost: float=0.0, max_cost: float=1.0, num
     pareto_costs = np.linspace(min_cost, max_cost, num=num)
     pareto_complexities = interpolated(pareto_costs)
     interpolated_points = np.array(list(zip(
-        np.round(pareto_costs, round), 
-        np.round(pareto_complexities, round)
+        pareto_costs, 
+        pareto_complexities,
         )))
     return interpolated_points
 
