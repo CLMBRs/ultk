@@ -82,7 +82,7 @@ def interpolate_data(points: list, min_cost: float=0.0, max_cost: float=1.0, num
     pareto_x, pareto_y = list(zip(*points))
     interpolated = interpolate.interp1d(pareto_x, pareto_y, fill_value="extrapolate")
 
-    pareto_costs = np.linspace(min_cost, max_cost, num=num)
+    pareto_costs = list(set(np.linspace(min_cost, max_cost, num=num).tolist()))
     pareto_complexities = interpolated(pareto_costs)
     interpolated_points = np.array(list(zip(
         pareto_costs, 
