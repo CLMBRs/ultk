@@ -77,8 +77,9 @@ def interpolate_data(points: list, min_cost: float=0.0, max_cost: float=1.0, num
         # hack to get end of pareto curve
         points.append((1, 0))
 
-    # warning: interp1d requires no duplicates.
-    points = list(set(points))
+    # NB: interp1d requires no duplicates and we require unique costs.
+    points = list({cost: comp for cost, comp in sorted(points, reverse=True)}.items())
+
     pareto_x, pareto_y = list(zip(*points))
     interpolated = interpolate.interp1d(pareto_x, pareto_y, fill_value="extrapolate")
 
