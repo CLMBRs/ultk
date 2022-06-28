@@ -4,12 +4,10 @@ from abc import abstractmethod
 import copy
 import random
 import math
+from typing import Callable
 from tqdm import tqdm
 from pathos.multiprocessing import ProcessPool
-from pygmo import non_dominated_front_2d
-from altk.effcomm.complexity import ComplexityMeasure
-from altk.effcomm.informativity import InformativityMeasure
-
+from altk.effcomm.tradeoff import batch_measure, pareto_optimal_languages
 from altk.language.language import Expression, Language
 
 ##############################################################################
@@ -43,8 +41,7 @@ class Evolutionary_Optimizer:
 
     def __init__(
         self,
-        comp_measure: ComplexityMeasure,
-        inf_measure: InformativityMeasure,
+        objectives: dict[str, Callable],
         expressions: list[Expression],
         mutations: list[Mutation],
         sample_size: int,
@@ -52,15 +49,19 @@ class Evolutionary_Optimizer:
         generations: int,
         lang_size: int,
         processes: int,
+        x: str = "comm_cost",
+        y: str = "complexity",        
     ):
         """Initialize the evolutionary algorithm configurations.
 
         The measures of complexity and informativity, the expressions, and the mutations are all specific to the particular semantic domain.
 
         Args:
-            - comp_measure:   a Complexity_Measure object
-
-            - inf_measure:    an Informativity_Measure object
+            - objectives: a dict of the two objectives to optimize for, e.g. simplicity and informativeness, of the form, e.g.
+                {
+                    "complexity": comp_measure,
+                    "comm_cost": lambda l: 1 - inf_measure(l)
+                }
 
             - expressions:    a list of expressions from which to apply mutations to languages.
 
@@ -76,8 +77,9 @@ class Evolutionary_Optimizer:
 
             - proceses:     for multiprocessing.ProcessPool, e.g. 6.
         """
-        self.comp_measure = comp_measure
-        self.inf_measure = inf_measure
+        self.objectives = objectives
+        self.x = x
+        self.y = y
         self.expressions = expressions
         self.mutations = mutations
 
@@ -103,9 +105,6 @@ class Evolutionary_Optimizer:
 
             - explored_languages:       a list of all the languages explored during the evolutionatry algorithm.
         """
-        batch_complexity = self.comp_measure.batch_complexity
-        batch_comm_cost = self.inf_measure.batch_communicative_cost
-
         pool = ProcessPool(nodes=self.processes)  # TODO: remove until you need it
 
         languages = seed_population
@@ -115,17 +114,12 @@ class Evolutionary_Optimizer:
             # Measure each generation
             # complexity = pool.map(batch_complexity, languages) # for some reason pool hates me
             # comm_cost = pool.map(batch_comm_cost, languages)
-
-            complexity = batch_complexity(languages)
-            comm_cost = batch_comm_cost(languages)
-
+            
+            languages = batch_measure(languages, self.objectives)
             explored_languages.extend(copy.deepcopy(languages))
 
             # Calculate dominating individuals
-            dominating_indices = non_dominated_front_2d(
-                list(zip(comm_cost, complexity))
-            )
-            dominating_languages = [languages[i] for i in dominating_indices]
+            dominating_languages = pareto_optimal_languages(languages, self.x, self.y)
 
             # Mutate dominating individuals
             languages = self.sample_mutated(
@@ -176,7 +170,6 @@ class Evolutionary_Optimizer:
             if mutation.precondition(
                 language,
                 lang_size=self.lang_size,
-                inf_measure=self.inf_measure,
             )
         ]
         mutation = random.choice(possible_mutations)
