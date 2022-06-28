@@ -3,8 +3,6 @@
 import numpy as np
 
 from altk.language.language import Language
-from altk.effcomm.complexity import ComplexityMeasure
-from altk.effcomm.informativity import InformativityMeasure
 from pygmo import non_dominated_front_2d
 from typing import Callable
 from tqdm import tqdm
@@ -16,20 +14,31 @@ from scipy.spatial.distance import cdist
 # Helper measurement functions
 ##############################################################################
 
+def batch_measure(languages: list[Language], measures: dict[str, Callable]) -> list[Language]:
+    """Measure properties of many languages at once, and modify their internal data."""
+    for lang in languages:
+        for m in measures:
+            lang.measurements[m] = measures[m](lang)
+    return languages
 
-def pareto_optimal_languages(languages: list[Language]) -> list[Language]:
+
+def pareto_optimal_languages(
+    languages: list[Language], 
+    x: str = "comm_cost",
+    y: str = "complexity", 
+    unique: bool = False,
+    ) -> list[Language]:
     """Use pygmo.non_dominated_front_2d to compute the Pareto languages."""
-    # TODO: refactor
     dominating_indices = non_dominated_front_2d(
         list(
             zip(
-                [1 - lang.informativity for lang in languages],
-                [lang.complexity for lang in languages],
+                [lang.measurements[x] for lang in languages],
+                [lang.measurements[y] for lang in languages],
             )
         )
     )
     dominating_languages = [languages[i] for i in dominating_indices]
-    return list(set(dominating_languages))
+    return list(set(dominating_languages)) if unique else dominating_languages
 
 
 def pareto_min_distances(points: list[tuple], pareto_points: list[tuple]):
@@ -96,16 +105,17 @@ def interpolate_data(points: list, min_cost: float=0.0, max_cost: float=1.0, num
 # Main tradeoff function
 ##############################################################################
 
-
 def tradeoff(
     languages: list[Language],
-    comp_measure: ComplexityMeasure,
-    inf_measure: InformativityMeasure,
-    degree_naturalness: Callable,
-):
+    properties: dict[str, Callable],    
+    x: str = "comm_cost",
+    y: str = "complexity",    
+) -> dict[str, list[Language]]:
     """Builds a final efficient communication analysis of languages.
 
-    A set of languages, measures of informativity and simplicity (complexity) fully define the efficient communication results, which is the relative (near) Pareto optimality of each language. Measure degrees of natualness, or a categorical analogue of naturalness, as e.g. satisfaction with a semantic universal.
+    A set of languages, measures of informativity (comm_cost) and simplicity (complexity) fully define the efficient communication results, which is the relative (near) Pareto optimality of each language. 
+    
+    This function also measures other properties of each language, e.g. degrees of natualness, or a categorical analogue of naturalness, as e.g. satisfaction with a semantic universal.
 
     This function does the following:
     Measure a list of languages, update their internal data, and return a pair of (all languages, dominant_languages).
@@ -113,35 +123,34 @@ def tradeoff(
     Args:
         languages: A list representing the pool of all languages to be measured for an efficient communication analysis.
 
-        comp_measure: the complexity measure to use for the trade-off.
+        x: the first pressure to measure, e.g. complexity.
 
-        inf_measure: the informativity measure to use for the trade-off.
-
-        degree_naturalness: the function to measure the degree of (quasi) naturalness for any languages.
+        y: the second pressure to measure, e.g. informativity.
 
     Returns:
-        languages: the same list of languages, with their internal efficient communication data updated.
+        a dictionary of the population and the pareto front, e.g.
+        {
+            "languages": the list of languages, with their internal efficient communication data updated,
 
-        dominating_languages: a list of the Pareto optimal languages in the simplicity/informativeness tradeoff.
+            "dominating_languages": the list of the Pareto optimal languages in the tradeoff.
+        }
     """
-    # measure simplicity, informativity, and semantic universals
-    # and convert languages to (cost, complexity) points.
-    print("Measuring languages for simplicity and informativeness...")
     points = []
     for lang in tqdm(languages):
-        lang.complexity = comp_measure.language_complexity(lang)
-        lang.informativity = inf_measure.language_informativity(lang)
-        lang.naturalness = degree_naturalness(lang)
-        points.append((1 - lang.informativity, lang.complexity))
+        for prop in properties:
+            lang.measurements[prop] = properties[prop](lang)
+        points.append((lang.measurements[x], lang.measurements[y]))
 
-    dominating_languages = pareto_optimal_languages(languages)
+    dominating_languages = pareto_optimal_languages(
+        languages, x, y, unique=True)
     dominant_points = [
-        (1 - lang.informativity, lang.complexity) for lang in dominating_languages
+        (lang.measurements[x], lang.measurements[y]) for lang in dominating_languages
     ]
 
     min_distances = pareto_min_distances(points, dominant_points)
     print("Setting optimality ...")
     for i, lang in enumerate(tqdm(languages)):
         # warning: yaml that saves lang must use float, not numpy.float64 !
-        lang.optimality = 1 - float(min_distances[i])
+        # lang.optimality = 1 - float(min_distances[i])
+        lang.measurements["optimality"] = 1 - float(min_distances[i])
     return languages, dominating_languages
