@@ -4,7 +4,7 @@ The base object of altk is a Language. This is intended to model a language scie
 """
 
 from abc import abstractmethod
-
+import numpy as np
 from altk.language.semantics import Universe
 from altk.language.semantics import Meaning
 
@@ -54,7 +54,7 @@ class Language:
     @property
     def expressions(self) -> list[Expression]:
         return self._expressions
-    
+
     @expressions.setter
     def expressions(self, val: list[Expression]) -> None:
         if not val:
@@ -69,9 +69,9 @@ class Language:
         """Add an expression to the list of expressions in a language."""
         self.expressions = self.expressions + [e]
 
-    def size(self) -> int:
-        """Returns the length of the list of expressions in a language."""
-        return len(self.expressions)
+    # def size(self) -> int:
+    #     """Returns the length of the list of expressions in a language."""
+    #     return len(self.expressions)
 
     def pop(self, index: int) -> Expression:
         """Removes an expression at the specified index of the list of expressions, and returns it."""
@@ -85,6 +85,28 @@ class Language:
     def is_natural(self) -> bool:
         """Whether a language represents a human natural language."""
         raise NotImplementedError
+
+    def get_matrix(self) -> np.ndarray:
+        """Get a binary matrix of shape `(num_meanings, num_expressions)`
+        specifying which expressions can express which meanings."""
+
+        # expressions = tuple(self.expressions)
+        # meanings = tuple(self.universe.objects)
+
+        # len_e = self.__len__()
+        # len_m = len(meanings)
+
+        # mat = np.zeros((len_m, len_e))
+        # for i, m in enumerate(meanings):
+        # for j, e in enumerate(expressions):
+        # mat[i, j] = float(e.can_express(m))
+
+        return np.ndarray(
+            [
+                [float(e.can_express(m)) for e in self.expressions]
+                for m in self.universe.objects
+            ]
+        )
 
     @property
     def universe(self) -> Universe:
@@ -108,3 +130,6 @@ class Language:
 
     def __eq__(self, __o: object) -> bool:
         return self.expressions == __o.expressions
+
+    def __len__(self) -> int:
+        return len(self.expressions)

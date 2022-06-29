@@ -1,6 +1,7 @@
-"""Classes for representing communicative agents, such as Senders and Receivers figuring in Lewis-Skyrms signaling games, or literal and pragmatic agents in the Rational Speech Act framework."""
+"""Classes for representing communicative agents, such as Senders and Receivers figuring in Lewis-Skyrms signaling games, literal and pragmatic agents in the Rational Speech Act framework, etc."""
 
 import numpy as np
+from scipy.special import softmax
 from altk.language.language import Language
 
 ##############################################################################
@@ -8,7 +9,7 @@ from altk.language.language import Language
 ##############################################################################
 
 
-class Communicative_Agent:
+class CommunicativeAgent:
     def __init__(self, language: Language):
         """Takes a language to construct a agent to define the relation between meanings and expressions.
 
@@ -16,41 +17,61 @@ class Communicative_Agent:
         """
         self.language = language
 
-
-class Speaker(Communicative_Agent):
+class Speaker(CommunicativeAgent):
     def __init__(self, language: Language):
         super().__init__(language)
 
+    @property
+    def S(self) -> np.ndarray:
+        return self._S
+    @S.setter
+    def S(self, mat: np.ndarray) -> None:
+        self._S = mat
 
-class Listener(Communicative_Agent):
+
+class Listener(CommunicativeAgent):
     def __init__(self, language: Language):
         super().__init__(language)
 
+    @property
+    def R(self) -> np.ndarray:
+        return self._R
+    @R.setter
+    def R(self, mat: np.ndarray) -> None:
+        self._R = mat
 
-"""In the RSA framework, communicative agents reason recursively about each other's literal and pragmatic interpretations of utterances."""
+
+"""In the RSA framework, communicative agents reason recursively about each other's literal and pragmatic interpretations of utterances. Concretely, each agent is modeled by a conditional distribution. The speaker is represented by the probability of choosing to use an utterance (expression) given an intended meaning, P(e|m). The listener is a mirror of the speaker; it is represented by the probability of guessing a meaning given that they heard an utterance (expression), P(m|e)."""
 
 
 class LiteralSpeaker(Speaker):
-    """A literal speaker chooses utterances without any reasoning about other agents."""
+    """A literal speaker chooses utterances without any reasoning about other agents. The literal speaker's conditional probability distribution P(e|m) is uniform over all expressions that can be used to communicate a particular meaning. This is in contrast to a pragmatic speaker, whose conditional distribution is not uniform in this way, but instead biased towards choosing expressions that are less likely to be misinterpreted by some listener."""
 
     def __init__(self, language: Language):
         super().__init__(language)
-        self.S = naive_matrix(self)
+        self.S = self.language.get_matrix()
+
+        # The sum of p(e | intended m) must be exactly 0 or 1.
+        # We check for nans because sometimes a language cannot express a particular meaning at all, resulting in a row sum of 0.
+        self.S = np.nan_to_num(self.S/self.S.sum(axis=1)[:,None])
 
 
 class LiteralListener(Listener):
-    """A naive literal listener interprets utterances without any reasoning about other agents."""
+    """A naive literal listener interprets utterances without any reasoning about other agents. Its conditional probability distribution P(m|e) for guessing meanings is uniform over all meanings that can be denoted by the particular expression heard. This is in contrast to a pragmatic listener, whose conditional distribution is biased to guess meanings that a pragmatic speaker most likely intended."""
 
     def __init__(self, language: Language):
         super().__init__(language)
-        self.R = naive_matrix(self)
+        self.R = self.language.get_matrix().T
+
+        # The sum of p(m | heard e) must be 1. We can safely divide each row by its sum because every expression has at least one meaning.
+        self.R/self.R.sum(axis=1)[:,None]
 
 
 class PragmaticSpeaker(Speaker):
-    """A pragmatic speaker chooses utterances based on how a naive, literal listener would interpret them."""
+    """A pragmatic speaker chooses utterances based on how a listener would interpret them. A pragmatic speaker may be initialized with any kind of listener, e.g. literal or pragmatic -- meaning the recursive reasoning can be modeled up to arbitrary depth."""
 
     def __init__(
-        self, language: Language, literal_listener: LiteralListener, temperature=1.0
+        self, language: Language, listener: Listener, temperature=1.0
     ):
         """Initialize the |M|-by-|E| matrix, S, corresponding to the pragmatic speaker's conditional probability distribution over expressions given meanings.
         
@@ -60,27 +81,31 @@ class PragmaticSpeaker(Speaker):
 
         where
 
-            Utility(e , m) := log(P_LiteralListener(m | e))
+            Utility(e , m) := log(P_Listener(m | e))
 
         Args:
             language: the language with |M| meanings and |E| expressions defining the size of S.
 
-            literal_listener: a communicative agent storing a matrix R representing the literal (naive) conditional distribution over expressions given meanings.
+            listener: a communicative agent storing a matrix R representing the conditional distribution over expressions given meanings.
 
             temperature: a float \in [0,1], representing how `optimally rational' the pragmatic speaker is; 1.0 is chosen when no particular assumptions about rationality are made.
         """
         super().__init__(language)
-        self.S = np.zeros_like(literal_listener.R.T)
+
         # Row vector \propto column vector of literal R
-        for i in range(len(self.S)):
-            col = literal_listener.R[:, i]
-            self.S[i] = softmax_temp_log(col, temperature)
+        self.S = softmax(np.log(listener.R.T) * temperature, axis=1)
+
+        # self.S = np.zeros_like(listener.R.T)
+        # for i in range(len(self.S)):
+            # col = listener.R[:, i]
+            # self.S[i] = softmax_temp_log(col, temperature)
+
 
 class PragmaticListener(Listener):
-    """A pragmatic listener interprets utterances based on their expectations about a pragmatic speaker's decisions."""
+    """A pragmatic listener interprets utterances based on their expectations about a pragmatic speaker's decisions. A pragmatic listener may be initialized with any kind of speaker, e.g. literal or pragmatic -- meaning the recursive reasoning can be modeled up to arbitrary depth."""
 
     def __init__(
-        self, language: Language, pragmatic_speaker: PragmaticSpeaker, prior: np.ndarray
+        self, language: Language, speaker: Speaker, prior: np.ndarray
     ):
         """Initialize the |E|-by-|M| matrix, R, corresponding to the pragmatic listener's conditional probability distribution over meanings given expressions.
 
@@ -91,72 +116,22 @@ class PragmaticListener(Listener):
         Args:
             language: the language with |M| meanings and |E| expressions defining the size of R.
 
-            pragmatic_speaker: a communicative agent storing a matrix S representing the pragmatic conditional distribution over expressions given meanings.
+            speaker: a communicative agent storing a matrix S representing the  conditional distribution over expressions given meanings.
 
             prior: a diagonal matrix of size |M|-by-|M| representing the communicative need probabilities for meanings.
         """
         super().__init__(language)
-        self.R = np.zeros_like(pragmatic_speaker.S.T)
         # Row vector \propto column vector of pragmatic S
-        for i in range(len(self.R)):
-            col = pragmatic_speaker.S[:, i]
-            self.R[i] = col @ prior / np.sum(col @ prior)
+
+
+        # self.R = np.zeros_like(speaker.S.T)        
+        # for i in range(len(self.R)):
+        #     col = speaker.S[:, i]
+        #     self.R[i] = col @ prior / np.sum(col @ prior)
 
 ##############################################################################
 # Helper functions
 ##############################################################################
-
-
-def naive_matrix(agent: Communicative_Agent) -> np.ndarray:
-    """Create and return the matrix representing the conditional distribution relevant to the agent.
-
-    _Sender_
-        The distribution P(e | m) represents the probability that a sender (speaker) chooses expression e to communicate her intended meaning m. The row vector S_i represents the distribution over expressions for meaning i.
-
-    _Receiver_
-        The distribution P(m | e) represents the probability that a receiver (listener) guesses that the spekaer meant to communicate m using e. The row vector R_i represents the distribution over meanings for expression i.
-
-    Assume that for a particular meaning, every expression that can denote it is equiprobable.
-
-    Args:
-        language: an Language from which to define the distributions
-
-        agent: a string, either 'speaker' or 'listener'
-
-    Returns:
-        mat: the matrix representing the conditional distribution.
-    """
-    expressions = tuple(agent.language.expressions)
-    meanings = tuple(agent.language.universe.objects)
-
-    len_e = len(expressions)
-    len_m = len(meanings)
-
-    mat = np.zeros((len_m, len_e))
-    for i, m in enumerate(meanings):
-        for j, e in enumerate(expressions):
-            mat[i, j] = float(e.can_express(m))
-
-    # The sum of p(e | intended m) must be exactly 0 or 1
-    if isinstance(agent, LiteralSpeaker):
-        for i in range(len_m):
-            # Sometimes a language cannot express a particular meaning at all, resulting in a row sum of 0.
-            if mat[i].sum():
-                mat[i] = mat[i] / mat[i].sum()
-
-    # The sum of p(m | heard e) must be 1
-    elif isinstance(agent, LiteralListener):
-        mat = mat.T
-        for i in range(len_e):
-            # Every expression must have at least one meaning.
-            mat[i] = mat[i] / mat[i].sum()
-
-    else:
-        raise ValueError(
-            f"Communicative agent must be a LiteralSpeaker or LiteralListener in order to build a naive conditional probability matrix. Received type: {type(agent)}"
-        )
-
-    return mat
 
 
 def softmax_temp_log(arr: np.ndarray, temperature: float) -> np.ndarray:
@@ -177,3 +152,55 @@ def softmax_temp_log(arr: np.ndarray, temperature: float) -> np.ndarray:
     denominator = np.sum(np.exp(temperature * np.log(arr)))
     numerator = np.exp(temperature * np.log(arr))
     return numerator / denominator
+
+
+    # def literal_matrix(self) -> np.ndarray:
+    #     """Create and return the matrix representing the conditional distribution relevant to the agent.
+
+    #     _Sender_
+    #         The distribution P(e | m) represents the probability that a sender (speaker) chooses expression e to communicate her intended meaning m. The row vector S_i represents the distribution over expressions for meaning i.
+
+    #     _Receiver_
+    #         The distribution P(m | e) represents the probability that a receiver (listener) guesses that the spekaer meant to communicate m using e. The row vector R_i represents the distribution over meanings for expression i.
+
+    #     Assume that for a particular meaning, every expression that can denote it is equiprobable.
+
+    #     Args:
+    #         language: an Language from which to define the distributions
+
+    #         agent: a string, either 'speaker' or 'listener'
+
+    #     Returns:
+    #         mat: the matrix representing the conditional distribution.
+    #     """
+    #     expressions = tuple(self.language.expressions)
+    #     meanings = tuple(self.language.universe.objects)
+
+    #     len_e = len(expressions)
+    #     len_m = len(meanings)
+
+    #     mat = np.zeros((len_m, len_e))
+    #     for i, m in enumerate(meanings):
+    #         for j, e in enumerate(expressions):
+    #             mat[i, j] = float(e.can_express(m))
+
+    #     # The sum of p(e | intended m) must be exactly 0 or 1
+    #     if isinstance(self, LiteralSpeaker):
+    #         for i in range(len_m):
+    #             # Sometimes a language cannot express a particular meaning at all, resulting in a row sum of 0.
+    #             if mat[i].sum():
+    #                 mat[i] = mat[i] / mat[i].sum()
+
+    #     # The sum of p(m | heard e) must be 1
+    #     elif isinstance(self, LiteralListener):
+    #         mat = mat.T
+    #         for i in range(len_e):
+    #             # Every expression must have at least one meaning.
+    #             mat[i] = mat[i] / mat[i].sum()
+
+    #     else:
+    #         raise ValueError(
+    #             f"Communicative agent must be a LiteralSpeaker or LiteralListener in order to build a naive conditional probability matrix. Received type: {type(self)}"
+    #         )
+
+    #     return mat
