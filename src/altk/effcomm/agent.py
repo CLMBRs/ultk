@@ -53,7 +53,8 @@ class LiteralSpeaker(Speaker):
 
         # The sum of p(e | intended m) must be exactly 0 or 1.
         # We check for nans because sometimes a language cannot express a particular meaning at all, resulting in a row sum of 0.
-        self.S = np.nan_to_num(self.S/self.S.sum(axis=1)[:,None])
+        np.seterr(divide='ignore', invalid='ignore')
+        self.S = np.nan_to_num(self.S/self.S.sum(axis=1, keepdims=True))
 
 
 class LiteralListener(Listener):
@@ -64,7 +65,7 @@ class LiteralListener(Listener):
         self.R = self.language.get_matrix().T
 
         # The sum of p(m | heard e) must be 1. We can safely divide each row by its sum because every expression has at least one meaning.
-        self.R/self.R.sum(axis=1)[:,None]
+        self.R = self.R/self.R.sum(axis=1, keepdims=True)
 
 
 class PragmaticSpeaker(Speaker):
@@ -123,11 +124,10 @@ class PragmaticListener(Listener):
         super().__init__(language)
         # Row vector \propto column vector of pragmatic S
 
-
-        # self.R = np.zeros_like(speaker.S.T)        
-        # for i in range(len(self.R)):
-        #     col = speaker.S[:, i]
-        #     self.R[i] = col @ prior / np.sum(col @ prior)
+        self.R = np.zeros_like(speaker.S.T)
+        for i in range(len(self.R)):
+            col = speaker.S[:, i]
+            self.R[i] = col @ prior / np.sum(col @ prior)
 
 ##############################################################################
 # Helper functions
@@ -152,55 +152,3 @@ def softmax_temp_log(arr: np.ndarray, temperature: float) -> np.ndarray:
     denominator = np.sum(np.exp(temperature * np.log(arr)))
     numerator = np.exp(temperature * np.log(arr))
     return numerator / denominator
-
-
-    # def literal_matrix(self) -> np.ndarray:
-    #     """Create and return the matrix representing the conditional distribution relevant to the agent.
-
-    #     _Sender_
-    #         The distribution P(e | m) represents the probability that a sender (speaker) chooses expression e to communicate her intended meaning m. The row vector S_i represents the distribution over expressions for meaning i.
-
-    #     _Receiver_
-    #         The distribution P(m | e) represents the probability that a receiver (listener) guesses that the spekaer meant to communicate m using e. The row vector R_i represents the distribution over meanings for expression i.
-
-    #     Assume that for a particular meaning, every expression that can denote it is equiprobable.
-
-    #     Args:
-    #         language: an Language from which to define the distributions
-
-    #         agent: a string, either 'speaker' or 'listener'
-
-    #     Returns:
-    #         mat: the matrix representing the conditional distribution.
-    #     """
-    #     expressions = tuple(self.language.expressions)
-    #     meanings = tuple(self.language.universe.objects)
-
-    #     len_e = len(expressions)
-    #     len_m = len(meanings)
-
-    #     mat = np.zeros((len_m, len_e))
-    #     for i, m in enumerate(meanings):
-    #         for j, e in enumerate(expressions):
-    #             mat[i, j] = float(e.can_express(m))
-
-    #     # The sum of p(e | intended m) must be exactly 0 or 1
-    #     if isinstance(self, LiteralSpeaker):
-    #         for i in range(len_m):
-    #             # Sometimes a language cannot express a particular meaning at all, resulting in a row sum of 0.
-    #             if mat[i].sum():
-    #                 mat[i] = mat[i] / mat[i].sum()
-
-    #     # The sum of p(m | heard e) must be 1
-    #     elif isinstance(self, LiteralListener):
-    #         mat = mat.T
-    #         for i in range(len_e):
-    #             # Every expression must have at least one meaning.
-    #             mat[i] = mat[i] / mat[i].sum()
-
-    #     else:
-    #         raise ValueError(
-    #             f"Communicative agent must be a LiteralSpeaker or LiteralListener in order to build a naive conditional probability matrix. Received type: {type(self)}"
-    #         )
-
-    #     return mat
