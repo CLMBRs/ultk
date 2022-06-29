@@ -72,7 +72,7 @@ class Language:
 
     def pop(self, index: int) -> Expression:
         """Removes an expression at the specified index of the list of expressions, and returns it."""
-        if not self.size():
+        if not len(self):
             raise Exception("Cannot pop expressions from an empty language.")
         expressions = self.expressions
         popped = expressions.pop(index)
@@ -85,7 +85,7 @@ class Language:
 
     def degree_property(self, property: Callable[[Expression], bool]) -> float:
         """Count what percentage of expressions in a language have a given property."""
-        return sum([property(item) for item in self.expressions]) / self.len(self)
+        return sum([property(item) for item in self.expressions]) / len(self)
 
     def get_matrix(self) -> np.ndarray:
         """Get a binary matrix of shape `(num_meanings, num_expressions)`
