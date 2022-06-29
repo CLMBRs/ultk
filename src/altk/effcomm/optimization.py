@@ -92,7 +92,7 @@ class Evolutionary_Optimizer:
         self.dominating_languages = None
         self.explored_languages = None
 
-    def fit(self, seed_population: list[Language]) -> tuple[list[Language]]:
+    def fit(self, seed_population: list[Language], explore: float = 0.0) -> tuple[list[Language]]:
         """Computes the Pareto frontier, a set languages which cannot be both more simple and more informative.
 
         Uses pygmo's nondominated_front method for computing a population's best solutions to a multi-objective optimization problem.
@@ -104,6 +104,8 @@ class Evolutionary_Optimizer:
             - dominating_languages:     a list of the Pareto optimal languages
 
             - explored_languages:       a list of all the languages explored during the evolutionatry algorithm.
+
+            - explore: a float in [0,1] representing how much to optimize for fitness (optimality wrt pareto front of complexity and comm_cost), and how much to randomly explore.
         """
         pool = ProcessPool(nodes=self.processes)  # TODO: remove until you need it
 
@@ -120,10 +122,14 @@ class Evolutionary_Optimizer:
 
             # Calculate dominating individuals
             dominating_languages = pareto_optimal_languages(languages, self.x, self.y)
+            total_fit = len(dominating_languages)
+            num_explore = int(explore * total_fit)
+            parent_languages = random.shuffle(range(total_fit))[:total_fit - num_explore] + random.sample(explored_languages, num_explore)
+            
 
             # Mutate dominating individuals
             languages = self.sample_mutated(
-                dominating_languages, self.sample_size, self.expressions
+                parent_languages, self.sample_size, self.expressions
             )
 
         return (dominating_languages, explored_languages)

@@ -132,13 +132,13 @@ def sample_lang_size(
     """Get a sample of languages each of exactly lang_size.
 
     Args:
-        language_class:
+        language_class: a subclass of altk.Language
 
-        expressions:
+        expressions: a list of Expressions to sample from
 
-        lang_size:
+        lang_size: the maximum language size to sample
 
-        sample_size:
+        sample_size: the number of total languages to return
     """
     return sample_quasi_natural(
         language_class=language_class,
