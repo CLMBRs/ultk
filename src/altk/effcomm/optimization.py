@@ -122,10 +122,7 @@ class Evolutionary_Optimizer:
 
             # Calculate dominating individuals
             dominating_languages = pareto_optimal_languages(languages, self.x, self.y)
-            total_fit = len(dominating_languages)
-            num_explore = int(explore * total_fit)
-            parent_languages = random.shuffle(range(total_fit))[:total_fit - num_explore] + random.sample(explored_languages, num_explore)
-            
+            parent_languages = sample_parents(dominating_languages, explored_languages, explore)
 
             # Mutate dominating individuals
             languages = self.sample_mutated(
@@ -180,3 +177,18 @@ class Evolutionary_Optimizer:
         ]
         mutation = random.choice(possible_mutations)
         return mutation.mutate(language, expressions)
+
+
+def sample_parents(dominating_languages: list[Language], explored_languages: list[Language], explore: float) -> list[Language]:
+    """Use the explore parameter to explore possibly suboptimal areas of the language space."""
+    total_fit = len(dominating_languages)
+    num_explore = int(explore * total_fit)
+
+    fit_indices = list(range(total_fit))
+    random.shuffle(fit_indices)
+    fit_indices = fit_indices[:total_fit - num_explore]
+    
+    parent_languages = [dominating_languages[i] for i in fit_indices] + random.sample(explored_languages, num_explore)
+
+    return parent_languages
+    
