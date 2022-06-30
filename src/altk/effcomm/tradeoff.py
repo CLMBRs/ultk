@@ -14,14 +14,6 @@ from scipy.spatial.distance import cdist
 # Helper measurement functions
 ##############################################################################
 
-def batch_measure(languages: list[Language], measures: dict[str, Callable]) -> list[Language]:
-    """Measure properties of many languages at once, and modify their internal data."""
-    for lang in languages:
-        for m in measures:
-            lang.measurements[m] = measures[m](lang)
-    return languages
-
-
 def pareto_optimal_languages(
     languages: list[Language], 
     x: str = "comm_cost",
