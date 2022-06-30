@@ -94,7 +94,7 @@ class PragmaticSpeaker(Speaker):
         super().__init__(language)
 
         # Row vector \propto column vector of literal R
-        self.S = softmax(np.log(listener.R.T) * temperature, axis=1)
+        self.S = softmax(np.nan_to_num(np.log(listener.R.T)) * temperature, axis=1)
 
         # self.S = np.zeros_like(listener.R.T)
         # for i in range(len(self.S)):
