@@ -109,17 +109,14 @@ class Evolutionary_Optimizer:
                 "explored_languages": list of all the languages explored during the evolutionary algorithm.
             }
         """
-        pool = ProcessPool(nodes=self.processes)  # TODO: remove until you need it
-
         languages = seed_population
         explored_languages = []
 
         for gen in tqdm(range(self.generations)):
             # Measure each generation
-            # complexity = pool.map(batch_complexity, languages) # for some reason pool hates me
-            # comm_cost = pool.map(batch_comm_cost, languages)
-            
-            pool.map(measure_language, languages)
+            for lang in languages:
+                for m in self.objectives:
+                    lang.measurements[m] = self.objectives[m](lang)
 
             explored_languages.extend(copy.deepcopy(languages))
 
@@ -197,8 +194,3 @@ def sample_parents(dominating_languages: list[Language], explored_languages: lis
     parent_languages = [dominating_languages[i] for i in fit_indices] + random.sample(explored_languages, num_explore)
 
     return parent_languages
-    
-def measure_language(language: Language, objectives: dict[str, Callable]) -> Language:
-    """Simple helper function to update language measurements dict."""
-    for m in objectives:
-        language.measurements[m] = objectives[m](language)
