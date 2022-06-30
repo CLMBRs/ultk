@@ -111,21 +111,16 @@ def tradeoff(
     x: str = "comm_cost",
     y: str = "complexity",    
 ) -> dict[str, list[Language]]:
-    """Builds a final efficient communication analysis of languages.
+    """Builds a final efficient communication analysis by measuring a list of languages, updating their internal data, and returning the results.
 
-    A set of languages, measures of informativity (comm_cost) and simplicity (complexity) fully define the efficient communication results, which is the relative (near) Pareto optimality of each language. 
-    
-    This function also measures other properties of each language, e.g. degrees of natualness, or a categorical analogue of naturalness, as e.g. satisfaction with a semantic universal.
-
-    This function does the following:
-    Measure a list of languages, update their internal data, and return a pair of (all languages, dominant_languages).
+    This function measures possibly many graded or categorical properties of each language, but minimally the properties of commmunicative cost and complexity. These two measures fully define the results of an efficiency analysis, in the sense they define the optimal solutions. 
 
     Args:
         languages: A list representing the pool of all languages to be measured for an efficient communication analysis.
 
-        x: the first pressure to measure, e.g. complexity.
+        x: the first pressure to measure, e.g. communicative cost.
 
-        y: the second pressure to measure, e.g. informativity.
+        y: the second pressure to measure, e.g. cognitive complexity.
 
     Returns:
         a dictionary of the population and the pareto front, e.g.
@@ -151,6 +146,8 @@ def tradeoff(
     print("Setting optimality ...")
     for i, lang in enumerate(tqdm(languages)):
         # warning: yaml that saves lang must use float, not numpy.float64 !
-        # lang.optimality = 1 - float(min_distances[i])
         lang.measurements["optimality"] = 1 - float(min_distances[i])
-    return languages, dominating_languages
+    return {
+        "languages": languages, 
+        "dominating_languages": dominating_languages,
+    }

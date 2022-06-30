@@ -92,20 +92,22 @@ class Evolutionary_Optimizer:
         self.dominating_languages = None
         self.explored_languages = None
 
-    def fit(self, seed_population: list[Language], explore: float = 0.0) -> tuple[list[Language]]:
+    def fit(self, seed_population: list[Language], explore: float = 0.0) -> dict[str, list[Language]]:
         """Computes the Pareto frontier, a set languages which cannot be both more simple and more informative.
 
         Uses pygmo's nondominated_front method for computing a population's best solutions to a multi-objective optimization problem.
 
         Args:
-            - seed_population:      a list of languages representing the population at generation 0 of the algorithm.
+            seed_population: a list of languages representing the population at generation 0 of the algorithm.
+
+            explore: a float in [0,1] representing how much to optimize for fitness (optimality wrt pareto front of complexity and comm_cost), and how much to randomly explore.
 
         Returns:
-            - dominating_languages:     a list of the Pareto optimal languages
-
-            - explored_languages:       a list of all the languages explored during the evolutionatry algorithm.
-
-            - explore: a float in [0,1] representing how much to optimize for fitness (optimality wrt pareto front of complexity and comm_cost), and how much to randomly explore.
+            a dict of the estimated optimization solutions, as well as points explored along the way; of the form
+            {
+                "dominating_languages": list of languages as estimated solutions,
+                "explored_languages": list of all the languages explored during the evolutionary algorithm.
+            }
         """
         pool = ProcessPool(nodes=self.processes)  # TODO: remove until you need it
 
@@ -117,7 +119,8 @@ class Evolutionary_Optimizer:
             # complexity = pool.map(batch_complexity, languages) # for some reason pool hates me
             # comm_cost = pool.map(batch_comm_cost, languages)
             
-            languages = batch_measure(languages, self.objectives)
+            pool.map(measure_language, languages)
+
             explored_languages.extend(copy.deepcopy(languages))
 
             # Calculate dominating individuals
@@ -129,7 +132,10 @@ class Evolutionary_Optimizer:
                 parent_languages, self.sample_size, self.expressions
             )
 
-        return (dominating_languages, explored_languages)
+        return {
+            "dominating_languages": dominating_languages,
+            "explored_languages": explored_languages,
+        }
 
     def sample_mutated(
         self, languages: list[Language], amount: int, expressions: list[Expression]
@@ -192,3 +198,7 @@ def sample_parents(dominating_languages: list[Language], explored_languages: lis
 
     return parent_languages
     
+def measure_language(language: Language, objectives: dict[str, Callable]) -> Language:
+    """Simple helper function to update language measurements dict."""
+    for m in objectives:
+        language.measurements[m] = objectives[m](language)
