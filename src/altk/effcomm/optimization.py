@@ -161,9 +161,9 @@ class EvolutionaryOptimizer:
     ) -> dict[str, Any]:
         """
         Arguments:
-            languages:   dominating languages of a generation
+            languages: dominating languages of a generation
 
-            amount:      sample_size.
+            amount: sample_size.
 
             expressions: the list of expressions
 
@@ -245,7 +245,13 @@ def sample_parents(
     """Use the explore parameter to explore possibly suboptimal areas of the language space.
     
     Args: 
+        dominating_languages: a list of the languages with current best fitness with respect to the objectives.
 
+        explored_languages: a list of all languages encountered during the evolutionary algorithm.
+
+        id_start: the number of languages generated in the experiment so far.
+
+        explore: a float in `[0,1]` specifying how much to explore possibly suboptimal languages. If set to 0, `parent_languages` is just `dominating_languages`.
 
     Returns:
         a dict of the languages to serve as the next generation (after possible mutations) and updated id_start, e.g.
@@ -261,7 +267,6 @@ def sample_parents(
     random.shuffle(fit_indices)
     fit_indices = fit_indices[:total_fit - num_explore]
     
-    # parent_languages = [dominating_languages[i] for i in fit_indices] + random.sample(explored_languages, num_explore)
     parent_languages = []
     for i in fit_indices:
         id_start += 1
