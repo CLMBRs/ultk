@@ -115,7 +115,7 @@ class Language:
 
     @abstractmethod
     def __hash__(self) -> int:
-        return hash(tuple(self.expressions))
+        return hash(tuple(sorted(self.expressions)))
 
     def __eq__(self, __o: object) -> bool:
         return self.expressions == __o.expressions

@@ -6,8 +6,10 @@ import random
 import math
 from typing import Callable
 from tqdm import tqdm
+from typing import Any
 from pathos.multiprocessing import ProcessPool
-from altk.effcomm.tradeoff import batch_measure, pareto_optimal_languages
+from altk.effcomm.sampling import rename_id
+from altk.effcomm.tradeoff import pareto_optimal_languages
 from altk.language.language import Expression, Language
 
 ##############################################################################
@@ -57,25 +59,25 @@ class Evolutionary_Optimizer:
         The measures of complexity and informativity, the expressions, and the mutations are all specific to the particular semantic domain.
 
         Args:
-            - objectives: a dict of the two objectives to optimize for, e.g. simplicity and informativeness, of the form, e.g.
+            objectives: a dict of the two objectives to optimize for, e.g. simplicity and informativeness, of the form, e.g.
                 {
                     "complexity": comp_measure,
                     "comm_cost": lambda l: 1 - inf_measure(l)
                 }
 
-            - expressions:    a list of expressions from which to apply mutations to languages.
+            expressions:    a list of expressions from which to apply mutations to languages.
 
-            - mutations: a list of Mutation objects
+            mutations: a list of Mutation objects
 
-            - sample_size:  the size of the population at every generation.
+            sample_size:  the size of the population at every generation.
 
-            - max_muatations:   between 1 and this number of mutations will be applied to a subset of the population at the end of each generation.
+            max_muatations:   between 1 and this number of mutations will be applied to a subset of the population at the end of each generation.
 
-            - generations:  how many iterations to run the evolutionary algorithm for.
+            generations:  how many iterations to run the evolutionary algorithm for.
 
-            - lang_size:    between 1 and this number of expressions comprise a language.
+            lang_size:    between 1 and this number of expressions comprise a language.
 
-            - proceses:     for multiprocessing.ProcessPool, e.g. 6.
+            proceses:     for multiprocessing.ProcessPool, e.g. 6.
         """
         self.objectives = objectives
         self.x = x
@@ -92,7 +94,12 @@ class Evolutionary_Optimizer:
         self.dominating_languages = None
         self.explored_languages = None
 
-    def fit(self, seed_population: list[Language], explore: float = 0.0) -> dict[str, list[Language]]:
+    def fit(
+        self, 
+        seed_population: list[Language], 
+        id_start: int, 
+        explore: float = 0.0
+        ) -> dict[str, Any]:
         """Computes the Pareto frontier, a set languages which cannot be both more simple and more informative.
 
         Uses pygmo's nondominated_front method for computing a population's best solutions to a multi-objective optimization problem.
@@ -100,19 +107,22 @@ class Evolutionary_Optimizer:
         Args:
             seed_population: a list of languages representing the population at generation 0 of the algorithm.
 
+            id_start: the number of languages generated in the experiment so far.
+
             explore: a float in [0,1] representing how much to optimize for fitness (optimality wrt pareto front of complexity and comm_cost), and how much to randomly explore.
 
         Returns:
             a dict of the estimated optimization solutions, as well as points explored along the way; of the form
             {
                 "dominating_languages": list of languages as estimated solutions,
-                "explored_languages": list of all the languages explored during the evolutionary algorithm.
+                "explored_languages": list of all the languages explored during the evolutionary algorithm,
+                "id_start": updated number of languages generated in the experiment.
             }
         """
         languages = seed_population
         explored_languages = []
 
-        for gen in tqdm(range(self.generations)):
+        for _ in tqdm(range(self.generations)):
             # Measure each generation
             for lang in languages:
                 for m in self.objectives:
@@ -122,28 +132,50 @@ class Evolutionary_Optimizer:
 
             # Calculate dominating individuals
             dominating_languages = pareto_optimal_languages(languages, self.x, self.y)
-            parent_languages = sample_parents(dominating_languages, explored_languages, explore)
+            parent_result = sample_parents(
+                dominating_languages, explored_languages, id_start, explore)
+            parent_languages = parent_result["languages"]
+            id_start = parent_result["id_start"]
 
             # Mutate dominating individuals
-            languages = self.sample_mutated(
-                parent_languages, self.sample_size, self.expressions
+            mutated_result = self.sample_mutated(
+                parent_languages, 
+                self.sample_size, 
+                self.expressions, 
+                id_start,
             )
+            languages = mutated_result["languages"]
+            id_start = mutated_result["id_start"]
 
         return {
             "dominating_languages": dominating_languages,
             "explored_languages": explored_languages,
+            "id_start": id_start,
         }
 
     def sample_mutated(
-        self, languages: list[Language], amount: int, expressions: list[Expression]
-    ) -> list[Language]:
+        self, languages: list[Language], 
+        amount: int, 
+        expressions: list[Expression],
+        id_start: int,
+    ) -> dict[str, Any]:
         """
         Arguments:
-            - languages:   dominating languages of a generation
-            - amount:      sample_size.
+            languages:   dominating languages of a generation
+
+            amount:      sample_size.
+
             expressions: the list of expressions
+
+            id_start: the number of languages generatd in the experiment so far.
+
         Returns:
-            - mutated_languages: a new population of languages of size=sample_size
+            a dict of the new population of languages of size=sample_size, and the updated id_start, e.g.
+            {
+                "languages": (a list)
+                "id_start": (an int)
+            }
+
         """
         amount -= len(languages)
         amount_per_lang = int(math.floor(amount / len(languages)))
@@ -154,19 +186,30 @@ class Evolutionary_Optimizer:
         for language in languages:
             for i in range(amount_per_lang):
                 num_mutations = random.randint(1, self.max_mutations)
+
                 mutated_language = copy.deepcopy(language)
+                id_start += 1
+                mutated_language.name = rename_id(mutated_language.name, id_start)
+
                 for j in range(num_mutations):
                     mutated_language = self.mutate(mutated_language, expressions)
                 mutated_languages.append(mutated_language)
 
         # Ensure the number of languages per generation is constant
-        for i in range(amount_random):
-            language = random.choice(languages)
+
+        for _ in range(amount_random):
+            language = copy.deepcopy(random.choice(languages))
+            id_start += 1
+            language.name = rename_id(language.name, id_start)
+
             mutated_languages.append(self.mutate(language, expressions))
 
         mutated_languages.extend(languages)
 
-        return mutated_languages
+        return {
+            "languages": mutated_languages,
+            "id_start": id_start,
+        }
 
     def mutate(self, language: Language, expressions: list[Expression]) -> Language:
         """Choose a mutation at random to apply to a language."""
@@ -182,8 +225,24 @@ class Evolutionary_Optimizer:
         return mutation.mutate(language, expressions)
 
 
-def sample_parents(dominating_languages: list[Language], explored_languages: list[Language], explore: float) -> list[Language]:
-    """Use the explore parameter to explore possibly suboptimal areas of the language space."""
+def sample_parents(
+    dominating_languages: list[Language], 
+    explored_languages: list[Language], 
+    id_start: int,
+    explore: float
+    ) -> dict[str, Any]:
+    """Use the explore parameter to explore possibly suboptimal areas of the language space.
+    
+    Args: 
+
+
+    Returns:
+        a dict of the languages to serve as the next generation (after possible mutations) and updated id_start, e.g.
+        {
+            "languages": (a list),
+            "id_start": (an int),
+        }
+    """
     total_fit = len(dominating_languages)
     num_explore = int(explore * total_fit)
 
@@ -191,6 +250,22 @@ def sample_parents(dominating_languages: list[Language], explored_languages: lis
     random.shuffle(fit_indices)
     fit_indices = fit_indices[:total_fit - num_explore]
     
-    parent_languages = [dominating_languages[i] for i in fit_indices] + random.sample(explored_languages, num_explore)
+    # parent_languages = [dominating_languages[i] for i in fit_indices] + random.sample(explored_languages, num_explore)
+    parent_languages = []
+    for i in fit_indices:
+        id_start += 1
+        lang = dominating_languages[i]
+        lang.name = rename_id(lang.name, id_start)
+        parent_languages.append(lang)
 
-    return parent_languages
+    langs_to_explore = random.sample(explored_languages, num_explore)
+    for i in range(num_explore):
+        id_start +=1
+        lang = langs_to_explore[i]
+        lang.name = rename_id(lang.name, id_start)
+        parent_languages.append(lang)
+
+    return {
+        "languages": parent_languages,
+        "id_start": id_start,
+    }
