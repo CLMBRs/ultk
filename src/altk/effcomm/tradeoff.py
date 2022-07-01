@@ -4,7 +4,7 @@ import numpy as np
 
 from altk.language.language import Language
 from pygmo import non_dominated_front_2d
-from typing import Callable
+from typing import Callable, Any
 from tqdm import tqdm
 
 from scipy import interpolate
@@ -14,12 +14,13 @@ from scipy.spatial.distance import cdist
 # Helper measurement functions
 ##############################################################################
 
+
 def pareto_optimal_languages(
-    languages: list[Language], 
+    languages: list[Language],
     x: str = "comm_cost",
-    y: str = "complexity", 
+    y: str = "complexity",
     unique: bool = False,
-    ) -> list[Language]:
+) -> list[Language]:
     """Use pygmo.non_dominated_front_2d to compute the Pareto languages."""
     dominating_indices = non_dominated_front_2d(
         list(
@@ -33,8 +34,19 @@ def pareto_optimal_languages(
     return list(set(dominating_languages)) if unique else dominating_languages
 
 
-def pareto_min_distances(points: list[tuple], pareto_points: list[tuple]):
-    """Measure the Pareto optimality of each language by measuring its Euclidean closeness to the frontier."""
+def pareto_min_distances(points: list[tuple], pareto_points: list[tuple]) -> np.ndarray:
+    """Measure the Pareto optimality of each language by measuring its Euclidean closeness to the frontier. The frontier is a line (list of points) interpolated from the pareto points.
+
+    Args:
+
+        points: the list of all language (x, y) pairs, where x and y are usually communicative cost and complexity.
+
+        pareto_points: the list of all dominant language (x, y) pairs to constitute the Pareto frontier. The points should have been measured by pygmo's non_dominated_front_2d function.
+
+    Returns:
+
+        min_distances: a 1D np.ndarray of Euclidean distances for each language to the closest point on the Pareto frontier.
+    """
     print("Measuring min distance to frontier ...")
 
     # Scale complexity
@@ -59,7 +71,9 @@ def pareto_min_distances(points: list[tuple], pareto_points: list[tuple]):
     return min_distances
 
 
-def interpolate_data(points: list, min_cost: float=0.0, max_cost: float=1.0, num=5000) -> np.ndarray:
+def interpolate_data(
+    points: list, min_cost: float = 0.0, max_cost: float = 1.0, num=5000
+) -> np.ndarray:
     """Interpolate the points yielded by the pareto optimal languages into a continuous (though not necessarily smooth) curve.
 
     Args:
@@ -86,10 +100,14 @@ def interpolate_data(points: list, min_cost: float=0.0, max_cost: float=1.0, num
 
     pareto_costs = list(set(np.linspace(min_cost, max_cost, num=num).tolist()))
     pareto_complexities = interpolated(pareto_costs)
-    interpolated_points = np.array(list(zip(
-        pareto_costs, 
-        pareto_complexities,
-        )))
+    interpolated_points = np.array(
+        list(
+            zip(
+                pareto_costs,
+                pareto_complexities,
+            )
+        )
+    )
     return interpolated_points
 
 
@@ -97,15 +115,16 @@ def interpolate_data(points: list, min_cost: float=0.0, max_cost: float=1.0, num
 # Main tradeoff function
 ##############################################################################
 
+
 def tradeoff(
     languages: list[Language],
-    properties: dict[str, Callable],    
+    properties: dict[str, Callable[[Language], Any]],
     x: str = "comm_cost",
-    y: str = "complexity",    
+    y: str = "complexity",
 ) -> dict[str, list[Language]]:
     """Builds a final efficient communication analysis by measuring a list of languages, updating their internal data, and returning the results.
 
-    This function measures possibly many graded or categorical properties of each language, but minimally the properties of commmunicative cost and complexity. These two measures fully define the results of an efficiency analysis, in the sense they define the optimal solutions. 
+    This function measures possibly many graded or categorical properties of each language, but minimally the properties of commmunicative cost and complexity. These two measures fully define the results of an efficiency analysis, in the sense they define the optimal solutions.
 
     Args:
         languages: A list representing the pool of all languages to be measured for an efficient communication analysis.
@@ -128,11 +147,8 @@ def tradeoff(
             lang.data[prop] = properties[prop](lang)
         points.append((lang.data[x], lang.data[y]))
 
-    dominating_languages = pareto_optimal_languages(
-        languages, x, y, unique=True)
-    dominant_points = [
-        (lang.data[x], lang.data[y]) for lang in dominating_languages
-    ]
+    dominating_languages = pareto_optimal_languages(languages, x, y, unique=True)
+    dominant_points = [(lang.data[x], lang.data[y]) for lang in dominating_languages]
 
     min_distances = pareto_min_distances(points, dominant_points)
     print("Setting optimality ...")
@@ -140,6 +156,6 @@ def tradeoff(
         # warning: yaml that saves lang must use float, not numpy.float64 !
         lang.data["optimality"] = 1 - float(min_distances[i])
     return {
-        "languages": languages, 
+        "languages": languages,
         "dominating_languages": dominating_languages,
     }
