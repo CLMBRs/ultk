@@ -126,7 +126,7 @@ class Evolutionary_Optimizer:
             # Measure each generation
             for lang in languages:
                 for m in self.objectives:
-                    lang.measurements[m] = self.objectives[m](lang)
+                    lang.data[m] = self.objectives[m](lang)
 
             explored_languages.extend(copy.deepcopy(languages))
 
