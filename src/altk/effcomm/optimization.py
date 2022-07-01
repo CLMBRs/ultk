@@ -189,7 +189,7 @@ class Evolutionary_Optimizer:
 
                 mutated_language = copy.deepcopy(language)
                 id_start += 1
-                mutated_language.name = rename_id(mutated_language.name, id_start)
+                mutated_language.data["name"] = rename_id(mutated_language.data["name"], id_start)
 
                 for j in range(num_mutations):
                     mutated_language = self.mutate(mutated_language, expressions)
@@ -200,7 +200,7 @@ class Evolutionary_Optimizer:
         for _ in range(amount_random):
             language = copy.deepcopy(random.choice(languages))
             id_start += 1
-            language.name = rename_id(language.name, id_start)
+            language.data["name"] = rename_id(language.data["name"], id_start)
 
             mutated_languages.append(self.mutate(language, expressions))
 
@@ -256,14 +256,14 @@ def sample_parents(
     for i in fit_indices:
         id_start += 1
         lang = dominating_languages[i]
-        lang.name = rename_id(lang.name, id_start)
+        lang.data["name"] = rename_id(lang.data["name"], id_start)
         parent_languages.append(lang)
 
     langs_to_explore = random.sample(explored_languages, num_explore)
     for i in range(num_explore):
         id_start +=1
         lang = langs_to_explore[i]
-        lang.name = rename_id(lang.name, id_start)
+        lang.data["name"] = rename_id(lang.data["name"], id_start)
         parent_languages.append(lang)
 
     return {
