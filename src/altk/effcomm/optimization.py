@@ -16,7 +16,7 @@ from altk.language.language import Expression, Language
 # Mutation
 ##############################################################################
 
-"""Minimal API for defining mutations used by an Evolutionary_Optimizer."""
+"""Minimal API for defining mutations used by an EvolutionaryOptimizer."""
 
 
 class Mutation:
@@ -38,7 +38,7 @@ class Mutation:
 ##############################################################################
 
 
-class Evolutionary_Optimizer:
+class EvolutionaryOptimizer:
     """Class for approximating the Pareto frontier of languages optimizing the simplicity/informativity trade-off."""
 
     def __init__(
@@ -212,7 +212,17 @@ class Evolutionary_Optimizer:
         }
 
     def mutate(self, language: Language, expressions: list[Expression]) -> Language:
-        """Choose a mutation at random to apply to a language."""
+        """Randomly selects a mutation that is allowed to apply and applies it to a language.
+        
+        Args: 
+            language: the Language to mutate
+
+            expressions: the list of all possible expressions. Some mutations need access to this list, so it is part of the mutation api.
+
+        Returns: 
+            the mutated Language
+
+        """
         possible_mutations = [
             mutation
             for mutation in self.mutations
