@@ -4,19 +4,16 @@
 
     In efficient communication analyses, simplicity and informativeness are typically properties of semantic aspects of a language. E.g., a meaning is simple if it is easy to represent, or to compress into some code; a meaning is informative if it is easy for a listener to recover a speaker's intended literal meaning.
 
-    Typical usage example:
+    Examples:
 
-        from altk.language.syntax import Form
-        from altk.language.language import Expression, Language
-        form = Form('blue')
-        meaning = Color_Meaning() # some default meaning
-        expression = Expression(form, meaning)
-        lang = Language([expression])
+        >>> from altk.language.syntax import Form
+        >>> from altk.language.language import Expression, Language
+        >>> form = Form('blue')
+        >>> meaning = Color_Meaning() # some default meaning
+        >>> expression = Expression(form, meaning)
+        >>> lang = Language([expression])
 
 """
-
-from abc import abstractmethod
-
 
 class Universe:
 
@@ -53,11 +50,3 @@ class Meaning:
         precise_meaning = Meaning({1}) # picks out one object
         vague_meaning = Meaning({1,6}) # can pick out more than one object
     """
-
-    @abstractmethod
-    def __str__(self) -> str:
-        raise NotImplementedError
-
-    @abstractmethod
-    def __eq__(self, __o: object) -> bool:
-        raise NotImplementedError

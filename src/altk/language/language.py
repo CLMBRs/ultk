@@ -44,6 +44,11 @@ class Language:
     """Minimally contains Expression objects."""
 
     def __init__(self, expressions: list[Expression], **kwargs):
+
+        # Check that all expressions have the same universe
+        if len(set([e.meaning.universe for e in expressions])) != 1:
+            raise ValueError(f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}")
+
         self.expressions = expressions
         self.universe = expressions[0].meaning.universe
 
@@ -59,10 +64,6 @@ class Language:
         if not val:
             raise ValueError("list of Expressions must not be empty.")
         self._expressions = val
-
-    def has_expression(self, expression: Expression) -> bool:
-        """Whether the language has the expression"""
-        return expression in self.expressions
 
     def add_expression(self, e: Expression):
         """Add an expression to the list of expressions in a language."""
@@ -103,13 +104,9 @@ class Language:
     def universe(self, val) -> None:
         self._universe = val
 
-    @abstractmethod
-    def __str__(self) -> str:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def __eq__(self, __o: object) -> bool:
-        raise NotImplementedError()
+    def __contains__(self, expression) -> bool:
+        """Whether the language has the expression"""
+        return expression in self.expressions        
 
     @abstractmethod
     def __hash__(self) -> int:

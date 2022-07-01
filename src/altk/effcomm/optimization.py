@@ -43,7 +43,7 @@ class EvolutionaryOptimizer:
 
     def __init__(
         self,
-        objectives: dict[str, Callable],
+        objectives: dict[str, Callable[[Language], Any]],
         expressions: list[Expression],
         mutations: list[Mutation],
         sample_size: int,

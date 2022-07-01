@@ -11,18 +11,20 @@ from tqdm import tqdm
 
 
 def generate_languages(
-    language_class: Type,
+    language_class: Type[Language],
     expressions: list[Expression],
     lang_size: int,
     sample_size: int,
-    criterion: Callable = lambda *_: True,
+    criterion: Callable[[Expression], bool] = lambda *_: True,
     fixed_wordcount=False,
     dummy_name="sampled_lang_",
     id_start: int = 0,
     exact_sample=False,
     verbose=False,
 ) -> dict[str, Any]:
-    """Generate languages by randomly sampling bags of expressions.
+    """Generate languages by randomly sampling vocabularies as bags of expressions. 
+    
+    A predicate (binary-valued property) of expressions may be supplied, which can be used to adjust the composition of vocabularies (e.g., by the percent of expressions satisfying the predicate).
 
     If sample size <= nCr, then take a random sample_size set of combinations. Otherwise, to prevent repeat languages, treat nCr as the sample size.
 
@@ -54,6 +56,21 @@ def generate_languages(
             "id_start": (an int),
         }
 
+    Examples:
+
+        >>> # Turn the knob on a universal property for modals
+        >>> expressions = load_expressions(expressions_file)
+        >>> universal_property = iff
+        >>> result = generate_languages(
+        ...    ModalLanguage,        
+        ...    expressions,
+        ...    lang_size,
+        ...    sample_size,
+        ...    universal_property,
+        ...)
+        >>> languages = result["languages"]
+        >>> id_start = result["id_start"]
+
     """
     # split the expressions
     natural_terms = []
@@ -76,16 +93,16 @@ def generate_languages(
                 print(
                     f"Enumerating {word_amt_sample_size} languages of size {word_amount}"
                 )
-            result = extend_languages_by_enumeration(
+            result = enumerate_all_languages(
                 language_class,
-                languages,
                 id_start,
                 expressions,
                 expressions_indices,
                 word_amount,
                 dummy_name=dummy_name,
             )
-            languages = result["languages"]
+            enumerated_langs = result["languages"]
+            languages.union(enumerated_langs)
             id_start = result["id_start"]
 
         # Otherwise, take random sample
@@ -148,10 +165,10 @@ def generate_languages(
 
 
 def sample_lang_size(
-    language_class: Type,
+    language_class: Type[Language],
     expressions: list[Expression],
-    lang_size,
-    sample_size,
+    lang_size: int,
+    sample_size: int,
     verbose=False,
     dummy_name="sampled_lang_id",
 ) -> list[Language]:
@@ -162,9 +179,9 @@ def sample_lang_size(
 
         expressions: a list of Expressions to sample from
 
-        lang_size: the maximum language size to sample
+        lang_size: int representing the maximum language size to sample
 
-        sample_size: the number of total languages to return
+        sample_size: int representing the number of total languages to return
     """
     return sample_quasi_natural(
         language_class=language_class,
@@ -178,7 +195,7 @@ def sample_lang_size(
 
 
 def sample_quasi_natural(
-    language_class: Type,
+    language_class: Type[Language],
     natural_terms: list[Expression],
     unnatural_terms: list[Expression],
     lang_size: int,
@@ -212,7 +229,7 @@ def sample_quasi_natural(
     unnatural_indices = list(range(len(unnatural_terms)))
 
     # by default, expresions:= natural_terms
-    degrees = [1 for _ in range(lang_size + 1)]
+    degrees = [1] * (lang_size + 1)
     if unnatural_terms:
         degrees = list(range(lang_size + 1))
     degree_sample_size = int(np.ceil(sample_size / len(degrees)))
@@ -237,9 +254,8 @@ def sample_quasi_natural(
                 print(
                     f"Enumerating {possible_langs} for degree {num_natural/lang_size}"
                 )
-            result = extend_languages_by_enumeration(
+            result = enumerate_all_languages(
                 language_class,
-                languages,
                 id_start,
                 natural_terms,
                 natural_indices,
@@ -248,7 +264,8 @@ def sample_quasi_natural(
                 unnatural_indices,
                 num_unnatural,
             )
-            languages = result["languages"]
+            enumerated_langs = result["languages"]
+            languages.union(enumerated_langs)
             id_start = result["id_start"]
 
         # Otherwise, take a random sample
@@ -290,9 +307,8 @@ def rename_id(name: str, id: int) -> str:
     return "".join([c for c in name if not c.isdigit()] + [str(id)])
 
 
-def extend_languages_by_enumeration(
-    language_class: Type,
-    languages: set[Language],
+def enumerate_all_languages(
+    language_class: Type[Language],
     id_start: int,    
     natural_terms: list[Expression],
     natural_indices: list[int],
@@ -303,12 +319,10 @@ def extend_languages_by_enumeration(
     dummy_name="sampled_lang_id",
     verbose=False,
 ) -> dict[str, Any]:
-    """When the sample size requested is greater than the size of all possible languages, just enumerate all the possible languages and extend the input set of languages with result.
+    """When the sample size requested is greater than the size of all possible languages, just enumerate all the possible languages.
 
     Args:
         language_class: the kind of Language to construct
-
-        languages: a set representing the pool of languages to expand
 
         id_start: a number to start counting from for assigning names with numerical ids to languages.        
 
@@ -327,7 +341,7 @@ def extend_languages_by_enumeration(
         dummy_name: the format of the string to name each language constructed.
 
     Returns:
-        a dict containing the expanded set of input languages and the updated id_start, e.g.
+        a dict containing a set of languages and the updated id_start, e.g.
         {
             "languages": (a set)
             "id_start": (an int),
@@ -337,6 +351,7 @@ def extend_languages_by_enumeration(
     natural_subsets = list(combinations(natural_indices, num_natural))
     unnatural_subsets = list(combinations(unnatural_indices, num_unnatural))
 
+    languages = set()
     # Construct the languages
     for natural_subset in natural_subsets:
         for unnatural_subset in unnatural_subsets:
