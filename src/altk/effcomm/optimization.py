@@ -219,6 +219,7 @@ class Evolutionary_Optimizer:
             if mutation.precondition(
                 language,
                 lang_size=self.lang_size,
+                objectives=self.objectives,
             )
         ]
         mutation = random.choice(possible_mutations)
