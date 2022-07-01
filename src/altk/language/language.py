@@ -47,10 +47,12 @@ class Language:
         self.expressions = expressions
         self.universe = expressions[0].meaning.universe
 
-        if "name" in kwargs:
-            self.name = kwargs["name"]
-        if "measurements" in kwargs:
-            self.measurements = kwargs["measurements"]
+        # if "name" in kwargs:
+            # self.name = kwargs["name"]
+        # if "measurements" in kwargs:
+            # self.measurements = kwargs["measurements"]
+        if "data" in kwargs:
+            self.data = kwargs["data"]
 
     @property
     def expressions(self) -> list[Expression]:

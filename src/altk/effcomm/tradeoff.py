@@ -24,8 +24,8 @@ def pareto_optimal_languages(
     dominating_indices = non_dominated_front_2d(
         list(
             zip(
-                [lang.measurements[x] for lang in languages],
-                [lang.measurements[y] for lang in languages],
+                [lang.data[x] for lang in languages],
+                [lang.data[y] for lang in languages],
             )
         )
     )
@@ -125,20 +125,20 @@ def tradeoff(
     points = []
     for lang in tqdm(languages):
         for prop in properties:
-            lang.measurements[prop] = properties[prop](lang)
-        points.append((lang.measurements[x], lang.measurements[y]))
+            lang.data[prop] = properties[prop](lang)
+        points.append((lang.data[x], lang.data[y]))
 
     dominating_languages = pareto_optimal_languages(
         languages, x, y, unique=True)
     dominant_points = [
-        (lang.measurements[x], lang.measurements[y]) for lang in dominating_languages
+        (lang.data[x], lang.data[y]) for lang in dominating_languages
     ]
 
     min_distances = pareto_min_distances(points, dominant_points)
     print("Setting optimality ...")
     for i, lang in enumerate(tqdm(languages)):
         # warning: yaml that saves lang must use float, not numpy.float64 !
-        lang.measurements["optimality"] = 1 - float(min_distances[i])
+        lang.data["optimality"] = 1 - float(min_distances[i])
     return {
         "languages": languages, 
         "dominating_languages": dominating_languages,
