@@ -2,13 +2,13 @@
 
 ## Introduction
 
-ALTK is a toolikt that aims to allow researchers to do "Unnatural Language Semantics" -- a style of research in linguistic semantics that tries to describe and explain natural languages by contrasting them with artificial (mathematically possible) ones. A particular focus is on _efficient communication_: determining whether particular (especially semantic) domains are optimized for a trade-off between cognitive complexity and communicative precision.
+ALTK is a toolikt that aims to allow researchers to do "Unnatural Language Semantics" -- a style of research that tries to describe and explain natural languages by situating them among the logically possible ones. A particular focus is on _efficient communication_: determining whether particular (especially semantic) domains are optimized for a trade-off between cognitive complexity and communicative precision.
 
 Key features:
 
-- feature 1
-- feature 2
-- feature 3
+- Tools for constructing arbitrary semantic spaces, expressions, and languages
+- Simplified logic for measuring informativity of languages / communicative success of signaling agents
+- Methods for language population sampling and optimization w.r.t Pareto fronts
 
 ## List of implemented analyses
 
@@ -43,7 +43,7 @@ src
 - A jupyter/colab tutorial for ALTK.
 - Original code for experiments reproduced with ALTK.
 
-Do you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on? ALTK is designed to lower the barrier to entry for such research and unify methodologies, so if you find something confusing or would like to collaborate, please open an issue or start contributing!
+Do you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on? ALTK is designed to lower the barrier to entry for such research and unify methodologies, so if you find something confusing or would like to collaborate, please contact us, open an issue or start contributing!
 
 ## Contributing
 
