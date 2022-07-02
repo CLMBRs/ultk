@@ -32,6 +32,9 @@ class Universe:
     def __eq__(self, __o: object) -> bool:
         """Returns true if the two universes are the same set."""
         return self.objects == __o.objects
+    
+    def __len__(self) -> int:
+        return len(self.objects)
 
 
 class Meaning:

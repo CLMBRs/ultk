@@ -50,7 +50,16 @@ class Language:
             raise ValueError(f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}")
 
         self.expressions = expressions
+        self.expressions_to_indices = {
+            e: idx for e, idx in enumerate(sorted(expressions))
+            }
+        self.indices_to_expressions = tuple(sorted(expressions))
+
         self.universe = expressions[0].meaning.universe
+        self.meanings_to_indices = {
+            m: idx for m, idx in enumerate(sorted(self.universe.objects))
+        }
+        self.indices_to_meanings = tuple(sorted(self.universe.objects))
 
         if "data" in kwargs:
             self.data = kwargs["data"]
@@ -86,7 +95,7 @@ class Language:
         """Count what percentage of expressions in a language have a given property."""
         return sum([property(item) for item in self.expressions]) / len(self)
 
-    def get_matrix(self) -> np.ndarray:
+    def binary_matrix(self) -> np.ndarray:
         """Get a binary matrix of shape `(num_meanings, num_expressions)`
         specifying which expressions can express which meanings."""
         return np.array(
@@ -96,14 +105,6 @@ class Language:
             ]
         )
 
-    def get_speaker_matrix(self) -> np.ndarray:
-        """Get a matrix of shape `(num_meanings, num_expressions)`
-        specifying which expressions can express which meanings, with what probability, representing P(expression | meaning)."""
-        mat = np.zeros((len(self.universe.objects), len(self.expressions)))
-        for i, e in enumerate(self.expressions):
-            for j, m in enumerate(self.universe.objects):
-                mat[i, j] = e.meaning.dist[m]
-        
 
     @property
     def universe(self) -> Universe:
