@@ -96,6 +96,15 @@ class Language:
             ]
         )
 
+    def get_speaker_matrix(self) -> np.ndarray:
+        """Get a matrix of shape `(num_meanings, num_expressions)`
+        specifying which expressions can express which meanings, with what probability, representing P(expression | meaning)."""
+        mat = np.zeros((len(self.universe.objects), len(self.expressions)))
+        for i, e in enumerate(self.expressions):
+            for j, m in enumerate(self.universe.objects):
+                mat[i, j] = e.meaning.dist[m]
+        
+
     @property
     def universe(self) -> Universe:
         return self._universe
