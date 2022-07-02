@@ -1,6 +1,7 @@
 """Classes for representing communicative agents, such as Senders and Receivers figuring in Lewis-Skyrms signaling games, literal and pragmatic agents in the Rational Speech Act framework, etc."""
 
 import numpy as np
+from typing import Any
 from scipy.special import softmax
 from altk.language.language import Language
 
@@ -11,15 +12,34 @@ from altk.language.language import Language
 
 class CommunicativeAgent:
     def __init__(self, language: Language):
-        """Takes a language to construct a agent to define the relation between meanings and expressions, which can be used to initialize the agent matrices (e.g. `S` or `R`).
+        """Takes a language to construct an agent to define the relation between meanings and expressions, which can be used to initialize the agent's conditional probability matrix (e.g. `S` or `R`).
+
+        Args:
+            language: a Language object to initialize the agent
         """
-        self._language = language
+        self.language = language
         self._matrix = np.zeros( # shape=`(num_meanings, num_expressions)`
             (len(language.universe), len(language))
         )
 
-class Speaker(CommunicativeAgent):
+class DynamicCommunicativeAgent(CommunicativeAgent):
+    """In this class, an agent's conditional probability distribution matrix can evolve over time. The language attribute of the agent may be different from `language` at some time following its initialization.
+    """
     def __init__(self, language: Language):
+        super().__init__(language)
+
+    @property
+    def language(self) -> Language:
+        """Return the dynamically updated language according to the current conditional probability distribution."""
+        raise NotImplementedError
+    
+    @language.setter
+    def language(self, lang: Language) -> None:
+        raise NotImplementedError
+
+
+class Speaker(CommunicativeAgent):
+    def __init__(self, language: Language, dynamic: bool = False):
         super().__init__(language)
 
     @property
