@@ -11,11 +11,12 @@ from altk.language.language import Language
 
 class CommunicativeAgent:
     def __init__(self, language: Language):
-        """Takes a language to construct a agent to define the relation between meanings and expressions.
-
-        By default initialize to uniform communicative need distribution.
+        """Takes a language to construct a agent to define the relation between meanings and expressions, which can be used to initialize the agent matrices (e.g. `S` or `R`).
         """
-        self.language = language
+        self._language = language
+        self._matrix = np.zeros( # shape=`(num_meanings, num_expressions)`
+            (len(language.universe), len(language))
+        )
 
 class Speaker(CommunicativeAgent):
     def __init__(self, language: Language):
@@ -23,10 +24,10 @@ class Speaker(CommunicativeAgent):
 
     @property
     def S(self) -> np.ndarray:
-        return self._S
+        return self._matrix
     @S.setter
     def S(self, mat: np.ndarray) -> None:
-        self._S = mat
+        self._matrix = mat
 
 
 class Listener(CommunicativeAgent):
@@ -35,10 +36,10 @@ class Listener(CommunicativeAgent):
 
     @property
     def R(self) -> np.ndarray:
-        return self._R
+        return self._matrix
     @R.setter
     def R(self, mat: np.ndarray) -> None:
-        self._R = mat
+        self._matrix = mat
 
 
 """In the RSA framework, communicative agents reason recursively about each other's literal and pragmatic interpretations of utterances. Concretely, each agent is modeled by a conditional distribution. The speaker is represented by the probability of choosing to use an utterance (expression) given an intended meaning, P(e|m). The listener is a mirror of the speaker; it is represented by the probability of guessing a meaning given that they heard an utterance (expression), P(m|e)."""
@@ -49,7 +50,7 @@ class LiteralSpeaker(Speaker):
 
     def __init__(self, language: Language):
         super().__init__(language)
-        self.S = self.language.get_matrix()
+        self.S = self.language.binary_matrix()
 
         # The sum of p(e | intended m) must be exactly 0 or 1.
         # We check for nans because sometimes a language cannot express a particular meaning at all, resulting in a row sum of 0.
@@ -62,7 +63,7 @@ class LiteralListener(Listener):
 
     def __init__(self, language: Language):
         super().__init__(language)
-        self.R = self.language.get_matrix().T
+        self.R = self.language.binary_matrix().T
 
         # The sum of p(m | heard e) must be 1. We can safely divide each row by its sum because every expression has at least one meaning.
         self.R = self.R/self.R.sum(axis=1, keepdims=True)
