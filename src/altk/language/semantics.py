@@ -15,11 +15,14 @@
 
 """
 
+from typing import Any, Iterable
+
+
 class Universe:
 
     """The universe is the set of possible referent objects for a meaning."""
 
-    def __init__(self, objects):
+    def __init__(self, objects: Iterable[Any]):
         self.objects = objects
 
     def __str__(self):
@@ -29,6 +32,9 @@ class Universe:
     def __eq__(self, __o: object) -> bool:
         """Returns true if the two universes are the same set."""
         return self.objects == __o.objects
+    
+    def __len__(self) -> int:
+        return len(self.objects)
 
 
 class Meaning:
@@ -42,11 +48,18 @@ class Meaning:
     On some efficient communication analysis models, we use the concept of meaning to be a more general mapping of forms to objects of reference.
 
     A meaning is always a subset of the universe, because an expression may itself be underspecified: that is, the expression can be used to express different meanings. Sometimes these different literal meanings are not equally likely, in which it can be helpful to define a meaning as a distribution over objects in the universe.
-
-    Typical usage example:
-
-        from altk.language.semantics import Meaning, Universe
-        universe = Universe(set(range(10))) # 10 objects with int labels
-        precise_meaning = Meaning({1}) # picks out one object
-        vague_meaning = Meaning({1,6}) # can pick out more than one object
     """
+
+    def __init__(self, dist: dict[Any, float], universe: Universe) -> None:
+        """A meaning is a probability distribution over a set of possible objects of reference. 
+        
+        Args: 
+            dist: a dict with objects of reference as keys, and probabilities as values. The keys must be exactly the objects in `universe`.
+
+            universe: a Universe object that defines the probability space for a meaning.
+        """
+        if set(dist.keys()) != set(universe.objects): 
+            raise ValueError(f"The keys of `dist` must match the Universe exactly; received keys={dist.keys()}, universe={universe.objects}")
+
+        self.dist = dist
+        self.universe = universe
