@@ -54,6 +54,6 @@ Link to a Contributing.md.
 For now, ALTK is focused on providing a unified library for efficient communication analyses of natural language semantic domains. Future work may extend the library to:
 
 - providing other causal analyses of linguistic domains, e.g. in terms of ease of learnability
-- building blocks to unify emergent communication, language modeling, and evolutionary analyses
+- building blocks to support closer integration of emergent communication, language modeling, and evolutionary analyses
 - generating artificial data for NLP experiments
 - constructing languages for psycholinguistics research
