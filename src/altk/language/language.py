@@ -86,7 +86,7 @@ class Language:
         """Count what percentage of expressions in a language have a given property."""
         return sum([property(item) for item in self.expressions]) / len(self)
 
-    def get_matrix(self) -> np.ndarray:
+    def binary_matrix(self) -> np.ndarray:
         """Get a binary matrix of shape `(num_meanings, num_expressions)`
         specifying which expressions can express which meanings."""
         return np.array(
