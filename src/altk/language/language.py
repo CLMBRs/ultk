@@ -50,16 +50,7 @@ class Language:
             raise ValueError(f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}")
 
         self.expressions = expressions
-        self.expressions_to_indices = {
-            e: idx for e, idx in enumerate(sorted(expressions))
-            }
-        self.indices_to_expressions = tuple(sorted(expressions))
-
         self.universe = expressions[0].meaning.universe
-        self.meanings_to_indices = {
-            m: idx for m, idx in enumerate(sorted(self.universe.objects))
-        }
-        self.indices_to_meanings = tuple(sorted(self.universe.objects))
 
         if "data" in kwargs:
             self.data = kwargs["data"]
@@ -104,7 +95,6 @@ class Language:
                 for m in self.universe.objects
             ]
         )
-
 
     @property
     def universe(self) -> Universe:
