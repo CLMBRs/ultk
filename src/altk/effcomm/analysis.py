@@ -35,7 +35,7 @@ def get_dataframe(languages: list[Language], columns: list[str] = None, subset: 
 
     # drop but count duplicates
     elif duplicates == "count":
-        vcs = data.value_counts(subset=subset)
+        vcs = data.value_counts(subset=subset, sort=False)
         data = data.drop_duplicates(subset=subset)
         data = data.sort_values(by=subset)
         data["counts"] = vcs.values
