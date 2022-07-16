@@ -14,9 +14,18 @@ class CommunicativeAgent:
         """Takes a language to construct a agent to define the relation between meanings and expressions, which can be used to initialize the agent matrices (e.g. `S` or `R`).
         """
         self.language = language
-        self._matrix = np.zeros( # shape=`(num_meanings, num_expressions)`
-            (len(language.universe), len(language))
-        )
+        self._matrix = None
+
+    def normalize_weights(self) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def from_weights(cls, weights: np.ndarray):
+        """Construct a CommunicativeAgent from a weight matrix."""
+        agent = cls(language=None)
+        agent._matrix = weights
+        agent.normalize_weights()
+        return agent
 
 
 class Speaker(CommunicativeAgent):
@@ -47,6 +56,7 @@ class Listener(CommunicativeAgent):
     @R.setter
     def R(self, mat: np.ndarray) -> None:
         self._matrix = mat
+
     def normalize_weights(self):
         # The sum of p(m | heard e) must be 1. We can safely divide each row by its sum because every expression has at least one meaning.
         self.R = self.R/self.R.sum(axis=1, keepdims=True)
@@ -62,6 +72,7 @@ class LiteralSpeaker(Speaker):
         super().__init__(language)
         self.S = self.language.binary_matrix()
         self.normalize_weights()
+
 
 class LiteralListener(Listener):
     """A naive literal listener interprets utterances without any reasoning about other agents. Its conditional probability distribution P(m|e) for guessing meanings is uniform over all meanings that can be denoted by the particular expression heard. This is in contrast to a pragmatic listener, whose conditional distribution is biased to guess meanings that a pragmatic speaker most likely intended."""
@@ -99,11 +110,6 @@ class PragmaticSpeaker(Speaker):
         # Row vector \propto column vector of literal R
         self.S = softmax(np.nan_to_num(np.log(listener.R.T)) * temperature, axis=1)
 
-        # self.S = np.zeros_like(listener.R.T)
-        # for i in range(len(self.S)):
-            # col = listener.R[:, i]
-            # self.S[i] = softmax_temp_log(col, temperature)
-
 
 class PragmaticListener(Listener):
     """A pragmatic listener interprets utterances based on their expectations about a pragmatic speaker's decisions. A pragmatic listener may be initialized with any kind of speaker, e.g. literal or pragmatic -- meaning the recursive reasoning can be modeled up to arbitrary depth."""
@@ -132,26 +138,3 @@ class PragmaticListener(Listener):
             col = speaker.S[:, i]
             self.R[i] = col @ prior / np.sum(col @ prior)
 
-##############################################################################
-# Helper functions
-##############################################################################
-
-
-def softmax_temp_log(arr: np.ndarray, temperature: float) -> np.ndarray:
-    """Function defining the proportional relationship between literal listener probabilities and speaker probabilies.
-
-    Compute softmax(temperature * log(arr)) but handle 0 probability values.
-
-    Args:
-        arr: a vector of real values; in this context it will be a vector of log probabilities scaled by the temperature parameter.
-
-        temperature: a float \in [0,1] representing rational optimality
-    Returns:
-
-        an array representing the resulting probability distribution.
-    """
-    # set dummy values for 0
-    arr[arr == 0.0] = 10**-10
-    denominator = np.sum(np.exp(temperature * np.log(arr)))
-    numerator = np.exp(temperature * np.log(arr))
-    return numerator / denominator
