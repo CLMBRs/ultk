@@ -18,6 +18,7 @@ class CommunicativeAgent:
             (len(language.universe), len(language))
         )
 
+
 class Speaker(CommunicativeAgent):
     def __init__(self, language: Language):
         super().__init__(language)
@@ -28,6 +29,12 @@ class Speaker(CommunicativeAgent):
     @S.setter
     def S(self, mat: np.ndarray) -> None:
         self._matrix = mat
+
+    def normalize_weights(self):
+        # The sum of p(e | intended m) must be exactly 0 or 1.
+        # We check for nans because sometimes a language cannot express a particular meaning at all, resulting in a row sum of 0.
+        np.seterr(divide='ignore', invalid='ignore')
+        self.S = np.nan_to_num(self.S/self.S.sum(axis=1, keepdims=True))
 
 
 class Listener(CommunicativeAgent):
@@ -40,6 +47,9 @@ class Listener(CommunicativeAgent):
     @R.setter
     def R(self, mat: np.ndarray) -> None:
         self._matrix = mat
+    def normalize_weights(self):
+        # The sum of p(m | heard e) must be 1. We can safely divide each row by its sum because every expression has at least one meaning.
+        self.R = self.R/self.R.sum(axis=1, keepdims=True)
 
 
 """In the RSA framework, communicative agents reason recursively about each other's literal and pragmatic interpretations of utterances. Concretely, each agent is modeled by a conditional distribution. The speaker is represented by the probability of choosing to use an utterance (expression) given an intended meaning, P(e|m). The listener is a mirror of the speaker; it is represented by the probability of guessing a meaning given that they heard an utterance (expression), P(m|e)."""
@@ -51,12 +61,7 @@ class LiteralSpeaker(Speaker):
     def __init__(self, language: Language):
         super().__init__(language)
         self.S = self.language.binary_matrix()
-
-        # The sum of p(e | intended m) must be exactly 0 or 1.
-        # We check for nans because sometimes a language cannot express a particular meaning at all, resulting in a row sum of 0.
-        np.seterr(divide='ignore', invalid='ignore')
-        self.S = np.nan_to_num(self.S/self.S.sum(axis=1, keepdims=True))
-
+        self.normalize_weights()
 
 class LiteralListener(Listener):
     """A naive literal listener interprets utterances without any reasoning about other agents. Its conditional probability distribution P(m|e) for guessing meanings is uniform over all meanings that can be denoted by the particular expression heard. This is in contrast to a pragmatic listener, whose conditional distribution is biased to guess meanings that a pragmatic speaker most likely intended."""
@@ -64,10 +69,7 @@ class LiteralListener(Listener):
     def __init__(self, language: Language):
         super().__init__(language)
         self.R = self.language.binary_matrix().T
-
-        # The sum of p(m | heard e) must be 1. We can safely divide each row by its sum because every expression has at least one meaning.
-        self.R = self.R/self.R.sum(axis=1, keepdims=True)
-
+        self.normalize_weights()
 
 class PragmaticSpeaker(Speaker):
     """A pragmatic speaker chooses utterances based on how a listener would interpret them. A pragmatic speaker may be initialized with any kind of listener, e.g. literal or pragmatic -- meaning the recursive reasoning can be modeled up to arbitrary depth."""
