@@ -14,7 +14,7 @@ class Expression:
 
     """Minimally contains a form and a meaning."""
 
-    def __init__(self, form=None, meaning=None):
+    def __init__(self, form: str = None, meaning: Meaning = None):
         self.form = form
         self.meaning = meaning
 
