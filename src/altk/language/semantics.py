@@ -35,19 +35,19 @@ class Universe:
 
     """The universe is the set of possible referent objects for a meaning."""
 
-    def __init__(self, objects: Iterable[Referent]):
-        self.objects = objects
+    def __init__(self, referents: Iterable[Referent]):
+        self.referents = referents
 
     def __str__(self):
-        objects_str = ",\n".join([str(point) for point in self.objects])
-        return f"Universe: {objects_str}"
+        referents_str = ",\n".join([str(point) for point in self.referents])
+        return f"Universe: {referents_str}"
 
     def __eq__(self, __o: object) -> bool:
         """Returns true if the two universes are the same set."""
-        return self.objects == __o.objects
+        return self.referents == __o.referents
     
     def __len__(self) -> int:
-        return len(self.objects)
+        return len(self.referents)
 
 
 class Meaning:
@@ -60,23 +60,23 @@ class Meaning:
     
     On some efficient communication analysis models, we use the concept of meaning to be a more general mapping of forms to objects of reference.
 
-    A meaning is always a subset of the universe, because an expression may itself be underspecified: that is, the expression can be used to express different meanings. Sometimes these different literal meanings are not equally likely, in which it can be helpful to define a meaning as a distribution over objects in the universe.
+    A meaning is always a subset of the universe, because an expression may itself be underspecified: that is, the expression can be used to express different meanings. Sometimes these different literal meanings are not equally likely, in which it can be helpful to define a meaning explicitly as a distribution.
     """
 
     def __init__(self, referents: Iterable[Referent], universe: Universe) -> None:
-        """A meaning is the set of objects it refers to.
+        """A meaning is the set of things it refers to.
 
         The objects of reference are a subset of the universe of discourse. Sometimes it is natural to construe the meaning as as a probability distribution over the universe, instead of just a binary predicate.
         
         Args: 
-            dist: a dict with objects of reference as keys, and probabilities as values. The keys must be exactly the objects in `universe`.
+            dist: a dict with referents as keys, and probabilities as values. The keys must be exactly the referents in `universe`.
 
             universe: a Universe object that defines the probability space for a meaning.
         """
-        if not set(referents).issubset(set(universe.objects)):
+        if not set(referents).issubset(set(universe.referents)):
             raise ValueError(f"The set of referents for a meaning must be a subset of the universe of discourse.")
 
-        self.objects = referents
+        self.referents = referents
         self.universe = universe
         self.dist = None
 
@@ -88,19 +88,19 @@ class Meaning:
         Args:
             weighted: a bool representing what weight to assign all elements in the extension of the meaning a probability. 
         """
-        zeros = {ref.name: 0.0 for ref in set(self.universe.objects) - set(self.objects)}
+        zeros = {ref.name: 0.0 for ref in set(self.universe.referents) - set(self.referents)}
         nonzeros = self.weighted_distribution() if weighted else self.referents_uniform()
         self.dist = nonzeros | zeros
 
     def referents_uniform(self):
         """Construct a probability distribution associated with the meaning such that every referent is equally weighted."""
-        return {ref.name: 1/len(self.objects) for ref in self.objects}
+        return {ref.name: 1/len(self.referents) for ref in self.referents}
 
     def weighted_distribution(self):
         """Construct a probability distribution associated with the meaning according to the weights specified by each referent."""
-        total_weight = sum([ref.weight for ref in self.objects.objects])
+        total_weight = sum([ref.weight for ref in self.referents])
         if not total_weight:
             # If there are no weights, make each referent equally likely.
             # One might also raise an error, complaining that there must be some nonzero weight in the space of referents.
             return self.referents_uniform()
-        return {ref.name: ref.weight / total_weight for ref in self.objects}
+        return {ref.name: ref.weight / total_weight for ref in self.referents}
