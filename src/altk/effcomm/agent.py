@@ -14,6 +14,9 @@ class CommunicativeAgent:
         """Takes a language to construct a agent to define the relation between meanings and expressions, which can be used to initialize the agent matrices (e.g. `S` or `R`).
         """
         self.language = language
+        self._matrix = np.zeros( # shape=`(num_meanings, num_expressions)`
+            (len(language.universe), len(language))
+        )
 
 
 class Speaker(CommunicativeAgent):
@@ -33,14 +36,6 @@ class Speaker(CommunicativeAgent):
         np.seterr(divide='ignore', invalid='ignore')
         self.S = np.nan_to_num(self.S/self.S.sum(axis=1, keepdims=True))
 
-    @classmethod
-    def from_weights(cls, weights: np.ndarray):
-        """Construct a Speaker agent from a weight matrix after normalizing."""
-        speaker = cls(language=None)
-        speaker.S = weights
-        speaker.normalize_weights()
-        return speaker
-
 
 class Listener(CommunicativeAgent):
     def __init__(self, language: Language):
@@ -52,18 +47,10 @@ class Listener(CommunicativeAgent):
     @R.setter
     def R(self, mat: np.ndarray) -> None:
         self._matrix = mat
-
     def normalize_weights(self):
         # The sum of p(m | heard e) must be 1. We can safely divide each row by its sum because every expression has at least one meaning.
         self.R = self.R/self.R.sum(axis=1, keepdims=True)
 
-    @classmethod
-    def from_weights(cls, weights: np.ndarray):
-        """Construct a Speaker agent from a weight matrix after normalizing."""
-        speaker = cls(language=None)
-        speaker.R = weights
-        speaker.normalize_weights()
-        return speaker
 
 """In the RSA framework, communicative agents reason recursively about each other's literal and pragmatic interpretations of utterances. Concretely, each agent is modeled by a conditional distribution. The speaker is represented by the probability of choosing to use an utterance (expression) given an intended meaning, P(e|m). The listener is a mirror of the speaker; it is represented by the probability of guessing a meaning given that they heard an utterance (expression), P(m|e)."""
 
@@ -75,7 +62,6 @@ class LiteralSpeaker(Speaker):
         super().__init__(language)
         self.S = self.language.binary_matrix()
         self.normalize_weights()
-
 
 class LiteralListener(Listener):
     """A naive literal listener interprets utterances without any reasoning about other agents. Its conditional probability distribution P(m|e) for guessing meanings is uniform over all meanings that can be denoted by the particular expression heard. This is in contrast to a pragmatic listener, whose conditional distribution is biased to guess meanings that a pragmatic speaker most likely intended."""

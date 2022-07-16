@@ -35,7 +35,7 @@ def get_dataframe(languages: list[Language], columns: list[str] = None, subset: 
 
     # drop but count duplicates
     elif duplicates == "count":
-        vcs = data.value_counts(subset=subset)
+        vcs = data.value_counts(subset=subset, sort=False)
         data = data.drop_duplicates(subset=subset)
         data = data.sort_values(by=subset)
         data["counts"] = vcs.values
@@ -62,6 +62,15 @@ def pearson_analysis(
         property: a string representing a column to measure pearson r with the predictor column
 
         num_bootstrap_samples: how many samples to bootstrap from the original data
+    
+    Returns:
+        a dict of the pearson correlation coefficient for the predictor and the property, and bootstrapped confidence intervals for this coefficient, e.g.
+        {
+            "rho": (a float between -1 and 1),
+            "confidence_intervals": (a pandas Dataframe with the columns [
+                'bootstrap_sample_percent', 'low', 'high'
+            ])
+        }
     """
     min_percent = 0.01  # must be > 2/ len(data)
     intervals = 5
