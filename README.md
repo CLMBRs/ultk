@@ -1,6 +1,7 @@
 # The Artificial Language ToolKit (ALTK)
 
-![Four examples of many recent results showing that natural languages are optimized for efficient communication](images/plots.jpeg).
+![](images/plots.jpeg)
+*Four examples of many recent results showing that natural languages are optimized for efficient communication.*
 
 ## Introduction
 
