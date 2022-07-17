@@ -1,59 +1,80 @@
 # The Artificial Language ToolKit (ALTK)
 
+![Four examples of many recent results showing that natural languages are optimized for efficient communication](images/plots.jpeg).
+
 ## Introduction
 
-ALTK is a toolikt that aims to allow researchers to do "Unnatural Language Semantics" -- a style of research that tries to describe and explain natural languages by situating them among the logically possible ones. A particular focus is on _efficient communication_: determining whether particular (especially semantic) domains are optimized for a trade-off between cognitive complexity and communicative precision.
+ALTK is a software library that aims to support research in "Unnatural Language Semantics" -- a program in linguistics and cognitive science that tries to describe and explain the properties of natural languages by comparing them the logically possible ones.
+
+A current focus is on **_efficient communication_**: determining whether linguistic meanings are optimized for a trade-off between cognitive complexity and communicative precision.
 
 Key features:
 
-- Tools for constructing arbitrary semantic spaces, expressions, and languages
+- Primitives for constructing semantic spaces, expressions, and languages
 - Simplified logic for measuring informativity of languages / communicative success of signaling agents
 - Methods for language population sampling and optimization w.r.t Pareto fronts
 
-## List of implemented analyses
+## Future work
 
-List of reproduced experiments from published work:
+ALTK is a long term project and it is currently in its early stages. 
 
-- modals
-- quantifiers
+However, it is intended to help lower the barrier to entry for certain research in computational semantics, and to and unify methodologies. So if you find something confusing or would like to collaborate, please contact the developers or open an issue. And if you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on, we are _very_ interested in helping!
+
+<details>
+<summary> Goals for future work</summary>
+<br>
+
+Immediate goals include reproducing the efficient communication analyses for the domains of:
+
 - color terms
+- quantifiers
+- numerals
+
+Longer term goals for ALTK include providing support for:
+
+- other causal analyses of linguistic domains, e.g. explanations from ease of learnability
+- building blocks to support closer integration of linguistics, emergent communication and NLP
+- generating artificial data for NLP experiments
+- constructing languages for psycholinguistics research
+
+</details>
 
 ## Installing ALTK
 
-1. Create a fresh conda environment with Python 3.6 or newer
+1. Install via pip:
 
-2. Install via pip
+    `python3 -m pip install git+https://github.com/nathimel/altk.git`
 
-3. Run an experiment, e.g. an efficient communication analysis of natural language modals
+2. Get the required packages by running
 
-## ALTK structure
+    `conda env create --file environment.yml`
 
-The repo is organized as follows:
+## Getting started
 
-```md
-src
-└── altk
-    ├── effcomm # efficient communication module
-    └── language # general artificial language module
-```
+- For an introduction to efficient communication research, here is a [survey paper](https://www.annualreviews.org/doi/abs/10.1146/annurev-linguistics-011817-045406) of the field.
+- For an introduction to the RSA framework, see [this online textbook](http://www.problang.org/).
+- Check out the basic [signaling game](src/examples/signaling_game) example.
+- For a more scaled up usage example, visit the codebase for an efficient communication analysis of [modals](https://github.com/nathimel/modals-effcomm).
 
-## How-to-start
+## References
 
-- Some resources for an introduction to efficient communication.
-- A jupyter/colab tutorial for ALTK.
-- Original code for experiments reproduced with ALTK.
+Figures:
 
-Do you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on? ALTK is designed to lower the barrier to entry for such research and unify methodologies, so if you find something confusing or would like to collaborate, please contact us, open an issue or start contributing!
+> Kemp, Charles & Terry Regier. 2012. Kinship categories across languages reflect
+general communicative principles. Science (New York, N.Y.) 336(6084). 1049–1054. doi:10.1126/science.1218811.
 
-## Contributing
+> Denic, Milica, Shane Steinert-Threlkeld & Jakub Szymanik. 2022. Indefinite Pronouns Optimize the Simplicity/Informativeness Trade-Off. Cognitive Science 46(5). e13142. doi:10.1111/cogs.13142
 
-Link to a Contributing.md.
+> Zaslavsky, Noga, Charles Kemp, Terry Regier & Naftali Tishby. 2018. Efficient
+compression in color naming and its evolution. Proceedings of the National
+Academy of Sciences 115(31). 7937–7942. doi:10.1073/pnas.1800521115. 
 
-### TODO
+> Steinert-Threlkeld, Shane. 2021. Quantifiers in Natural Language: Efficient Communication and Degrees of Semantic Universals. Entropy. An International and Interdisciplinary Journal of Entropy and Information Studies 23(10). 1335. doi:10.3390/e23101335.
 
-For now, ALTK is focused on providing a unified library for efficient communication analyses of natural language semantic domains. Future work may extend the library to:
+Links:
 
-- providing other causal analyses of linguistic domains, e.g. in terms of ease of learnability
-- building blocks to support closer integration of emergent communication, language modeling, and evolutionary analyses
-- generating artificial data for NLP experiments
-- constructing languages for psycholinguistics research
+> Kemp, Charles, Yang Xu & Terry Regier. 2018. Semantic typology and efficient
+communication. Annual Review of Linguistics 1–23. doi:10.1146/annurev-linguistics-011817-045406
+
+> N. Imel and S. Steinert-Threlkeld, Modals in natural language optimize the simplicity/informativeness
+trade-off, in Proceedings of Semantics and Linguistic Theory (SALT 32), 2022.

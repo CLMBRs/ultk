@@ -1,0 +1,11 @@
+name: altk
+channels:
+  - conda-forge
+dependencies:
+  - pyyaml
+  - numpy
+  - nltk
+  - pandas
+  - pygmo
+  - plotnine
+  - pathos
