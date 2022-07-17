@@ -12,19 +12,19 @@ from altk.effcomm.agent import Speaker, Listener, LiteralListener, LiteralSpeake
 ##############################################################################
 
 
-def uniform_prior(space: Universe) -> np.ndarray:
-    """Return a 1-D numpy array of size |space| reprsenting uniform distribution."""
-    return np.array([1 / len(space.objects) for _ in range(len(space.objects))])
+def uniform_prior(universe: Universe) -> np.ndarray:
+    """Return a 1-D numpy array of size |universe| reprsenting uniform distribution."""
+    return np.array([1 / len(universe.referents) for _ in range(len(universe.referents))])
 
 
 def build_utility_matrix(
-    space: Universe, utility: Callable[[Meaning, Meaning], float]
+    universe: Universe, utility: Callable[[Meaning, Meaning], float]
 ) -> np.ndarray:
     """Construct the square matrix specifying the utility function defined for pairs of meanings."""
     return np.array(
         [
-            [utility(meaning, meaning_) for meaning_ in space.objects]
-            for meaning in space.objects
+            [utility(meaning, meaning_) for meaning_ in universe.referents]
+            for meaning in universe.referents
         ]
     )
 

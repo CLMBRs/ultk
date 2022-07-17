@@ -1,0 +1,13 @@
+num_states: 10
+num_signals: 10
+reward_amount: 1
+num_rounds: 10000
+prior_over_states: uniform # 'uniform' or 'random'
+random_seed: 42
+paths:
+  weights: outputs/ten/weights.txt
+  languages: outputs/ten/languages.yml
+  accuracy_plot: outputs/ten/accuracy.png
+  complexity_plot: outputs/ten/complexity.png
+  tradeoff_plot: outputs/ten/tradeoff.png
+  prior_plot: outputs/ten/prior.png
