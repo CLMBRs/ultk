@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A signaling game is a an evolutionary game theoretic model of how linguistic meaning (and more generally, convention) can emerge under very simple reinforcement learning.
+A signaling game is a an evolutionary game theoretic model of how meaning can emerge under very simple reinforcement learning.
 
 Here we illustrate how the tools from ALTK can be used to develop reusable code for basic signaling game simulations, while interfacing usefully with other paradigms such as efficient communication analyses, the Rational Speech Act Framework, and language modeling.
 
@@ -44,8 +44,7 @@ Research in signaling games is extensive and interdisciplinary. Here are a few r
 - A gentle but profound introduction to signaling games research is Brian Skyrms' book, [Signals](https://oxford.universitypressscholarship.com/view/10.1093/acprof:oso/9780199580828.001.0001/acprof-9780199580828).
 - [EGG](https://github.com/facebookresearch/EGG) is a software library for emergent communication and includes a neural agent signaling game [example](https://github.com/facebookresearch/EGG/tree/main/egg/zoo/signal_game).
 
-<details>
-<summary>References</summary>
+References
 
 > Kharitonov, Eugene, Roberto Dessì, Rahma Chaabouni, Diane Bouchacourt, and Marco Baroni. 2021. “EGG: A Toolkit for Research on Emergence of LanGuage in Games.” <https://github.com/facebookresearch/EGG>.
 
@@ -55,4 +54,3 @@ Research in signaling games is extensive and interdisciplinary. Here are a few r
 
 > Skyrms, Brian. 2010. Signals: Evolution, Learning, and Information. Oxford: Oxford University Press. <https://doi.org/10.1093/acprof:oso/9780199580828.001.0001>.
 
-</details>
