@@ -14,30 +14,42 @@ class CommunicativeAgent:
         """Takes a language to construct a agent to define the relation between meanings and expressions, which can be used to initialize the agent matrices (e.g. `S` or `R`).
         """
         self.language = language
-        self._matrix = None
+        self._parameters = None
+
+
+class StaticAgent(CommunicativeAgent):
+    """As opposed to a dynamic agent whose learned parameters can evolve over, a static agent is always with the same langauge."""
+    def __init__(self, language: Language):
+        super().__init__(language)
 
     def normalize_weights(self) -> None:
         raise NotImplementedError
 
+    @property
+    def weights(self) -> np.ndarray:
+        return self._parameters
+    @weights.setter
+    def weights(self, weights: np.ndarray) -> None:
+        self._parameters = weights
+
     @classmethod
     def from_weights(cls, weights: np.ndarray):
-        """Construct a CommunicativeAgent from a weight matrix."""
+        """Construct a StaticAgent from a weight matrix."""
         agent = cls(language=None)
-        agent._matrix = weights
+        agent.weights = weights
         agent.normalize_weights()
         return agent
 
-
-class Speaker(CommunicativeAgent):
+class Speaker(StaticAgent):
     def __init__(self, language: Language):
         super().__init__(language)
 
     @property
     def S(self) -> np.ndarray:
-        return self._matrix
+        return self.weights
     @S.setter
     def S(self, mat: np.ndarray) -> None:
-        self._matrix = mat
+        self.weights = mat
 
     def normalize_weights(self):
         # The sum of p(e | intended m) must be exactly 0 or 1.
@@ -46,16 +58,16 @@ class Speaker(CommunicativeAgent):
         self.S = np.nan_to_num(self.S/self.S.sum(axis=1, keepdims=True))
 
 
-class Listener(CommunicativeAgent):
+class Listener(StaticAgent):
     def __init__(self, language: Language):
         super().__init__(language)
 
     @property
     def R(self) -> np.ndarray:
-        return self._matrix
+        return self.weights
     @R.setter
     def R(self, mat: np.ndarray) -> None:
-        self._matrix = mat
+        self.weights = mat
 
     def normalize_weights(self):
         # The sum of p(m | heard e) must be 1. We can safely divide each row by its sum because every expression has at least one meaning.

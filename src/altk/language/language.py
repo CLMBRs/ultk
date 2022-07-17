@@ -14,13 +14,13 @@ class Expression:
 
     """Minimally contains a form and a meaning."""
 
-    def __init__(self, form=None, meaning=None):
+    def __init__(self, form: str = None, meaning: Meaning = None):
         self.form = form
         self.meaning = meaning
 
     def can_express(self, m: Meaning) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
-        return m in self.meaning.objects
+        return m in self.meaning.referents
 
     @abstractmethod
     def yaml_rep(self):
@@ -92,7 +92,7 @@ class Language:
         return np.array(
             [
                 [float(e.can_express(m)) for e in self.expressions]
-                for m in self.universe.objects
+                for m in self.universe.referents
             ]
         )
 
