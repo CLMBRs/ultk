@@ -10,14 +10,14 @@ Here we illustrate how the tools from ALTK can be used to develop reusable code 
 
 To run a basic signaling game simulation, use the following command:
 
-    `python3 main.py configs/two.yml`
+`python3 main.py configs/two.yml`
 
 This will produce results in the folder called `outputs/two`, including plots, weights and the resulting 'languages'.
 
 ## Experimenting
 
 <details>
-<summary> Here are some details about changing game parameters and using ALTK more generally to do signaling games.
+<summary> Adjusting parameters and using ALTK more generally to do signaling games.
 </summary>
 
 ### Existing game parameters
@@ -47,8 +47,9 @@ This example is limited for simplicity, but is also intended to be an recylable 
 Research in signaling games is extensive and interdisciplinary.
 <details>
 <summary>
-Here are a few resources:
+Links
 </summary>
+<br>
 
 - The idea of a signaling game was introduced by David Lewis in his book, [Convention](https://www.wiley.com/en-us/Convention:+A+Philosophical+Study-p-9780631232568).
 - A gentle but profound introduction to signaling games research is Brian Skyrms' book, [Signals](https://oxford.universitypressscholarship.com/view/10.1093/acprof:oso/9780199580828.001.0001/acprof-9780199580828).
