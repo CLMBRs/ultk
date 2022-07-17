@@ -1,0 +1,74 @@
+languages:
+- sender:
+    data:
+      accuracy: 0.708096586639488
+      name: sender
+    expressions:
+    - form: signal_1
+      meaning:
+      - state_3
+      - state_8
+    - form: signal_2
+      meaning:
+      - state_7
+    - form: signal_3
+      meaning:
+      - state_2
+    - form: signal_4
+      meaning:
+      - state_6
+    - form: signal_5
+      meaning:
+      - state_5
+    - form: signal_6
+      meaning: []
+    - form: signal_7
+      meaning:
+      - state_1
+      - state_4
+    - form: signal_8
+      meaning:
+      - state_9
+    - form: signal_9
+      meaning: []
+    - form: signal_10
+      meaning:
+      - state_10
+- receiver:
+    data:
+      accuracy: 0.708096586639488
+      name: receiver
+    expressions:
+    - form: signal_1
+      meaning:
+      - state_3
+      - state_8
+    - form: signal_2
+      meaning:
+      - state_7
+    - form: signal_3
+      meaning:
+      - state_2
+    - form: signal_4
+      meaning:
+      - state_5
+      - state_6
+    - form: signal_5
+      meaning:
+      - state_5
+    - form: signal_6
+      meaning:
+      - state_1
+    - form: signal_7
+      meaning:
+      - state_1
+      - state_4
+    - form: signal_8
+      meaning:
+      - state_9
+    - form: signal_9
+      meaning:
+      - state_3
+    - form: signal_10
+      meaning:
+      - state_10
