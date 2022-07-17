@@ -1,0 +1,23 @@
+languages:
+- sender:
+    data:
+      accuracy: 0.8104553492484527
+      name: sender
+    expressions:
+    - form: signal_1
+      meaning:
+      - state_2
+    - form: signal_2
+      meaning:
+      - state_1
+- receiver:
+    data:
+      accuracy: 0.8104553492484527
+      name: receiver
+    expressions:
+    - form: signal_1
+      meaning:
+      - state_2
+    - form: signal_2
+      meaning:
+      - state_1
