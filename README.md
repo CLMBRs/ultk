@@ -4,7 +4,7 @@
 
 ## Introduction
 
-ALTK is a software library that aims to support research in "Unnatural Language Semantics" -- a program in linguistics and cognitive science that tries to describe and explain the properties of natural languages by comparing them the logically possible ones.
+ALTK is a software library that aims to support research in "Unnatural Language Semantics" -- a program in linguistics and cognitive science that tries to describe and explain the properties of natural languages by comparing them to the much larger set of mathematically possible languages.
 
 A current focus is on **_efficient communication_**: determining whether linguistic meanings are optimized for a trade-off between cognitive complexity and communicative precision.
 
