@@ -4,7 +4,7 @@
 
 A signaling game is a an evolutionary game theoretic model of how meaning can emerge under very simple reinforcement learning.
 
-Here we illustrate how the tools from ALTK can be used to develop reusable code for basic signaling game simulations, while interfacing usefully with other paradigms such as efficient communication analyses, the Rational Speech Act Framework, and language modeling.
+Here we illustrate how the tools from ALTK can be used to develop reusable code for basic signaling game simulations, while tying in with other paradigms such as efficient communication analyses, the Rational Speech Act Framework, and machine learning.
 
 ## Running a simulation
 
