@@ -46,7 +46,7 @@ def main():
     states = universe.referents
 
     # All meanings are dummy placeholders at this stage, but they can be substantive once agents are given a weight matrix.
-    dummy_meaning = SignalMeaning([], universe)
+    dummy_meaning = SignalMeaning(states=[], universe=universe)
     signals = [Signal(form=name, meaning=dummy_meaning) for name in signal_names]
 
     # Create a seed language to initialize agents.
