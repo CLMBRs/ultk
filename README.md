@@ -1,10 +1,11 @@
 # The Artificial Language ToolKit (ALTK)
 
-![Four examples of many recent results showing that natural languages are optimized for efficient communication](images/plots.jpeg).
+![](images/plots.jpeg)
+*Four examples of many recent results showing that natural languages are optimized for efficient communication.*
 
 ## Introduction
 
-ALTK is a software library that aims to support research in "Unnatural Language Semantics" -- a program in linguistics and cognitive science that tries to describe and explain the properties of natural languages by comparing them to the much larger set of mathematically possible languages.
+ALTK is a software library that aims to support research in [Unnatural Language Semantics](https://gu-clasp.github.io/static/951dfcd6d280ce7416e79e206c291358/clasp.pdf) -- a program in linguistics and cognitive science that tries to describe and explain the properties of natural languages by comparing them to the much larger set of mathematically possible languages.
 
 A current focus is on **_efficient communication_**: determining whether linguistic meanings are optimized for a trade-off between cognitive complexity and communicative precision.
 
