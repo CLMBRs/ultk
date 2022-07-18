@@ -42,13 +42,15 @@ Longer term goals for ALTK include providing support for:
 
 ## Installing ALTK
 
-1. Install via pip:
+1. Download or clone this repository and navigate to the root folder.
 
-    `python3 -m pip install git+https://github.com/nathimel/altk.git`
-
-2. Get the required packages by running
+2. Create a fresh conda environment with the required packages by runing
 
     `conda env create --file environment.yml`
+
+3. Install ALTK
+
+    `pip install -e .`
 
 ## Getting started
 
