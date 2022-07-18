@@ -9,7 +9,7 @@ class SignalingAgent(CommunicativeAgent):
     def __init__(self, language: SignalingLanguage, name: str = None):
         super().__init__(language)
         self.signals = [e for e in language.expressions]
-        self.states = list(language.universe.objects)
+        self.states = list(language.universe.referents)
         
         # matrix indexing lookups
         self._state_to_index = {state: i for i, state in enumerate(self.states)}

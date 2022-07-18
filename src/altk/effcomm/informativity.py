@@ -113,6 +113,8 @@ def communicative_success(
 
              = sum(diag(p)SR * u)
 
+        For more details, see the docs/vectorized_informativity.pdf.
+
     Args:
         - speaker: a literal or pragmatic speaker, containing a matrix S for P(e | m)
 

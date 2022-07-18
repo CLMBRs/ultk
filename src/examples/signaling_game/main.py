@@ -43,7 +43,7 @@ def main():
 
     # Construct the universe of states, and language defined over it
     universe = StateSpace([State(name=name) for name in state_names])
-    states = universe.objects
+    states = universe.referents
 
     # All meanings are dummy placeholders at this stage, but they can be substantive once agents are given a weight matrix.
     dummy_meaning = SignalMeaning([], universe)

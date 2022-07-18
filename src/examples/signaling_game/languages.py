@@ -28,7 +28,7 @@ class StateSpace(Universe):
         super().__init__(objects)
 
     def __hash__(self) -> int:
-        return hash(tuple(sorted(state.name for state in self.objects)))
+        return hash(tuple(sorted(state.name for state in self.referents)))
 
 class SignalMeaning(Meaning):
     def __init__(self, states: list[State], universe: StateSpace) -> None:
@@ -43,7 +43,7 @@ class SignalMeaning(Meaning):
 
     def yaml_rep(self) -> dict:
         """Convert to a dictionary representation of the meaning for compact saving to .yml files."""
-        return [str(state) for state in self.objects]
+        return [str(state) for state in self.referents]
 
 
 class Signal(Expression):
