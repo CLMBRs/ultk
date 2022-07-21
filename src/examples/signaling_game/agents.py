@@ -14,7 +14,7 @@ class Sender(Speaker):
         weights = None, 
         name: str = None,
         ):
-        super().__init__(language, name)
+        super().__init__(language, name=name)
         self.shape = (len(self.language.universe), len(self.language))
         self.initialize_weights(weights)
 
@@ -42,7 +42,7 @@ class Receiver(Listener):
         weights = None, 
         name: str = None
         ):
-        super().__init__(language, name)
+        super().__init__(language, name=name)
         self.shape = (len(self.language), len(self.language.universe))
         self.initialize_weights(weights=weights)
             
