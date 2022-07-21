@@ -4,34 +4,6 @@ from altk.effcomm.informativity import communicative_success, build_utility_matr
 from languages import State
 from typing import Callable
 
-def signaling_accuracy(
-    sender: Sender, 
-    receiver: Receiver,
-    utility: Callable[[State, State],float],
-    prior: np.ndarray = None,
-    ) -> float:
-    """Compute the communicative success of sender and receiver as the informativity of RSA speakers and listeners.
-
-    Args:
-        language: the seed_language representing the possible signals and states of the game. 
-
-        sender: the agent whose weights determine those of a LiteralSpeaker.
-
-        receiver: the agent wose weights determine those of a LiteralListener
-
-        prior: the prior probability distribution over states, Default is None and will be assigned uniform. This distribution represents 'communicative need', and aims to track how often speakers of a language need to refer to a particular state.
-
-    Wrapper function for ALTK `communicative_success` with some default parameters.
-    """
-    language = sender.language
-    return communicative_success(
-        speaker=sender.to_static_agent(),
-        listener=receiver.to_static_agent(),
-        prior=uniform_prior(language.universe) if prior is None else prior, 
-        utility=build_utility_matrix(language.universe, utility),
-        )
-    
-    
 def encoder_complexity(sender: Sender, prior_over_states: np.ndarray = None) -> float:
     """Compute the cognitive complexity for the encoder q, given by the information rate of compressing meanings M into words W:
 
