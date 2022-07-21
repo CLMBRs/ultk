@@ -1,11 +1,11 @@
 import numpy as np
-from altk.effcomm.agent import CommunicativeAgent, StaticAgent, Speaker, Listener
+from altk.effcomm.agent import CommunicativeAgent, Speaker, Listener
 from altk.language.semantics import Meaning
 from languages import State, Signal, SignalMeaning, SignalingLanguage
 from typing import Any
 
 class SignalingAgent(CommunicativeAgent):
-    """The agent type used in an Atomi-n signaling game."""
+    """The agent type used in a signaling game."""
     def __init__(self, language: SignalingLanguage, name: str = None):
         super().__init__(language)
         self.signals = [e for e in language.expressions]
@@ -34,9 +34,10 @@ class SignalingAgent(CommunicativeAgent):
                 raise ValueError(f"Inapropriate Sender weight matrix shape for language. Sender is of shape {self.shape} but received {weights.shape}.")
             self.weights = weights
         else:
-            # initialize uniformly. Other options could include random initialization.
+            # initialize equally
             if initial == 'ones':
                 self.weights = np.ones(self.shape)
+            # initialize from uniform distribution
             elif initial == 'random':
                 self.weights = np.random.uniform(
                     low=0.0, 
@@ -94,12 +95,12 @@ class SignalingAgent(CommunicativeAgent):
             raise ValueError(f"Amount to reinforce weight must be a positive number.")
         self.weights[self.policy_to_indices(policy)] += amount
 
-    def to_static_agent(self) -> StaticAgent:
-        """Get a static RSA speaker agent from this Sender agent.
+    # def to_static_agent(self) -> StaticAgent:
+    #     """Get a static RSA speaker agent from this Sender agent.
         
-        The conceptual difference between a static RSA agent and the signaling game Receiver is that an RSA agent is a static 'snapshot' of what linguistic behavior the Sender has learned.
-        """
-        raise NotImplementedError
+    #     The conceptual difference between a static RSA agent and the signaling game Receiver is that an RSA agent is a static 'snapshot' of what linguistic behavior the Sender has learned.
+    #     """
+    #     raise NotImplementedError
 
     def to_language(
         self, 
@@ -118,7 +119,10 @@ class SignalingAgent(CommunicativeAgent):
         Args:
             threshold: a float in [0,1] representing the cutoff for determining if a meaning (state) can be communicated by a signal. Because weights are not initialized to 0, it is a good idea to set nonzero values as the threshold.
         """
-        agent = self.to_static_agent()
+        # agent = self.to_static_agent()
+
+        # get distribution over policies from accumulated rewards
+        policies = self.normalize_weights()
 
         signals = []
         # loop over agent's initalization vocabulary
@@ -126,7 +130,7 @@ class SignalingAgent(CommunicativeAgent):
             # get all meanings that the signal can communicate
             states = [
                 state for state in self.states 
-                    if agent.weights[self.policy_to_indices(
+                    if policies[self.policy_to_indices(
                         policy={"state": state, "signal": outdated_signal}
                     )] > threshold # if probability of state is high enough
             ]
@@ -172,12 +176,12 @@ class Sender(SignalingAgent):
             self.signal_to_index(policy["signal"]),
             )
 
-    def to_static_agent(self) -> Speaker:
-        """Get a static RSA speaker agent from this Sender agent.
+    # def to_static_agent(self) -> Speaker:
+    #     """Get a static RSA speaker agent from this Sender agent.
         
-        The conceptual difference between an RSA agent and the signaling game Receiver is that an RSA agent is a static 'snapshot' of what linguistic behavior the Sender has learned.
-        """
-        return Speaker.from_weights(self.weights)
+    #     The conceptual difference between an RSA agent and the signaling game Receiver is that an RSA agent is a static 'snapshot' of what linguistic behavior the Sender has learned.
+    #     """
+    #     return Speaker.from_weights(self.weights)
 
 
 class Receiver(SignalingAgent):
@@ -207,9 +211,9 @@ class Receiver(SignalingAgent):
             self.state_to_index(policy["state"]),             
             )
 
-    def to_static_agent(self) -> Listener:
-        """Get a static RSA Listener agent from this Sender agent.
+    # def to_static_agent(self) -> Listener:
+    #     """Get a static RSA Listener agent from this Sender agent.
         
-        The conceptual difference between an RSA agent and the signaling game Receiver is that an RSA agent is a static 'snapshot' of what linguistic behavior the Sender has learned.
-        """
-        return Listener.from_weights(self.weights)
+    #     The conceptual difference between an RSA agent and the signaling game Receiver is that an RSA agent is a static 'snapshot' of what linguistic behavior the Sender has learned.
+    #     """
+    #     return Listener.from_weights(self.weights)
