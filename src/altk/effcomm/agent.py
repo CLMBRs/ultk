@@ -189,7 +189,7 @@ class CommunicativeAgent:
 
 class Speaker(CommunicativeAgent):
     def __init__(self, language: Language, **kwargs):
-        super().__init__(language, kwargs)
+        super().__init__(language, **kwargs)
 
     @property
     def S(self) -> np.ndarray:
@@ -209,7 +209,7 @@ class Speaker(CommunicativeAgent):
 
 class Listener(CommunicativeAgent):
     def __init__(self, language: Language, **kwargs):
-        super().__init__(language, kwargs)
+        super().__init__(language, **kwargs)
 
     @property
     def R(self) -> np.ndarray:
@@ -236,7 +236,7 @@ class LiteralSpeaker(Speaker):
     """A literal speaker chooses utterances without any reasoning about other agents. The literal speaker's conditional probability distribution P(e|m) is uniform over all expressions that can be used to communicate a particular meaning. This is in contrast to a pragmatic speaker, whose conditional distribution is not uniform in this way, but instead biased towards choosing expressions that are less likely to be misinterpreted by some listener."""
 
     def __init__(self, language: Language, **kwargs):
-        super().__init__(language, kwargs)
+        super().__init__(language, **kwargs)
         self.S = self.language.binary_matrix()
         self.normalize_weights()
 
@@ -245,7 +245,7 @@ class LiteralListener(Listener):
     """A naive literal listener interprets utterances without any reasoning about other agents. Its conditional probability distribution P(m|e) for guessing meanings is uniform over all meanings that can be denoted by the particular expression heard. This is in contrast to a pragmatic listener, whose conditional distribution is biased to guess meanings that a pragmatic speaker most likely intended."""
 
     def __init__(self, language: Language, **kwargs):
-        super().__init__(language, kwargs)
+        super().__init__(language, **kwargs)
         self.R = self.language.binary_matrix().T
         self.normalize_weights()
 
@@ -275,7 +275,7 @@ class PragmaticSpeaker(Speaker):
 
             temperature: a float \in [0,1], representing how `optimally rational' the pragmatic speaker is; 1.0 is chosen when no particular assumptions about rationality are made.
         """
-        super().__init__(language, kwargs)
+        super().__init__(language, **kwargs)
 
         temperature = 1.0
         if "temperature" in kwargs:
@@ -308,7 +308,7 @@ class PragmaticListener(Listener):
 
             prior: a diagonal matrix of size |M|-by-|M| representing the communicative need probabilities for meanings.
         """
-        super().__init__(language, kwargs)
+        super().__init__(language, **kwargs)
         # Row vector \propto column vector of pragmatic S
 
         self.R = np.zeros_like(speaker.S.T)
