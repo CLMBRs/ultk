@@ -4,6 +4,7 @@ import vis
 import numpy as np
 import measures
 from tqdm import tqdm
+from altk.effcomm.informativity import communicative_success, build_utility_matrix
 from agents import Receiver, Sender
 from languages import (
     State, 
@@ -64,10 +65,10 @@ def main():
         )
 
     # Define the measures for analysis
-    comm_success = lambda s, r: measures.signaling_accuracy(
+    comm_success = lambda s, r: communicative_success(
         sender=s, 
         receiver=r, 
-        utility=measures.indicator, # always based on coordination
+        utility=build_utility_matrix(universe, measures.indicator),
         prior=prior_over_states,
         )
     complexity = lambda s: measures.encoder_complexity(s, prior_over_states)
@@ -89,11 +90,11 @@ def main():
 
         # update agents
         sender.reward(
-            policy={"state": target, "signal": signal}, 
+            policy={"referent": target, "expression": signal}, 
             amount=amount
             )
         receiver.reward(
-            policy={"state": output, "signal": signal}, 
+            policy={"referent": output, "expression": signal}, 
             amount=amount
             )
 
