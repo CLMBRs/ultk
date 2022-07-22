@@ -105,7 +105,7 @@ class CommunicativeAgent:
         raise NotImplementedError
 
     def sample_policy(self, index: int) -> int:
-        """Chooses an entry of the agent's weight matrix by sampling from the row vector specified by the index.
+        """Sample a communicative policy by uniformly sampling from a row vector of the agent's weight matrix specified by the index.
         
         Args:
             index: the integer index representing a row of the weight matrix.
