@@ -10,10 +10,11 @@ from altk.language.semantics import Referent
 # Base communicative agent class
 ##############################################################################
 
+
 class CommunicativeAgent:
     def __init__(self, language: Language, **kwargs):
         """An agent that uses a language to communicate, e.g. a RSA pragmatic agent or a Lewis-Skyrms signaler.
-        
+
         Args:
             language: a language to construct a agent to define the relation between meanings and expressions, which can be used to initialize the agent matrices (e.g. `S` or `R`).
 
@@ -22,10 +23,14 @@ class CommunicativeAgent:
         self.language = language
 
         # weight matrix indexing lookups
-        self._referent_to_index = {referent: i for i, referent in enumerate(self.language.universe.referents)}
+        self._referent_to_index = {
+            referent: i for i, referent in enumerate(self.language.universe.referents)
+        }
         self._index_to_referent = tuple(self.language.universe.referents)
-        self._expression_to_index = {expression: i for i, expression in enumerate(self.language.expressions)}
-        self._index_to_expression = tuple(self.language.expressions)  
+        self._expression_to_index = {
+            expression: i for i, expression in enumerate(self.language.expressions)
+        }
+        self._index_to_expression = tuple(self.language.expressions)
 
         self.shape = None
         self.weights = None
@@ -36,6 +41,7 @@ class CommunicativeAgent:
     @property
     def weights(self) -> np.ndarray:
         return self._weights
+
     @weights.setter
     def weights(self, weights: np.ndarray) -> None:
         self._weights = weights
@@ -48,17 +54,12 @@ class CommunicativeAgent:
         return agent
 
     def normalized_weights(self) -> None:
-        """Return the normalized weights of a CommunicativeAgent so that each row vector represents a probability distribution.
-        """
+        """Return the normalized weights of a CommunicativeAgent so that each row vector represents a probability distribution."""
         raise NotImplementedError
 
-    def initialize_weights(
-        self, 
-        weights: np.ndarray = None, 
-        initial='ones'
-        ) -> None:
+    def initialize_weights(self, weights: np.ndarray = None, initial="ones") -> None:
         """Initialize the agent's weight matrix.
-        
+
         Args:
             weights: an np.ndarray representing the weights to initialize the agent with. By default None, and the agent's weights will be initialized uniformly.
 
@@ -66,28 +67,32 @@ class CommunicativeAgent:
         """
         if weights is not None:
             if weights.shape != self.shape:
-                raise ValueError(f"Inapropriate Sender weight matrix shape for language. Sender is of shape {self.shape} but received {weights.shape}.")
+                raise ValueError(
+                    f"Inapropriate Sender weight matrix shape for language. Sender is of shape {self.shape} but received {weights.shape}."
+                )
             self.weights = weights
         else:
             # initialize equally
-            if initial == 'ones':
+            if initial == "ones":
                 self.weights = np.ones(self.shape)
             # initialize from uniform distribution
-            elif initial == 'random':
+            elif initial == "random":
                 self.weights = np.random.uniform(
-                    low=0.0, 
+                    low=0.0,
                     high=1.0,
                     size=self.shape,
                 )
             else:
-                raise ValueError(f"Inappropriate value received for argument `initial`. Possible values are {'ones', 'random'}, but received: {initial}. ")
-    
+                raise ValueError(
+                    f"Inappropriate value received for argument `initial`. Possible values are {'ones', 'random'}, but received: {initial}. "
+                )
+
     def referent_to_index(self, referent: Referent) -> int:
         return self._referent_to_index[referent]
 
     def index_to_referent(self, index: int) -> Referent:
         return self._index_to_referent[index]
-    
+
     def expression_to_index(self, expression: Expression) -> int:
         return self._expression_to_index[expression]
 
@@ -106,7 +111,7 @@ class CommunicativeAgent:
 
     def sample_policy(self, index: int) -> int:
         """Sample a communicative policy by uniformly sampling from a row vector of the agent's weight matrix specified by the index.
-        
+
         Args:
             index: the integer index representing a row of the weight matrix.
 
@@ -121,22 +126,22 @@ class CommunicativeAgent:
         )
 
     def to_language(
-        self, 
+        self,
         data: dict = {
-                "complexity": None, 
-                "accuracy": None, 
-            },
-        threshold: float = 0.1
-        ) -> Language:
+            "complexity": None,
+            "accuracy": None,
+        },
+        threshold: float = 0.1,
+    ) -> Language:
         """Get a language from the agent, representing its current (possibly learned) communicative behavior.
 
-        This function uses 
-            1. the agent's weight matrix, 
-            2. the set of expression forms, and 
-            3. the set of referents 
+        This function uses
+            1. the agent's weight matrix,
+            2. the set of expression forms, and
+            3. the set of referents
 
-        from the language the agent was initialized with to generate a new language accurately reflecting the new expression meanings, e.g. how the agent interprets expressions as meaning zero or more referents. 
-        
+        from the language the agent was initialized with to generate a new language accurately reflecting the new expression meanings, e.g. how the agent interprets expressions as meaning zero or more referents.
+
         Args:
             threshold: a float in [0,1] representing the cutoff for determining if a meaning (referent) can be communicated by a expression. Because weights are not initialized to 0, it is a good idea to set nonzero values as the threshold.
         """
@@ -153,10 +158,14 @@ class CommunicativeAgent:
         for old_expression in self.language.expressions:
             # get all meanings that the expression can communicate
             referents = [
-                referent for referent in self.language.universe.referents 
-                    if policies[self.policy_to_indices(
+                referent
+                for referent in self.language.universe.referents
+                if policies[
+                    self.policy_to_indices(
                         policy={"referent": referent, "expression": old_expression}
-                    )] > threshold # if probability of referent is high enough
+                    )
+                ]
+                > threshold  # if probability of referent is high enough
             ]
 
             meaning = meaning_type(referents, self.language.universe)
@@ -177,6 +186,7 @@ class CommunicativeAgent:
 # Derived Speaker and Listener classes
 ##############################################################################
 
+
 class Speaker(CommunicativeAgent):
     def __init__(self, language: Language, **kwargs):
         super().__init__(language, **kwargs)
@@ -184,19 +194,20 @@ class Speaker(CommunicativeAgent):
     @property
     def S(self) -> np.ndarray:
         return self.weights
+
     @S.setter
     def S(self, mat: np.ndarray) -> None:
         self.weights = mat
 
     def normalized_weights(self) -> np.ndarray:
         """Get the normalized weights of a Speaker.
-        
+
         Each row vector represents a conditional probability distribution over expressions, P(e | m).
         """
         # The sum of p(e | intended m) must be exactly 0 or 1.
         # We check for nans because sometimes a language cannot express a particular meaning at all, resulting in a row sum of 0.
-        np.seterr(divide='ignore', invalid='ignore')
-        return np.nan_to_num(self.S/self.S.sum(axis=1, keepdims=True))
+        np.seterr(divide="ignore", invalid="ignore")
+        return np.nan_to_num(self.S / self.S.sum(axis=1, keepdims=True))
 
 
 class Listener(CommunicativeAgent):
@@ -206,15 +217,15 @@ class Listener(CommunicativeAgent):
     @property
     def R(self) -> np.ndarray:
         return self.weights
+
     @R.setter
     def R(self, mat: np.ndarray) -> None:
         self.weights = mat
 
     def normalized_weights(self) -> np.ndarray:
-        """Normalize the weights of a Listener so that each row vector for the heard expression e represents a conditional probability distribution over referents P(m | e).
-        """
+        """Normalize the weights of a Listener so that each row vector for the heard expression e represents a conditional probability distribution over referents P(m | e)."""
         # The sum of p(m | heard e) must be 1. We can safely divide each row by its sum because every expression has at least one meaning.
-        return self.R/self.R.sum(axis=1, keepdims=True)
+        return self.R / self.R.sum(axis=1, keepdims=True)
 
 
 ##############################################################################
@@ -241,17 +252,18 @@ class LiteralListener(Listener):
         self.R = self.language.binary_matrix().T
         self.R = self.normalized_weights()
 
+
 class PragmaticSpeaker(Speaker):
     """A pragmatic speaker chooses utterances based on how a listener would interpret them. A pragmatic speaker may be initialized with any kind of listener, e.g. literal or pragmatic -- meaning the recursive reasoning can be modeled up to arbitrary depth."""
 
     def __init__(
-        self, 
-        language: Language, 
-        listener: Listener, 
+        self,
+        language: Language,
+        listener: Listener,
         **kwargs,
     ):
         """Initialize the |M|-by-|E| matrix, S, corresponding to the pragmatic speaker's conditional probability distribution over expressions given meanings.
-        
+
         The pragmatic speaker chooses expressions to communicate their intended meaning according to:
 
             P(e | m) \propto exp(temperature * Utility(e,m))
@@ -281,9 +293,9 @@ class PragmaticListener(Listener):
     """A pragmatic listener interprets utterances based on their expectations about a pragmatic speaker's decisions. A pragmatic listener may be initialized with any kind of speaker, e.g. literal or pragmatic -- meaning the recursive reasoning can be modeled up to arbitrary depth."""
 
     def __init__(
-        self, 
-        language: Language, 
-        speaker: Speaker, 
+        self,
+        language: Language,
+        speaker: Speaker,
         prior: np.ndarray,
         **kwargs,
     ):

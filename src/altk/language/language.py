@@ -47,7 +47,9 @@ class Language:
 
         # Check that all expressions have the same universe
         if len(set([e.meaning.universe for e in expressions])) != 1:
-            raise ValueError(f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}")
+            raise ValueError(
+                f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}"
+            )
 
         self.expressions = expressions
         self.universe = expressions[0].meaning.universe
@@ -106,7 +108,7 @@ class Language:
 
     def __contains__(self, expression) -> bool:
         """Whether the language has the expression"""
-        return expression in self.expressions        
+        return expression in self.expressions
 
     @abstractmethod
     def __hash__(self) -> int:
