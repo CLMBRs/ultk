@@ -1,5 +1,5 @@
 import numpy as np
-from agent import Speaker
+from altk.effcomm.agent import Speaker
 
 def encoder_complexity(encoder: Speaker, prior: np.ndarray) -> float:
     """Compute the cognitive complexity for the encoder q, given by the information rate of compressing meanings M into words W:
