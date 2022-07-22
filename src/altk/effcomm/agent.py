@@ -48,7 +48,7 @@ class CommunicativeAgent:
         return agent
 
     def normalized_weights(self) -> None:
-        """Normalize the weights of a CommunicativeAgent so that each row vector represents a probability distribution.
+        """Return the normalized weights of a CommunicativeAgent so that each row vector represents a probability distribution.
         """
         raise NotImplementedError
 
@@ -95,10 +95,16 @@ class CommunicativeAgent:
         return self._index_to_expression[index]
 
     def policy_to_indices(self, policy: dict[str, Any]) -> tuple[int]:
-        """Given a expression and referent, access the corresponding weight."""
+        """Maps communicative policies to weights.
+
+        Given a expression and referent, access the corresponding weight coordinate.
+
+        Args:
+            policy: a dict of the form {"referent": Referent, "expression": expression} representing an instance of communicative behavior, which we may call a communicative action policy for this agent.
+        """
         raise NotImplementedError
 
-    def decision_function(self, index: int) -> int:
+    def sample_policy(self, index: int) -> int:
         """Chooses an entry of the agent's weight matrix by sampling from the row vector specified by the index.
         
         Args:
@@ -113,22 +119,6 @@ class CommunicativeAgent:
             a=range(len(choices)),
             p=choices_normalized,
         )
-
-    def reward(self, policy: dict[str, Any], amount: float) -> None:
-        """Reward an agent for a particular referent-expression behavior.
-        
-        In a signaling game, the communicative success of Sender and Receiver language protocols evolve under simple reinforcement learning dynamics. The reward function increments an agent's weight matrix at the specified location by the specified amount.
-
-        Args:
-            policy: a dict of the form {"referent": referent, "expression": Expression}
-
-            amount: a positive number reprsenting how much to reward the behavior
-        """
-        if set(policy.keys()) != {"referent", "expression"}:
-            raise ValueError(f"The argument `policy` must take a dict with keys 'referent' and 'expression'. Received: {policy.keys()}'")
-        if amount < 0:
-            raise ValueError(f"Amount to reinforce weight must be a positive number.")
-        self.weights[self.policy_to_indices(policy)] += amount
 
     def to_language(
         self, 
@@ -155,7 +145,7 @@ class CommunicativeAgent:
         expression_type = type(self.language.expressions[0])
         meaning_type = type(self.language.expressions[0].meaning)
 
-        # get distribution over policies from a weight matrix
+        # get distribution over communicative policies from a weight matrix
         policies = self.normalized_weights()
 
         expressions = []

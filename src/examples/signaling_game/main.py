@@ -4,8 +4,8 @@ import vis
 import numpy as np
 import measures
 from tqdm import tqdm
-from altk.effcomm.informativity import communicative_success, build_utility_matrix
 from agents import Receiver, Sender
+from game import SignalingGame
 from languages import (
     State, 
     StateSpace, 
@@ -44,7 +44,6 @@ def main():
 
     # Construct the universe of states, and language defined over it
     universe = StateSpace([State(name=name) for name in state_names])
-    states = universe.referents
 
     # All meanings are dummy placeholders at this stage, but they can be substantive once agents are given a weight matrix.
     dummy_meaning = SignalMeaning(states=[], universe=universe)
@@ -58,51 +57,26 @@ def main():
     # Construct a prior probability distribution over states
     prior_over_states = measures.distribution_over_states(num_states, type=prior_type)
 
+    ##########################################################################
+    # Main simulation
+    ##########################################################################
 
-    # Define how agents will be trained under simple reinforcement learning
-    payout = lambda target, output: int(
-        measures.indicator(target, output) * reward_amount
-        )
-
-    # Define the measures for analysis
-    comm_success = lambda s, r: communicative_success(
-        speaker=s, 
-        listener=r, 
-        utility=build_utility_matrix(universe, measures.indicator),
+    game = SignalingGame(
+        states=universe.referents,
+        signals=signals,
+        sender=sender,
+        receiver=receiver,
+        utility=lambda x, y: measures.indicator(x,y) * reward_amount,
         prior=prior_over_states,
-        )
-    complexity = lambda s: measures.encoder_complexity(s, prior_over_states)
-
-    ##########################################################################
-    # Main simulation training loop
-    ##########################################################################
-    accuracies = []
-    complexities = []
-
-    for _ in tqdm(range(num_rounds)):
-        # get input to sender
-        target = np.random.choice(a=states, p=prior_over_states)
-
-        # record interaction
-        signal = sender.encode(target)
-        output = receiver.decode(signal)
-        amount = payout(target, output)
-
-        # update agents
-        sender.reward(
-            policy={"referent": target, "expression": signal}, 
-            amount=amount
-            )
-        receiver.reward(
-            policy={"referent": output, "expression": signal}, 
-            amount=amount
-            )
-
-        # measure success / expected accuracy
-        accuracies.append(comm_success(sender, receiver))
-        complexities.append(complexity(sender))
+    )
+    game.play(num_rounds)
     
-    # Analyze and save results
+    ##########################################################################
+    # Analysis
+    ##########################################################################
+
+    accuracies = game.data["accuracy"]
+    complexities = game.data["complexity"]
     languages = [
         agent.to_language(
             # optionally add analysis data
