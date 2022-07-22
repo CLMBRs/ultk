@@ -66,8 +66,8 @@ def main():
 
     # Define the measures for analysis
     comm_success = lambda s, r: communicative_success(
-        sender=s, 
-        receiver=r, 
+        speaker=s, 
+        listener=r, 
         utility=build_utility_matrix(universe, measures.indicator),
         prior=prior_over_states,
         )

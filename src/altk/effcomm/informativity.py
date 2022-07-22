@@ -85,7 +85,7 @@ def informativity(
         raise ValueError(
             f"agent_type must be either 'literal' or 'pragmatic'. Received: {agent_type}."
         )
-
+    
     inf = communicative_success(speaker, listener, prior, utility)
 
     # Check informativity > 0
@@ -124,4 +124,6 @@ def communicative_success(
 
         - utility: a function u(m, m') representing similarity of meanings, or pair-wise usefulness of listener guesses about speaker meanings.
     """
-    return float(np.sum(np.diag(prior) @ speaker.S @ listener.R * utility))
+    S = speaker.normalized_weights()
+    R = listener.normalized_weights()
+    return float(np.sum(np.diag(prior) @ S @ R * utility))
