@@ -1,15 +1,16 @@
 import numpy as np
 from altk.effcomm.agent import Speaker
 
+
 def encoder_complexity(encoder: Speaker, prior: np.ndarray) -> float:
     """Compute the cognitive complexity for the encoder q, given by the information rate of compressing meanings M into words W:
 
         $I(M;W) = \sum_m p(m) \sum_w q(w|m) log [q(w|m) / q(w)]$
-    
-    where 
+
+    where
         $q(w) = \sum_m p(m) q(w|m) $
 
-    Args: 
+    Args:
         encoder: a Speaker to compute the complexity (information rate) of
 
         prior: the probability distribution over referents.
@@ -29,5 +30,5 @@ def encoder_complexity(encoder: Speaker, prior: np.ndarray) -> float:
 
             referent_sum.append(prob_expression_given_referent * log_term)
         total += prob_referent * sum(referent_sum)
-    
+
     return total

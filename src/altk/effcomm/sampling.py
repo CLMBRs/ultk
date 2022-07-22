@@ -22,8 +22,8 @@ def generate_languages(
     exact_sample=False,
     verbose=False,
 ) -> dict[str, Any]:
-    """Generate languages by randomly sampling vocabularies as bags of expressions. 
-    
+    """Generate languages by randomly sampling vocabularies as bags of expressions.
+
     A predicate (binary-valued property) of expressions may be supplied, which can be used to adjust the composition of vocabularies (e.g., by the percent of expressions satisfying the predicate).
 
     If sample size <= nCr, then take a random sample_size set of combinations. Otherwise, to prevent repeat languages, treat nCr as the sample size.
@@ -62,7 +62,7 @@ def generate_languages(
         >>> expressions = load_expressions(expressions_file)
         >>> universal_property = iff
         >>> result = generate_languages(
-        ...    ModalLanguage,        
+        ...    ModalLanguage,
         ...    expressions,
         ...    lang_size,
         ...    sample_size,
@@ -158,7 +158,6 @@ def generate_languages(
     }
 
 
-
 ##############################################################################
 # Different sampling methods
 ##############################################################################
@@ -214,7 +213,7 @@ def sample_quasi_natural(
         lang_size: the exact number of expressions a language must have.
 
         sample_size: how many languages to sample.
-    
+
     Returns:
         a dict containing the randomly sampled quasi-natural languages and the updated id_start, e.g.
         {
@@ -285,7 +284,7 @@ def sample_quasi_natural(
                     num_unnatural,
                     unnatural_terms,
                 )
-                id_start += 1                
+                id_start += 1
                 language = language_class(
                     vocabulary, name=rename_id(dummy_name, id_start)
                 )
@@ -302,6 +301,7 @@ def sample_quasi_natural(
 # Helper functions for generating languages
 ##############################################################################
 
+
 def rename_id(name: str, id: int) -> str:
     """Updates a string of form `sampled_lang_X` with a new id for X."""
     return "".join([c for c in name if not c.isdigit()] + [str(id)])
@@ -309,7 +309,7 @@ def rename_id(name: str, id: int) -> str:
 
 def enumerate_all_languages(
     language_class: Type[Language],
-    id_start: int,    
+    id_start: int,
     natural_terms: list[Expression],
     natural_indices: list[int],
     num_natural: int = 0,
@@ -324,7 +324,7 @@ def enumerate_all_languages(
     Args:
         language_class: the kind of Language to construct
 
-        id_start: a number to start counting from for assigning names with numerical ids to languages.        
+        id_start: a number to start counting from for assigning names with numerical ids to languages.
 
         natural_indices: the indices of quasi-natural languages already seen
 
@@ -360,9 +360,7 @@ def enumerate_all_languages(
                 unnatural_terms[idx] for idx in unnatural_subset
             ]
             id_start += 1
-            language = language_class(
-                vocabulary, name=rename_id(dummy_name, id_start)
-            )
+            language = language_class(vocabulary, name=rename_id(dummy_name, id_start))
             languages.add(language)
     return {
         "languages": languages,
