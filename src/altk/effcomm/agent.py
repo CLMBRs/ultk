@@ -47,7 +47,7 @@ class CommunicativeAgent:
         agent.weights = weights
         return agent
 
-    def normalize_weights(self) -> None:
+    def normalized_weights(self) -> None:
         """Normalize the weights of a CommunicativeAgent so that each row vector represents a probability distribution.
         """
         raise NotImplementedError
@@ -83,7 +83,7 @@ class CommunicativeAgent:
                 raise ValueError(f"Inappropriate value received for argument `initial`. Possible values are {'ones', 'random'}, but received: {initial}. ")
     
     def referent_to_index(self, referent: Referent) -> int:
-        return self._referent_to_index[Referent]
+        return self._referent_to_index[referent]
 
     def index_to_referent(self, index: int) -> Referent:
         return self._index_to_referent[index]
@@ -152,11 +152,11 @@ class CommunicativeAgent:
         """
         # Construct the same kind of language as initialized with
         language_type = type(self.language)
-        expression_type = type(self.language.expressions)
+        expression_type = type(self.language.expressions[0])
         meaning_type = type(self.language.expressions[0].meaning)
 
         # get distribution over policies from a weight matrix
-        policies = self.normalize_weights()
+        policies = self.normalized_weights()
 
         expressions = []
         # loop over agent's vocabulary
@@ -180,7 +180,7 @@ class CommunicativeAgent:
         if "name" not in data:
             data["name"] = self.name
 
-        return language_type(expressions=expressions, data=data)        
+        return language_type(expressions, data=data)
 
 
 ##############################################################################
@@ -198,13 +198,15 @@ class Speaker(CommunicativeAgent):
     def S(self, mat: np.ndarray) -> None:
         self.weights = mat
 
-    def normalize_weights(self):
-        """Normalize the weights of a Speaker so that each row vector for intended referent m represents a conditional probability distribution over expressions P(e | m).
+    def normalized_weights(self) -> np.ndarray:
+        """Get the normalized weights of a Speaker.
+        
+        Each row vector represents a conditional probability distribution over expressions, P(e | m).
         """
         # The sum of p(e | intended m) must be exactly 0 or 1.
         # We check for nans because sometimes a language cannot express a particular meaning at all, resulting in a row sum of 0.
         np.seterr(divide='ignore', invalid='ignore')
-        self.S = np.nan_to_num(self.S/self.S.sum(axis=1, keepdims=True))
+        return np.nan_to_num(self.S/self.S.sum(axis=1, keepdims=True))
 
 
 class Listener(CommunicativeAgent):
@@ -218,11 +220,11 @@ class Listener(CommunicativeAgent):
     def R(self, mat: np.ndarray) -> None:
         self.weights = mat
 
-    def normalize_weights(self):
+    def normalized_weights(self) -> np.ndarray:
         """Normalize the weights of a Listener so that each row vector for the heard expression e represents a conditional probability distribution over referents P(m | e).
         """
         # The sum of p(m | heard e) must be 1. We can safely divide each row by its sum because every expression has at least one meaning.
-        self.R = self.R/self.R.sum(axis=1, keepdims=True)
+        return self.R/self.R.sum(axis=1, keepdims=True)
 
 
 ##############################################################################
@@ -238,7 +240,7 @@ class LiteralSpeaker(Speaker):
     def __init__(self, language: Language, **kwargs):
         super().__init__(language, **kwargs)
         self.S = self.language.binary_matrix()
-        self.normalize_weights()
+        self.S = self.normalized_weights()
 
 
 class LiteralListener(Listener):
@@ -247,7 +249,7 @@ class LiteralListener(Listener):
     def __init__(self, language: Language, **kwargs):
         super().__init__(language, **kwargs)
         self.R = self.language.binary_matrix().T
-        self.normalize_weights()
+        self.R = self.normalized_weights()
 
 class PragmaticSpeaker(Speaker):
     """A pragmatic speaker chooses utterances based on how a listener would interpret them. A pragmatic speaker may be initialized with any kind of listener, e.g. literal or pragmatic -- meaning the recursive reasoning can be modeled up to arbitrary depth."""

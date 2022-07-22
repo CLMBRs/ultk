@@ -1,7 +1,7 @@
 import numpy as np
-from altk.effcomm.agent import CommunicativeAgent, Speaker, Listener
+from altk.effcomm.agent import Speaker, Listener
 from altk.language.semantics import Meaning
-from languages import State, Signal, SignalMeaning, SignalingLanguage
+from languages import Signal, SignalMeaning, SignalingLanguage
 from typing import Any
 
 
@@ -46,7 +46,7 @@ class Receiver(Listener):
         self.shape = (len(self.language), len(self.language.universe))
         self.initialize_weights(weights=weights)
             
-    def decode(self, signal: Signal) -> Meaning:
+    def decode(self, signal: Signal) -> SignalMeaning:
         """Choose an action given the signal received, e.g. decode a target state given its discrete encoding. """
         index = self.decision_function(
             index=self.expression_to_index(signal)
