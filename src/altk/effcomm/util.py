@@ -3,9 +3,12 @@ import numpy as np
 from altk.language.semantics import Universe, Meaning
 from typing import Callable
 
+
 def uniform_prior(universe: Universe) -> np.ndarray:
     """Return a 1-D numpy array of size |universe| reprsenting uniform distribution over the referents in a universe."""
-    return np.array([1 / len(universe.referents) for _ in range(len(universe.referents))])
+    return np.array(
+        [1 / len(universe.referents) for _ in range(len(universe.referents))]
+    )
 
 
 def build_utility_matrix(
@@ -18,6 +21,7 @@ def build_utility_matrix(
             for meaning in universe.referents
         ]
     )
+
 
 def compute_sparsity(mat: np.ndarray) -> float:
     """Number of 0s / number of elements in matrix."""

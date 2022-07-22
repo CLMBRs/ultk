@@ -5,18 +5,19 @@ import random
 import plotnine as pn
 from languages import SignalingLanguage
 
+
 def set_seed(seed: int) -> None:
     """Sets various random seeds."""
     random.seed(seed)
     np.random.seed(seed)
 
+
 def save_weights(fn, sender, receiver) -> None:
     """Save weights to a txt file."""
-    sender_n = sender.weights/sender.weights.sum(axis=1, keepdims=True)
-    receiver_n = receiver.weights/receiver.weights.sum(axis=0, keepdims=True)
+    sender_n = sender.weights / sender.weights.sum(axis=1, keepdims=True)
+    receiver_n = receiver.weights / receiver.weights.sum(axis=0, keepdims=True)
     np.set_printoptions(precision=2)
-    weights_string = (
-    f"""Sender
+    weights_string = f"""Sender
     \n------------------
     \nweights:
     \n{sender.weights}
@@ -30,17 +31,17 @@ def save_weights(fn, sender, receiver) -> None:
     \n{receiver.weights}
     \ndistribution:
     \n{receiver_n}
-    """)
-    with open(fn, 'w') as f:
+    """
+    with open(fn, "w") as f:
         f.write(weights_string)
+
 
 def save_languages(fn: str, languages: list[SignalingLanguage]) -> None:
     """Save a list of languages to a YAML file."""
-    data = {
-        "languages": list(lang.yaml_rep() for lang in languages)
-    }
+    data = {"languages": list(lang.yaml_rep() for lang in languages)}
     with open(fn, "w") as outfile:
-        yaml.safe_dump(data, outfile)    
+        yaml.safe_dump(data, outfile)
+
 
 def save_plot(fn: str, plot: pn.ggplot, width=10, height=10, dpi=300) -> None:
     """Save a plot with some default settings."""
@@ -67,11 +68,11 @@ def get_args() -> argparse.Namespace:
         type=int,
         default=100,
         help="How many rounds of the signaling game to run.",
-    )    
+    )
     parser.add_argument(
         "--distribution_over_states",
         type=str,
-        choices=["deterministic", "random"],        
+        choices=["deterministic", "random"],
         default="deterministic",
         help="How to generate distribution over states, either deterministically uniform or randomly sampled.",
     )
@@ -86,7 +87,7 @@ def get_args() -> argparse.Namespace:
         type=str,
         default="outputs/default/languages.yml",
         help="Languages of agents will be saved to this file as YAML.",
-    )    
+    )
     parser.add_argument(
         "--save_weights",
         type=str,
@@ -104,7 +105,7 @@ def get_args() -> argparse.Namespace:
         type=str,
         default="outputs/default/complexity.png",
         help="Plot of complexity accuracy will be saved to this file as png.",
-    )    
+    )
     parser.add_argument(
         "--save_tradeoff_plot",
         type=str,

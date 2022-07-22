@@ -5,8 +5,16 @@ from cmath import isclose
 from typing import Callable
 from altk.language.language import Language
 from altk.language.semantics import Referent
-from altk.effcomm.agent import Speaker, Listener, LiteralListener, LiteralSpeaker, PragmaticSpeaker, PragmaticListener
+from altk.effcomm.agent import (
+    Speaker,
+    Listener,
+    LiteralListener,
+    LiteralSpeaker,
+    PragmaticSpeaker,
+    PragmaticListener,
+)
 from altk.effcomm.util import build_utility_matrix
+
 
 def informativity(
     language: Language,
@@ -55,7 +63,7 @@ def informativity(
         raise ValueError(
             f"agent_type must be either 'literal' or 'pragmatic'. Received: {agent_type}."
         )
-    
+
     inf = communicative_success(speaker, listener, prior, utility)
 
     # Check informativity > 0

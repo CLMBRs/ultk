@@ -52,7 +52,7 @@ class EvolutionaryOptimizer:
         lang_size: int,
         processes: int,
         x: str = "comm_cost",
-        y: str = "complexity",        
+        y: str = "complexity",
     ):
         """Initialize the evolutionary algorithm configurations.
 
@@ -95,11 +95,8 @@ class EvolutionaryOptimizer:
         self.explored_languages = None
 
     def fit(
-        self, 
-        seed_population: list[Language], 
-        id_start: int, 
-        explore: float = 0.0
-        ) -> dict[str, Any]:
+        self, seed_population: list[Language], id_start: int, explore: float = 0.0
+    ) -> dict[str, Any]:
         """Computes the Pareto frontier, a set languages which cannot be both more simple and more informative.
 
         Uses pygmo's nondominated_front method for computing a population's best solutions to a multi-objective optimization problem.
@@ -133,15 +130,16 @@ class EvolutionaryOptimizer:
             # Calculate dominating individuals
             dominating_languages = pareto_optimal_languages(languages, self.x, self.y)
             parent_result = sample_parents(
-                dominating_languages, explored_languages, id_start, explore)
+                dominating_languages, explored_languages, id_start, explore
+            )
             parent_languages = parent_result["languages"]
             id_start = parent_result["id_start"]
 
             # Mutate dominating individuals
             mutated_result = self.sample_mutated(
-                parent_languages, 
-                self.sample_size, 
-                self.expressions, 
+                parent_languages,
+                self.sample_size,
+                self.expressions,
                 id_start,
             )
             languages = mutated_result["languages"]
@@ -154,8 +152,9 @@ class EvolutionaryOptimizer:
         }
 
     def sample_mutated(
-        self, languages: list[Language], 
-        amount: int, 
+        self,
+        languages: list[Language],
+        amount: int,
         expressions: list[Expression],
         id_start: int,
     ) -> dict[str, Any]:
@@ -189,7 +188,9 @@ class EvolutionaryOptimizer:
 
                 mutated_language = copy.deepcopy(language)
                 id_start += 1
-                mutated_language.data["name"] = rename_id(mutated_language.data["name"], id_start)
+                mutated_language.data["name"] = rename_id(
+                    mutated_language.data["name"], id_start
+                )
 
                 for j in range(num_mutations):
                     mutated_language = self.mutate(mutated_language, expressions)
@@ -213,13 +214,13 @@ class EvolutionaryOptimizer:
 
     def mutate(self, language: Language, expressions: list[Expression]) -> Language:
         """Randomly selects a mutation that is allowed to apply and applies it to a language.
-        
-        Args: 
+
+        Args:
             language: the Language to mutate
 
             expressions: the list of all possible expressions. Some mutations need access to this list, so it is part of the mutation api.
 
-        Returns: 
+        Returns:
             the mutated Language
 
         """
@@ -237,14 +238,14 @@ class EvolutionaryOptimizer:
 
 
 def sample_parents(
-    dominating_languages: list[Language], 
-    explored_languages: list[Language], 
+    dominating_languages: list[Language],
+    explored_languages: list[Language],
     id_start: int,
-    explore: float
-    ) -> dict[str, Any]:
+    explore: float,
+) -> dict[str, Any]:
     """Use the explore parameter to explore possibly suboptimal areas of the language space.
-    
-    Args: 
+
+    Args:
         dominating_languages: a list of the languages with current best fitness with respect to the objectives.
 
         explored_languages: a list of all languages encountered during the evolutionary algorithm.
@@ -265,8 +266,8 @@ def sample_parents(
 
     fit_indices = list(range(total_fit))
     random.shuffle(fit_indices)
-    fit_indices = fit_indices[:total_fit - num_explore]
-    
+    fit_indices = fit_indices[: total_fit - num_explore]
+
     parent_languages = []
     for i in fit_indices:
         id_start += 1
@@ -276,7 +277,7 @@ def sample_parents(
 
     langs_to_explore = random.sample(explored_languages, num_explore)
     for i in range(num_explore):
-        id_start +=1
+        id_start += 1
         lang = langs_to_explore[i]
         lang.data["name"] = rename_id(lang.data["name"], id_start)
         parent_languages.append(lang)

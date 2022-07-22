@@ -6,7 +6,13 @@ from altk.language.language import Language
 from scipy.stats import pearsonr, scoreatpercentile, ttest_1samp
 from typing import Any
 
-def get_dataframe(languages: list[Language], columns: list[str] = None, subset: list[str] = ["complexity", "comm_cost"], duplicates: str = "leave") -> pd.DataFrame:
+
+def get_dataframe(
+    languages: list[Language],
+    columns: list[str] = None,
+    subset: list[str] = ["complexity", "comm_cost"],
+    duplicates: str = "leave",
+) -> pd.DataFrame:
     """Get a pandas DataFrame for a list of languages containing efficient communication data.
 
     Args:
@@ -19,7 +25,7 @@ def get_dataframe(languages: list[Language], columns: list[str] = None, subset: 
         duplicates: {"drop", "count", "leave"} whether to drop, count, or do nothing with duplicates. By default is set to "leave" which will leave duplicates in the dataframe.
 
     Returns:
-        - data: a pandas DataFrame with rows as individual languages, with the columns specifying their data. 
+        - data: a pandas DataFrame with rows as individual languages, with the columns specifying their data.
     """
     if columns is None:
         columns = list(languages[0].data.keys())
@@ -45,7 +51,8 @@ def get_dataframe(languages: list[Language], columns: list[str] = None, subset: 
             f"the argument `duplicates` must be either 'drop', 'count', 'leave'. Received: {duplicates}"
         )
 
-    return data    
+    return data
+
 
 def pearson_analysis(
     data, predictor: str, property: str, num_bootstrap_samples=100
@@ -62,7 +69,7 @@ def pearson_analysis(
         property: a string representing a column to measure pearson r with the predictor column
 
         num_bootstrap_samples: how many samples to bootstrap from the original data
-    
+
     Returns:
         a dict of the pearson correlation coefficient for the predictor and the property, and bootstrapped confidence intervals for this coefficient, e.g.
         {
@@ -111,24 +118,24 @@ def pearson_analysis(
 
 def trade_off_means(name: str, df: pd.DataFrame, properties: list) -> pd.DataFrame:
     """Get a dataframe with the mean tradeoff data.
-    
-    Args: 
+
+    Args:
         name: a str representing the subset of the population to observe mean properties for, e.g. "natural" or "population".
 
         df: a pandas DataFrame containing data of a language population to take the means of.
 
         prperties: the properties to take means of, corresponding to columns of `df`.
 
-    Examples: 
+    Examples:
 
     >>> natural_means = trade_off_means("natural_means", natural_data, properties)
     >>> population_means = trade_off_means("population_means", data, properties)
     >>> means_df = pd.concat([natural_means, dlsav_means, population_means]).set_index("name")
     >>> means_df
                         simplicity  complexity  informativity  optimality
-        name                                                               
+        name
         natural_means       0.772222     16.4000       0.746296    0.952280
-        population_means    0.681068     22.9631       0.525118    0.832010    
+        population_means    0.681068     22.9631       0.525118    0.832010
 
     """
     means_dict = {prop: [df[prop].mean()] for prop in properties} | {"name": name}
@@ -141,9 +148,9 @@ def trade_off_ttest(
 ) -> pd.DataFrame:
     """Get a dataframe with a single-samples t-test results for a subpopulation against the full population.
 
-    This is useful if we want to compare the optimality of natural languages to the full population of languages in an experiment. Because the property of 'being a natural language' is categorical, we use a single-samples T test.    
+    This is useful if we want to compare the optimality of natural languages to the full population of languages in an experiment. Because the property of 'being a natural language' is categorical, we use a single-samples T test.
 
-    Args: 
+    Args:
         sub_population: a pandas DataFrame representing a subset of the population to take ttests against the full language population for `properties`.
 
         population_means: a dict containing properties as keys and the mean value of the full language population for that property.
@@ -155,7 +162,7 @@ def trade_off_ttest(
         >>> df = trade_off_ttest(natural_data, population_means, properties)
         >>> df
                                 simplicity  complexity  informativity  optimality
-            stat                                                                
+            stat
             t-statistic          4.101937   -4.101937       3.126855    4.031027
             Two-sided p-value    0.014830    0.014830       0.035292    0.015720
 
@@ -168,4 +175,3 @@ def trade_off_ttest(
     df = pd.DataFrame(data)
     df["stat"] = ["t-statistic", "Two-sided p-value"]
     return df.set_index("stat")
-    

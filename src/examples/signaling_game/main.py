@@ -2,13 +2,8 @@ import game
 import util
 import vis
 from agents import Receiver, Sender
-from languages import (
-    State, 
-    StateSpace, 
-    Signal, 
-    SignalMeaning, 
-    SignalingLanguage
-    )
+from languages import State, StateSpace, Signal, SignalMeaning, SignalingLanguage
+
 
 def main(args):
 
@@ -58,7 +53,7 @@ def main(args):
         prior=prior_over_states,
     )
     signaling_game.play(num_rounds)
-    
+
     ##########################################################################
     # Analysis
     ##########################################################################
@@ -70,8 +65,9 @@ def main(args):
             # optionally add analysis data
             data={"accuracy": accuracies[-1]},
             threshold=0.2,
-            ) for agent in [sender, receiver]
-        ]
+        )
+        for agent in [sender, receiver]
+    ]
 
     util.save_weights(args.save_weights, sender, receiver)
     util.save_languages(args.save_languages, languages)
@@ -82,6 +78,7 @@ def main(args):
     vis.plot_tradeoff(args.save_tradeoff_plot, complexities, accuracies)
 
     print("Done.")
+
 
 if __name__ == "__main__":
 
