@@ -4,7 +4,7 @@ import numpy as np
 from cmath import isclose
 from typing import Callable
 from altk.language.language import Language
-from altk.language.semantics import Meaning, Universe
+from altk.language.semantics import Meaning, Universe, Referent
 from altk.effcomm.agent import Speaker, Listener, LiteralListener, LiteralSpeaker, PragmaticSpeaker, PragmaticListener
 
 ##############################################################################
@@ -43,17 +43,19 @@ def compute_sparsity(mat: np.ndarray) -> float:
 def informativity(
     language: Language,
     prior: np.ndarray,
-    utility: np.ndarray,
+    utility: Callable[[Referent, Referent], float],
     agent_type: str = "literal",
 ) -> float:
-    """The informativity of a language is based on the successful communication between a Sender and a Receiver.
+    """The informativity of a language is identified with the successful communication between a Sender and a Receiver.
+
+    This function is a wrapper for `communicative_success`.
 
     Args:
         language: the language to compute informativity of.
 
         prior: a probability distribution representing communicative need (frequency) for meanings.
 
-        utility: a 2d numpy array of size |meanings| by |meanings|, containing the function representing the usefulness of listener guesses about speaker meanings, e.g. meaning similarity. To reward only exact recovery of meanings. pass the identity_{|meanings|} matrix.
+        utility: a function representing the usefulness of listener guesses about speaker meanings, e.g. meaning similarity. To reward only exact recovery of meanings, pass the an indicator function.
 
         kind: {"literal, pragmatic"} Whether to measure informativity using literal or pragmatic agents, as canonically described in the Rational Speech Act framework. The default is "literal".
 
@@ -89,7 +91,8 @@ def informativity(
     inf = communicative_success(speaker, listener, prior, utility)
 
     # Check informativity > 0
-    m, _ = utility.shape  # square matrix
+    utility_matrix = build_utility_matrix(speaker.language.universe, utility)
+    m, _ = utility_matrix.shape  # square matrix
     if np.array_equal(utility, np.eye(m)):
         if isclose(inf, 0.0):
             raise ValueError(
@@ -103,7 +106,7 @@ def communicative_success(
     speaker: Speaker,
     listener: Listener,
     prior: np.ndarray,
-    utility: np.ndarray,
+    utility: Callable[[Referent, Referent], float],
 ) -> float:
     """Helper function to compute the literal informativity of a language.
 
@@ -126,4 +129,5 @@ def communicative_success(
     """
     S = speaker.normalized_weights()
     R = listener.normalized_weights()
+    U = build_utility_matrix(speaker.language.universe, utility)
     return float(np.sum(np.diag(prior) @ S @ R * utility))
