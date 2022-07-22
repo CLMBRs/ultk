@@ -1,9 +1,6 @@
-import sys
-import file_util
+import game
+import util
 import vis
-import numpy as np
-import measures
-from tqdm import tqdm
 from agents import Receiver, Sender
 from languages import (
     State, 
@@ -13,25 +10,17 @@ from languages import (
     SignalingLanguage
     )
 
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: python3 src/main.py path_to_config_file")
-        raise TypeError(f"Expected {2} arguments but received {len(sys.argv)}.")
+def main(args):
 
     # load game settings
-    config_fn = sys.argv[1]
-    configs = file_util.load_configs(config_fn)
-    
-    num_signals = configs['num_signals']
-    num_states = configs['num_states']
-    reward_amount = configs['reward_amount']
-    num_rounds = configs['num_rounds']
-    prior_type = configs['prior_over_states']
-    seed = configs['random_seed']
+    num_signals = args.num_signals
+    num_states = args.num_states
+    num_rounds = args.num_rounds
+    learning_rate = args.learning_rate
+    prior_type = args.distribution_over_states
+    seed = args.seed
 
-    # output files
-    paths = configs['paths']
-    file_util.set_seed(seed)
+    util.set_seed(seed)
 
     ##########################################################################
     # Define game parameters
@@ -43,7 +32,6 @@ def main():
 
     # Construct the universe of states, and language defined over it
     universe = StateSpace([State(name=name) for name in state_names])
-    states = universe.referents
 
     # All meanings are dummy placeholders at this stage, but they can be substantive once agents are given a weight matrix.
     dummy_meaning = SignalMeaning(states=[], universe=universe)
@@ -55,53 +43,28 @@ def main():
     receiver = Receiver(seed_language, name="receiver")
 
     # Construct a prior probability distribution over states
-    prior_over_states = measures.distribution_over_states(num_states, type=prior_type)
+    prior_over_states = game.distribution_over_states(num_states, type=prior_type)
 
+    ##########################################################################
+    # Main simulation
+    ##########################################################################
 
-    # Define how agents will be trained under simple reinforcement learning
-    payout = lambda target, output: int(
-        measures.indicator(target, output) * reward_amount
-        )
-
-    # Define the measures for analysis
-    comm_success = lambda s, r: measures.signaling_accuracy(
-        sender=s, 
-        receiver=r, 
-        utility=measures.indicator, # always based on coordination
+    signaling_game = game.SignalingGame(
+        states=universe.referents,
+        signals=signals,
+        sender=sender,
+        receiver=receiver,
+        utility=lambda x, y: game.indicator(x, y) * learning_rate,
         prior=prior_over_states,
-        )
-    complexity = lambda s: measures.encoder_complexity(s, prior_over_states)
-
-    ##########################################################################
-    # Main simulation training loop
-    ##########################################################################
-    accuracies = []
-    complexities = []
-
-    for _ in tqdm(range(num_rounds)):
-        # get input to sender
-        target = np.random.choice(a=states, p=prior_over_states)
-
-        # record interaction
-        signal = sender.encode(target)
-        output = receiver.decode(signal)
-        amount = payout(target, output)
-
-        # update agents
-        sender.reward(
-            policy={"state": target, "signal": signal}, 
-            amount=amount
-            )
-        receiver.reward(
-            policy={"state": output, "signal": signal}, 
-            amount=amount
-            )
-
-        # measure success / expected accuracy
-        accuracies.append(comm_success(sender, receiver))
-        complexities.append(complexity(sender))
+    )
+    signaling_game.play(num_rounds)
     
-    # Analyze and save results
+    ##########################################################################
+    # Analysis
+    ##########################################################################
+
+    accuracies = signaling_game.data["accuracy"]
+    complexities = signaling_game.data["complexity"]
     languages = [
         agent.to_language(
             # optionally add analysis data
@@ -110,15 +73,18 @@ def main():
             ) for agent in [sender, receiver]
         ]
 
-    file_util.save_weights(paths['weights'], sender, receiver)
-    file_util.save_languages(paths['languages'], languages)
+    util.save_weights(args.save_weights, sender, receiver)
+    util.save_languages(args.save_languages, languages)
 
-    vis.plot_distribution(paths['prior_plot'], prior_over_states)
-    vis.plot_accuracy(paths['accuracy_plot'], accuracies)
-    vis.plot_complexity(paths['complexity_plot'], complexities)
-    vis.plot_tradeoff(paths['tradeoff_plot'], complexities, accuracies)
+    vis.plot_distribution(args.save_distribution, prior_over_states)
+    vis.plot_accuracy(args.save_accuracy_plot, accuracies)
+    vis.plot_complexity(args.save_complexity_plot, complexities)
+    vis.plot_tradeoff(args.save_tradeoff_plot, complexities, accuracies)
 
     print("Done.")
 
 if __name__ == "__main__":
-    main()
+
+    args = util.get_args()
+
+    main(args)

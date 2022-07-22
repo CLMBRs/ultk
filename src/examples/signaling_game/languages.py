@@ -101,8 +101,7 @@ class SignalingLanguage(Language):
                 "name": None,
             },
         ):
-        self.data = data
-        super().__init__(signals)
+        super().__init__(signals, data=data)
 
     def yaml_rep(self) -> dict[str, dict]:
         """Get a data structure for safe compact saving in a .yml file.
