@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A signaling game is a an evolutionary game theoretic model of how meaning can emerge under very simple reinforcement learning.
+A signaling game is a an evolutionary game theoretic model that can be used to show how meaning can emerge under very simple reinforcement learning.
 
 Here we illustrate how the tools from ALTK can be used to develop reusable code for basic signaling game simulations that is integrated with other research paradigms such as efficient communication analyses, the Rational Speech Act Framework, and machine learning.
 
@@ -10,9 +10,13 @@ Here we illustrate how the tools from ALTK can be used to develop reusable code 
 
 To run a basic signaling game simulation, use the following command:
 
-`python3 main.py configs/two.yml`
+`python3 main.py`
 
-This will produce results in the folder called `outputs/two`, including plots, weights and the resulting 'languages'.
+or
+
+`./run_example.sh`
+
+This will produce results in the folders `outputs/default` or `outputs/example`, respectively. They include plots, weights and the resulting 'languages'.
 
 ## Experimenting
 
@@ -27,11 +31,11 @@ Run different simulations by creating new config files and output folder. One mi
 - the number of states
 - the number of signals
 - the number of rounds in a game
-- the reward amount
+- the learning rate
 
 ### Using ALTK for signaling games
 
-The most general aspects of the learning agents, measures of communicative success and the language primitives are implemented in ALTK. Some signaling-specific concepts and wrappers implemented in `agents.py`, `languages.py`, and `measures.py`.
+The most general aspects of the communicative agents, measures of communicative success and the language primitives are implemented in ALTK. Some signaling-specific concepts and wrappers implemented in the `.py` files.
 
 This example is limited for simplicity, but is also intended to be an recylable outline for additional simulations, such as:
 
