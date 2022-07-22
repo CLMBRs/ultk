@@ -4,41 +4,9 @@ import numpy as np
 from cmath import isclose
 from typing import Callable
 from altk.language.language import Language
-from altk.language.semantics import Meaning, Universe, Referent
+from altk.language.semantics import Referent
 from altk.effcomm.agent import Speaker, Listener, LiteralListener, LiteralSpeaker, PragmaticSpeaker, PragmaticListener
-
-##############################################################################
-# Helper functions for informativity calculation
-##############################################################################
-
-
-def uniform_prior(universe: Universe) -> np.ndarray:
-    """Return a 1-D numpy array of size |universe| reprsenting uniform distribution."""
-    return np.array([1 / len(universe.referents) for _ in range(len(universe.referents))])
-
-
-def build_utility_matrix(
-    universe: Universe, utility: Callable[[Meaning, Meaning], float]
-) -> np.ndarray:
-    """Construct the square matrix specifying the utility function defined for pairs of meanings."""
-    return np.array(
-        [
-            [utility(meaning, meaning_) for meaning_ in universe.referents]
-            for meaning in universe.referents
-        ]
-    )
-
-
-def compute_sparsity(mat: np.ndarray) -> float:
-    """Number of 0s / number of elements in matrix."""
-    total = mat.shape[0] * mat.shape[1]
-    zeros = np.count_nonzero(mat == 0)
-    return float(zeros / total)
-
-##############################################################################
-# Main informativity functions
-##############################################################################
-
+from altk.effcomm.util import build_utility_matrix
 
 def informativity(
     language: Language,
@@ -130,4 +98,4 @@ def communicative_success(
     S = speaker.normalized_weights()
     R = listener.normalized_weights()
     U = build_utility_matrix(speaker.language.universe, utility)
-    return float(np.sum(np.diag(prior) @ S @ R * utility))
+    return float(np.sum(np.diag(prior) @ S @ R * U))
