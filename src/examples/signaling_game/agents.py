@@ -58,19 +58,3 @@ class Receiver(Listener):
             self.expression_to_index(policy["expression"]),
             self.referent_to_index(policy["referent"]),             
             )
-
-def reward(agent: CommunicativeAgent, policy: dict[str, Any], amount: float) -> None:
-    """Reward an agent for a particular referent-expression behavior.
-    
-    In a signaling game, the communicative success of Sender and Receiver language protocols evolve under simple reinforcement learning dynamics. The reward function increments an agent's weight matrix at the specified location by the specified amount.
-
-    Args:
-        policy: a dict of the form {"referent": referent, "expression": Expression}
-
-        amount: a positive number reprsenting how much to reward the behavior
-    """
-    if set(policy.keys()) != {"referent", "expression"}:
-        raise ValueError(f"The argument `policy` must take a dict with keys 'referent' and 'expression'. Received: {policy.keys()}'")
-    if amount < 0:
-        raise ValueError(f"Amount to reinforce weight must be a positive number.")
-    agent.weights[agent.policy_to_indices(policy)] += amount
