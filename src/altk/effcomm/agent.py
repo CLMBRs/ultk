@@ -1,6 +1,6 @@
 """Classes for representing communicative agents, such as Senders and Receivers figuring in Lewis-Skyrms signaling games, literal and pragmatic agents in the Rational Speech Act framework, etc."""
 
-from typing import Type, Any
+from typing import Any
 import numpy as np
 from scipy.special import softmax
 from altk.language.language import Expression, Language
