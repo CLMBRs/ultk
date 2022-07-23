@@ -47,9 +47,9 @@ class CommunicativeAgent:
         self._weights = weights
 
     @classmethod
-    def from_weights(cls, weights: np.ndarray, language: Type[Language] = None):
+    def from_weights(cls, weights: np.ndarray):
         """Construct a CommunicativeAgent from a weight matrix."""
-        agent = cls(language=language)
+        agent = cls(language=None)
         agent.weights = weights
         return agent
 
