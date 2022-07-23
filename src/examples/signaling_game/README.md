@@ -26,7 +26,7 @@ This will produce results in the folders `outputs/default` or `outputs/example`,
 
 ### Existing game parameters
 
-Run different simulations by creating new config files and output folder. One might vary, for example:
+Run different games by supplying command line arguments, described in `python3 main.py -h`. One can vary, for example:
 
 - the number of states
 - the number of signals
