@@ -102,7 +102,7 @@ def generate_languages(
                 dummy_name=dummy_name,
             )
             enumerated_langs = result["languages"]
-            languages.union(enumerated_langs)
+            languages = languages.union(enumerated_langs)
             id_start = result["id_start"]
 
         # Otherwise, take random sample
@@ -112,15 +112,16 @@ def generate_languages(
                     f"Generating {word_amt_sample_size} languages of size {word_amount}"
                 )
             result = sample_quasi_natural(
-                language_class,
-                natural_terms,
-                unnatural_terms,
-                word_amount,
-                word_amt_sample_size,
-                id_start,
+                language_class=language_class,
+                natural_terms=natural_terms,
+                unnatural_terms=unnatural_terms,
+                lang_size=word_amount,
+                sample_size=word_amt_sample_size,
+                id_start=id_start,
                 dummy_name=dummy_name,
                 verbose=verbose,
             )
+
             rlangs = result["languages"]
             id_start = result["id_start"]
             languages = languages.union(rlangs)
@@ -168,6 +169,7 @@ def sample_lang_size(
     expressions: list[Expression],
     lang_size: int,
     sample_size: int,
+    id_start: int = 0,
     verbose=False,
     dummy_name="sampled_lang_id",
 ) -> list[Language]:
@@ -181,16 +183,23 @@ def sample_lang_size(
         lang_size: int representing the maximum language size to sample
 
         sample_size: int representing the number of total languages to return
+
+        id_start: an int representing the number of languages already generated in an experiment.
     """
-    return sample_quasi_natural(
+    result = sample_quasi_natural(
         language_class=language_class,
         natural_terms=expressions,
         unnatural_terms=[],
         lang_size=lang_size,
         sample_size=sample_size,
+        id_start=id_start,
         dummy_name=dummy_name,
         verbose=verbose,
     )
+    return {
+        "languages": list(result["languages"]),
+        "id_start": result["id_start"],
+    }
 
 
 def sample_quasi_natural(
@@ -227,8 +236,8 @@ def sample_quasi_natural(
     natural_indices = list(range(len(natural_terms)))
     unnatural_indices = list(range(len(unnatural_terms)))
 
-    # by default, expresions:= natural_terms
-    degrees = [1] * (lang_size + 1)
+    # by default, expresions:= natural_terms, i.e. all degree-1.0
+    degrees = [lang_size]
     if unnatural_terms:
         degrees = list(range(lang_size + 1))
     degree_sample_size = int(np.ceil(sample_size / len(degrees)))
@@ -264,7 +273,7 @@ def sample_quasi_natural(
                 num_unnatural,
             )
             enumerated_langs = result["languages"]
-            languages.union(enumerated_langs)
+            languages = languages.union(enumerated_langs)
             id_start = result["id_start"]
 
         # Otherwise, take a random sample
