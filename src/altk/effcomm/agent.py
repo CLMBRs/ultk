@@ -1,6 +1,6 @@
 """Classes for representing communicative agents, such as Senders and Receivers figuring in Lewis-Skyrms signaling games, literal and pragmatic agents in the Rational Speech Act framework, etc."""
 
-from typing import Any
+from typing import Type, Any
 import numpy as np
 from scipy.special import softmax
 from altk.language.language import Expression, Language
@@ -47,9 +47,9 @@ class CommunicativeAgent:
         self._weights = weights
 
     @classmethod
-    def from_weights(cls, weights: np.ndarray):
+    def from_weights(cls, weights: np.ndarray, language: Type[Language] = None):
         """Construct a CommunicativeAgent from a weight matrix."""
-        agent = cls(language=None)
+        agent = cls(language=language)
         agent.weights = weights
         return agent
 
