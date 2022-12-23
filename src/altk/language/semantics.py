@@ -75,6 +75,10 @@ class Meaning:
             universe: a Universe object that defines the probability space for a meaning.
         """
         if not set(referents).issubset(set(universe.referents)):
+            print("referents:")
+            print([str(r) for r in referents])
+            print("universe:")
+            print([str(r) for r in universe.referents])
             raise ValueError(
                 f"The set of referents for a meaning must be a subset of the universe of discourse."
             )
