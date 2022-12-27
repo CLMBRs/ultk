@@ -35,7 +35,7 @@ def generate_languages(
 
         sample_size: the number of languages to generate.
 
-        criterion: the predicate, (e.g. semantic universal) by which to split the expressions into those satisfying and those not, and then sample languages with degrees of naturalness based on the percentage from those satisfying. Must apply at the expression level.
+        criterion: the predicate, (e.g. semantic universal) by which to split the expressions into those satisfying and those not, and then sample languages with degrees of naturalness based on the percentage from those satisfying. Must apply at the expression level. By default is a trivial criterion, so that all expressions are 'quasi-natural'.
 
         fixed_wordcount: whether to vary the language size from 1 to lang_size.
 
