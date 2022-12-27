@@ -46,13 +46,6 @@ class CommunicativeAgent:
     def weights(self, weights: np.ndarray) -> None:
         self._weights = weights
 
-    @classmethod
-    def from_weights(cls, weights: np.ndarray, language: Type[Language] = None):
-        """Construct a CommunicativeAgent from a weight matrix."""
-        agent = cls(language=language)
-        agent.weights = weights
-        return agent
-
     def normalized_weights(self) -> None:
         """Return the normalized weights of a CommunicativeAgent so that each row vector represents a probability distribution."""
         raise NotImplementedError
