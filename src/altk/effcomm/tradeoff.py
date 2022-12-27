@@ -72,12 +72,12 @@ def pareto_min_distances(points: list[tuple], pareto_points: list[tuple]) -> np.
 
 
 def interpolate_data(
-    points: list, min_cost: float = 0.0, max_cost: float = 1.0, num=5000
+    points: list[tuple[float]], min_cost: float = 0.0, max_cost: float = 1.0, num=5000
 ) -> np.ndarray:
     """Interpolate the points yielded by the pareto optimal languages into a continuous (though not necessarily smooth) curve.
 
     Args:
-        points: an array of size [dominating_languages], a possibly non-smooth set of solutions to the trade-off.
+        points: an list of (comm_cost, complexity) pairs of size [dominating_languages], a possibly non-smooth set of solutions to the trade-off.
 
         min_cost: the minimum communicative cost value possible to interpolate from.
 
@@ -93,7 +93,7 @@ def interpolate_data(
         points.append((1, 0))
 
     # NB: interp1d requires no duplicates and we require unique costs.
-    points = list({cost: comp for cost, comp in sorted(points, reverse=True)}.items())
+    points = list({cost: comp for cost, comp in sorted(points, key=lambda x: x[0], reverse=True)}.items())
 
     pareto_x, pareto_y = list(zip(*points))
     interpolated = interpolate.interp1d(pareto_x, pareto_y, fill_value="extrapolate")
