@@ -3,6 +3,7 @@ import util
 import vis
 from agents import Receiver, Sender
 from languages import State, StateSpace, Signal, SignalMeaning, SignalingLanguage
+from learning import simulate_learning
 
 
 def main(args):
@@ -49,10 +50,10 @@ def main(args):
         signals=signals,
         sender=sender,
         receiver=receiver,
-        utility=lambda x, y: game.indicator(x, y) * learning_rate,
+        utility=lambda x, y: game.indicator(x, y),
         prior=prior_over_states,
     )
-    signaling_game.play(num_rounds)
+    signaling_game = simulate_learning(signaling_game, num_rounds, learning_rate)
 
     ##########################################################################
     # Analysis
