@@ -50,7 +50,6 @@ class EvolutionaryOptimizer:
         max_mutations: int,
         generations: int,
         lang_size: int,
-        processes: int,
         x: str = "comm_cost",
         y: str = "complexity",
     ):
@@ -89,7 +88,6 @@ class EvolutionaryOptimizer:
         self.max_mutations = max_mutations
         self.generations = generations
         self.lang_size = lang_size
-        self.processes = processes
 
         self.dominating_languages = None
         self.explored_languages = None
