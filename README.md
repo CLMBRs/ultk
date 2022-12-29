@@ -19,13 +19,13 @@ Key features:
 
 ALTK is a long term project and it is currently in its early stages.
 
-However, it is intended to help lower the barrier to entry for certain research in computational semantics, and to unify methodologies. So if you find something confusing or would like to collaborate, please contact the developers or open an issue. And if you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on, we are _very_ interested in helping!
+However, it is intended to help lower the barrier to entry for certain research in computational semantics, and to unify methodologies. So if you find something confusing or would like to collaborate, please contact the developers or open an issue. If you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on, we are very interested in helping.
 
 <details>
 <summary> Goals for future work</summary>
 <br>
 
-Immediate goals include reproducing the efficient communication analyses for the domains of:
+Immediate goals include reproducing the efficient communication analyses for domains such as:
 
 - color terms
 - quantifiers
