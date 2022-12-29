@@ -57,7 +57,7 @@ Longer term goals for ALTK include providing support for:
 - For an introduction to efficient communication research, here is a [survey paper](https://www.annualreviews.org/doi/abs/10.1146/annurev-linguistics-011817-045406) of the field.
 - For an introduction to the RSA framework, see [this online textbook](http://www.problang.org/).
 - Check out the basic [signaling game](src/examples/signaling_game) example.
-- For a more scaled up usage example, visit the codebase for an efficient communication analysis of [modals](https://github.com/nathimel/modals-effcomm).
+- To see more scaled up usage examples, visit the codebase for an efficient communication analysis of [modals](https://github.com/nathimel/modals-effcomm) or [sim-max games](https://github.com/nathimel/rdsg).
 
 ## References
 
