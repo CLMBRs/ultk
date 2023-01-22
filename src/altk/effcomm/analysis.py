@@ -103,7 +103,6 @@ def pearson_analysis(
             except ValueError:
                 print("MINIMUM SIZE OF DATA: ", int(2 / min_percent))
                 print("SIZE OF DATA: ", len(data.index))
-                assert False
             rhos.append(rho)
         interval = scoreatpercentile(rhos, (2.5, 97.5))
         confidence_intervals_df.iloc[
