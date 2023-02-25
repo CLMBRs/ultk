@@ -192,7 +192,7 @@
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">    If sample size &lt;= nCr, then take a random sample_size set of combinations. Otherwise, to prevent repeat languages, treat nCr as the sample size.</span>
 </span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">    Args:</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">        expressions: a list of the possible modal expressions to sample from.</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">        expressions: a list of the possible expressions to sample from.</span>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">        lang_size: the maximum (or exact) number of expressions in each language.</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
@@ -715,7 +715,7 @@
 </span><span id="generate_languages-95"><a href="#generate_languages-95"><span class="linenos"> 95</span></a><span class="sd">    If sample size &lt;= nCr, then take a random sample_size set of combinations. Otherwise, to prevent repeat languages, treat nCr as the sample size.</span>
 </span><span id="generate_languages-96"><a href="#generate_languages-96"><span class="linenos"> 96</span></a>
 </span><span id="generate_languages-97"><a href="#generate_languages-97"><span class="linenos"> 97</span></a><span class="sd">    Args:</span>
-</span><span id="generate_languages-98"><a href="#generate_languages-98"><span class="linenos"> 98</span></a><span class="sd">        expressions: a list of the possible modal expressions to sample from.</span>
+</span><span id="generate_languages-98"><a href="#generate_languages-98"><span class="linenos"> 98</span></a><span class="sd">        expressions: a list of the possible expressions to sample from.</span>
 </span><span id="generate_languages-99"><a href="#generate_languages-99"><span class="linenos"> 99</span></a>
 </span><span id="generate_languages-100"><a href="#generate_languages-100"><span class="linenos">100</span></a><span class="sd">        lang_size: the maximum (or exact) number of expressions in each language.</span>
 </span><span id="generate_languages-101"><a href="#generate_languages-101"><span class="linenos">101</span></a>
@@ -855,7 +855,7 @@
 <h6 id="arguments">Arguments:</h6>
 
 <ul>
-<li><strong>expressions:</strong>  a list of the possible modal expressions to sample from.</li>
+<li><strong>expressions:</strong>  a list of the possible expressions to sample from.</li>
 <li><strong>lang_size:</strong>  the maximum (or exact) number of expressions in each language.</li>
 <li><strong>sample_size:</strong>  the number of languages to generate.</li>
 <li><strong>criterion:</strong>  the predicate, (e.g. semantic universal) by which to split the expressions into those satisfying and those not, and then sample languages with degrees of naturalness based on the percentage from those satisfying. Must apply at the expression level. By default is a trivial criterion, so that all expressions are 'quasi-natural'.</li>

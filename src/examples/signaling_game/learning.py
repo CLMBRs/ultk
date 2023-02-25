@@ -4,7 +4,7 @@ import numpy as np
 from altk.effcomm.agent import CommunicativeAgent
 from altk.effcomm.informativity import communicative_success
 from altk.effcomm.information import information_rate
-from game import SignalingGame
+from .game import SignalingGame
 from tqdm import tqdm
 from typing import Any
 

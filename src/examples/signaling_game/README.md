@@ -42,13 +42,13 @@ This example is limited for simplicity, but is also intended to be an recylable 
 - extending to more than two agents
 - defining more powerful learning agents
 - defining different or multiple objectives besides perfect recovery of atomic states
-- exploring different evolutionary trajectories of languages in the 2D trade-off space of $( \text{simplicity}, \text{informativeness} )$.
+- exploring different evolutionary trajectories of languages in the 2D trade-off space.
 
 </details>
 
-## Resources
+## Links
 
-Research in signaling games is extensive and interdisciplinary.
+Here are a few links to more information about signaling games.
 <details>
 <summary>
 Links

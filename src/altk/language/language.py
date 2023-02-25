@@ -1,6 +1,6 @@
 """Classes for modeling languages as form-meaning mappings, most important among them the Language and Expression classes.
 
-The base object of altk is a Language. This is intended to model a language scientifically (especially parts of its semantics) and to enable various use cases. Most notably, experiments such as analyses of efficient communication, learnability, automatic corpus generation for ML probing, etc.
+The base object of altk is a Language. This is intended to model a language  (especially parts of its semantics) and to enable various use cases. Most notably, experiments such as analyses of efficient communication, learnability, automatic corpus generation for ML probing, etc.
 """
 
 import numpy as np

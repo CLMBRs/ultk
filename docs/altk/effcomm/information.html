@@ -382,100 +382,109 @@
 </span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation</span>
 </span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>
 </span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="sd">        utility: parameter for meaning distribution p(u|m) generation</span>
-</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a>    <span class="n">system</span> <span class="o">=</span> <span class="n">language_to_ib_encoder_decoder</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
-</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>    <span class="n">encoder</span> <span class="o">=</span> <span class="n">system</span><span class="p">[</span><span class="s2">&quot;encoder&quot;</span><span class="p">]</span>
-</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>    <span class="n">decoder</span> <span class="o">=</span> <span class="n">system</span><span class="p">[</span><span class="s2">&quot;decoder&quot;</span><span class="p">]</span>
-</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a>    <span class="n">space</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">universe</span>
-</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a>
-</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)</span>
-</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a>    <span class="n">conditional_puw</span> <span class="o">=</span> <span class="n">deterministic_decoder</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="n">conditional_pum</span><span class="p">)</span>
-</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a>    <span class="n">joint_pmu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_pum</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
-</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a>    <span class="n">p_w</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">marginalize</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
-</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a>    <span class="n">joint_pwu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_puw</span><span class="p">,</span> <span class="n">p_w</span><span class="p">)</span>
-</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a>
-</span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a>    <span class="k">return</span> <span class="p">{</span>
-</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a>        <span class="s2">&quot;joint_pmu&quot;</span><span class="p">:</span> <span class="n">joint_pmu</span><span class="p">,</span>
-</span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a>        <span class="s2">&quot;joint_pwu&quot;</span><span class="p">:</span> <span class="n">joint_pwu</span><span class="p">,</span>
-</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a>    <span class="p">}</span>
-</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a>
-</span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a>
-</span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a><span class="c1"># === IB Helpers ===</span>
-</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a>
+</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>
+</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="sd">    Returns:</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">        a dict of the form </span>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>
+</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">            {</span>
+</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="sd">            &quot;joint_pmu&quot;: an array of shape `(|U|, |M|)` representing P(U, M)</span>
+</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">            &quot;joint_pwu&quot;: an array of shape `(|W|, |U|)` representing P(W, U)</span>
+</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="sd">            }</span>
+</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a>
+</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a>    <span class="n">system</span> <span class="o">=</span> <span class="n">language_to_ib_encoder_decoder</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a>    <span class="n">encoder</span> <span class="o">=</span> <span class="n">system</span><span class="p">[</span><span class="s2">&quot;encoder&quot;</span><span class="p">]</span>
+</span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a>    <span class="n">decoder</span> <span class="o">=</span> <span class="n">system</span><span class="p">[</span><span class="s2">&quot;decoder&quot;</span><span class="p">]</span>
+</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a>    <span class="n">space</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">universe</span>
+</span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a>
+</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)</span>
+</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a>    <span class="n">conditional_puw</span> <span class="o">=</span> <span class="n">deterministic_decoder</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="n">conditional_pum</span><span class="p">)</span>
+</span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a>    <span class="n">joint_pmu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_pum</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+</span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a>    <span class="n">p_w</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">marginalize</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a>    <span class="n">joint_pwu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_puw</span><span class="p">,</span> <span class="n">p_w</span><span class="p">)</span>
 </span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a>
-</span><span id="L-290"><a href="#L-290"><span class="linenos">290</span></a><span class="k">def</span> <span class="nf">language_to_ib_encoder_decoder</span><span class="p">(</span>
-</span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a>    <span class="n">language</span><span class="p">:</span> <span class="n">Language</span><span class="p">,</span>
-</span><span id="L-292"><a href="#L-292"><span class="linenos">292</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-</span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-</span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a>    <span class="sd">&quot;&quot;&quot;Convert a Language, a mapping of words to meanings, to IB encoder, q(w|m) and IB decoder q(m|w).</span>
+</span><span id="L-290"><a href="#L-290"><span class="linenos">290</span></a>    <span class="k">return</span> <span class="p">{</span>
+</span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a>        <span class="s2">&quot;joint_pmu&quot;</span><span class="p">:</span> <span class="n">joint_pmu</span><span class="p">,</span>
+</span><span id="L-292"><a href="#L-292"><span class="linenos">292</span></a>        <span class="s2">&quot;joint_pwu&quot;</span><span class="p">:</span> <span class="n">joint_pwu</span><span class="p">,</span>
+</span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a>    <span class="p">}</span>
+</span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a>
 </span><span id="L-295"><a href="#L-295"><span class="linenos">295</span></a>
-</span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a><span class="sd">    Args:</span>
-</span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a><span class="sd">        language: the lexicon from which to infer a speaker (encoder).</span>
+</span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a><span class="c1"># === IB Helpers ===</span>
+</span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a>
 </span><span id="L-298"><a href="#L-298"><span class="linenos">298</span></a>
-</span><span id="L-299"><a href="#L-299"><span class="linenos">299</span></a><span class="sd">        prior: communicative need distribution</span>
-</span><span id="L-300"><a href="#L-300"><span class="linenos">300</span></a>
-</span><span id="L-301"><a href="#L-301"><span class="linenos">301</span></a><span class="sd">    Returns:</span>
-</span><span id="L-302"><a href="#L-302"><span class="linenos">302</span></a><span class="sd">        a dict of the form</span>
-</span><span id="L-303"><a href="#L-303"><span class="linenos">303</span></a><span class="sd">        {</span>
-</span><span id="L-304"><a href="#L-304"><span class="linenos">304</span></a><span class="sd">            &quot;encoder&quot;: np.ndarray of shape `(|meanings|, |words|)`,</span>
-</span><span id="L-305"><a href="#L-305"><span class="linenos">305</span></a><span class="sd">            &quot;decoder&quot;: np.ndarray of shape `(|words|, |meanings|)`,</span>
-</span><span id="L-306"><a href="#L-306"><span class="linenos">306</span></a><span class="sd">        }</span>
-</span><span id="L-307"><a href="#L-307"><span class="linenos">307</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-308"><a href="#L-308"><span class="linenos">308</span></a>    <span class="c1"># In the IB framework, the encoder is _typically_ a literal speaker and the decoder is a bayes optimal listener. TODO: There are obviously other possible choices here.</span>
-</span><span id="L-309"><a href="#L-309"><span class="linenos">309</span></a>    <span class="n">speaker</span> <span class="o">=</span> <span class="n">LiteralSpeaker</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
-</span><span id="L-310"><a href="#L-310"><span class="linenos">310</span></a>    <span class="n">speaker</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">rows_zero_to_uniform</span><span class="p">(</span><span class="n">speaker</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">())</span>
-</span><span id="L-311"><a href="#L-311"><span class="linenos">311</span></a>    <span class="n">listener</span> <span class="o">=</span> <span class="n">BayesianListener</span><span class="p">(</span><span class="n">speaker</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
-</span><span id="L-312"><a href="#L-312"><span class="linenos">312</span></a>    <span class="k">return</span> <span class="p">{</span>
-</span><span id="L-313"><a href="#L-313"><span class="linenos">313</span></a>        <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="n">speaker</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">(),</span>
-</span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a>        <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="n">listener</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">(),</span>
-</span><span id="L-315"><a href="#L-315"><span class="linenos">315</span></a>    <span class="p">}</span>
-</span><span id="L-316"><a href="#L-316"><span class="linenos">316</span></a>
-</span><span id="L-317"><a href="#L-317"><span class="linenos">317</span></a>
-</span><span id="L-318"><a href="#L-318"><span class="linenos">318</span></a><span class="k">def</span> <span class="nf">deterministic_decoder</span><span class="p">(</span>
-</span><span id="L-319"><a href="#L-319"><span class="linenos">319</span></a>    <span class="n">decoder</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">meaning_distributions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-</span><span id="L-320"><a href="#L-320"><span class="linenos">320</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-</span><span id="L-321"><a href="#L-321"><span class="linenos">321</span></a>    <span class="sd">&quot;&quot;&quot;Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) * m(u) $</span>
-</span><span id="L-322"><a href="#L-322"><span class="linenos">322</span></a>
-</span><span id="L-323"><a href="#L-323"><span class="linenos">323</span></a><span class="sd">    Args:</span>
-</span><span id="L-324"><a href="#L-324"><span class="linenos">324</span></a><span class="sd">        decoder: array of shape `(|words|, |meanings|)`</span>
+</span><span id="L-299"><a href="#L-299"><span class="linenos">299</span></a><span class="k">def</span> <span class="nf">language_to_ib_encoder_decoder</span><span class="p">(</span>
+</span><span id="L-300"><a href="#L-300"><span class="linenos">300</span></a>    <span class="n">language</span><span class="p">:</span> <span class="n">Language</span><span class="p">,</span>
+</span><span id="L-301"><a href="#L-301"><span class="linenos">301</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+</span><span id="L-302"><a href="#L-302"><span class="linenos">302</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+</span><span id="L-303"><a href="#L-303"><span class="linenos">303</span></a>    <span class="sd">&quot;&quot;&quot;Convert a Language, a mapping of words to meanings, to IB encoder, q(w|m) and IB decoder q(m|w).</span>
+</span><span id="L-304"><a href="#L-304"><span class="linenos">304</span></a>
+</span><span id="L-305"><a href="#L-305"><span class="linenos">305</span></a><span class="sd">    Args:</span>
+</span><span id="L-306"><a href="#L-306"><span class="linenos">306</span></a><span class="sd">        language: the lexicon from which to infer a speaker (encoder).</span>
+</span><span id="L-307"><a href="#L-307"><span class="linenos">307</span></a>
+</span><span id="L-308"><a href="#L-308"><span class="linenos">308</span></a><span class="sd">        prior: communicative need distribution</span>
+</span><span id="L-309"><a href="#L-309"><span class="linenos">309</span></a>
+</span><span id="L-310"><a href="#L-310"><span class="linenos">310</span></a><span class="sd">    Returns:</span>
+</span><span id="L-311"><a href="#L-311"><span class="linenos">311</span></a><span class="sd">        a dict of the form</span>
+</span><span id="L-312"><a href="#L-312"><span class="linenos">312</span></a><span class="sd">        {</span>
+</span><span id="L-313"><a href="#L-313"><span class="linenos">313</span></a><span class="sd">            &quot;encoder&quot;: np.ndarray of shape `(|meanings|, |words|)`,</span>
+</span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a><span class="sd">            &quot;decoder&quot;: np.ndarray of shape `(|words|, |meanings|)`,</span>
+</span><span id="L-315"><a href="#L-315"><span class="linenos">315</span></a><span class="sd">        }</span>
+</span><span id="L-316"><a href="#L-316"><span class="linenos">316</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-317"><a href="#L-317"><span class="linenos">317</span></a>    <span class="c1"># In the IB framework, the encoder is _typically_ a literal speaker and the decoder is a bayes optimal listener. TODO: There are obviously other possible choices here.</span>
+</span><span id="L-318"><a href="#L-318"><span class="linenos">318</span></a>    <span class="n">speaker</span> <span class="o">=</span> <span class="n">LiteralSpeaker</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+</span><span id="L-319"><a href="#L-319"><span class="linenos">319</span></a>    <span class="n">speaker</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">rows_zero_to_uniform</span><span class="p">(</span><span class="n">speaker</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">())</span>
+</span><span id="L-320"><a href="#L-320"><span class="linenos">320</span></a>    <span class="n">listener</span> <span class="o">=</span> <span class="n">BayesianListener</span><span class="p">(</span><span class="n">speaker</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+</span><span id="L-321"><a href="#L-321"><span class="linenos">321</span></a>    <span class="k">return</span> <span class="p">{</span>
+</span><span id="L-322"><a href="#L-322"><span class="linenos">322</span></a>        <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="n">speaker</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">(),</span>
+</span><span id="L-323"><a href="#L-323"><span class="linenos">323</span></a>        <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="n">listener</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">(),</span>
+</span><span id="L-324"><a href="#L-324"><span class="linenos">324</span></a>    <span class="p">}</span>
 </span><span id="L-325"><a href="#L-325"><span class="linenos">325</span></a>
-</span><span id="L-326"><a href="#L-326"><span class="linenos">326</span></a><span class="sd">        meaning_distributions: array of shape `(|meanings|, |meanings|)`</span>
-</span><span id="L-327"><a href="#L-327"><span class="linenos">327</span></a>
-</span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a><span class="sd">    Returns:</span>
-</span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="sd">        array of shape `(|words|, |meanings|)` representing the &#39;optimal&#39; deterministic decoder</span>
-</span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a>    <span class="k">return</span> <span class="n">decoder</span> <span class="o">@</span> <span class="n">meaning_distributions</span>
-</span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a>
-</span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a>
-</span><span id="L-334"><a href="#L-334"><span class="linenos">334</span></a><span class="k">def</span> <span class="nf">generate_meaning_distributions</span><span class="p">(</span>
-</span><span id="L-335"><a href="#L-335"><span class="linenos">335</span></a>    <span class="n">space</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
-</span><span id="L-336"><a href="#L-336"><span class="linenos">336</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="L-337"><a href="#L-337"><span class="linenos">337</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
-</span><span id="L-338"><a href="#L-338"><span class="linenos">338</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-</span><span id="L-339"><a href="#L-339"><span class="linenos">339</span></a>    <span class="sd">&quot;&quot;&quot;Generate a conditional distribution over world states given meanings, $p(u|m)$, for each meaning.</span>
-</span><span id="L-340"><a href="#L-340"><span class="linenos">340</span></a>
-</span><span id="L-341"><a href="#L-341"><span class="linenos">341</span></a><span class="sd">    Args:</span>
-</span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a><span class="sd">        space: the ModalMeaningSpace on which meanings are defined</span>
-</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a>
-</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a><span class="sd">        decay: a float in [0,1]. controls informativity, by decaying how much probability mass is assigned to perfect recoveries. As decay approaches 0, only perfect recovery is rewarded (which overrides any partial credit structure built into the utility/cost function). As decay approaches 1, the worst guesses become most likely.</span>
-</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a>
-</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a><span class="sd">        cost: a cost function defining the pairwise communicative cost for confusing one Referent in the Universe with another. If you have a (scaled) communicative utility matrix, a natural choice for cost might be `lambda x, y: 1 - utility(x, y)`.</span>
-</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a>
-</span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a><span class="sd">    Returns:</span>
-</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a><span class="sd">        p_u_m: an array of shape `(|space.referents|, |space.referents|)`</span>
-</span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a>
-</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a>    <span class="c1"># construct p(u|m) for each meaning</span>
-</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a>    <span class="n">meaning_distributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-</span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a>        <span class="p">[[</span><span class="n">decay</span> <span class="o">**</span> <span class="n">cost</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">space</span><span class="o">.</span><span class="n">referents</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">space</span><span class="o">.</span><span class="n">referents</span><span class="p">]</span>
-</span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a>    <span class="p">)</span>
-</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a>    <span class="c1"># each row sums to 1.0</span>
-</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a>    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a>    <span class="n">meaning_distributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
-</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a>        <span class="n">meaning_distributions</span> <span class="o">/</span> <span class="n">meaning_distributions</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a>    <span class="p">)</span>
-</span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a>
-</span><span id="L-362"><a href="#L-362"><span class="linenos">362</span></a>    <span class="k">return</span> <span class="n">meaning_distributions</span>
+</span><span id="L-326"><a href="#L-326"><span class="linenos">326</span></a>
+</span><span id="L-327"><a href="#L-327"><span class="linenos">327</span></a><span class="k">def</span> <span class="nf">deterministic_decoder</span><span class="p">(</span>
+</span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a>    <span class="n">decoder</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">meaning_distributions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a>    <span class="sd">&quot;&quot;&quot;Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) * m(u) $</span>
+</span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a>
+</span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a><span class="sd">    Args:</span>
+</span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a><span class="sd">        decoder: array of shape `(|words|, |meanings|)`</span>
+</span><span id="L-334"><a href="#L-334"><span class="linenos">334</span></a>
+</span><span id="L-335"><a href="#L-335"><span class="linenos">335</span></a><span class="sd">        meaning_distributions: array of shape `(|meanings|, |meanings|)`</span>
+</span><span id="L-336"><a href="#L-336"><span class="linenos">336</span></a>
+</span><span id="L-337"><a href="#L-337"><span class="linenos">337</span></a><span class="sd">    Returns:</span>
+</span><span id="L-338"><a href="#L-338"><span class="linenos">338</span></a><span class="sd">        array of shape `(|words|, |meanings|)` representing the &#39;optimal&#39; deterministic decoder</span>
+</span><span id="L-339"><a href="#L-339"><span class="linenos">339</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-340"><a href="#L-340"><span class="linenos">340</span></a>    <span class="k">return</span> <span class="n">decoder</span> <span class="o">@</span> <span class="n">meaning_distributions</span>
+</span><span id="L-341"><a href="#L-341"><span class="linenos">341</span></a>
+</span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a>
+</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a><span class="k">def</span> <span class="nf">generate_meaning_distributions</span><span class="p">(</span>
+</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a>    <span class="n">space</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
+</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a>    <span class="sd">&quot;&quot;&quot;Generate a conditional distribution over world states given meanings, $p(u|m)$, for each meaning.</span>
+</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a>
+</span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a><span class="sd">    Args:</span>
+</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a><span class="sd">        space: the ModalMeaningSpace on which meanings are defined</span>
+</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a>
+</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a><span class="sd">        decay: a float in [0,1]. controls informativity, by decaying how much probability mass is assigned to perfect recoveries. As decay approaches 0, only perfect recovery is rewarded (which overrides any partial credit structure built into the utility/cost function). As decay approaches 1, the worst guesses become most likely.</span>
+</span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a>
+</span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a><span class="sd">        cost: a cost function defining the pairwise communicative cost for confusing one Referent in the Universe with another. If you have a (scaled) communicative utility matrix, a natural choice for cost might be `lambda x, y: 1 - utility(x, y)`.</span>
+</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a>
+</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a><span class="sd">    Returns:</span>
+</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a><span class="sd">        p_u_m: an array of shape `(|space.referents|, |space.referents|)`</span>
+</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a>
+</span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a>    <span class="c1"># construct p(u|m) for each meaning</span>
+</span><span id="L-362"><a href="#L-362"><span class="linenos">362</span></a>    <span class="n">meaning_distributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+</span><span id="L-363"><a href="#L-363"><span class="linenos">363</span></a>        <span class="p">[[</span><span class="n">decay</span> <span class="o">**</span> <span class="n">cost</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">space</span><span class="o">.</span><span class="n">referents</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">space</span><span class="o">.</span><span class="n">referents</span><span class="p">]</span>
+</span><span id="L-364"><a href="#L-364"><span class="linenos">364</span></a>    <span class="p">)</span>
+</span><span id="L-365"><a href="#L-365"><span class="linenos">365</span></a>    <span class="c1"># each row sums to 1.0</span>
+</span><span id="L-366"><a href="#L-366"><span class="linenos">366</span></a>    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</span><span id="L-367"><a href="#L-367"><span class="linenos">367</span></a>    <span class="n">meaning_distributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
+</span><span id="L-368"><a href="#L-368"><span class="linenos">368</span></a>        <span class="n">meaning_distributions</span> <span class="o">/</span> <span class="n">meaning_distributions</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="L-369"><a href="#L-369"><span class="linenos">369</span></a>    <span class="p">)</span>
+</span><span id="L-370"><a href="#L-370"><span class="linenos">370</span></a>
+</span><span id="L-371"><a href="#L-371"><span class="linenos">371</span></a>    <span class="k">return</span> <span class="n">meaning_distributions</span>
 </span></pre></div>
 
 
@@ -976,22 +985,31 @@
 </span><span id="language_to_joint_distributions-267"><a href="#language_to_joint_distributions-267"><span class="linenos">267</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation</span>
 </span><span id="language_to_joint_distributions-268"><a href="#language_to_joint_distributions-268"><span class="linenos">268</span></a>
 </span><span id="language_to_joint_distributions-269"><a href="#language_to_joint_distributions-269"><span class="linenos">269</span></a><span class="sd">        utility: parameter for meaning distribution p(u|m) generation</span>
-</span><span id="language_to_joint_distributions-270"><a href="#language_to_joint_distributions-270"><span class="linenos">270</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="language_to_joint_distributions-271"><a href="#language_to_joint_distributions-271"><span class="linenos">271</span></a>    <span class="n">system</span> <span class="o">=</span> <span class="n">language_to_ib_encoder_decoder</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
-</span><span id="language_to_joint_distributions-272"><a href="#language_to_joint_distributions-272"><span class="linenos">272</span></a>    <span class="n">encoder</span> <span class="o">=</span> <span class="n">system</span><span class="p">[</span><span class="s2">&quot;encoder&quot;</span><span class="p">]</span>
-</span><span id="language_to_joint_distributions-273"><a href="#language_to_joint_distributions-273"><span class="linenos">273</span></a>    <span class="n">decoder</span> <span class="o">=</span> <span class="n">system</span><span class="p">[</span><span class="s2">&quot;decoder&quot;</span><span class="p">]</span>
-</span><span id="language_to_joint_distributions-274"><a href="#language_to_joint_distributions-274"><span class="linenos">274</span></a>    <span class="n">space</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">universe</span>
-</span><span id="language_to_joint_distributions-275"><a href="#language_to_joint_distributions-275"><span class="linenos">275</span></a>
-</span><span id="language_to_joint_distributions-276"><a href="#language_to_joint_distributions-276"><span class="linenos">276</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)</span>
-</span><span id="language_to_joint_distributions-277"><a href="#language_to_joint_distributions-277"><span class="linenos">277</span></a>    <span class="n">conditional_puw</span> <span class="o">=</span> <span class="n">deterministic_decoder</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="n">conditional_pum</span><span class="p">)</span>
-</span><span id="language_to_joint_distributions-278"><a href="#language_to_joint_distributions-278"><span class="linenos">278</span></a>    <span class="n">joint_pmu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_pum</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
-</span><span id="language_to_joint_distributions-279"><a href="#language_to_joint_distributions-279"><span class="linenos">279</span></a>    <span class="n">p_w</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">marginalize</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
-</span><span id="language_to_joint_distributions-280"><a href="#language_to_joint_distributions-280"><span class="linenos">280</span></a>    <span class="n">joint_pwu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_puw</span><span class="p">,</span> <span class="n">p_w</span><span class="p">)</span>
-</span><span id="language_to_joint_distributions-281"><a href="#language_to_joint_distributions-281"><span class="linenos">281</span></a>
-</span><span id="language_to_joint_distributions-282"><a href="#language_to_joint_distributions-282"><span class="linenos">282</span></a>    <span class="k">return</span> <span class="p">{</span>
-</span><span id="language_to_joint_distributions-283"><a href="#language_to_joint_distributions-283"><span class="linenos">283</span></a>        <span class="s2">&quot;joint_pmu&quot;</span><span class="p">:</span> <span class="n">joint_pmu</span><span class="p">,</span>
-</span><span id="language_to_joint_distributions-284"><a href="#language_to_joint_distributions-284"><span class="linenos">284</span></a>        <span class="s2">&quot;joint_pwu&quot;</span><span class="p">:</span> <span class="n">joint_pwu</span><span class="p">,</span>
-</span><span id="language_to_joint_distributions-285"><a href="#language_to_joint_distributions-285"><span class="linenos">285</span></a>    <span class="p">}</span>
+</span><span id="language_to_joint_distributions-270"><a href="#language_to_joint_distributions-270"><span class="linenos">270</span></a>
+</span><span id="language_to_joint_distributions-271"><a href="#language_to_joint_distributions-271"><span class="linenos">271</span></a><span class="sd">    Returns:</span>
+</span><span id="language_to_joint_distributions-272"><a href="#language_to_joint_distributions-272"><span class="linenos">272</span></a><span class="sd">        a dict of the form </span>
+</span><span id="language_to_joint_distributions-273"><a href="#language_to_joint_distributions-273"><span class="linenos">273</span></a>
+</span><span id="language_to_joint_distributions-274"><a href="#language_to_joint_distributions-274"><span class="linenos">274</span></a><span class="sd">            {</span>
+</span><span id="language_to_joint_distributions-275"><a href="#language_to_joint_distributions-275"><span class="linenos">275</span></a><span class="sd">            &quot;joint_pmu&quot;: an array of shape `(|U|, |M|)` representing P(U, M)</span>
+</span><span id="language_to_joint_distributions-276"><a href="#language_to_joint_distributions-276"><span class="linenos">276</span></a><span class="sd">            &quot;joint_pwu&quot;: an array of shape `(|W|, |U|)` representing P(W, U)</span>
+</span><span id="language_to_joint_distributions-277"><a href="#language_to_joint_distributions-277"><span class="linenos">277</span></a><span class="sd">            }</span>
+</span><span id="language_to_joint_distributions-278"><a href="#language_to_joint_distributions-278"><span class="linenos">278</span></a>
+</span><span id="language_to_joint_distributions-279"><a href="#language_to_joint_distributions-279"><span class="linenos">279</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="language_to_joint_distributions-280"><a href="#language_to_joint_distributions-280"><span class="linenos">280</span></a>    <span class="n">system</span> <span class="o">=</span> <span class="n">language_to_ib_encoder_decoder</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+</span><span id="language_to_joint_distributions-281"><a href="#language_to_joint_distributions-281"><span class="linenos">281</span></a>    <span class="n">encoder</span> <span class="o">=</span> <span class="n">system</span><span class="p">[</span><span class="s2">&quot;encoder&quot;</span><span class="p">]</span>
+</span><span id="language_to_joint_distributions-282"><a href="#language_to_joint_distributions-282"><span class="linenos">282</span></a>    <span class="n">decoder</span> <span class="o">=</span> <span class="n">system</span><span class="p">[</span><span class="s2">&quot;decoder&quot;</span><span class="p">]</span>
+</span><span id="language_to_joint_distributions-283"><a href="#language_to_joint_distributions-283"><span class="linenos">283</span></a>    <span class="n">space</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">universe</span>
+</span><span id="language_to_joint_distributions-284"><a href="#language_to_joint_distributions-284"><span class="linenos">284</span></a>
+</span><span id="language_to_joint_distributions-285"><a href="#language_to_joint_distributions-285"><span class="linenos">285</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)</span>
+</span><span id="language_to_joint_distributions-286"><a href="#language_to_joint_distributions-286"><span class="linenos">286</span></a>    <span class="n">conditional_puw</span> <span class="o">=</span> <span class="n">deterministic_decoder</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="n">conditional_pum</span><span class="p">)</span>
+</span><span id="language_to_joint_distributions-287"><a href="#language_to_joint_distributions-287"><span class="linenos">287</span></a>    <span class="n">joint_pmu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_pum</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+</span><span id="language_to_joint_distributions-288"><a href="#language_to_joint_distributions-288"><span class="linenos">288</span></a>    <span class="n">p_w</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">marginalize</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+</span><span id="language_to_joint_distributions-289"><a href="#language_to_joint_distributions-289"><span class="linenos">289</span></a>    <span class="n">joint_pwu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_puw</span><span class="p">,</span> <span class="n">p_w</span><span class="p">)</span>
+</span><span id="language_to_joint_distributions-290"><a href="#language_to_joint_distributions-290"><span class="linenos">290</span></a>
+</span><span id="language_to_joint_distributions-291"><a href="#language_to_joint_distributions-291"><span class="linenos">291</span></a>    <span class="k">return</span> <span class="p">{</span>
+</span><span id="language_to_joint_distributions-292"><a href="#language_to_joint_distributions-292"><span class="linenos">292</span></a>        <span class="s2">&quot;joint_pmu&quot;</span><span class="p">:</span> <span class="n">joint_pmu</span><span class="p">,</span>
+</span><span id="language_to_joint_distributions-293"><a href="#language_to_joint_distributions-293"><span class="linenos">293</span></a>        <span class="s2">&quot;joint_pwu&quot;</span><span class="p">:</span> <span class="n">joint_pwu</span><span class="p">,</span>
+</span><span id="language_to_joint_distributions-294"><a href="#language_to_joint_distributions-294"><span class="linenos">294</span></a>    <span class="p">}</span>
 </span></pre></div>
 
 
@@ -1005,6 +1023,18 @@
 <li><strong>decay:</strong>  parameter for meaning distribution p(u|m) generation</li>
 <li><strong>utility:</strong>  parameter for meaning distribution p(u|m) generation</li>
 </ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>a dict of the form </p>
+
+<pre><code>{
+"joint_pmu": an array of shape `(|U|, |M|)` representing P(U, M)
+"joint_pwu": an array of shape `(|W|, |U|)` representing P(W, U)
+}
+</code></pre>
+</blockquote>
 </div>
 
 
@@ -1020,32 +1050,32 @@
 
     </div>
     <a class="headerlink" href="#language_to_ib_encoder_decoder"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="language_to_ib_encoder_decoder-291"><a href="#language_to_ib_encoder_decoder-291"><span class="linenos">291</span></a><span class="k">def</span> <span class="nf">language_to_ib_encoder_decoder</span><span class="p">(</span>
-</span><span id="language_to_ib_encoder_decoder-292"><a href="#language_to_ib_encoder_decoder-292"><span class="linenos">292</span></a>    <span class="n">language</span><span class="p">:</span> <span class="n">Language</span><span class="p">,</span>
-</span><span id="language_to_ib_encoder_decoder-293"><a href="#language_to_ib_encoder_decoder-293"><span class="linenos">293</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-</span><span id="language_to_ib_encoder_decoder-294"><a href="#language_to_ib_encoder_decoder-294"><span class="linenos">294</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-</span><span id="language_to_ib_encoder_decoder-295"><a href="#language_to_ib_encoder_decoder-295"><span class="linenos">295</span></a>    <span class="sd">&quot;&quot;&quot;Convert a Language, a mapping of words to meanings, to IB encoder, q(w|m) and IB decoder q(m|w).</span>
-</span><span id="language_to_ib_encoder_decoder-296"><a href="#language_to_ib_encoder_decoder-296"><span class="linenos">296</span></a>
-</span><span id="language_to_ib_encoder_decoder-297"><a href="#language_to_ib_encoder_decoder-297"><span class="linenos">297</span></a><span class="sd">    Args:</span>
-</span><span id="language_to_ib_encoder_decoder-298"><a href="#language_to_ib_encoder_decoder-298"><span class="linenos">298</span></a><span class="sd">        language: the lexicon from which to infer a speaker (encoder).</span>
-</span><span id="language_to_ib_encoder_decoder-299"><a href="#language_to_ib_encoder_decoder-299"><span class="linenos">299</span></a>
-</span><span id="language_to_ib_encoder_decoder-300"><a href="#language_to_ib_encoder_decoder-300"><span class="linenos">300</span></a><span class="sd">        prior: communicative need distribution</span>
-</span><span id="language_to_ib_encoder_decoder-301"><a href="#language_to_ib_encoder_decoder-301"><span class="linenos">301</span></a>
-</span><span id="language_to_ib_encoder_decoder-302"><a href="#language_to_ib_encoder_decoder-302"><span class="linenos">302</span></a><span class="sd">    Returns:</span>
-</span><span id="language_to_ib_encoder_decoder-303"><a href="#language_to_ib_encoder_decoder-303"><span class="linenos">303</span></a><span class="sd">        a dict of the form</span>
-</span><span id="language_to_ib_encoder_decoder-304"><a href="#language_to_ib_encoder_decoder-304"><span class="linenos">304</span></a><span class="sd">        {</span>
-</span><span id="language_to_ib_encoder_decoder-305"><a href="#language_to_ib_encoder_decoder-305"><span class="linenos">305</span></a><span class="sd">            &quot;encoder&quot;: np.ndarray of shape `(|meanings|, |words|)`,</span>
-</span><span id="language_to_ib_encoder_decoder-306"><a href="#language_to_ib_encoder_decoder-306"><span class="linenos">306</span></a><span class="sd">            &quot;decoder&quot;: np.ndarray of shape `(|words|, |meanings|)`,</span>
-</span><span id="language_to_ib_encoder_decoder-307"><a href="#language_to_ib_encoder_decoder-307"><span class="linenos">307</span></a><span class="sd">        }</span>
-</span><span id="language_to_ib_encoder_decoder-308"><a href="#language_to_ib_encoder_decoder-308"><span class="linenos">308</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="language_to_ib_encoder_decoder-309"><a href="#language_to_ib_encoder_decoder-309"><span class="linenos">309</span></a>    <span class="c1"># In the IB framework, the encoder is _typically_ a literal speaker and the decoder is a bayes optimal listener. TODO: There are obviously other possible choices here.</span>
-</span><span id="language_to_ib_encoder_decoder-310"><a href="#language_to_ib_encoder_decoder-310"><span class="linenos">310</span></a>    <span class="n">speaker</span> <span class="o">=</span> <span class="n">LiteralSpeaker</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
-</span><span id="language_to_ib_encoder_decoder-311"><a href="#language_to_ib_encoder_decoder-311"><span class="linenos">311</span></a>    <span class="n">speaker</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">rows_zero_to_uniform</span><span class="p">(</span><span class="n">speaker</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">())</span>
-</span><span id="language_to_ib_encoder_decoder-312"><a href="#language_to_ib_encoder_decoder-312"><span class="linenos">312</span></a>    <span class="n">listener</span> <span class="o">=</span> <span class="n">BayesianListener</span><span class="p">(</span><span class="n">speaker</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
-</span><span id="language_to_ib_encoder_decoder-313"><a href="#language_to_ib_encoder_decoder-313"><span class="linenos">313</span></a>    <span class="k">return</span> <span class="p">{</span>
-</span><span id="language_to_ib_encoder_decoder-314"><a href="#language_to_ib_encoder_decoder-314"><span class="linenos">314</span></a>        <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="n">speaker</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">(),</span>
-</span><span id="language_to_ib_encoder_decoder-315"><a href="#language_to_ib_encoder_decoder-315"><span class="linenos">315</span></a>        <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="n">listener</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">(),</span>
-</span><span id="language_to_ib_encoder_decoder-316"><a href="#language_to_ib_encoder_decoder-316"><span class="linenos">316</span></a>    <span class="p">}</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="language_to_ib_encoder_decoder-300"><a href="#language_to_ib_encoder_decoder-300"><span class="linenos">300</span></a><span class="k">def</span> <span class="nf">language_to_ib_encoder_decoder</span><span class="p">(</span>
+</span><span id="language_to_ib_encoder_decoder-301"><a href="#language_to_ib_encoder_decoder-301"><span class="linenos">301</span></a>    <span class="n">language</span><span class="p">:</span> <span class="n">Language</span><span class="p">,</span>
+</span><span id="language_to_ib_encoder_decoder-302"><a href="#language_to_ib_encoder_decoder-302"><span class="linenos">302</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+</span><span id="language_to_ib_encoder_decoder-303"><a href="#language_to_ib_encoder_decoder-303"><span class="linenos">303</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+</span><span id="language_to_ib_encoder_decoder-304"><a href="#language_to_ib_encoder_decoder-304"><span class="linenos">304</span></a>    <span class="sd">&quot;&quot;&quot;Convert a Language, a mapping of words to meanings, to IB encoder, q(w|m) and IB decoder q(m|w).</span>
+</span><span id="language_to_ib_encoder_decoder-305"><a href="#language_to_ib_encoder_decoder-305"><span class="linenos">305</span></a>
+</span><span id="language_to_ib_encoder_decoder-306"><a href="#language_to_ib_encoder_decoder-306"><span class="linenos">306</span></a><span class="sd">    Args:</span>
+</span><span id="language_to_ib_encoder_decoder-307"><a href="#language_to_ib_encoder_decoder-307"><span class="linenos">307</span></a><span class="sd">        language: the lexicon from which to infer a speaker (encoder).</span>
+</span><span id="language_to_ib_encoder_decoder-308"><a href="#language_to_ib_encoder_decoder-308"><span class="linenos">308</span></a>
+</span><span id="language_to_ib_encoder_decoder-309"><a href="#language_to_ib_encoder_decoder-309"><span class="linenos">309</span></a><span class="sd">        prior: communicative need distribution</span>
+</span><span id="language_to_ib_encoder_decoder-310"><a href="#language_to_ib_encoder_decoder-310"><span class="linenos">310</span></a>
+</span><span id="language_to_ib_encoder_decoder-311"><a href="#language_to_ib_encoder_decoder-311"><span class="linenos">311</span></a><span class="sd">    Returns:</span>
+</span><span id="language_to_ib_encoder_decoder-312"><a href="#language_to_ib_encoder_decoder-312"><span class="linenos">312</span></a><span class="sd">        a dict of the form</span>
+</span><span id="language_to_ib_encoder_decoder-313"><a href="#language_to_ib_encoder_decoder-313"><span class="linenos">313</span></a><span class="sd">        {</span>
+</span><span id="language_to_ib_encoder_decoder-314"><a href="#language_to_ib_encoder_decoder-314"><span class="linenos">314</span></a><span class="sd">            &quot;encoder&quot;: np.ndarray of shape `(|meanings|, |words|)`,</span>
+</span><span id="language_to_ib_encoder_decoder-315"><a href="#language_to_ib_encoder_decoder-315"><span class="linenos">315</span></a><span class="sd">            &quot;decoder&quot;: np.ndarray of shape `(|words|, |meanings|)`,</span>
+</span><span id="language_to_ib_encoder_decoder-316"><a href="#language_to_ib_encoder_decoder-316"><span class="linenos">316</span></a><span class="sd">        }</span>
+</span><span id="language_to_ib_encoder_decoder-317"><a href="#language_to_ib_encoder_decoder-317"><span class="linenos">317</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="language_to_ib_encoder_decoder-318"><a href="#language_to_ib_encoder_decoder-318"><span class="linenos">318</span></a>    <span class="c1"># In the IB framework, the encoder is _typically_ a literal speaker and the decoder is a bayes optimal listener. TODO: There are obviously other possible choices here.</span>
+</span><span id="language_to_ib_encoder_decoder-319"><a href="#language_to_ib_encoder_decoder-319"><span class="linenos">319</span></a>    <span class="n">speaker</span> <span class="o">=</span> <span class="n">LiteralSpeaker</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+</span><span id="language_to_ib_encoder_decoder-320"><a href="#language_to_ib_encoder_decoder-320"><span class="linenos">320</span></a>    <span class="n">speaker</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">rows_zero_to_uniform</span><span class="p">(</span><span class="n">speaker</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">())</span>
+</span><span id="language_to_ib_encoder_decoder-321"><a href="#language_to_ib_encoder_decoder-321"><span class="linenos">321</span></a>    <span class="n">listener</span> <span class="o">=</span> <span class="n">BayesianListener</span><span class="p">(</span><span class="n">speaker</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+</span><span id="language_to_ib_encoder_decoder-322"><a href="#language_to_ib_encoder_decoder-322"><span class="linenos">322</span></a>    <span class="k">return</span> <span class="p">{</span>
+</span><span id="language_to_ib_encoder_decoder-323"><a href="#language_to_ib_encoder_decoder-323"><span class="linenos">323</span></a>        <span class="s2">&quot;encoder&quot;</span><span class="p">:</span> <span class="n">speaker</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">(),</span>
+</span><span id="language_to_ib_encoder_decoder-324"><a href="#language_to_ib_encoder_decoder-324"><span class="linenos">324</span></a>        <span class="s2">&quot;decoder&quot;</span><span class="p">:</span> <span class="n">listener</span><span class="o">.</span><span class="n">normalized_weights</span><span class="p">(),</span>
+</span><span id="language_to_ib_encoder_decoder-325"><a href="#language_to_ib_encoder_decoder-325"><span class="linenos">325</span></a>    <span class="p">}</span>
 </span></pre></div>
 
 
@@ -1082,20 +1112,20 @@
 
     </div>
     <a class="headerlink" href="#deterministic_decoder"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="deterministic_decoder-319"><a href="#deterministic_decoder-319"><span class="linenos">319</span></a><span class="k">def</span> <span class="nf">deterministic_decoder</span><span class="p">(</span>
-</span><span id="deterministic_decoder-320"><a href="#deterministic_decoder-320"><span class="linenos">320</span></a>    <span class="n">decoder</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">meaning_distributions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-</span><span id="deterministic_decoder-321"><a href="#deterministic_decoder-321"><span class="linenos">321</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-</span><span id="deterministic_decoder-322"><a href="#deterministic_decoder-322"><span class="linenos">322</span></a>    <span class="sd">&quot;&quot;&quot;Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) * m(u) $</span>
-</span><span id="deterministic_decoder-323"><a href="#deterministic_decoder-323"><span class="linenos">323</span></a>
-</span><span id="deterministic_decoder-324"><a href="#deterministic_decoder-324"><span class="linenos">324</span></a><span class="sd">    Args:</span>
-</span><span id="deterministic_decoder-325"><a href="#deterministic_decoder-325"><span class="linenos">325</span></a><span class="sd">        decoder: array of shape `(|words|, |meanings|)`</span>
-</span><span id="deterministic_decoder-326"><a href="#deterministic_decoder-326"><span class="linenos">326</span></a>
-</span><span id="deterministic_decoder-327"><a href="#deterministic_decoder-327"><span class="linenos">327</span></a><span class="sd">        meaning_distributions: array of shape `(|meanings|, |meanings|)`</span>
-</span><span id="deterministic_decoder-328"><a href="#deterministic_decoder-328"><span class="linenos">328</span></a>
-</span><span id="deterministic_decoder-329"><a href="#deterministic_decoder-329"><span class="linenos">329</span></a><span class="sd">    Returns:</span>
-</span><span id="deterministic_decoder-330"><a href="#deterministic_decoder-330"><span class="linenos">330</span></a><span class="sd">        array of shape `(|words|, |meanings|)` representing the &#39;optimal&#39; deterministic decoder</span>
-</span><span id="deterministic_decoder-331"><a href="#deterministic_decoder-331"><span class="linenos">331</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="deterministic_decoder-332"><a href="#deterministic_decoder-332"><span class="linenos">332</span></a>    <span class="k">return</span> <span class="n">decoder</span> <span class="o">@</span> <span class="n">meaning_distributions</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="deterministic_decoder-328"><a href="#deterministic_decoder-328"><span class="linenos">328</span></a><span class="k">def</span> <span class="nf">deterministic_decoder</span><span class="p">(</span>
+</span><span id="deterministic_decoder-329"><a href="#deterministic_decoder-329"><span class="linenos">329</span></a>    <span class="n">decoder</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">meaning_distributions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</span><span id="deterministic_decoder-330"><a href="#deterministic_decoder-330"><span class="linenos">330</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="deterministic_decoder-331"><a href="#deterministic_decoder-331"><span class="linenos">331</span></a>    <span class="sd">&quot;&quot;&quot;Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) * m(u) $</span>
+</span><span id="deterministic_decoder-332"><a href="#deterministic_decoder-332"><span class="linenos">332</span></a>
+</span><span id="deterministic_decoder-333"><a href="#deterministic_decoder-333"><span class="linenos">333</span></a><span class="sd">    Args:</span>
+</span><span id="deterministic_decoder-334"><a href="#deterministic_decoder-334"><span class="linenos">334</span></a><span class="sd">        decoder: array of shape `(|words|, |meanings|)`</span>
+</span><span id="deterministic_decoder-335"><a href="#deterministic_decoder-335"><span class="linenos">335</span></a>
+</span><span id="deterministic_decoder-336"><a href="#deterministic_decoder-336"><span class="linenos">336</span></a><span class="sd">        meaning_distributions: array of shape `(|meanings|, |meanings|)`</span>
+</span><span id="deterministic_decoder-337"><a href="#deterministic_decoder-337"><span class="linenos">337</span></a>
+</span><span id="deterministic_decoder-338"><a href="#deterministic_decoder-338"><span class="linenos">338</span></a><span class="sd">    Returns:</span>
+</span><span id="deterministic_decoder-339"><a href="#deterministic_decoder-339"><span class="linenos">339</span></a><span class="sd">        array of shape `(|words|, |meanings|)` representing the &#39;optimal&#39; deterministic decoder</span>
+</span><span id="deterministic_decoder-340"><a href="#deterministic_decoder-340"><span class="linenos">340</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="deterministic_decoder-341"><a href="#deterministic_decoder-341"><span class="linenos">341</span></a>    <span class="k">return</span> <span class="n">decoder</span> <span class="o">@</span> <span class="n">meaning_distributions</span>
 </span></pre></div>
 
 
@@ -1128,35 +1158,35 @@
 
     </div>
     <a class="headerlink" href="#generate_meaning_distributions"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="generate_meaning_distributions-335"><a href="#generate_meaning_distributions-335"><span class="linenos">335</span></a><span class="k">def</span> <span class="nf">generate_meaning_distributions</span><span class="p">(</span>
-</span><span id="generate_meaning_distributions-336"><a href="#generate_meaning_distributions-336"><span class="linenos">336</span></a>    <span class="n">space</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
-</span><span id="generate_meaning_distributions-337"><a href="#generate_meaning_distributions-337"><span class="linenos">337</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="generate_meaning_distributions-338"><a href="#generate_meaning_distributions-338"><span class="linenos">338</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
-</span><span id="generate_meaning_distributions-339"><a href="#generate_meaning_distributions-339"><span class="linenos">339</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-</span><span id="generate_meaning_distributions-340"><a href="#generate_meaning_distributions-340"><span class="linenos">340</span></a>    <span class="sd">&quot;&quot;&quot;Generate a conditional distribution over world states given meanings, $p(u|m)$, for each meaning.</span>
-</span><span id="generate_meaning_distributions-341"><a href="#generate_meaning_distributions-341"><span class="linenos">341</span></a>
-</span><span id="generate_meaning_distributions-342"><a href="#generate_meaning_distributions-342"><span class="linenos">342</span></a><span class="sd">    Args:</span>
-</span><span id="generate_meaning_distributions-343"><a href="#generate_meaning_distributions-343"><span class="linenos">343</span></a><span class="sd">        space: the ModalMeaningSpace on which meanings are defined</span>
-</span><span id="generate_meaning_distributions-344"><a href="#generate_meaning_distributions-344"><span class="linenos">344</span></a>
-</span><span id="generate_meaning_distributions-345"><a href="#generate_meaning_distributions-345"><span class="linenos">345</span></a><span class="sd">        decay: a float in [0,1]. controls informativity, by decaying how much probability mass is assigned to perfect recoveries. As decay approaches 0, only perfect recovery is rewarded (which overrides any partial credit structure built into the utility/cost function). As decay approaches 1, the worst guesses become most likely.</span>
-</span><span id="generate_meaning_distributions-346"><a href="#generate_meaning_distributions-346"><span class="linenos">346</span></a>
-</span><span id="generate_meaning_distributions-347"><a href="#generate_meaning_distributions-347"><span class="linenos">347</span></a><span class="sd">        cost: a cost function defining the pairwise communicative cost for confusing one Referent in the Universe with another. If you have a (scaled) communicative utility matrix, a natural choice for cost might be `lambda x, y: 1 - utility(x, y)`.</span>
-</span><span id="generate_meaning_distributions-348"><a href="#generate_meaning_distributions-348"><span class="linenos">348</span></a>
-</span><span id="generate_meaning_distributions-349"><a href="#generate_meaning_distributions-349"><span class="linenos">349</span></a><span class="sd">    Returns:</span>
-</span><span id="generate_meaning_distributions-350"><a href="#generate_meaning_distributions-350"><span class="linenos">350</span></a><span class="sd">        p_u_m: an array of shape `(|space.referents|, |space.referents|)`</span>
-</span><span id="generate_meaning_distributions-351"><a href="#generate_meaning_distributions-351"><span class="linenos">351</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="generate_meaning_distributions-352"><a href="#generate_meaning_distributions-352"><span class="linenos">352</span></a>
-</span><span id="generate_meaning_distributions-353"><a href="#generate_meaning_distributions-353"><span class="linenos">353</span></a>    <span class="c1"># construct p(u|m) for each meaning</span>
-</span><span id="generate_meaning_distributions-354"><a href="#generate_meaning_distributions-354"><span class="linenos">354</span></a>    <span class="n">meaning_distributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-</span><span id="generate_meaning_distributions-355"><a href="#generate_meaning_distributions-355"><span class="linenos">355</span></a>        <span class="p">[[</span><span class="n">decay</span> <span class="o">**</span> <span class="n">cost</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">space</span><span class="o">.</span><span class="n">referents</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">space</span><span class="o">.</span><span class="n">referents</span><span class="p">]</span>
-</span><span id="generate_meaning_distributions-356"><a href="#generate_meaning_distributions-356"><span class="linenos">356</span></a>    <span class="p">)</span>
-</span><span id="generate_meaning_distributions-357"><a href="#generate_meaning_distributions-357"><span class="linenos">357</span></a>    <span class="c1"># each row sums to 1.0</span>
-</span><span id="generate_meaning_distributions-358"><a href="#generate_meaning_distributions-358"><span class="linenos">358</span></a>    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-</span><span id="generate_meaning_distributions-359"><a href="#generate_meaning_distributions-359"><span class="linenos">359</span></a>    <span class="n">meaning_distributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
-</span><span id="generate_meaning_distributions-360"><a href="#generate_meaning_distributions-360"><span class="linenos">360</span></a>        <span class="n">meaning_distributions</span> <span class="o">/</span> <span class="n">meaning_distributions</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="generate_meaning_distributions-361"><a href="#generate_meaning_distributions-361"><span class="linenos">361</span></a>    <span class="p">)</span>
-</span><span id="generate_meaning_distributions-362"><a href="#generate_meaning_distributions-362"><span class="linenos">362</span></a>
-</span><span id="generate_meaning_distributions-363"><a href="#generate_meaning_distributions-363"><span class="linenos">363</span></a>    <span class="k">return</span> <span class="n">meaning_distributions</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="generate_meaning_distributions-344"><a href="#generate_meaning_distributions-344"><span class="linenos">344</span></a><span class="k">def</span> <span class="nf">generate_meaning_distributions</span><span class="p">(</span>
+</span><span id="generate_meaning_distributions-345"><a href="#generate_meaning_distributions-345"><span class="linenos">345</span></a>    <span class="n">space</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
+</span><span id="generate_meaning_distributions-346"><a href="#generate_meaning_distributions-346"><span class="linenos">346</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="generate_meaning_distributions-347"><a href="#generate_meaning_distributions-347"><span class="linenos">347</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+</span><span id="generate_meaning_distributions-348"><a href="#generate_meaning_distributions-348"><span class="linenos">348</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="generate_meaning_distributions-349"><a href="#generate_meaning_distributions-349"><span class="linenos">349</span></a>    <span class="sd">&quot;&quot;&quot;Generate a conditional distribution over world states given meanings, $p(u|m)$, for each meaning.</span>
+</span><span id="generate_meaning_distributions-350"><a href="#generate_meaning_distributions-350"><span class="linenos">350</span></a>
+</span><span id="generate_meaning_distributions-351"><a href="#generate_meaning_distributions-351"><span class="linenos">351</span></a><span class="sd">    Args:</span>
+</span><span id="generate_meaning_distributions-352"><a href="#generate_meaning_distributions-352"><span class="linenos">352</span></a><span class="sd">        space: the ModalMeaningSpace on which meanings are defined</span>
+</span><span id="generate_meaning_distributions-353"><a href="#generate_meaning_distributions-353"><span class="linenos">353</span></a>
+</span><span id="generate_meaning_distributions-354"><a href="#generate_meaning_distributions-354"><span class="linenos">354</span></a><span class="sd">        decay: a float in [0,1]. controls informativity, by decaying how much probability mass is assigned to perfect recoveries. As decay approaches 0, only perfect recovery is rewarded (which overrides any partial credit structure built into the utility/cost function). As decay approaches 1, the worst guesses become most likely.</span>
+</span><span id="generate_meaning_distributions-355"><a href="#generate_meaning_distributions-355"><span class="linenos">355</span></a>
+</span><span id="generate_meaning_distributions-356"><a href="#generate_meaning_distributions-356"><span class="linenos">356</span></a><span class="sd">        cost: a cost function defining the pairwise communicative cost for confusing one Referent in the Universe with another. If you have a (scaled) communicative utility matrix, a natural choice for cost might be `lambda x, y: 1 - utility(x, y)`.</span>
+</span><span id="generate_meaning_distributions-357"><a href="#generate_meaning_distributions-357"><span class="linenos">357</span></a>
+</span><span id="generate_meaning_distributions-358"><a href="#generate_meaning_distributions-358"><span class="linenos">358</span></a><span class="sd">    Returns:</span>
+</span><span id="generate_meaning_distributions-359"><a href="#generate_meaning_distributions-359"><span class="linenos">359</span></a><span class="sd">        p_u_m: an array of shape `(|space.referents|, |space.referents|)`</span>
+</span><span id="generate_meaning_distributions-360"><a href="#generate_meaning_distributions-360"><span class="linenos">360</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="generate_meaning_distributions-361"><a href="#generate_meaning_distributions-361"><span class="linenos">361</span></a>
+</span><span id="generate_meaning_distributions-362"><a href="#generate_meaning_distributions-362"><span class="linenos">362</span></a>    <span class="c1"># construct p(u|m) for each meaning</span>
+</span><span id="generate_meaning_distributions-363"><a href="#generate_meaning_distributions-363"><span class="linenos">363</span></a>    <span class="n">meaning_distributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+</span><span id="generate_meaning_distributions-364"><a href="#generate_meaning_distributions-364"><span class="linenos">364</span></a>        <span class="p">[[</span><span class="n">decay</span> <span class="o">**</span> <span class="n">cost</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">space</span><span class="o">.</span><span class="n">referents</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">space</span><span class="o">.</span><span class="n">referents</span><span class="p">]</span>
+</span><span id="generate_meaning_distributions-365"><a href="#generate_meaning_distributions-365"><span class="linenos">365</span></a>    <span class="p">)</span>
+</span><span id="generate_meaning_distributions-366"><a href="#generate_meaning_distributions-366"><span class="linenos">366</span></a>    <span class="c1"># each row sums to 1.0</span>
+</span><span id="generate_meaning_distributions-367"><a href="#generate_meaning_distributions-367"><span class="linenos">367</span></a>    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</span><span id="generate_meaning_distributions-368"><a href="#generate_meaning_distributions-368"><span class="linenos">368</span></a>    <span class="n">meaning_distributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
+</span><span id="generate_meaning_distributions-369"><a href="#generate_meaning_distributions-369"><span class="linenos">369</span></a>        <span class="n">meaning_distributions</span> <span class="o">/</span> <span class="n">meaning_distributions</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="generate_meaning_distributions-370"><a href="#generate_meaning_distributions-370"><span class="linenos">370</span></a>    <span class="p">)</span>
+</span><span id="generate_meaning_distributions-371"><a href="#generate_meaning_distributions-371"><span class="linenos">371</span></a>
+</span><span id="generate_meaning_distributions-372"><a href="#generate_meaning_distributions-372"><span class="linenos">372</span></a>    <span class="k">return</span> <span class="n">meaning_distributions</span>
 </span></pre></div>
 
 
