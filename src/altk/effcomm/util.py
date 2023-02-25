@@ -10,9 +10,9 @@ from typing import Callable
 
 
 def rows_zero_to_uniform(mat) -> np.ndarray:
-    """Ensure that P(a|b) is a probability distribution, i.e. each row (indexed by a meaning) is a distribution over expressions: sums to exactly 1.0.
+    """Ensure that `mat` encodes a probability distribution, i.e. each row (indexed by a meaning) is a distribution over expressions: sums to exactly 1.0.
 
-    Necessary when exploring mathematically possible languages (including natural languages, like Hausa in the case of modals) which sometimes have that a row of the matrix p(word|meaning) is a vector of 0s.
+    This is necessary when exploring mathematically possible languages (including natural languages, like Hausa in the case of modals) which sometimes have that a row of the matrix p(word|meaning) is a vector of 0s.
     """
 
     threshold = 1e-5
@@ -55,29 +55,63 @@ PRECISION = 1e-16
 
 
 def marginal(pXY, axis=1):
-    """:return pY (axis = 0) or pX (default, axis = 1)"""
+    """Compute $p(x) = \sum_x p(x,y)$
+
+    Args:
+        pXY: a numpy array of shape `(|X|, |Y|)`
+
+    Returns: 
+        pY: (axis = 0) or pX (default, axis = 1)
+    """
     return pXY.sum(axis)
 
 
 def conditional(pXY):
-    """:return  pY_X"""
+    """Compute $p(y|x) = \\frac{p(x,y)}{p(x)}$
+
+    Args:
+        pXY: a numpy array of shape `(|X|, |Y|)`
+
+    Returns:  
+        pY_X: a numpy array of shape `(|X|, |Y|)`
+    """
     pX = pXY.sum(axis=1, keepdims=True)
     return np.where(pX > PRECISION, pXY / pX, 1 / pXY.shape[1])
 
 
 def joint(pY_X, pX):
-    """:return  pXY"""
+    """Compute $p(x,y) = p(y|x) \cdot p(x) $
+
+    Args:
+        pY_X: a numpy array of shape `(|X|, |Y|)`
+
+        pX: a numpy array `|X|`
+    Returns:
+        pXY: a numpy array of the shape `(|X|, |Y|)`
+    """
     # breakpoint()
     return pY_X * pX[:, None]
 
 
 def marginalize(pY_X, pX):
-    """:return  pY"""
+    """Compute $p(y) = \sum_x p(y|x) \cdot p(x)$
+
+    Args:
+        pY_X: a numpy array of shape `(|X|, |Y|)`
+
+        pX: a numpy array of shape `|X|`
+    
+    Returns:  
+        pY: a numpy array of shape `|Y|`
+    """
     return pY_X.T @ pX
 
 
 def bayes(pY_X, pX):
-    """:return pX_Y"""
+    """Compute $p(x|y) = \\frac{p(y|x) \cdot p(x)}{p(y)}$
+    Args:
+        pY_X: a numpy array of shape `(|X|, |Y|)`
+    """
     pXY = joint(pY_X, pX)
     pY = marginalize(pY_X, pX)
     return np.where(pY > PRECISION, pXY / pY, 1 / pXY.shape[0]).T
@@ -86,23 +120,24 @@ def bayes(pY_X, pX):
 # === INFORMATION ===
 
 
-def xlogx(v):
+def xlogx(p):
+    """Compute $x \\log p(x)$"""
     with np.errstate(divide="ignore", invalid="ignore"):
-        return np.where(v > PRECISION, v * np.log2(v), 0)
+        return np.where(p > PRECISION, p * np.log2(p), 0)
 
 
 def H(p, axis=None):
-    """Entropy"""
+    """Compute the entropy of p, $H(X) = - \sum_x x \\log p(x)$"""
     return -xlogx(p).sum(axis=axis)
 
 
 def MI(pXY):
-    """mutual information, I(X;Y)"""
+    """Compute mutual information, $I[X:Y]$"""
     return H(pXY.sum(axis=0)) + H(pXY.sum(axis=1)) - H(pXY)
 
 
 def DKL(p, q, axis=None):
-    """KL divergences, D[p||q]"""
+    """Compute KL divergences, $D_{KL}[p||q]$"""
     return (xlogx(p) - np.where(p > PRECISION, p * np.log2(q + PRECISION), 0)).sum(
         axis=axis
     )

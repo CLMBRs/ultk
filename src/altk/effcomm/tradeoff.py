@@ -45,7 +45,7 @@ def pareto_min_distances(points: list[tuple], pareto_points: list[tuple]) -> np.
 
     Returns:
 
-        min_distances: a 1D np.ndarray of Euclidean distances for each language to the closest point on the Pareto frontier.
+        min_distances: an array of shape `len(points)` Euclidean distances for each language to the closest point on the Pareto frontier.
     """
     print("Measuring min distance to frontier ...")
 
@@ -89,7 +89,7 @@ def interpolate_data(
         num: the number of x-axis points (cost) to interpolate. Controls smoothness of curve.
 
     Returns:
-        interpolated_points: an array of size [num, num]
+        interpolated_points: an array of size `(num, num)`
     """
     if max_cost == 1:
         # hack to get end of pareto curve
@@ -145,12 +145,13 @@ def tradeoff(
         frontier: a list of (comm_cost, complexity) points representing a Pareto frontier to measure optimality w.r.t.
 
     Returns:
-        a dictionary of the population and the pareto front, e.g.
-        {
-            "languages": the list of languages, with their internal efficient communication data updated,
+        a dictionary of the population and the pareto front, of the form
 
-            "dominating_languages": the list of the languages dominating the population w.r.t. comm_cost and complexity. If no `frontier` is none, this can be considered the Pareto frontier.
-        }
+            {
+                "languages": the list of languages, with their internal efficient communication data updated,
+
+                "dominating_languages": the list of the languages dominating the population w.r.t. comm_cost and complexity. If no `frontier` is none, this can be considered the Pareto frontier.
+            }
     """
     points = []
     for lang in tqdm(languages):

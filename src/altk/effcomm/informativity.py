@@ -22,7 +22,7 @@ def informativity(
     utility: Callable[[Referent, Referent], float],
     agent_type: str = "literal",
 ) -> float:
-    """The informativity of a language is identified with the successful communication between a Sender and a Receiver.
+    """The informativity of a language is identified with the successful communication between a speaker and a listener.
 
     This function is a wrapper for `communicative_success`.
 
@@ -35,15 +35,15 @@ def informativity(
 
         kind: {"literal, pragmatic"} Whether to measure informativity using literal or pragmatic agents, as canonically described in the Rational Speech Act framework. The default is "literal".
 
-    _Concepts_
-        The Sender can be thought of as a conditional distribution over expressions given meanings. The Receiver is likewise a conditional distribution over meanings given expressions. The communicative need, or cognitive source, is a prior probability over meanings representing how frequently agents need to use certain meanings in communication. The utility function represents the similarity, or appropriateness, of the Receiver's guess m' about the Sender's intended meaning m.
+    *Concepts*:
+        The speaker can be thought of as a conditional distribution over expressions given meanings. The listener is likewise a conditional distribution over meanings given expressions. The communicative need, or cognitive source, is a prior probability over meanings representing how frequently agents need to use certain meanings in communication. The utility function represents the similarity, or appropriateness, of the listener's guess m' about the speaker's intended meaning m.
 
-    _Formula_
+    *Formula*:
         The informativity of a language $L$ with meaning space $M$ is defined:
 
-        $I(L) := \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{m' \in i} p(m'|i) * u(m, m')$
+    $I(L) := \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m}|i) * u(m, \hat{m})$
 
-    _Bounds_
+    *Bounds*:
         A perfectly informative (=1.0) language can be constructed with a exactly one expression for each meaning.
 
         For u() = indicator(), every language has nonzero informativity because a language must contain at least one expression, and an expression must contain at least one meaning.
@@ -86,22 +86,23 @@ def communicative_success(
 ) -> float:
     """Helper function to compute the literal informativity of a language.
 
-        I(L) = P(m, m') * u(m, m')
 
-             = \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{m' \in i} p(m'|i) * u(m, m')
+    $I(L) = \sum_{m, \hat{m}} P(m, \hat{m}) \cdot u(m, \hat{m})$
 
-             = sum(diag(p)SR * u)
+    $ = \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m} |i) \cdot u(m, m')$
 
-        For more details, see the docs/vectorized_informativity.pdf.
+    $ = \sum diag(p)SR \odot U $
+
+    For more details, see [docs/vectorized_informativity](https://github.com/CLMBRs/altk/blob/main/docs/vectorized_informativity.pdf).
 
     Args:
-        - speaker: a literal or pragmatic speaker, containing a matrix S for P(e | m)
+        speaker: a literal or pragmatic speaker, containing a matrix S for P(e | m)
 
-        - listener: a literal or pragmatic listener, containing a matrix R for P(m | e)
+        listener: a literal or pragmatic listener, containing a matrix R for P(m | e)
 
-        - prior: p(m), distribution over meanings representing communicative need
+        prior: p(m), distribution over meanings representing communicative need
 
-        - utility: a function u(m, m') representing similarity of meanings, or pair-wise usefulness of listener guesses about speaker meanings.
+        utility: a function u(m, m') representing similarity of meanings, or pair-wise usefulness of listener guesses about speaker meanings.
     """
     S = speaker.normalized_weights()
     R = listener.normalized_weights()

@@ -129,15 +129,18 @@ class CommunicativeAgent:
     ) -> Language:
         """Get a language from the agent, representing its current (possibly learned) communicative behavior.
 
-        This function uses
+        This function uses:
             1. the agent's weight matrix,
-            2. the set of expression forms, and
-            3. the set of referents
+            1. the set of expression forms, and
+            1. the set of referents
 
         from the language the agent was initialized with to generate a new language accurately reflecting the new expression meanings, e.g. how the agent interprets expressions as meaning zero or more referents.
 
         Args:
             threshold: a float in [0,1] representing the cutoff for determining if a meaning (referent) can be communicated by a expression. Because weights are not initialized to 0, it is a good idea to set nonzero values as the threshold.
+        
+        Returns:
+            a Language corresponding to the form-meaning mapping defined by the communicative agent's weights.
         """
         # Construct the same kind of language as initialized with
         language_type = type(self.language)
@@ -318,11 +321,11 @@ class PragmaticListener(Listener):
 class BayesianListener(Listener):
     """A Bayesian reciever chooses an interpretation according to p(meaning | word), where
 
-        P(meanings | words) = P(meanings | words) * P(meanings) / P(words)
+    $P(m | w) = \\frac{P(M | W) \cdot P(M)} { P(W) }$
 
-    Furthermore, we sometimes require that each word w is deterministically interpreted as meaning \hat{m} as follows:
+    Furthermore, we sometimes require that each word w is deterministically interpreted as meaning $\hat{m}$ as follows:
 
-        \hat{m}_{w}(u) = sum_m [ p(m|w) * m(u) ]
+    $\hat{m}_{w}(u) = \sum_m p(m|w) \cdot m(u)$
 
     See altk.effcomm.information for more details.
     """

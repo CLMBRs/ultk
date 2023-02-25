@@ -115,11 +115,12 @@ def generate_languages(
         verbose: a boolean representing how verbose output should be during sampling.
 
     Returns:
-        a dict representing the generated pool of languages and the updated id_start, e.g.
-        {
-            "languages": (a list),
-            "id_start": (an int),
-        }
+        a dict representing the generated pool of languages and the updated id_start, of the form
+
+            {
+                "languages": (list of updated languages)
+                "id_start": (updated length of languages)
+            }
 
     Examples:
 
@@ -249,6 +250,14 @@ def sample_lang_size(
         sample_size: int representing the number of total languages to return
 
         id_start: an int representing the number of languages already generated in an experiment.
+
+    Returns:
+        a dict containing the randomly sampled languages and the updated id_start, of the form
+
+            {
+                "languages": (list of updated languages)
+                "id_start": (updated length of languages)
+            }    
     """
     result = sample_quasi_natural(
         language_class=language_class,
@@ -288,12 +297,12 @@ def sample_quasi_natural(
         sample_size: how many languages to sample.
 
     Returns:
-        a dict containing the randomly sampled quasi-natural languages and the updated id_start, e.g.
-        {
-            "languages": (a set),
-            "id_start": (an int),
-        }
+        a dict containing the randomly sampled quasi-natural languages and the updated id_start, of the form
 
+            {
+                "languages": (list of updated languages)
+                "id_start": (updated length of languages)
+            }
     """
     languages = set()
 
@@ -414,11 +423,12 @@ def enumerate_all_languages(
         dummy_name: the format of the string to name each language constructed.
 
     Returns:
-        a dict containing a set of languages and the updated id_start, e.g.
-        {
-            "languages": (a set)
-            "id_start": (an int),
-        }
+        a dict containing a set of languages and the updated id_start,  of the form
+
+            {
+                "languages": (list of updated languages)
+                "id_start": (updated length of languages)
+            }
     """
     # combinations is invariant to order
     natural_subsets = list(combinations(natural_indices, num_natural))

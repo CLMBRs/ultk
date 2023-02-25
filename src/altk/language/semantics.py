@@ -88,12 +88,17 @@ class Meaning:
         self.dist = None
 
     def construct_distribution(self, weighted=False):
-        """Construct the probability distributino associated with the meaning.
+        """Construct the probability distribution associated with the meaning.
 
         By default, all elements in extension are assigned equal probability. If `weighted` set to true, elements are assigned probability according proportional to their weight attribute.
 
         Args:
             weighted: a bool representing what weight to assign all elements in the extension of the meaning a probability.
+        
+        Returns:
+            a dict of the form
+
+                {"referent_name": p(referent) }
         """
         zeros = {
             ref.name: 0.0 for ref in set(self.universe.referents) - set(self.referents)
@@ -104,11 +109,23 @@ class Meaning:
         self.dist = nonzeros | zeros
 
     def referents_uniform(self):
-        """Construct a probability distribution associated with the meaning such that every referent is equally weighted."""
+        """Construct a probability distribution associated with the meaning such that every referent is equally weighted.
+        
+        Returns:
+            a dict of the form
+
+                {"referent_name": probability 1/len(self.referents)}
+        """
         return {ref.name: 1 / len(self.referents) for ref in self.referents}
 
     def weighted_distribution(self):
-        """Construct a probability distribution associated with the meaning according to the weights specified by each referent."""
+        """Construct a probability distribution associated with the meaning according to the weights specified by each referent.
+        
+        Returns:
+            a dict of the form
+            
+                {"referent_name": p(referent) }
+        """
         total_weight = sum([ref.weight for ref in self.referents])
         if not total_weight:
             # If there are no weights, make each referent equally likely.
