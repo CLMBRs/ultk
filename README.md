@@ -15,6 +15,8 @@ Key features:
 - Simplified logic for measuring informativity of languages / communicative success of signaling agents
 - Methods for language population sampling and optimization w.r.t Pareto fronts
 
+See the [docs](https://nathimel.github.io/altk/altk.html).
+
 ## Future work
 
 ALTK is a long term project and it is currently in its early stages.

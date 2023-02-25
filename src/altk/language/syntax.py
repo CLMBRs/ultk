@@ -9,7 +9,7 @@
         from altk.language.syntax import Form
         from altk.language.language import Expression, Language
         form = Form('blue')
-        meaning = Color_Meaning() # some default meaning
+        meaning = ColorMeaning() # some default meaning
         expression = Expression(form, meaning)
         lang = Language([expression])
 
