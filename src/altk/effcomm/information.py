@@ -74,7 +74,7 @@ def blahut_arimoto(
     """Compute the rate-distortion function of an i.i.d distribution
 
     Args:
-        dist_mat: array of shape `(|X|, |X_hat|)` representing the distoriton matrix between the input alphabet and the reconstruction alphabet. dist_mat[i,j] = dist(x[i],x_hat[j]). In this context, X is a random variable representing the state of Nature, and X_hat is a random variable representing actions appropriate.
+        dist_mat: array of shape `(|X|, |X_hat|)` representing the distortion matrix between the input alphabet and the reconstruction alphabet. dist_mat[i,j] = dist(x[i],x_hat[j]). In this context, X is a random variable representing the a speaker's meaning (target referent), and X_hat is a random variable representing a listener's meaning (guessed  referent).
 
         p_x: (1D array of shape `|X|`) representing the probability mass function of the source. In this context, the prior over states of nature.
 
