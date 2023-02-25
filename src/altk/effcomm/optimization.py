@@ -167,11 +167,11 @@ class EvolutionaryOptimizer:
             id_start: the number of languages generatd in the experiment so far.
 
         Returns:
-            a dict of the new population of languages of size=sample_size, and the updated id_start, e.g.
-            {
-                "languages": (a list)
-                "id_start": (an int)
-            }
+            a dict of the new population of languages of size=sample_size, and the updated id_start, of the form
+                {
+                "languages": (list of updated languages)
+                "id_start": (updated length of languages)
+                }
 
         """
         amount -= len(languages)
@@ -253,11 +253,12 @@ def sample_parents(
         explore: a float in `[0,1]` specifying how much to explore possibly suboptimal languages. If set to 0, `parent_languages` is just `dominating_languages`.
 
     Returns:
-        a dict of the languages to serve as the next generation (after possible mutations) and updated id_start, e.g.
-        {
-            "languages": (a list),
-            "id_start": (an int),
-        }
+        a dict of the languages to serve as the next generation (after possible mutations) and updated id_start, of the form
+
+            {
+                "languages": (list of updated languages)
+                "id_start": (updated length of languages)
+            }
     """
     total_fit = len(dominating_languages)
     num_explore = int(explore * total_fit)

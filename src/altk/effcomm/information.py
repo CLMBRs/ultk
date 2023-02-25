@@ -10,7 +10,7 @@ from typing import Callable
 
 
 def information_rate(source: np.ndarray, encoder: np.ndarray) -> float:
-    """Compute the information rate / complexity of the encoder q(w|m) as I[W:M]."""
+    """Compute the information rate / complexity of the encoder q(w|m) as $I[W:M]$."""
     pXY = util.joint(pY_X=encoder, pX=source)
     return util.MI(pXY=pXY)
 
@@ -25,7 +25,7 @@ def get_rd_curve(
     dist_mat: np.ndarray,
     betas: np.ndarray = np.linspace(start=0, stop=2**7, num=1500),
 ) -> list[tuple[float]]:
-    """Use the Blahut Arimoto algorithm to obtain a list of points."""
+    """Use the Blahut Arimoto algorithm to obtain a list of (rate, distortion) points."""
     rd = lambda beta: blahut_arimoto(dist_mat, p_x=prior, beta=beta)["final"]
     pareto_points = [rd(beta) for beta in betas]
     return pareto_points
@@ -34,7 +34,7 @@ def get_rd_curve(
 def expected_distortion(
     p_x: np.ndarray, p_xhat_x: np.ndarray, dist_mat: np.ndarray
 ) -> float:
-    """D[X, Xhat] = sum_x p(x) sum_xhat p(xhat|x) * d(x, xhat)"""
+    """$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) * d(x, \hat{x})$"""
     return np.sum(p_x @ (p_xhat_x * dist_mat))
 
 
@@ -43,19 +43,19 @@ def compute_rate_distortion(
     p_xhat_x,
     dist_mat,
 ) -> tuple[np.ndarray]:
-    """Compute the information rate I(X;Xhat) and total distortion D[X, Xhat] of a joint distribution defind by P(X) and P(Xhat|X).
+    """Compute the information rate $I(X;\hat{X})$ and total distortion $D[X, \hat{X}]$ of a joint distribution defind by $P(X)$ and $P(\hat{X}|X)$.
 
     Args:
-        p_x: (1D array of shape `|X|`) the prior probability of an input symbol (i.e., the source)
+        p_x: array of shape `|X|` the prior probability of an input symbol (i.e., the source)
 
-        p_xhat_x: (2D array of shape `(|X|, |Xhat|)`) the probability of an output symbol given the input
+        p_xhat_x: array of shape `(|X|, |X_hat|)` the probability of an output symbol given the input
 
-        dist_mat: (2D array of shape `(|X|, |X_hat|)`) representing the distoriton matrix between the input alphabet and the reconstruction alphabet.
+        dist_mat: array of shape `(|X|, |X_hat|)` representing the distoriton matrix between the input alphabet and the reconstruction alphabet.
 
     Returns:
         a tuple containing
-        rate: rate (in bits) of compressing X into X_hat
-        distortion: expected distortion between X, X_hat
+            rate: rate (in bits) of compressing X into X_hat
+            distortion: expected distortion between X, X_hat
     """
     return (
         information_rate(p_x, p_xhat_x),
@@ -87,11 +87,13 @@ def blahut_arimoto(
         ignore_converge: whether to run the optimization until `max_it`, ignoring the stopping criterion specified by `eps`.
 
     Returns:
-        a dict containing
+        a dict of the form
 
-            'final': a tuple of (rate, distortion) values. This is the rate (in bits) of compressing X into X_hat, and distortion between X, X_hat
+            { 
+                'final': a tuple of (rate, distortion) values. This is the rate (in bits) of compressing X into X_hat, and distortion between X, X_hat
 
-            'trajectory': a list of the (rate, distortion) points discovered during optimization
+                'trajectory': a list of the (rate, distortion) points discovered during optimization
+            }
     """
     # start with iid conditional distribution, as p(x) may not be uniform
     p_xhat_x = np.tile(p_x, (dist_mat.shape[1], 1)).T
@@ -183,7 +185,7 @@ def ib_complexity(
     language: Language,
     prior: np.ndarray,
 ) -> float:
-    """Compute the IB encoder complexity of a language."""
+    """Compute the IB encoder complexity of a language $I[M:W]$."""
     return float(
         information_rate(
             source=prior,
@@ -201,7 +203,7 @@ def ib_informativity(
     decay: float,
     utility: str,
 ) -> float:
-    """Compute the expected informativity (accuracy) I[W:U] of a lexicon.
+    """Compute the expected informativity (accuracy) $I[W:U]$ of a lexicon.
 
     Args:
         language: the Language to measure for informativity
@@ -242,7 +244,7 @@ def ib_comm_cost(
         utility: parameter for meaning distribution p(u|m) generation
 
     Returns:
-        the communicative cost, E[D[M || \hat{M}]] = I[M:U] - I[W:U] in bits.
+        the communicative cost, $\mathbb{E}[D_{KL}[M || \hat{M}]] = I[M:U] - I[W:U]$ in bits.
     """
     dists = language_to_joint_distributions(language, prior, decay, utility)
     return float(util.MI(dists["joint_pmu"]) - util.MI(dists["joint_pwu"]))
@@ -316,7 +318,7 @@ def language_to_ib_encoder_decoder(
 def deterministic_decoder(
     decoder: np.ndarray, meaning_distributions: np.ndarray
 ) -> np.ndarray:
-    """Compute \hat{m}_{w}(u) = sum_m [ p(m|w) * m(u) ]
+    """Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) * m(u) $
 
     Args:
         decoder: array of shape `(|words|, |meanings|)`
@@ -334,7 +336,7 @@ def generate_meaning_distributions(
     decay: float,
     cost: Callable[[Referent, Referent], float],
 ) -> np.ndarray:
-    """Generate a conditional distribution over world states given meanings, p(u|m), for each meaning.
+    """Generate a conditional distribution over world states given meanings, $p(u|m)$, for each meaning.
 
     Args:
         space: the ModalMeaningSpace on which meanings are defined
