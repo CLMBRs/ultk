@@ -1,9 +1,9 @@
-import game
-import util
-import vis
-from agents import Receiver, Sender
-from languages import State, StateSpace, Signal, SignalMeaning, SignalingLanguage
-from learning import simulate_learning
+from . import util
+from . import vis
+from .agents import Receiver, Sender
+from .game import distribution_over_states, SignalingGame, indicator
+from .languages import State, StateSpace, Signal, SignalMeaning, SignalingLanguage
+from .learning import simulate_learning
 
 
 def main(args):
@@ -38,18 +38,18 @@ def main(args):
     receiver = Receiver(seed_language, name="receiver")
 
     # Construct a prior probability distribution over states
-    prior_over_states = game.distribution_over_states(num_states, type=prior_type)
+    prior_over_states = distribution_over_states(num_states, type=prior_type)
 
     ##########################################################################
     # Main simulation
     ##########################################################################
 
-    signaling_game = game.SignalingGame(
+    signaling_game = SignalingGame(
         states=universe.referents,
         signals=signals,
         sender=sender,
         receiver=receiver,
-        utility=lambda x, y: game.indicator(x, y),
+        utility=lambda x, y: indicator(x, y),
         prior=prior_over_states,
     )
     signaling_game = simulate_learning(signaling_game, num_rounds, learning_rate)

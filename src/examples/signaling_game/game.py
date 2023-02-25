@@ -1,6 +1,6 @@
 import numpy as np
-from languages import State, Signal
-from agents import Sender, Receiver
+from .languages import State, Signal
+from .agents import Sender, Receiver
 from typing import Callable
 
 

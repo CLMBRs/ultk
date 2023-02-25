@@ -94,7 +94,7 @@ def generate_languages(
     If sample size <= nCr, then take a random sample_size set of combinations. Otherwise, to prevent repeat languages, treat nCr as the sample size.
 
     Args:
-        expressions: a list of the possible modal expressions to sample from.
+        expressions: a list of the possible expressions to sample from.
 
         lang_size: the maximum (or exact) number of expressions in each language.
 

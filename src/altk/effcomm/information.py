@@ -266,6 +266,15 @@ def language_to_joint_distributions(
         decay: parameter for meaning distribution p(u|m) generation
 
         utility: parameter for meaning distribution p(u|m) generation
+
+    Returns:
+        a dict of the form 
+
+            {
+            "joint_pmu": an array of shape `(|U|, |M|)` representing P(U, M)
+            "joint_pwu": an array of shape `(|W|, |U|)` representing P(W, U)
+            }
+
     """
     system = language_to_ib_encoder_decoder(language, prior)
     encoder = system["encoder"]

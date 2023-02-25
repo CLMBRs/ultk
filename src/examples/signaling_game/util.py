@@ -3,7 +3,7 @@ import yaml
 import numpy as np
 import random
 import plotnine as pn
-from languages import SignalingLanguage
+from .languages import SignalingLanguage
 
 
 def set_seed(seed: int) -> None:
