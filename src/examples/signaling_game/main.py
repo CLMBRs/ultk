@@ -7,7 +7,6 @@ from learning import simulate_learning
 
 
 def main(args):
-
     # load game settings
     num_signals = args.num_signals
     num_states = args.num_states
@@ -82,7 +81,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-
     args = util.get_args()
 
     main(args)

@@ -1,10 +1,11 @@
 """Classes for representing communicative agents, such as Senders and Receivers figuring in Lewis-Skyrms signaling games, literal and pragmatic agents in the Rational Speech Act framework, etc."""
 
-from typing import Type, Any
+from typing import Any
 import numpy as np
 from scipy.special import softmax
 from altk.language.language import Expression, Language
 from altk.language.semantics import Referent
+from altk.effcomm.util import bayes
 
 ##############################################################################
 # Base communicative agent class
@@ -312,3 +313,20 @@ class PragmaticListener(Listener):
         for i in range(len(self.R)):
             col = speaker.S[:, i]
             self.R[i] = col @ prior / np.sum(col @ prior)
+
+
+class BayesianListener(Listener):
+    """A Bayesian reciever chooses an interpretation according to p(meaning | word), where
+
+        P(meanings | words) = P(meanings | words) * P(meanings) / P(words)
+
+    Furthermore, we sometimes require that each word w is deterministically interpreted as meaning \hat{m} as follows:
+
+        \hat{m}_{w}(u) = sum_m [ p(m|w) * m(u) ]
+
+    See altk.effcomm.information for more details.
+    """
+
+    def __init__(self, speaker: Speaker, prior: np.ndarray, name: str = None):
+        weights = bayes(speaker.normalized_weights(), prior)
+        super().__init__(speaker.language, weights=weights, name=name)
