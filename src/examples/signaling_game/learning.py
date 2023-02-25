@@ -3,7 +3,7 @@
 import numpy as np
 from altk.effcomm.agent import CommunicativeAgent
 from altk.effcomm.informativity import communicative_success
-from altk.effcomm.complexity import encoder_complexity
+from altk.effcomm.information import information_rate
 from game import SignalingGame
 from tqdm import tqdm
 from typing import Any
@@ -48,7 +48,7 @@ def simulate_learning(g: SignalingGame, num_rounds: int, learning_rate=1.0) -> N
                 prior=g.prior,
             )
         )
-        g.data["complexity"].append(encoder_complexity(g.sender, g.prior))
+        g.data["complexity"].append(information_rate(g.prior, g.sender.normalized_weights()))
 
     return g
 
