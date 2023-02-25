@@ -49,10 +49,13 @@ def pareto_min_distances(points: list[tuple], pareto_points: list[tuple]) -> np.
     """
     print("Measuring min distance to frontier ...")
 
-    # Scale complexity
+    # Scale cost and complexity
     points = np.array(points)
     pareto_points = np.array(pareto_points)
     max_cost, max_complexity = points.max(axis=0)
+
+    points[:, 0] = points[:, 0] / max_cost
+    pareto_points[:, 0] = pareto_points[:, 0] / max_cost
 
     points[:, 1] = points[:, 1] / max_complexity
     pareto_points[:, 1] = pareto_points[:, 1] / max_complexity
@@ -121,6 +124,7 @@ def tradeoff(
     properties: dict[str, Callable[[Language], Any]],
     x: str = "comm_cost",
     y: str = "complexity",
+    frontier: list[tuple] = None,
 ) -> dict[str, list[Language]]:
     """Builds a final efficient communication analysis by measuring a list of languages, updating their internal data, and returning the results.
 
@@ -133,12 +137,14 @@ def tradeoff(
 
         y: the second pressure to measure, e.g. cognitive complexity.
 
+        frontier: a list of (comm_cost, complexity) points representing a Pareto frontier to measure optimality w.r.t.
+
     Returns:
         a dictionary of the population and the pareto front, e.g.
         {
             "languages": the list of languages, with their internal efficient communication data updated,
 
-            "dominating_languages": the list of the Pareto optimal languages in the tradeoff.
+            "dominating_languages": the list of the languages dominating the population w.r.t. comm_cost and complexity. If no `frontier` is none, this can be considered the Pareto frontier.
         }
     """
     points = []
@@ -150,7 +156,11 @@ def tradeoff(
     dominating_languages = pareto_optimal_languages(languages, x, y, unique=True)
     dominant_points = [(lang.data[x], lang.data[y]) for lang in dominating_languages]
 
-    min_distances = pareto_min_distances(points, dominant_points)
+    if frontier is not None:
+        min_distances = pareto_min_distances(points, frontier)
+    else:
+        min_distances = pareto_min_distances(points, dominant_points)
+
     print("Setting optimality ...")
     for i, lang in enumerate(tqdm(languages)):
         # warning: yaml that saves lang must use float, not numpy.float64 !
