@@ -8,7 +8,8 @@ from game import SignalingGame
 from tqdm import tqdm
 from typing import Any
 
-def simulate_learning(g: SignalingGame, num_rounds: int, learning_rate = 1.0) -> None:
+
+def simulate_learning(g: SignalingGame, num_rounds: int, learning_rate=1.0) -> None:
     """Simulate Roth-Erev reinforcement learning in the signaling game.
 
     Args:
@@ -45,10 +46,12 @@ def simulate_learning(g: SignalingGame, num_rounds: int, learning_rate = 1.0) ->
                 listener=g.receiver,
                 utility=g.utility,
                 prior=g.prior,
-                ))
+            )
+        )
         g.data["complexity"].append(encoder_complexity(g.sender, g.prior))
 
     return g
+
 
 def reward(agent: CommunicativeAgent, policy: dict[str, Any], amount: float) -> None:
     """Reward an agent for a particular referent-expression behavior.
