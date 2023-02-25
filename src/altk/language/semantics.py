@@ -1,21 +1,19 @@
 """Classes for modeling the meanings of a language.
 
-    Meanings are modeled as things which map linguistic forms to objects of reference. The linguistic forms and objects of reference can be richly defined, but they are in some sense inaccessible at the level of a meaning. We think of meanings as informationally encapsulated instructions for building concepts.
+    Meanings are modeled as things which map linguistic forms to objects of reference. The linguistic forms and objects of reference can in principle be very detailed, and future work may elaborate the meaning classes and implement a Form class.
 
-    In efficient communication analyses, simplicity and informativeness are typically properties of semantic aspects of a language. E.g., a meaning is simple if it is easy to represent, or to compress into some code; a meaning is informative if it is easy for a listener to recover a speaker's intended literal meaning.
+    In efficient communication analyses, simplicity and informativeness can be measured as properties of semantic aspects of a language. E.g., a meaning is simple if it is easy to represent, or to compress into some code; a meaning is informative if it is easy for a listener to recover a speaker's intended literal meaning.
 
     Examples:
 
-        >>> from altk.language.syntax import Form
         >>> from altk.language.language import Expression, Language
-        >>> form = Form('blue')
-        >>> meaning = Color_Meaning() # some default meaning
+        >>> meaning = ColorMeaning() # some default meaning
         >>> expression = Expression(form, meaning)
         >>> lang = Language([expression])
 
 """
 
-from typing import Any, Iterable
+from typing import Iterable
 
 
 class Referent:
@@ -53,15 +51,9 @@ class Universe:
 
 class Meaning:
 
-    """A meaning picks out objects of the universe.
+    """A meaning picks out a set of objects from the universe.
 
-    There are several easy ways of modeling this.
-
-    On one familiar model from (e.g. predicate logic and formal semantics) a semantic value can be set, called a property: the set of objects of the universe satisfying that property. A meaning can be associated with the relevant subset of the universe, or its characteristic function.
-
-    On some efficient communication analysis models, we use the concept of meaning to be a more general mapping of forms to objects of reference.
-
-    A meaning is always a subset of the universe, because an expression may itself be underspecified: that is, the expression can be used to express different meanings. Sometimes these different literal meanings are not equally likely, in which it can be helpful to define a meaning explicitly as a distribution.
+    On one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe. Sometimes these different referents are not equally likely, in which it can be helpful to define a meaning explicitly as a distribution over the universe.
     """
 
     def __init__(self, referents: Iterable[Referent], universe: Universe) -> None:
