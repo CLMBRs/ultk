@@ -96,7 +96,12 @@ def interpolate_data(
         points.append((1, 0))
 
     # NB: interp1d requires no duplicates and we require unique costs.
-    points = list({cost: comp for cost, comp in sorted(points, key=lambda x: x[0], reverse=True)}.items())
+    points = list(
+        {
+            cost: comp
+            for cost, comp in sorted(points, key=lambda x: x[0], reverse=True)
+        }.items()
+    )
 
     pareto_x, pareto_y = list(zip(*points))
     interpolated = interpolate.interp1d(pareto_x, pareto_y, fill_value="extrapolate")

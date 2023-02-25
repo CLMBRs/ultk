@@ -44,7 +44,6 @@ class Language:
     """Minimally contains Expression objects."""
 
     def __init__(self, expressions: list[Expression], **kwargs):
-
         # Check that all expressions have the same universe
         if len(set([e.meaning.universe for e in expressions])) != 1:
             raise ValueError(
