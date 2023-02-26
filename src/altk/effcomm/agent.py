@@ -266,11 +266,11 @@ class PragmaticSpeaker(Speaker):
 
         The pragmatic speaker chooses expressions to communicate their intended meaning according to:
 
-            P(e | m) \propto exp(temperature * Utility(e,m))
+        $P(e | m) \propto \\exp(t * u(e,m))$
 
-        where
+        where $t \in [0,1]$ is a temperature parameter and utility $u$ is defined
 
-            Utility(e , m) := log(P_Listener(m | e))
+        $u(e , m) := \\log(P_{\\text{Listener}}(m | e))$
 
         Args:
             language: the language with |M| meanings and |E| expressions defining the size of S.
@@ -303,7 +303,7 @@ class PragmaticListener(Listener):
 
         The pragmatic listener chooses meanings as their best guesses of the expression they heard according to:
 
-            P(m | e) \propto P_PragmaticSpeaker(e | m)
+        $P(m | e) \propto P_{\\text{PragmaticSpeaker}}(e | m)$
 
         Args:
             language: the language with |M| meanings and |E| expressions defining the size of R.

@@ -9,10 +9,13 @@ from typing import Callable
 ##############################################################################
 
 
-def rows_zero_to_uniform(mat) -> np.ndarray:
+def rows_zero_to_uniform(mat: np.ndarray) -> np.ndarray:
     """Ensure that `mat` encodes a probability distribution, i.e. each row (indexed by a meaning) is a distribution over expressions: sums to exactly 1.0.
 
     This is necessary when exploring mathematically possible languages (including natural languages, like Hausa in the case of modals) which sometimes have that a row of the matrix p(word|meaning) is a vector of 0s.
+
+    Args:
+        mat: a 2D numpy array that should be normalized so that each row is a probability distribution.
     """
 
     threshold = 1e-5
@@ -137,7 +140,7 @@ def MI(pXY):
 
 
 def DKL(p, q, axis=None):
-    """Compute KL divergences, $D_{KL}[p||q]$"""
+    """Compute KL divergences, $D_{KL}[p~||~q]$"""
     return (xlogx(p) - np.where(p > PRECISION, p * np.log2(q + PRECISION), 0)).sum(
         axis=axis
     )

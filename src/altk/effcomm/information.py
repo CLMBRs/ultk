@@ -53,9 +53,7 @@ def compute_rate_distortion(
         dist_mat: array of shape `(|X|, |X_hat|)` representing the distoriton matrix between the input alphabet and the reconstruction alphabet.
 
     Returns:
-        a tuple containing
-            rate: rate (in bits) of compressing X into X_hat
-            distortion: expected distortion between X, X_hat
+        a (rate, distortion) tuple containing the information rate (in bits) of compressing X into X_hat and the expected distortion between X, X_hat
     """
     return (
         information_rate(p_x, p_xhat_x),

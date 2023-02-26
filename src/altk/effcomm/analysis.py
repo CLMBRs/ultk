@@ -72,12 +72,13 @@ def pearson_analysis(
 
     Returns:
         a dict of the pearson correlation coefficient for the predictor and the property, and bootstrapped confidence intervals for this coefficient, e.g.
-        {
+
+            {
             "rho": (a float between -1 and 1),
             "confidence_intervals": (a pandas Dataframe with the columns [
                 'bootstrap_sample_percent', 'low', 'high'
             ])
-        }
+            }
     """
     min_percent = 0.01  # must be > 2/ len(data)
     intervals = 5
