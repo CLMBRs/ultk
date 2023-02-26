@@ -89,7 +89,7 @@ def blahut_arimoto(
     Returns:
         a dict of the form
 
-            { 
+            {
                 'final': a tuple of (rate, distortion) values. This is the rate (in bits) of compressing X into X_hat, and distortion between X, X_hat
 
                 'trajectory': a list of the (rate, distortion) points discovered during optimization
@@ -268,7 +268,7 @@ def language_to_joint_distributions(
         utility: parameter for meaning distribution p(u|m) generation
 
     Returns:
-        a dict of the form 
+        a dict of the form
 
             {
             "joint_pmu": an array of shape `(|U|, |M|)` representing P(U, M)

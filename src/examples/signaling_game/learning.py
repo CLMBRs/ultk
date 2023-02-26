@@ -48,7 +48,9 @@ def simulate_learning(g: SignalingGame, num_rounds: int, learning_rate=1.0) -> N
                 prior=g.prior,
             )
         )
-        g.data["complexity"].append(information_rate(g.prior, g.sender.normalized_weights()))
+        g.data["complexity"].append(
+            information_rate(g.prior, g.sender.normalized_weights())
+        )
 
     return g
 

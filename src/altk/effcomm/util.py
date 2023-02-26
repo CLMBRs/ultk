@@ -60,7 +60,7 @@ def marginal(pXY, axis=1):
     Args:
         pXY: a numpy array of shape `(|X|, |Y|)`
 
-    Returns: 
+    Returns:
         pY: (axis = 0) or pX (default, axis = 1)
     """
     return pXY.sum(axis)
@@ -72,7 +72,7 @@ def conditional(pXY):
     Args:
         pXY: a numpy array of shape `(|X|, |Y|)`
 
-    Returns:  
+    Returns:
         pY_X: a numpy array of shape `(|X|, |Y|)`
     """
     pX = pXY.sum(axis=1, keepdims=True)
@@ -100,8 +100,8 @@ def marginalize(pY_X, pX):
         pY_X: a numpy array of shape `(|X|, |Y|)`
 
         pX: a numpy array of shape `|X|`
-    
-    Returns:  
+
+    Returns:
         pY: a numpy array of shape `|Y|`
     """
     return pY_X.T @ pX
