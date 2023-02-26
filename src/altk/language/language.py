@@ -3,9 +3,13 @@
 Example usage:
 
     >>> from altk.language.language import Expression, Language
-    >>> meaning = ColorMeaning() # some default meaning
-    >>> expression = Expression(form, meaning)
-    >>> lang = Language([expression]).
+    >>> # assuming the meaning `a_few_meaning` has already been constructed
+    >>> # define the expression
+    >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
+    >>> # define a very small language
+    >>> lang_1 = Language([a_few])
+    >>> # or a slightly larger one with synonymy
+    >>> lang_2 = Language([a_few] * 3)
 """
 
 import numpy as np
