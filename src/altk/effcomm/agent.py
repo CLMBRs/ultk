@@ -39,6 +39,9 @@ class CommunicativeAgent:
         if "name" in kwargs:
             self.name = kwargs["name"]
 
+        if "weights" in kwargs:
+            self.weights = kwargs["weights"]
+
     @property
     def weights(self) -> np.ndarray:
         return self._weights
@@ -138,7 +141,7 @@ class CommunicativeAgent:
 
         Args:
             threshold: a float in [0,1] representing the cutoff for determining if a meaning (referent) can be communicated by a expression. Because weights are not initialized to 0, it is a good idea to set nonzero values as the threshold.
-        
+
         Returns:
             a Language corresponding to the form-meaning mapping defined by the communicative agent's weights.
         """
