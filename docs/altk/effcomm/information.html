@@ -150,7 +150,7 @@
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="k">def</span> <span class="nf">expected_distortion</span><span class="p">(</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>    <span class="n">p_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">p_xhat_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">dist_mat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>    <span class="sd">&quot;&quot;&quot;$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) * d(x, \hat{x})$&quot;&quot;&quot;</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>    <span class="sd">&quot;&quot;&quot;$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) \cdot d(x, \hat{x})$&quot;&quot;&quot;</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">p_x</span> <span class="o">@</span> <span class="p">(</span><span class="n">p_xhat_x</span> <span class="o">*</span> <span class="n">dist_mat</span><span class="p">))</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>
@@ -443,7 +443,7 @@
 </span><span id="L-327"><a href="#L-327"><span class="linenos">327</span></a><span class="k">def</span> <span class="nf">deterministic_decoder</span><span class="p">(</span>
 </span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a>    <span class="n">decoder</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">meaning_distributions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 </span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-</span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a>    <span class="sd">&quot;&quot;&quot;Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) * m(u) $</span>
+</span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a>    <span class="sd">&quot;&quot;&quot;Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) \cdot m(u) $</span>
 </span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a>
 </span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a><span class="sd">    Args:</span>
 </span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a><span class="sd">        decoder: array of shape `(|words|, |meanings|)`</span>
@@ -555,12 +555,12 @@
             <div class="pdoc-code codehilite"><pre><span></span><span id="expected_distortion-35"><a href="#expected_distortion-35"><span class="linenos">35</span></a><span class="k">def</span> <span class="nf">expected_distortion</span><span class="p">(</span>
 </span><span id="expected_distortion-36"><a href="#expected_distortion-36"><span class="linenos">36</span></a>    <span class="n">p_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">p_xhat_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">dist_mat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 </span><span id="expected_distortion-37"><a href="#expected_distortion-37"><span class="linenos">37</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="expected_distortion-38"><a href="#expected_distortion-38"><span class="linenos">38</span></a>    <span class="sd">&quot;&quot;&quot;$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) * d(x, \hat{x})$&quot;&quot;&quot;</span>
+</span><span id="expected_distortion-38"><a href="#expected_distortion-38"><span class="linenos">38</span></a>    <span class="sd">&quot;&quot;&quot;$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) \cdot d(x, \hat{x})$&quot;&quot;&quot;</span>
 </span><span id="expected_distortion-39"><a href="#expected_distortion-39"><span class="linenos">39</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">p_x</span> <span class="o">@</span> <span class="p">(</span><span class="n">p_xhat_x</span> <span class="o">*</span> <span class="n">dist_mat</span><span class="p">))</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) * d(x, \hat{x})$</p>
+            <div class="docstring"><p>$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) \cdot d(x, \hat{x})$</p>
 </div>
 
 
@@ -1115,7 +1115,7 @@
             <div class="pdoc-code codehilite"><pre><span></span><span id="deterministic_decoder-328"><a href="#deterministic_decoder-328"><span class="linenos">328</span></a><span class="k">def</span> <span class="nf">deterministic_decoder</span><span class="p">(</span>
 </span><span id="deterministic_decoder-329"><a href="#deterministic_decoder-329"><span class="linenos">329</span></a>    <span class="n">decoder</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">meaning_distributions</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 </span><span id="deterministic_decoder-330"><a href="#deterministic_decoder-330"><span class="linenos">330</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-</span><span id="deterministic_decoder-331"><a href="#deterministic_decoder-331"><span class="linenos">331</span></a>    <span class="sd">&quot;&quot;&quot;Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) * m(u) $</span>
+</span><span id="deterministic_decoder-331"><a href="#deterministic_decoder-331"><span class="linenos">331</span></a>    <span class="sd">&quot;&quot;&quot;Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) \cdot m(u) $</span>
 </span><span id="deterministic_decoder-332"><a href="#deterministic_decoder-332"><span class="linenos">332</span></a>
 </span><span id="deterministic_decoder-333"><a href="#deterministic_decoder-333"><span class="linenos">333</span></a><span class="sd">    Args:</span>
 </span><span id="deterministic_decoder-334"><a href="#deterministic_decoder-334"><span class="linenos">334</span></a><span class="sd">        decoder: array of shape `(|words|, |meanings|)`</span>
@@ -1129,7 +1129,7 @@
 </span></pre></div>
 
 
-            <div class="docstring"><p>Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) * m(u) $</p>
+            <div class="docstring"><p>Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) \cdot m(u) $</p>
 
 <h6 id="arguments">Arguments:</h6>
 
