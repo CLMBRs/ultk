@@ -219,9 +219,7 @@ def ib_informativity(
     """
     return float(
         util.MI(
-            language_to_joint_distributions(language, prior, decay, cost)[
-                "joint_pwu"
-            ]
+            language_to_joint_distributions(language, prior, decay, cost)["joint_pwu"]
         )
     )
 

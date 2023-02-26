@@ -215,7 +215,7 @@
 </span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
 </span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">        Args:</span>
 </span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">            weighted: a bool representing what weight to assign all elements in the extension of the meaning a probability.</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">        </span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">        Returns:</span>
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">            a dict of the form</span>
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
@@ -231,7 +231,7 @@
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="k">def</span> <span class="nf">referents_uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="sd">&quot;&quot;&quot;Construct a probability distribution associated with the meaning such that every referent is equally weighted.</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">        </span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">        Returns:</span>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">            a dict of the form</span>
 </span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
@@ -241,10 +241,10 @@
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="k">def</span> <span class="nf">weighted_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="sd">&quot;&quot;&quot;Construct a probability distribution associated with the meaning according to the weights specified by each referent.</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">        </span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">        Returns:</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">            a dict of the form</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">            </span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
 </span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">                {&quot;referent_name&quot;: p(referent) }</span>
 </span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="n">total_weight</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">ref</span><span class="o">.</span><span class="n">weight</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">referents</span><span class="p">])</span>
@@ -409,7 +409,7 @@
 </span><span id="Meaning-87"><a href="#Meaning-87"><span class="linenos"> 87</span></a>
 </span><span id="Meaning-88"><a href="#Meaning-88"><span class="linenos"> 88</span></a><span class="sd">        Args:</span>
 </span><span id="Meaning-89"><a href="#Meaning-89"><span class="linenos"> 89</span></a><span class="sd">            weighted: a bool representing what weight to assign all elements in the extension of the meaning a probability.</span>
-</span><span id="Meaning-90"><a href="#Meaning-90"><span class="linenos"> 90</span></a><span class="sd">        </span>
+</span><span id="Meaning-90"><a href="#Meaning-90"><span class="linenos"> 90</span></a>
 </span><span id="Meaning-91"><a href="#Meaning-91"><span class="linenos"> 91</span></a><span class="sd">        Returns:</span>
 </span><span id="Meaning-92"><a href="#Meaning-92"><span class="linenos"> 92</span></a><span class="sd">            a dict of the form</span>
 </span><span id="Meaning-93"><a href="#Meaning-93"><span class="linenos"> 93</span></a>
@@ -425,7 +425,7 @@
 </span><span id="Meaning-103"><a href="#Meaning-103"><span class="linenos">103</span></a>
 </span><span id="Meaning-104"><a href="#Meaning-104"><span class="linenos">104</span></a>    <span class="k">def</span> <span class="nf">referents_uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="Meaning-105"><a href="#Meaning-105"><span class="linenos">105</span></a>        <span class="sd">&quot;&quot;&quot;Construct a probability distribution associated with the meaning such that every referent is equally weighted.</span>
-</span><span id="Meaning-106"><a href="#Meaning-106"><span class="linenos">106</span></a><span class="sd">        </span>
+</span><span id="Meaning-106"><a href="#Meaning-106"><span class="linenos">106</span></a>
 </span><span id="Meaning-107"><a href="#Meaning-107"><span class="linenos">107</span></a><span class="sd">        Returns:</span>
 </span><span id="Meaning-108"><a href="#Meaning-108"><span class="linenos">108</span></a><span class="sd">            a dict of the form</span>
 </span><span id="Meaning-109"><a href="#Meaning-109"><span class="linenos">109</span></a>
@@ -435,10 +435,10 @@
 </span><span id="Meaning-113"><a href="#Meaning-113"><span class="linenos">113</span></a>
 </span><span id="Meaning-114"><a href="#Meaning-114"><span class="linenos">114</span></a>    <span class="k">def</span> <span class="nf">weighted_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="Meaning-115"><a href="#Meaning-115"><span class="linenos">115</span></a>        <span class="sd">&quot;&quot;&quot;Construct a probability distribution associated with the meaning according to the weights specified by each referent.</span>
-</span><span id="Meaning-116"><a href="#Meaning-116"><span class="linenos">116</span></a><span class="sd">        </span>
+</span><span id="Meaning-116"><a href="#Meaning-116"><span class="linenos">116</span></a>
 </span><span id="Meaning-117"><a href="#Meaning-117"><span class="linenos">117</span></a><span class="sd">        Returns:</span>
 </span><span id="Meaning-118"><a href="#Meaning-118"><span class="linenos">118</span></a><span class="sd">            a dict of the form</span>
-</span><span id="Meaning-119"><a href="#Meaning-119"><span class="linenos">119</span></a><span class="sd">            </span>
+</span><span id="Meaning-119"><a href="#Meaning-119"><span class="linenos">119</span></a>
 </span><span id="Meaning-120"><a href="#Meaning-120"><span class="linenos">120</span></a><span class="sd">                {&quot;referent_name&quot;: p(referent) }</span>
 </span><span id="Meaning-121"><a href="#Meaning-121"><span class="linenos">121</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Meaning-122"><a href="#Meaning-122"><span class="linenos">122</span></a>        <span class="n">total_weight</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">ref</span><span class="o">.</span><span class="n">weight</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">referents</span><span class="p">])</span>
@@ -523,7 +523,7 @@
 </span><span id="Meaning.construct_distribution-87"><a href="#Meaning.construct_distribution-87"><span class="linenos"> 87</span></a>
 </span><span id="Meaning.construct_distribution-88"><a href="#Meaning.construct_distribution-88"><span class="linenos"> 88</span></a><span class="sd">        Args:</span>
 </span><span id="Meaning.construct_distribution-89"><a href="#Meaning.construct_distribution-89"><span class="linenos"> 89</span></a><span class="sd">            weighted: a bool representing what weight to assign all elements in the extension of the meaning a probability.</span>
-</span><span id="Meaning.construct_distribution-90"><a href="#Meaning.construct_distribution-90"><span class="linenos"> 90</span></a><span class="sd">        </span>
+</span><span id="Meaning.construct_distribution-90"><a href="#Meaning.construct_distribution-90"><span class="linenos"> 90</span></a>
 </span><span id="Meaning.construct_distribution-91"><a href="#Meaning.construct_distribution-91"><span class="linenos"> 91</span></a><span class="sd">        Returns:</span>
 </span><span id="Meaning.construct_distribution-92"><a href="#Meaning.construct_distribution-92"><span class="linenos"> 92</span></a><span class="sd">            a dict of the form</span>
 </span><span id="Meaning.construct_distribution-93"><a href="#Meaning.construct_distribution-93"><span class="linenos"> 93</span></a>
@@ -574,7 +574,7 @@
     <a class="headerlink" href="#Meaning.referents_uniform"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="Meaning.referents_uniform-104"><a href="#Meaning.referents_uniform-104"><span class="linenos">104</span></a>    <span class="k">def</span> <span class="nf">referents_uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="Meaning.referents_uniform-105"><a href="#Meaning.referents_uniform-105"><span class="linenos">105</span></a>        <span class="sd">&quot;&quot;&quot;Construct a probability distribution associated with the meaning such that every referent is equally weighted.</span>
-</span><span id="Meaning.referents_uniform-106"><a href="#Meaning.referents_uniform-106"><span class="linenos">106</span></a><span class="sd">        </span>
+</span><span id="Meaning.referents_uniform-106"><a href="#Meaning.referents_uniform-106"><span class="linenos">106</span></a>
 </span><span id="Meaning.referents_uniform-107"><a href="#Meaning.referents_uniform-107"><span class="linenos">107</span></a><span class="sd">        Returns:</span>
 </span><span id="Meaning.referents_uniform-108"><a href="#Meaning.referents_uniform-108"><span class="linenos">108</span></a><span class="sd">            a dict of the form</span>
 </span><span id="Meaning.referents_uniform-109"><a href="#Meaning.referents_uniform-109"><span class="linenos">109</span></a>
@@ -611,10 +611,10 @@
     <a class="headerlink" href="#Meaning.weighted_distribution"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="Meaning.weighted_distribution-114"><a href="#Meaning.weighted_distribution-114"><span class="linenos">114</span></a>    <span class="k">def</span> <span class="nf">weighted_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="Meaning.weighted_distribution-115"><a href="#Meaning.weighted_distribution-115"><span class="linenos">115</span></a>        <span class="sd">&quot;&quot;&quot;Construct a probability distribution associated with the meaning according to the weights specified by each referent.</span>
-</span><span id="Meaning.weighted_distribution-116"><a href="#Meaning.weighted_distribution-116"><span class="linenos">116</span></a><span class="sd">        </span>
+</span><span id="Meaning.weighted_distribution-116"><a href="#Meaning.weighted_distribution-116"><span class="linenos">116</span></a>
 </span><span id="Meaning.weighted_distribution-117"><a href="#Meaning.weighted_distribution-117"><span class="linenos">117</span></a><span class="sd">        Returns:</span>
 </span><span id="Meaning.weighted_distribution-118"><a href="#Meaning.weighted_distribution-118"><span class="linenos">118</span></a><span class="sd">            a dict of the form</span>
-</span><span id="Meaning.weighted_distribution-119"><a href="#Meaning.weighted_distribution-119"><span class="linenos">119</span></a><span class="sd">            </span>
+</span><span id="Meaning.weighted_distribution-119"><a href="#Meaning.weighted_distribution-119"><span class="linenos">119</span></a>
 </span><span id="Meaning.weighted_distribution-120"><a href="#Meaning.weighted_distribution-120"><span class="linenos">120</span></a><span class="sd">                {&quot;referent_name&quot;: p(referent) }</span>
 </span><span id="Meaning.weighted_distribution-121"><a href="#Meaning.weighted_distribution-121"><span class="linenos">121</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Meaning.weighted_distribution-122"><a href="#Meaning.weighted_distribution-122"><span class="linenos">122</span></a>        <span class="n">total_weight</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">ref</span><span class="o">.</span><span class="n">weight</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">referents</span><span class="p">])</span>

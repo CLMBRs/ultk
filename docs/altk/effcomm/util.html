@@ -170,7 +170,7 @@
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">    Args:</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">        pXY: a numpy array of shape `(|X|, |Y|)`</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">    Returns: </span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">    Returns:</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">        pY: (axis = 0) or pX (default, axis = 1)</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>    <span class="k">return</span> <span class="n">pXY</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
@@ -182,7 +182,7 @@
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">    Args:</span>
 </span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">        pXY: a numpy array of shape `(|X|, |Y|)`</span>
 </span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">    Returns:  </span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">    Returns:</span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">        pY_X: a numpy array of shape `(|X|, |Y|)`</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="n">pX</span> <span class="o">=</span> <span class="n">pXY</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -210,8 +210,8 @@
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">        pY_X: a numpy array of shape `(|X|, |Y|)`</span>
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">        pX: a numpy array of shape `|X|`</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">    </span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">    Returns:  </span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">    Returns:</span>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">        pY: a numpy array of shape `|Y|`</span>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">return</span> <span class="n">pY_X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">pX</span>
@@ -343,7 +343,7 @@
 </span><span id="marginal-61"><a href="#marginal-61"><span class="linenos">61</span></a><span class="sd">    Args:</span>
 </span><span id="marginal-62"><a href="#marginal-62"><span class="linenos">62</span></a><span class="sd">        pXY: a numpy array of shape `(|X|, |Y|)`</span>
 </span><span id="marginal-63"><a href="#marginal-63"><span class="linenos">63</span></a>
-</span><span id="marginal-64"><a href="#marginal-64"><span class="linenos">64</span></a><span class="sd">    Returns: </span>
+</span><span id="marginal-64"><a href="#marginal-64"><span class="linenos">64</span></a><span class="sd">    Returns:</span>
 </span><span id="marginal-65"><a href="#marginal-65"><span class="linenos">65</span></a><span class="sd">        pY: (axis = 0) or pX (default, axis = 1)</span>
 </span><span id="marginal-66"><a href="#marginal-66"><span class="linenos">66</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="marginal-67"><a href="#marginal-67"><span class="linenos">67</span></a>    <span class="k">return</span> <span class="n">pXY</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
@@ -358,8 +358,11 @@
 <li><strong>pXY:</strong>  a numpy array of shape <code>(|X|, |Y|)</code></li>
 </ul>
 
-<p>Returns: 
-    pY: (axis = 0) or pX (default, axis = 1)</p>
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>pY: (axis = 0) or pX (default, axis = 1)</p>
+</blockquote>
 </div>
 
 
@@ -381,7 +384,7 @@
 </span><span id="conditional-73"><a href="#conditional-73"><span class="linenos">73</span></a><span class="sd">    Args:</span>
 </span><span id="conditional-74"><a href="#conditional-74"><span class="linenos">74</span></a><span class="sd">        pXY: a numpy array of shape `(|X|, |Y|)`</span>
 </span><span id="conditional-75"><a href="#conditional-75"><span class="linenos">75</span></a>
-</span><span id="conditional-76"><a href="#conditional-76"><span class="linenos">76</span></a><span class="sd">    Returns:  </span>
+</span><span id="conditional-76"><a href="#conditional-76"><span class="linenos">76</span></a><span class="sd">    Returns:</span>
 </span><span id="conditional-77"><a href="#conditional-77"><span class="linenos">77</span></a><span class="sd">        pY_X: a numpy array of shape `(|X|, |Y|)`</span>
 </span><span id="conditional-78"><a href="#conditional-78"><span class="linenos">78</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="conditional-79"><a href="#conditional-79"><span class="linenos">79</span></a>    <span class="n">pX</span> <span class="o">=</span> <span class="n">pXY</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -397,8 +400,11 @@
 <li><strong>pXY:</strong>  a numpy array of shape <code>(|X|, |Y|)</code></li>
 </ul>
 
-<p>Returns: <br />
-    pY_X: a numpy array of shape <code>(|X|, |Y|)</code></p>
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>pY_X: a numpy array of shape <code>(|X|, |Y|)</code></p>
+</blockquote>
 </div>
 
 
@@ -465,8 +471,8 @@
 </span><span id="marginalize-101"><a href="#marginalize-101"><span class="linenos">101</span></a><span class="sd">        pY_X: a numpy array of shape `(|X|, |Y|)`</span>
 </span><span id="marginalize-102"><a href="#marginalize-102"><span class="linenos">102</span></a>
 </span><span id="marginalize-103"><a href="#marginalize-103"><span class="linenos">103</span></a><span class="sd">        pX: a numpy array of shape `|X|`</span>
-</span><span id="marginalize-104"><a href="#marginalize-104"><span class="linenos">104</span></a><span class="sd">    </span>
-</span><span id="marginalize-105"><a href="#marginalize-105"><span class="linenos">105</span></a><span class="sd">    Returns:  </span>
+</span><span id="marginalize-104"><a href="#marginalize-104"><span class="linenos">104</span></a>
+</span><span id="marginalize-105"><a href="#marginalize-105"><span class="linenos">105</span></a><span class="sd">    Returns:</span>
 </span><span id="marginalize-106"><a href="#marginalize-106"><span class="linenos">106</span></a><span class="sd">        pY: a numpy array of shape `|Y|`</span>
 </span><span id="marginalize-107"><a href="#marginalize-107"><span class="linenos">107</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="marginalize-108"><a href="#marginalize-108"><span class="linenos">108</span></a>    <span class="k">return</span> <span class="n">pY_X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">pX</span>
@@ -482,8 +488,11 @@
 <li><strong>pX:</strong>  a numpy array of shape <code>|X|</code></li>
 </ul>
 
-<p>Returns: <br />
-    pY: a numpy array of shape <code>|Y|</code></p>
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>pY: a numpy array of shape <code>|Y|</code></p>
+</blockquote>
 </div>
 
 
