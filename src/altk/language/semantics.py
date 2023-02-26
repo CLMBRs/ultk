@@ -21,21 +21,15 @@ from typing import Iterable
 
 
 class Referent:
-    """A referent is an object of communication.
-    
-    TODO: remove `weight` attribute, which is dead code at this point.
-    """
+    """A referent is some object in the universe for a language."""
 
-    def __init__(self, name: str, weight: float = None) -> None:
+    def __init__(self, name: str) -> None:
         """Initialize a referent.
 
         Args:
             name: a string representing the name of the referent
-
-            weight: a float that determines the relative weight / communicative need of a referent in a meaning. 
         """
         self.name = name
-        self.weight = weight
 
     def __str__(self) -> str:
         raise NotImplementedError
