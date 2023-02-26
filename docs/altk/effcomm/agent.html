@@ -448,11 +448,11 @@
 </span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a>
 </span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">        The pragmatic speaker chooses expressions to communicate their intended meaning according to:</span>
 </span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>
-</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="sd">            P(e | m) \propto exp(temperature * Utility(e,m))</span>
+</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="sd">        $P(e | m) \propto \\exp(t * u(e,m))$</span>
 </span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a>
-</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">        where</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">        where $t \in [0,1]$ is a temperature parameter and utility $u$ is defined</span>
 </span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>
-</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">            Utility(e , m) := log(P_Listener(m | e))</span>
+</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">        $u(e , m) := \\log(P_{\\text{Listener}}(m | e))$</span>
 </span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a>
 </span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">        Args:</span>
 </span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="sd">            language: the language with |M| meanings and |E| expressions defining the size of S.</span>
@@ -485,7 +485,7 @@
 </span><span id="L-303"><a href="#L-303"><span class="linenos">303</span></a>
 </span><span id="L-304"><a href="#L-304"><span class="linenos">304</span></a><span class="sd">        The pragmatic listener chooses meanings as their best guesses of the expression they heard according to:</span>
 </span><span id="L-305"><a href="#L-305"><span class="linenos">305</span></a>
-</span><span id="L-306"><a href="#L-306"><span class="linenos">306</span></a><span class="sd">            P(m | e) \propto P_PragmaticSpeaker(e | m)</span>
+</span><span id="L-306"><a href="#L-306"><span class="linenos">306</span></a><span class="sd">        $P(m | e) \propto P_{\\text{PragmaticSpeaker}}(e | m)$</span>
 </span><span id="L-307"><a href="#L-307"><span class="linenos">307</span></a>
 </span><span id="L-308"><a href="#L-308"><span class="linenos">308</span></a><span class="sd">        Args:</span>
 </span><span id="L-309"><a href="#L-309"><span class="linenos">309</span></a><span class="sd">            language: the language with |M| meanings and |E| expressions defining the size of R.</span>
@@ -1480,11 +1480,11 @@
 </span><span id="PragmaticSpeaker-267"><a href="#PragmaticSpeaker-267"><span class="linenos">267</span></a>
 </span><span id="PragmaticSpeaker-268"><a href="#PragmaticSpeaker-268"><span class="linenos">268</span></a><span class="sd">        The pragmatic speaker chooses expressions to communicate their intended meaning according to:</span>
 </span><span id="PragmaticSpeaker-269"><a href="#PragmaticSpeaker-269"><span class="linenos">269</span></a>
-</span><span id="PragmaticSpeaker-270"><a href="#PragmaticSpeaker-270"><span class="linenos">270</span></a><span class="sd">            P(e | m) \propto exp(temperature * Utility(e,m))</span>
+</span><span id="PragmaticSpeaker-270"><a href="#PragmaticSpeaker-270"><span class="linenos">270</span></a><span class="sd">        $P(e | m) \propto \\exp(t * u(e,m))$</span>
 </span><span id="PragmaticSpeaker-271"><a href="#PragmaticSpeaker-271"><span class="linenos">271</span></a>
-</span><span id="PragmaticSpeaker-272"><a href="#PragmaticSpeaker-272"><span class="linenos">272</span></a><span class="sd">        where</span>
+</span><span id="PragmaticSpeaker-272"><a href="#PragmaticSpeaker-272"><span class="linenos">272</span></a><span class="sd">        where $t \in [0,1]$ is a temperature parameter and utility $u$ is defined</span>
 </span><span id="PragmaticSpeaker-273"><a href="#PragmaticSpeaker-273"><span class="linenos">273</span></a>
-</span><span id="PragmaticSpeaker-274"><a href="#PragmaticSpeaker-274"><span class="linenos">274</span></a><span class="sd">            Utility(e , m) := log(P_Listener(m | e))</span>
+</span><span id="PragmaticSpeaker-274"><a href="#PragmaticSpeaker-274"><span class="linenos">274</span></a><span class="sd">        $u(e , m) := \\log(P_{\\text{Listener}}(m | e))$</span>
 </span><span id="PragmaticSpeaker-275"><a href="#PragmaticSpeaker-275"><span class="linenos">275</span></a>
 </span><span id="PragmaticSpeaker-276"><a href="#PragmaticSpeaker-276"><span class="linenos">276</span></a><span class="sd">        Args:</span>
 </span><span id="PragmaticSpeaker-277"><a href="#PragmaticSpeaker-277"><span class="linenos">277</span></a><span class="sd">            language: the language with |M| meanings and |E| expressions defining the size of S.</span>
@@ -1528,11 +1528,11 @@
 </span><span id="PragmaticSpeaker.__init__-267"><a href="#PragmaticSpeaker.__init__-267"><span class="linenos">267</span></a>
 </span><span id="PragmaticSpeaker.__init__-268"><a href="#PragmaticSpeaker.__init__-268"><span class="linenos">268</span></a><span class="sd">        The pragmatic speaker chooses expressions to communicate their intended meaning according to:</span>
 </span><span id="PragmaticSpeaker.__init__-269"><a href="#PragmaticSpeaker.__init__-269"><span class="linenos">269</span></a>
-</span><span id="PragmaticSpeaker.__init__-270"><a href="#PragmaticSpeaker.__init__-270"><span class="linenos">270</span></a><span class="sd">            P(e | m) \propto exp(temperature * Utility(e,m))</span>
+</span><span id="PragmaticSpeaker.__init__-270"><a href="#PragmaticSpeaker.__init__-270"><span class="linenos">270</span></a><span class="sd">        $P(e | m) \propto \\exp(t * u(e,m))$</span>
 </span><span id="PragmaticSpeaker.__init__-271"><a href="#PragmaticSpeaker.__init__-271"><span class="linenos">271</span></a>
-</span><span id="PragmaticSpeaker.__init__-272"><a href="#PragmaticSpeaker.__init__-272"><span class="linenos">272</span></a><span class="sd">        where</span>
+</span><span id="PragmaticSpeaker.__init__-272"><a href="#PragmaticSpeaker.__init__-272"><span class="linenos">272</span></a><span class="sd">        where $t \in [0,1]$ is a temperature parameter and utility $u$ is defined</span>
 </span><span id="PragmaticSpeaker.__init__-273"><a href="#PragmaticSpeaker.__init__-273"><span class="linenos">273</span></a>
-</span><span id="PragmaticSpeaker.__init__-274"><a href="#PragmaticSpeaker.__init__-274"><span class="linenos">274</span></a><span class="sd">            Utility(e , m) := log(P_Listener(m | e))</span>
+</span><span id="PragmaticSpeaker.__init__-274"><a href="#PragmaticSpeaker.__init__-274"><span class="linenos">274</span></a><span class="sd">        $u(e , m) := \\log(P_{\\text{Listener}}(m | e))$</span>
 </span><span id="PragmaticSpeaker.__init__-275"><a href="#PragmaticSpeaker.__init__-275"><span class="linenos">275</span></a>
 </span><span id="PragmaticSpeaker.__init__-276"><a href="#PragmaticSpeaker.__init__-276"><span class="linenos">276</span></a><span class="sd">        Args:</span>
 </span><span id="PragmaticSpeaker.__init__-277"><a href="#PragmaticSpeaker.__init__-277"><span class="linenos">277</span></a><span class="sd">            language: the language with |M| meanings and |E| expressions defining the size of S.</span>
@@ -1554,16 +1554,13 @@
 
             <div class="docstring"><p>Initialize the |M|-by-|E| matrix, S, corresponding to the pragmatic speaker's conditional probability distribution over expressions given meanings.</p>
 
-<h6 id="the-pragmatic-speaker-chooses-expressions-to-communicate-their-intended-meaning-according-to">The pragmatic speaker chooses expressions to communicate their intended meaning according to:</h6>
+<p>The pragmatic speaker chooses expressions to communicate their intended meaning according to:</p>
 
-<blockquote>
-  <p>P(e | m) \propto exp(temperature * Utility(e,m))</p>
-</blockquote>
+<p>$P(e | m) \propto \exp(t * u(e,m))$</p>
 
-<p>where</p>
+<p>where $t \in [0,1]$ is a temperature parameter and utility $u$ is defined</p>
 
-<pre><code>Utility(e , m) := log(P_Listener(m | e))
-</code></pre>
+<p>$u(e , m) := \log(P_{\text{Listener}}(m | e))$</p>
 
 <h6 id="arguments">Arguments:</h6>
 
@@ -1622,7 +1619,7 @@
 </span><span id="PragmaticListener-304"><a href="#PragmaticListener-304"><span class="linenos">304</span></a>
 </span><span id="PragmaticListener-305"><a href="#PragmaticListener-305"><span class="linenos">305</span></a><span class="sd">        The pragmatic listener chooses meanings as their best guesses of the expression they heard according to:</span>
 </span><span id="PragmaticListener-306"><a href="#PragmaticListener-306"><span class="linenos">306</span></a>
-</span><span id="PragmaticListener-307"><a href="#PragmaticListener-307"><span class="linenos">307</span></a><span class="sd">            P(m | e) \propto P_PragmaticSpeaker(e | m)</span>
+</span><span id="PragmaticListener-307"><a href="#PragmaticListener-307"><span class="linenos">307</span></a><span class="sd">        $P(m | e) \propto P_{\\text{PragmaticSpeaker}}(e | m)$</span>
 </span><span id="PragmaticListener-308"><a href="#PragmaticListener-308"><span class="linenos">308</span></a>
 </span><span id="PragmaticListener-309"><a href="#PragmaticListener-309"><span class="linenos">309</span></a><span class="sd">        Args:</span>
 </span><span id="PragmaticListener-310"><a href="#PragmaticListener-310"><span class="linenos">310</span></a><span class="sd">            language: the language with |M| meanings and |E| expressions defining the size of R.</span>
@@ -1666,7 +1663,7 @@
 </span><span id="PragmaticListener.__init__-304"><a href="#PragmaticListener.__init__-304"><span class="linenos">304</span></a>
 </span><span id="PragmaticListener.__init__-305"><a href="#PragmaticListener.__init__-305"><span class="linenos">305</span></a><span class="sd">        The pragmatic listener chooses meanings as their best guesses of the expression they heard according to:</span>
 </span><span id="PragmaticListener.__init__-306"><a href="#PragmaticListener.__init__-306"><span class="linenos">306</span></a>
-</span><span id="PragmaticListener.__init__-307"><a href="#PragmaticListener.__init__-307"><span class="linenos">307</span></a><span class="sd">            P(m | e) \propto P_PragmaticSpeaker(e | m)</span>
+</span><span id="PragmaticListener.__init__-307"><a href="#PragmaticListener.__init__-307"><span class="linenos">307</span></a><span class="sd">        $P(m | e) \propto P_{\\text{PragmaticSpeaker}}(e | m)$</span>
 </span><span id="PragmaticListener.__init__-308"><a href="#PragmaticListener.__init__-308"><span class="linenos">308</span></a>
 </span><span id="PragmaticListener.__init__-309"><a href="#PragmaticListener.__init__-309"><span class="linenos">309</span></a><span class="sd">        Args:</span>
 </span><span id="PragmaticListener.__init__-310"><a href="#PragmaticListener.__init__-310"><span class="linenos">310</span></a><span class="sd">            language: the language with |M| meanings and |E| expressions defining the size of R.</span>
@@ -1687,11 +1684,9 @@
 
             <div class="docstring"><p>Initialize the |E|-by-|M| matrix, R, corresponding to the pragmatic listener's conditional probability distribution over meanings given expressions.</p>
 
-<h6 id="the-pragmatic-listener-chooses-meanings-as-their-best-guesses-of-the-expression-they-heard-according-to">The pragmatic listener chooses meanings as their best guesses of the expression they heard according to:</h6>
+<p>The pragmatic listener chooses meanings as their best guesses of the expression they heard according to:</p>
 
-<blockquote>
-  <p>P(m | e) \propto P_PragmaticSpeaker(e | m)</p>
-</blockquote>
+<p>$P(m | e) \propto P_{\text{PragmaticSpeaker}}(e | m)$</p>
 
 <h6 id="arguments">Arguments:</h6>
 

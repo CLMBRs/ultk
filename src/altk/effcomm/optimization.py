@@ -108,11 +108,12 @@ class EvolutionaryOptimizer:
 
         Returns:
             a dict of the estimated optimization solutions, as well as points explored along the way; of the form
-            {
+
+                {
                 "dominating_languages": list of languages as estimated solutions,
                 "explored_languages": list of all the languages explored during the evolutionary algorithm,
                 "id_start": updated number of languages generated in the experiment.
-            }
+                }
         """
         languages = seed_population
         explored_languages = []
@@ -168,6 +169,7 @@ class EvolutionaryOptimizer:
 
         Returns:
             a dict of the new population of languages of size=sample_size, and the updated id_start, of the form
+            
                 {
                 "languages": (list of updated languages)
                 "id_start": (updated length of languages)
