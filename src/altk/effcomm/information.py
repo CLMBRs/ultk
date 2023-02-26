@@ -254,7 +254,7 @@ def language_to_joint_distributions(
     language: Language,
     prior: np.ndarray,
     decay: float,
-    utility: str,
+    cost: Callable[[Referent, Referent], float],
 ) -> float:
     """Given a Language, get P(M,U) the joint distribution over meanings and referents, and P(W,U) the joint distribution over words and referents.
 
@@ -263,9 +263,9 @@ def language_to_joint_distributions(
 
         prior: communicative need distribution
 
-        decay: parameter for meaning distribution p(u|m) generation
+        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
 
-        utility: parameter for meaning distribution p(u|m) generation
+        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
 
     Returns:
         a dict of the form
@@ -281,7 +281,7 @@ def language_to_joint_distributions(
     decoder = system["decoder"]
     space = language.universe
 
-    conditional_pum = generate_meaning_distributions(space, decay, utility)
+    conditional_pum = generate_meaning_distributions(space, decay, cost)
     conditional_puw = deterministic_decoder(decoder, conditional_pum)
     joint_pmu = util.joint(conditional_pum, prior)
     p_w = util.marginalize(encoder, prior)
