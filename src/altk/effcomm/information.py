@@ -34,7 +34,7 @@ def get_rd_curve(
 def expected_distortion(
     p_x: np.ndarray, p_xhat_x: np.ndarray, dist_mat: np.ndarray
 ) -> float:
-    """$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) * d(x, \hat{x})$"""
+    """$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) \cdot d(x, \hat{x})$"""
     return np.sum(p_x @ (p_xhat_x * dist_mat))
 
 
@@ -146,7 +146,7 @@ def get_ib_curve(
     prior: np.ndarray,
     space: Universe,
     decay: float,
-    utility: str,
+    cost: Callable[[Referent, Referent], float],
     curve_type: str = "informativity",
 ) -> np.ndarray:
     """Compute the IB curve bound (I[M:W] vs. I[W:U]) for a given semantic space. We use the embo package, which does not allow one to specify the number of betas, which means some interpolation might be necessary later.
@@ -156,16 +156,16 @@ def get_ib_curve(
 
         space: the ModalMeaningSpace on which meanings are defined
 
-        decay: parameter for meaning distribution p(u|m) generation
+        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
 
-        utility: parameter for meaning distribution p(u|m) generation
+        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
 
         curve_type: {'informativity', 'comm_cost'} specifies whether to return the (classic) IB axes of informativity vs. complexity, or the more Rate-Distortion Theory aligned axes of comm_cost vs. complexity. The latter can be obtained easily from the former by subtracting each informativity value from I[M:U], which is a constant for all languages in the same domain.
 
     Returns:
         an array of shape `(num_points, 2)` representing the list of (accuracy/comm_cost, complexity) points on the information plane.
     """
-    conditional_pum = generate_meaning_distributions(space, decay, utility)
+    conditional_pum = generate_meaning_distributions(space, decay, cost)
     joint_pmu = util.joint(conditional_pum, prior)  # P(u) = P(m)
     I_mu = util.MI(joint_pmu)
 
@@ -327,7 +327,7 @@ def language_to_ib_encoder_decoder(
 def deterministic_decoder(
     decoder: np.ndarray, meaning_distributions: np.ndarray
 ) -> np.ndarray:
-    """Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) * m(u) $
+    """Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) \cdot m(u) $
 
     Args:
         decoder: array of shape `(|words|, |meanings|)`
