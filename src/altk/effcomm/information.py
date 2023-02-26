@@ -34,7 +34,7 @@ def get_rd_curve(
 def expected_distortion(
     p_x: np.ndarray, p_xhat_x: np.ndarray, dist_mat: np.ndarray
 ) -> float:
-    """$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) * d(x, \hat{x})$"""
+    """$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) \cdot d(x, \hat{x})$"""
     return np.sum(p_x @ (p_xhat_x * dist_mat))
 
 
@@ -327,7 +327,7 @@ def language_to_ib_encoder_decoder(
 def deterministic_decoder(
     decoder: np.ndarray, meaning_distributions: np.ndarray
 ) -> np.ndarray:
-    """Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) * m(u) $
+    """Compute $\hat{m}_{w}(u) = \sum_m  p(m|w) \cdot m(u) $
 
     Args:
         decoder: array of shape `(|words|, |meanings|)`
