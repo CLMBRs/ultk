@@ -205,7 +205,7 @@
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">    Returns:</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">        a dict of the form</span>
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">            { </span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">            {</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">                &#39;final&#39;: a tuple of (rate, distortion) values. This is the rate (in bits) of compressing X into X_hat, and distortion between X, X_hat</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
 </span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">                &#39;trajectory&#39;: a list of the (rate, distortion) points discovered during optimization</span>
@@ -262,7 +262,7 @@
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 </span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>    <span class="n">space</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
 </span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>    <span class="n">utility</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 </span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>    <span class="n">curve_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;informativity&quot;</span><span class="p">,</span>
 </span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 </span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>    <span class="sd">&quot;&quot;&quot;Compute the IB curve bound (I[M:W] vs. I[W:U]) for a given semantic space. We use the embo package, which does not allow one to specify the number of betas, which means some interpolation might be necessary later.</span>
@@ -272,16 +272,16 @@
 </span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>
 </span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a><span class="sd">        space: the ModalMeaningSpace on which meanings are defined</span>
 </span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">        utility: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>
 </span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="sd">        curve_type: {&#39;informativity&#39;, &#39;comm_cost&#39;} specifies whether to return the (classic) IB axes of informativity vs. complexity, or the more Rate-Distortion Theory aligned axes of comm_cost vs. complexity. The latter can be obtained easily from the former by subtracting each informativity value from I[M:U], which is a constant for all languages in the same domain.</span>
 </span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>
 </span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="sd">    Returns:</span>
 </span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a><span class="sd">        an array of shape `(num_points, 2)` representing the list of (accuracy/comm_cost, complexity) points on the information plane.</span>
 </span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
 </span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>    <span class="n">joint_pmu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_pum</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>  <span class="c1"># P(u) = P(m)</span>
 </span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>    <span class="n">I_mu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">MI</span><span class="p">(</span><span class="n">joint_pmu</span><span class="p">)</span>
 </span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>
@@ -317,7 +317,7 @@
 </span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>    <span class="n">language</span><span class="p">:</span> <span class="n">Language</span><span class="p">,</span>
 </span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 </span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>    <span class="n">utility</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 </span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>    <span class="sd">&quot;&quot;&quot;Compute the expected informativity (accuracy) $I[W:U]$ of a lexicon.</span>
 </span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>
@@ -326,16 +326,16 @@
 </span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>
 </span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a><span class="sd">        prior: communicative need distribution</span>
 </span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>
-</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>
-</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a><span class="sd">        utility: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a><span class="sd">        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a>
 </span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a><span class="sd">    Returns:</span>
 </span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a><span class="sd">        the informativity of the language I[W:U] in bits.</span>
 </span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span>
 </span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a>        <span class="n">util</span><span class="o">.</span><span class="n">MI</span><span class="p">(</span>
-</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a>            <span class="n">language_to_joint_distributions</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)[</span>
+</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a>            <span class="n">language_to_joint_distributions</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">cost</span><span class="p">)[</span>
 </span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>                <span class="s2">&quot;joint_pwu&quot;</span>
 </span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>            <span class="p">]</span>
 </span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>        <span class="p">)</span>
@@ -346,7 +346,7 @@
 </span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>    <span class="n">language</span><span class="p">:</span> <span class="n">Language</span><span class="p">,</span>
 </span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 </span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>    <span class="n">utility</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 </span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>    <span class="sd">&quot;&quot;&quot;Compute the IB communicative cost, i.e. expected KL-divergence betweeen speaker and listener meanings, for a language.</span>
 </span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a>
@@ -355,14 +355,14 @@
 </span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>
 </span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="sd">        prior: communicative need distribution</span>
 </span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>
-</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>
-</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="sd">        utility: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="sd">        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>
 </span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a><span class="sd">    Returns:</span>
 </span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="sd">        the communicative cost, $\mathbb{E}[D_{KL}[M || \hat{M}]] = I[M:U] - I[W:U]$ in bits.</span>
 </span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>    <span class="n">dists</span> <span class="o">=</span> <span class="n">language_to_joint_distributions</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)</span>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>    <span class="n">dists</span> <span class="o">=</span> <span class="n">language_to_joint_distributions</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
 </span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">MI</span><span class="p">(</span><span class="n">dists</span><span class="p">[</span><span class="s2">&quot;joint_pmu&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="n">util</span><span class="o">.</span><span class="n">MI</span><span class="p">(</span><span class="n">dists</span><span class="p">[</span><span class="s2">&quot;joint_pwu&quot;</span><span class="p">]))</span>
 </span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>
 </span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>
@@ -370,7 +370,7 @@
 </span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a>    <span class="n">language</span><span class="p">:</span> <span class="n">Language</span><span class="p">,</span>
 </span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 </span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>    <span class="n">utility</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 </span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a>    <span class="sd">&quot;&quot;&quot;Given a Language, get P(M,U) the joint distribution over meanings and referents, and P(W,U) the joint distribution over words and referents.</span>
 </span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a>
@@ -379,12 +379,12 @@
 </span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>
 </span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a><span class="sd">        prior: communicative need distribution</span>
 </span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a>
-</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>
-</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="sd">        utility: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="sd">        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>
 </span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="sd">    Returns:</span>
-</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">        a dict of the form </span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">        a dict of the form</span>
 </span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>
 </span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">            {</span>
 </span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="sd">            &quot;joint_pmu&quot;: an array of shape `(|U|, |M|)` representing P(U, M)</span>
@@ -397,7 +397,7 @@
 </span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a>    <span class="n">decoder</span> <span class="o">=</span> <span class="n">system</span><span class="p">[</span><span class="s2">&quot;decoder&quot;</span><span class="p">]</span>
 </span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a>    <span class="n">space</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">universe</span>
 </span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a>
-</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)</span>
+</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
 </span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a>    <span class="n">conditional_puw</span> <span class="o">=</span> <span class="n">deterministic_decoder</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="n">conditional_pum</span><span class="p">)</span>
 </span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a>    <span class="n">joint_pmu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_pum</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
 </span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a>    <span class="n">p_w</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">marginalize</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
@@ -660,7 +660,7 @@
 </span><span id="blahut_arimoto-90"><a href="#blahut_arimoto-90"><span class="linenos"> 90</span></a><span class="sd">    Returns:</span>
 </span><span id="blahut_arimoto-91"><a href="#blahut_arimoto-91"><span class="linenos"> 91</span></a><span class="sd">        a dict of the form</span>
 </span><span id="blahut_arimoto-92"><a href="#blahut_arimoto-92"><span class="linenos"> 92</span></a>
-</span><span id="blahut_arimoto-93"><a href="#blahut_arimoto-93"><span class="linenos"> 93</span></a><span class="sd">            { </span>
+</span><span id="blahut_arimoto-93"><a href="#blahut_arimoto-93"><span class="linenos"> 93</span></a><span class="sd">            {</span>
 </span><span id="blahut_arimoto-94"><a href="#blahut_arimoto-94"><span class="linenos"> 94</span></a><span class="sd">                &#39;final&#39;: a tuple of (rate, distortion) values. This is the rate (in bits) of compressing X into X_hat, and distortion between X, X_hat</span>
 </span><span id="blahut_arimoto-95"><a href="#blahut_arimoto-95"><span class="linenos"> 95</span></a>
 </span><span id="blahut_arimoto-96"><a href="#blahut_arimoto-96"><span class="linenos"> 96</span></a><span class="sd">                &#39;trajectory&#39;: a list of the (rate, distortion) points discovered during optimization</span>
@@ -725,7 +725,7 @@
 <blockquote>
   <p>a dict of the form</p>
 
-<pre><code>{ 
+<pre><code>{
     'final': a tuple of (rate, distortion) values. This is the rate (in bits) of compressing X into X_hat, and distortion between X, X_hat
 
     'trajectory': a list of the (rate, distortion) points discovered during optimization
@@ -741,7 +741,7 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_ib_curve</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">prior</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">space</span><span class="p">:</span> <span class="n"><a href="../language/semantics.html#Universe">altk.language.semantics.Universe</a></span>,</span><span class="param">	<span class="n">decay</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">utility</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">curve_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;informativity&#39;</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>:</span></span>
+        <span class="name">get_ib_curve</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">prior</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">space</span><span class="p">:</span> <span class="n"><a href="../language/semantics.html#Universe">altk.language.semantics.Universe</a></span>,</span><span class="param">	<span class="n">decay</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n"><a href="../language/semantics.html#Referent">altk.language.semantics.Referent</a></span><span class="p">,</span> <span class="n"><a href="../language/semantics.html#Referent">altk.language.semantics.Referent</a></span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span>,</span><span class="param">	<span class="n">curve_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;informativity&#39;</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>:</span></span>
 
                 <label class="view-source-button" for="get_ib_curve-view-source"><span>View Source</span></label>
 
@@ -751,7 +751,7 @@
 </span><span id="get_ib_curve-147"><a href="#get_ib_curve-147"><span class="linenos">147</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 </span><span id="get_ib_curve-148"><a href="#get_ib_curve-148"><span class="linenos">148</span></a>    <span class="n">space</span><span class="p">:</span> <span class="n">Universe</span><span class="p">,</span>
 </span><span id="get_ib_curve-149"><a href="#get_ib_curve-149"><span class="linenos">149</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="get_ib_curve-150"><a href="#get_ib_curve-150"><span class="linenos">150</span></a>    <span class="n">utility</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="get_ib_curve-150"><a href="#get_ib_curve-150"><span class="linenos">150</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 </span><span id="get_ib_curve-151"><a href="#get_ib_curve-151"><span class="linenos">151</span></a>    <span class="n">curve_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;informativity&quot;</span><span class="p">,</span>
 </span><span id="get_ib_curve-152"><a href="#get_ib_curve-152"><span class="linenos">152</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 </span><span id="get_ib_curve-153"><a href="#get_ib_curve-153"><span class="linenos">153</span></a>    <span class="sd">&quot;&quot;&quot;Compute the IB curve bound (I[M:W] vs. I[W:U]) for a given semantic space. We use the embo package, which does not allow one to specify the number of betas, which means some interpolation might be necessary later.</span>
@@ -761,16 +761,16 @@
 </span><span id="get_ib_curve-157"><a href="#get_ib_curve-157"><span class="linenos">157</span></a>
 </span><span id="get_ib_curve-158"><a href="#get_ib_curve-158"><span class="linenos">158</span></a><span class="sd">        space: the ModalMeaningSpace on which meanings are defined</span>
 </span><span id="get_ib_curve-159"><a href="#get_ib_curve-159"><span class="linenos">159</span></a>
-</span><span id="get_ib_curve-160"><a href="#get_ib_curve-160"><span class="linenos">160</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="get_ib_curve-160"><a href="#get_ib_curve-160"><span class="linenos">160</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="get_ib_curve-161"><a href="#get_ib_curve-161"><span class="linenos">161</span></a>
-</span><span id="get_ib_curve-162"><a href="#get_ib_curve-162"><span class="linenos">162</span></a><span class="sd">        utility: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="get_ib_curve-162"><a href="#get_ib_curve-162"><span class="linenos">162</span></a><span class="sd">        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="get_ib_curve-163"><a href="#get_ib_curve-163"><span class="linenos">163</span></a>
 </span><span id="get_ib_curve-164"><a href="#get_ib_curve-164"><span class="linenos">164</span></a><span class="sd">        curve_type: {&#39;informativity&#39;, &#39;comm_cost&#39;} specifies whether to return the (classic) IB axes of informativity vs. complexity, or the more Rate-Distortion Theory aligned axes of comm_cost vs. complexity. The latter can be obtained easily from the former by subtracting each informativity value from I[M:U], which is a constant for all languages in the same domain.</span>
 </span><span id="get_ib_curve-165"><a href="#get_ib_curve-165"><span class="linenos">165</span></a>
 </span><span id="get_ib_curve-166"><a href="#get_ib_curve-166"><span class="linenos">166</span></a><span class="sd">    Returns:</span>
 </span><span id="get_ib_curve-167"><a href="#get_ib_curve-167"><span class="linenos">167</span></a><span class="sd">        an array of shape `(num_points, 2)` representing the list of (accuracy/comm_cost, complexity) points on the information plane.</span>
 </span><span id="get_ib_curve-168"><a href="#get_ib_curve-168"><span class="linenos">168</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="get_ib_curve-169"><a href="#get_ib_curve-169"><span class="linenos">169</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)</span>
+</span><span id="get_ib_curve-169"><a href="#get_ib_curve-169"><span class="linenos">169</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
 </span><span id="get_ib_curve-170"><a href="#get_ib_curve-170"><span class="linenos">170</span></a>    <span class="n">joint_pmu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_pum</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>  <span class="c1"># P(u) = P(m)</span>
 </span><span id="get_ib_curve-171"><a href="#get_ib_curve-171"><span class="linenos">171</span></a>    <span class="n">I_mu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">MI</span><span class="p">(</span><span class="n">joint_pmu</span><span class="p">)</span>
 </span><span id="get_ib_curve-172"><a href="#get_ib_curve-172"><span class="linenos">172</span></a>
@@ -794,8 +794,8 @@
 <ul>
 <li><strong>prior:</strong>  array of shape <code>|meanings|</code></li>
 <li><strong>space:</strong>  the ModalMeaningSpace on which meanings are defined</li>
-<li><strong>decay:</strong>  parameter for meaning distribution p(u|m) generation</li>
-<li><strong>utility:</strong>  parameter for meaning distribution p(u|m) generation</li>
+<li><strong>decay:</strong>  parameter for meaning distribution p(u|m) generation. See <code><a href="#generate_meaning_distributions">generate_meaning_distributions</a></code>.</li>
+<li><strong>cost:</strong>  parameter for meaning distribution p(u|m) generation. See <code><a href="#generate_meaning_distributions">generate_meaning_distributions</a></code>.</li>
 <li><strong>curve_type:</strong>  {'informativity', 'comm_cost'} specifies whether to return the (classic) IB axes of informativity vs. complexity, or the more Rate-Distortion Theory aligned axes of comm_cost vs. complexity. The latter can be obtained easily from the former by subtracting each informativity value from I[M:U], which is a constant for all languages in the same domain.</li>
 </ul>
 
@@ -846,7 +846,7 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">ib_informativity</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">language</span><span class="p">:</span> <span class="n"><a href="../language/language.html#Language">altk.language.language.Language</a></span>,</span><span class="param">	<span class="n">prior</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">decay</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">utility</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
+        <span class="name">ib_informativity</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">language</span><span class="p">:</span> <span class="n"><a href="../language/language.html#Language">altk.language.language.Language</a></span>,</span><span class="param">	<span class="n">prior</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">decay</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n"><a href="../language/semantics.html#Referent">altk.language.semantics.Referent</a></span><span class="p">,</span> <span class="n"><a href="../language/semantics.html#Referent">altk.language.semantics.Referent</a></span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
 
                 <label class="view-source-button" for="ib_informativity-view-source"><span>View Source</span></label>
 
@@ -856,7 +856,7 @@
 </span><span id="ib_informativity-202"><a href="#ib_informativity-202"><span class="linenos">202</span></a>    <span class="n">language</span><span class="p">:</span> <span class="n">Language</span><span class="p">,</span>
 </span><span id="ib_informativity-203"><a href="#ib_informativity-203"><span class="linenos">203</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 </span><span id="ib_informativity-204"><a href="#ib_informativity-204"><span class="linenos">204</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="ib_informativity-205"><a href="#ib_informativity-205"><span class="linenos">205</span></a>    <span class="n">utility</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="ib_informativity-205"><a href="#ib_informativity-205"><span class="linenos">205</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 </span><span id="ib_informativity-206"><a href="#ib_informativity-206"><span class="linenos">206</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="ib_informativity-207"><a href="#ib_informativity-207"><span class="linenos">207</span></a>    <span class="sd">&quot;&quot;&quot;Compute the expected informativity (accuracy) $I[W:U]$ of a lexicon.</span>
 </span><span id="ib_informativity-208"><a href="#ib_informativity-208"><span class="linenos">208</span></a>
@@ -865,16 +865,16 @@
 </span><span id="ib_informativity-211"><a href="#ib_informativity-211"><span class="linenos">211</span></a>
 </span><span id="ib_informativity-212"><a href="#ib_informativity-212"><span class="linenos">212</span></a><span class="sd">        prior: communicative need distribution</span>
 </span><span id="ib_informativity-213"><a href="#ib_informativity-213"><span class="linenos">213</span></a>
-</span><span id="ib_informativity-214"><a href="#ib_informativity-214"><span class="linenos">214</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="ib_informativity-214"><a href="#ib_informativity-214"><span class="linenos">214</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="ib_informativity-215"><a href="#ib_informativity-215"><span class="linenos">215</span></a>
-</span><span id="ib_informativity-216"><a href="#ib_informativity-216"><span class="linenos">216</span></a><span class="sd">        utility: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="ib_informativity-216"><a href="#ib_informativity-216"><span class="linenos">216</span></a><span class="sd">        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="ib_informativity-217"><a href="#ib_informativity-217"><span class="linenos">217</span></a>
 </span><span id="ib_informativity-218"><a href="#ib_informativity-218"><span class="linenos">218</span></a><span class="sd">    Returns:</span>
 </span><span id="ib_informativity-219"><a href="#ib_informativity-219"><span class="linenos">219</span></a><span class="sd">        the informativity of the language I[W:U] in bits.</span>
 </span><span id="ib_informativity-220"><a href="#ib_informativity-220"><span class="linenos">220</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="ib_informativity-221"><a href="#ib_informativity-221"><span class="linenos">221</span></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span>
 </span><span id="ib_informativity-222"><a href="#ib_informativity-222"><span class="linenos">222</span></a>        <span class="n">util</span><span class="o">.</span><span class="n">MI</span><span class="p">(</span>
-</span><span id="ib_informativity-223"><a href="#ib_informativity-223"><span class="linenos">223</span></a>            <span class="n">language_to_joint_distributions</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)[</span>
+</span><span id="ib_informativity-223"><a href="#ib_informativity-223"><span class="linenos">223</span></a>            <span class="n">language_to_joint_distributions</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">cost</span><span class="p">)[</span>
 </span><span id="ib_informativity-224"><a href="#ib_informativity-224"><span class="linenos">224</span></a>                <span class="s2">&quot;joint_pwu&quot;</span>
 </span><span id="ib_informativity-225"><a href="#ib_informativity-225"><span class="linenos">225</span></a>            <span class="p">]</span>
 </span><span id="ib_informativity-226"><a href="#ib_informativity-226"><span class="linenos">226</span></a>        <span class="p">)</span>
@@ -889,8 +889,8 @@
 <ul>
 <li><strong>language:</strong>  the Language to measure for informativity</li>
 <li><strong>prior:</strong>  communicative need distribution</li>
-<li><strong>decay:</strong>  parameter for meaning distribution p(u|m) generation</li>
-<li><strong>utility:</strong>  parameter for meaning distribution p(u|m) generation</li>
+<li><strong>decay:</strong>  parameter for meaning distribution p(u|m) generation. See <code><a href="#generate_meaning_distributions">generate_meaning_distributions</a></code>.</li>
+<li><strong>cost:</strong>  parameter for meaning distribution p(u|m) generation. See <code><a href="#generate_meaning_distributions">generate_meaning_distributions</a></code>.</li>
 </ul>
 
 <h6 id="returns">Returns:</h6>
@@ -907,7 +907,7 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">ib_comm_cost</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">language</span><span class="p">:</span> <span class="n"><a href="../language/language.html#Language">altk.language.language.Language</a></span>,</span><span class="param">	<span class="n">prior</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">decay</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">utility</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
+        <span class="name">ib_comm_cost</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">language</span><span class="p">:</span> <span class="n"><a href="../language/language.html#Language">altk.language.language.Language</a></span>,</span><span class="param">	<span class="n">prior</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">decay</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n"><a href="../language/semantics.html#Referent">altk.language.semantics.Referent</a></span><span class="p">,</span> <span class="n"><a href="../language/semantics.html#Referent">altk.language.semantics.Referent</a></span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
 
                 <label class="view-source-button" for="ib_comm_cost-view-source"><span>View Source</span></label>
 
@@ -917,7 +917,7 @@
 </span><span id="ib_comm_cost-231"><a href="#ib_comm_cost-231"><span class="linenos">231</span></a>    <span class="n">language</span><span class="p">:</span> <span class="n">Language</span><span class="p">,</span>
 </span><span id="ib_comm_cost-232"><a href="#ib_comm_cost-232"><span class="linenos">232</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 </span><span id="ib_comm_cost-233"><a href="#ib_comm_cost-233"><span class="linenos">233</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="ib_comm_cost-234"><a href="#ib_comm_cost-234"><span class="linenos">234</span></a>    <span class="n">utility</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="ib_comm_cost-234"><a href="#ib_comm_cost-234"><span class="linenos">234</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 </span><span id="ib_comm_cost-235"><a href="#ib_comm_cost-235"><span class="linenos">235</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="ib_comm_cost-236"><a href="#ib_comm_cost-236"><span class="linenos">236</span></a>    <span class="sd">&quot;&quot;&quot;Compute the IB communicative cost, i.e. expected KL-divergence betweeen speaker and listener meanings, for a language.</span>
 </span><span id="ib_comm_cost-237"><a href="#ib_comm_cost-237"><span class="linenos">237</span></a>
@@ -926,14 +926,14 @@
 </span><span id="ib_comm_cost-240"><a href="#ib_comm_cost-240"><span class="linenos">240</span></a>
 </span><span id="ib_comm_cost-241"><a href="#ib_comm_cost-241"><span class="linenos">241</span></a><span class="sd">        prior: communicative need distribution</span>
 </span><span id="ib_comm_cost-242"><a href="#ib_comm_cost-242"><span class="linenos">242</span></a>
-</span><span id="ib_comm_cost-243"><a href="#ib_comm_cost-243"><span class="linenos">243</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="ib_comm_cost-243"><a href="#ib_comm_cost-243"><span class="linenos">243</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="ib_comm_cost-244"><a href="#ib_comm_cost-244"><span class="linenos">244</span></a>
-</span><span id="ib_comm_cost-245"><a href="#ib_comm_cost-245"><span class="linenos">245</span></a><span class="sd">        utility: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="ib_comm_cost-245"><a href="#ib_comm_cost-245"><span class="linenos">245</span></a><span class="sd">        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="ib_comm_cost-246"><a href="#ib_comm_cost-246"><span class="linenos">246</span></a>
 </span><span id="ib_comm_cost-247"><a href="#ib_comm_cost-247"><span class="linenos">247</span></a><span class="sd">    Returns:</span>
 </span><span id="ib_comm_cost-248"><a href="#ib_comm_cost-248"><span class="linenos">248</span></a><span class="sd">        the communicative cost, $\mathbb{E}[D_{KL}[M || \hat{M}]] = I[M:U] - I[W:U]$ in bits.</span>
 </span><span id="ib_comm_cost-249"><a href="#ib_comm_cost-249"><span class="linenos">249</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="ib_comm_cost-250"><a href="#ib_comm_cost-250"><span class="linenos">250</span></a>    <span class="n">dists</span> <span class="o">=</span> <span class="n">language_to_joint_distributions</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)</span>
+</span><span id="ib_comm_cost-250"><a href="#ib_comm_cost-250"><span class="linenos">250</span></a>    <span class="n">dists</span> <span class="o">=</span> <span class="n">language_to_joint_distributions</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
 </span><span id="ib_comm_cost-251"><a href="#ib_comm_cost-251"><span class="linenos">251</span></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">MI</span><span class="p">(</span><span class="n">dists</span><span class="p">[</span><span class="s2">&quot;joint_pmu&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="n">util</span><span class="o">.</span><span class="n">MI</span><span class="p">(</span><span class="n">dists</span><span class="p">[</span><span class="s2">&quot;joint_pwu&quot;</span><span class="p">]))</span>
 </span></pre></div>
 
@@ -945,8 +945,8 @@
 <ul>
 <li><strong>language:</strong>  the Language to measure for communicative cost</li>
 <li><strong>prior:</strong>  communicative need distribution</li>
-<li><strong>decay:</strong>  parameter for meaning distribution p(u|m) generation</li>
-<li><strong>utility:</strong>  parameter for meaning distribution p(u|m) generation</li>
+<li><strong>decay:</strong>  parameter for meaning distribution p(u|m) generation. See <code><a href="#generate_meaning_distributions">generate_meaning_distributions</a></code>.</li>
+<li><strong>cost:</strong>  parameter for meaning distribution p(u|m) generation. See <code><a href="#generate_meaning_distributions">generate_meaning_distributions</a></code>.</li>
 </ul>
 
 <h6 id="returns">Returns:</h6>
@@ -963,7 +963,7 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">language_to_joint_distributions</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">language</span><span class="p">:</span> <span class="n"><a href="../language/language.html#Language">altk.language.language.Language</a></span>,</span><span class="param">	<span class="n">prior</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">decay</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">utility</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
+        <span class="name">language_to_joint_distributions</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">language</span><span class="p">:</span> <span class="n"><a href="../language/language.html#Language">altk.language.language.Language</a></span>,</span><span class="param">	<span class="n">prior</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">decay</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n"><a href="../language/semantics.html#Referent">altk.language.semantics.Referent</a></span><span class="p">,</span> <span class="n"><a href="../language/semantics.html#Referent">altk.language.semantics.Referent</a></span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
 
                 <label class="view-source-button" for="language_to_joint_distributions-view-source"><span>View Source</span></label>
 
@@ -973,7 +973,7 @@
 </span><span id="language_to_joint_distributions-255"><a href="#language_to_joint_distributions-255"><span class="linenos">255</span></a>    <span class="n">language</span><span class="p">:</span> <span class="n">Language</span><span class="p">,</span>
 </span><span id="language_to_joint_distributions-256"><a href="#language_to_joint_distributions-256"><span class="linenos">256</span></a>    <span class="n">prior</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 </span><span id="language_to_joint_distributions-257"><a href="#language_to_joint_distributions-257"><span class="linenos">257</span></a>    <span class="n">decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-</span><span id="language_to_joint_distributions-258"><a href="#language_to_joint_distributions-258"><span class="linenos">258</span></a>    <span class="n">utility</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="language_to_joint_distributions-258"><a href="#language_to_joint_distributions-258"><span class="linenos">258</span></a>    <span class="n">cost</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Referent</span><span class="p">,</span> <span class="n">Referent</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
 </span><span id="language_to_joint_distributions-259"><a href="#language_to_joint_distributions-259"><span class="linenos">259</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="language_to_joint_distributions-260"><a href="#language_to_joint_distributions-260"><span class="linenos">260</span></a>    <span class="sd">&quot;&quot;&quot;Given a Language, get P(M,U) the joint distribution over meanings and referents, and P(W,U) the joint distribution over words and referents.</span>
 </span><span id="language_to_joint_distributions-261"><a href="#language_to_joint_distributions-261"><span class="linenos">261</span></a>
@@ -982,12 +982,12 @@
 </span><span id="language_to_joint_distributions-264"><a href="#language_to_joint_distributions-264"><span class="linenos">264</span></a>
 </span><span id="language_to_joint_distributions-265"><a href="#language_to_joint_distributions-265"><span class="linenos">265</span></a><span class="sd">        prior: communicative need distribution</span>
 </span><span id="language_to_joint_distributions-266"><a href="#language_to_joint_distributions-266"><span class="linenos">266</span></a>
-</span><span id="language_to_joint_distributions-267"><a href="#language_to_joint_distributions-267"><span class="linenos">267</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="language_to_joint_distributions-267"><a href="#language_to_joint_distributions-267"><span class="linenos">267</span></a><span class="sd">        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="language_to_joint_distributions-268"><a href="#language_to_joint_distributions-268"><span class="linenos">268</span></a>
-</span><span id="language_to_joint_distributions-269"><a href="#language_to_joint_distributions-269"><span class="linenos">269</span></a><span class="sd">        utility: parameter for meaning distribution p(u|m) generation</span>
+</span><span id="language_to_joint_distributions-269"><a href="#language_to_joint_distributions-269"><span class="linenos">269</span></a><span class="sd">        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.</span>
 </span><span id="language_to_joint_distributions-270"><a href="#language_to_joint_distributions-270"><span class="linenos">270</span></a>
 </span><span id="language_to_joint_distributions-271"><a href="#language_to_joint_distributions-271"><span class="linenos">271</span></a><span class="sd">    Returns:</span>
-</span><span id="language_to_joint_distributions-272"><a href="#language_to_joint_distributions-272"><span class="linenos">272</span></a><span class="sd">        a dict of the form </span>
+</span><span id="language_to_joint_distributions-272"><a href="#language_to_joint_distributions-272"><span class="linenos">272</span></a><span class="sd">        a dict of the form</span>
 </span><span id="language_to_joint_distributions-273"><a href="#language_to_joint_distributions-273"><span class="linenos">273</span></a>
 </span><span id="language_to_joint_distributions-274"><a href="#language_to_joint_distributions-274"><span class="linenos">274</span></a><span class="sd">            {</span>
 </span><span id="language_to_joint_distributions-275"><a href="#language_to_joint_distributions-275"><span class="linenos">275</span></a><span class="sd">            &quot;joint_pmu&quot;: an array of shape `(|U|, |M|)` representing P(U, M)</span>
@@ -1000,7 +1000,7 @@
 </span><span id="language_to_joint_distributions-282"><a href="#language_to_joint_distributions-282"><span class="linenos">282</span></a>    <span class="n">decoder</span> <span class="o">=</span> <span class="n">system</span><span class="p">[</span><span class="s2">&quot;decoder&quot;</span><span class="p">]</span>
 </span><span id="language_to_joint_distributions-283"><a href="#language_to_joint_distributions-283"><span class="linenos">283</span></a>    <span class="n">space</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">universe</span>
 </span><span id="language_to_joint_distributions-284"><a href="#language_to_joint_distributions-284"><span class="linenos">284</span></a>
-</span><span id="language_to_joint_distributions-285"><a href="#language_to_joint_distributions-285"><span class="linenos">285</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">utility</span><span class="p">)</span>
+</span><span id="language_to_joint_distributions-285"><a href="#language_to_joint_distributions-285"><span class="linenos">285</span></a>    <span class="n">conditional_pum</span> <span class="o">=</span> <span class="n">generate_meaning_distributions</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
 </span><span id="language_to_joint_distributions-286"><a href="#language_to_joint_distributions-286"><span class="linenos">286</span></a>    <span class="n">conditional_puw</span> <span class="o">=</span> <span class="n">deterministic_decoder</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="n">conditional_pum</span><span class="p">)</span>
 </span><span id="language_to_joint_distributions-287"><a href="#language_to_joint_distributions-287"><span class="linenos">287</span></a>    <span class="n">joint_pmu</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">joint</span><span class="p">(</span><span class="n">conditional_pum</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
 </span><span id="language_to_joint_distributions-288"><a href="#language_to_joint_distributions-288"><span class="linenos">288</span></a>    <span class="n">p_w</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">marginalize</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
@@ -1020,14 +1020,14 @@
 <ul>
 <li><strong>language:</strong>  the Language to convert to distributions</li>
 <li><strong>prior:</strong>  communicative need distribution</li>
-<li><strong>decay:</strong>  parameter for meaning distribution p(u|m) generation</li>
-<li><strong>utility:</strong>  parameter for meaning distribution p(u|m) generation</li>
+<li><strong>decay:</strong>  parameter for meaning distribution p(u|m) generation. See <code><a href="#generate_meaning_distributions">generate_meaning_distributions</a></code>.</li>
+<li><strong>cost:</strong>  parameter for meaning distribution p(u|m) generation. See <code><a href="#generate_meaning_distributions">generate_meaning_distributions</a></code>.</li>
 </ul>
 
 <h6 id="returns">Returns:</h6>
 
 <blockquote>
-  <p>a dict of the form </p>
+  <p>a dict of the form</p>
 
 <pre><code>{
 "joint_pmu": an array of shape `(|U|, |M|)` representing P(U, M)
