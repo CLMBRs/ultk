@@ -20,7 +20,7 @@ def get_hypothetical_variants(
     languages: list[Language] = None,
     speakers: list[Speaker] = None,
     total: int = 0,
-) -> list[Language]:
+) -> list[Any]:
     """For each system (parameterized by a language or else a speaker), generate `num` hypothetical variants by permuting the signals that the system assigns to states.
 
     Args:

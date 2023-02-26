@@ -41,7 +41,7 @@ def informativity(
     *Formula*:
         The informativity of a language $L$ with meaning space $M$ is defined:
 
-    $I(L) := \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m}|i) * u(m, \hat{m})$
+    $I(L) := \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m}|i) \cdot u(m, \hat{m})$
 
     *Bounds*:
         A perfectly informative (=1.0) language can be constructed with a exactly one expression for each meaning.
@@ -91,7 +91,7 @@ def communicative_success(
 
     $ = \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m} |i) \cdot u(m, m')$
 
-    $ = \sum diag(p)SR \odot U $
+    $ = \sum \\text{diag}(p)SR \odot U $
 
     For more details, see [docs/vectorized_informativity](https://github.com/CLMBRs/altk/blob/main/docs/vectorized_informativity.pdf).
 
