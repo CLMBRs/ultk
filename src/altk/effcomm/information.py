@@ -201,7 +201,7 @@ def ib_informativity(
     language: Language,
     prior: np.ndarray,
     decay: float,
-    utility: str,
+    cost: Callable[[Referent, Referent], float],
 ) -> float:
     """Compute the expected informativity (accuracy) $I[W:U]$ of a lexicon.
 
@@ -210,16 +210,16 @@ def ib_informativity(
 
         prior: communicative need distribution
 
-        decay: parameter for meaning distribution p(u|m) generation
+        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
 
-        utility: parameter for meaning distribution p(u|m) generation
+        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
 
     Returns:
         the informativity of the language I[W:U] in bits.
     """
     return float(
         util.MI(
-            language_to_joint_distributions(language, prior, decay, utility)[
+            language_to_joint_distributions(language, prior, decay, cost)[
                 "joint_pwu"
             ]
         )
@@ -230,7 +230,7 @@ def ib_comm_cost(
     language: Language,
     prior: np.ndarray,
     decay: float,
-    utility: str,
+    cost: Callable[[Referent, Referent], float],
 ) -> float:
     """Compute the IB communicative cost, i.e. expected KL-divergence betweeen speaker and listener meanings, for a language.
 
@@ -239,14 +239,14 @@ def ib_comm_cost(
 
         prior: communicative need distribution
 
-        decay: parameter for meaning distribution p(u|m) generation
+        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
 
-        utility: parameter for meaning distribution p(u|m) generation
+        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
 
     Returns:
         the communicative cost, $\mathbb{E}[D_{KL}[M || \hat{M}]] = I[M:U] - I[W:U]$ in bits.
     """
-    dists = language_to_joint_distributions(language, prior, decay, utility)
+    dists = language_to_joint_distributions(language, prior, decay, cost)
     return float(util.MI(dists["joint_pmu"]) - util.MI(dists["joint_pwu"]))
 
 
