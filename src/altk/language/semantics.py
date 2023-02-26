@@ -6,10 +6,17 @@
 
     Examples:
 
-        >>> from altk.language.language import Expression, Language
-        >>> meaning = ColorMeaning() # some default meaning
-        >>> expression = Expression(form, meaning)
-        >>> lang = Language([expression])
+        >>> from altk.language.semantics import Referent, Meaning, Universe
+        >>> from altk.language.language import Expression
+        >>> # construct the meaning space for numerals
+        >>> numerals_universe = NumeralUniverse(referents=[NumeralReferent(str(i)) for i in range(1, 100)])
+        >>> # construct a list of referents for the expression 'a few'
+        >>> a_few_refs = [NumeralReferent(str(i)) for i in range(1,6)]
+        >>> a_few_meaning = NumeralMeaning(referents=a_few_refs)
+        >>> # define the expression
+        >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
+        >>> # and a very small language
+        >>> lang = Language([a_few])
 
 """
 
