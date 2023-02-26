@@ -86,7 +86,7 @@ class Meaning:
 
         Args:
             weighted: a bool representing what weight to assign all elements in the extension of the meaning a probability.
-        
+
         Returns:
             a dict of the form
 
@@ -102,7 +102,7 @@ class Meaning:
 
     def referents_uniform(self):
         """Construct a probability distribution associated with the meaning such that every referent is equally weighted.
-        
+
         Returns:
             a dict of the form
 
@@ -112,10 +112,10 @@ class Meaning:
 
     def weighted_distribution(self):
         """Construct a probability distribution associated with the meaning according to the weights specified by each referent.
-        
+
         Returns:
             a dict of the form
-            
+
                 {"referent_name": p(referent) }
         """
         total_weight = sum([ref.weight for ref in self.referents])
