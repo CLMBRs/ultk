@@ -257,7 +257,7 @@ def sample_lang_size(
             {
                 "languages": (list of updated languages)
                 "id_start": (updated length of languages)
-            }    
+            }
     """
     result = sample_quasi_natural(
         language_class=language_class,
