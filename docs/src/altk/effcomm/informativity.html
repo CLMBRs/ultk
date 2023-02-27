@@ -72,7 +72,7 @@
     <main class="pdoc">
             <section class="module-info">
                     <h1 class="modulename">
-<a href="./../../../src.html">src</a><wbr>.<a href="./../../altk.html">altk</a><wbr>.<a href="./../effcomm.html">effcomm</a><wbr>.informativity    </h1>
+src<wbr>.<a href="./../../altk.html">altk</a><wbr>.<a href="./../effcomm.html">effcomm</a><wbr>.informativity    </h1>
 
                         <div class="docstring"><p>Functions for measuring informativity in efficient communication analyses of languages.</p>
 </div>
@@ -124,7 +124,7 @@
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="sd">    *Formula*:</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">        The informativity of a language $L$ with meaning space $M$ is defined:</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">    $I(L) := \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m}|i) * u(m, \hat{m})$</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">    $I(L) := \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m}|i) \cdot u(m, \hat{m})$</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">    *Bounds*:</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">        A perfectly informative (=1.0) language can be constructed with a exactly one expression for each meaning.</span>
@@ -174,7 +174,7 @@
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">    $ = \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m} |i) \cdot u(m, m&#39;)$</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">    $ = \sum diag(p)SR \odot U $</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">    $ = \sum \\text{diag}(p)SR \odot U $</span>
 </span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">    For more details, see [docs/vectorized_informativity](https://github.com/CLMBRs/altk/blob/main/docs/vectorized_informativity.pdf).</span>
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>
@@ -231,7 +231,7 @@
 </span><span id="informativity-42"><a href="#informativity-42"><span class="linenos">42</span></a><span class="sd">    *Formula*:</span>
 </span><span id="informativity-43"><a href="#informativity-43"><span class="linenos">43</span></a><span class="sd">        The informativity of a language $L$ with meaning space $M$ is defined:</span>
 </span><span id="informativity-44"><a href="#informativity-44"><span class="linenos">44</span></a>
-</span><span id="informativity-45"><a href="#informativity-45"><span class="linenos">45</span></a><span class="sd">    $I(L) := \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m}|i) * u(m, \hat{m})$</span>
+</span><span id="informativity-45"><a href="#informativity-45"><span class="linenos">45</span></a><span class="sd">    $I(L) := \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m}|i) \cdot u(m, \hat{m})$</span>
 </span><span id="informativity-46"><a href="#informativity-46"><span class="linenos">46</span></a>
 </span><span id="informativity-47"><a href="#informativity-47"><span class="linenos">47</span></a><span class="sd">    *Bounds*:</span>
 </span><span id="informativity-48"><a href="#informativity-48"><span class="linenos">48</span></a><span class="sd">        A perfectly informative (=1.0) language can be constructed with a exactly one expression for each meaning.</span>
@@ -288,7 +288,7 @@
 <p><em>Formula</em>:
     The informativity of a language $L$ with meaning space $M$ is defined:</p>
 
-<p>$I(L) := \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m}|i) * u(m, \hat{m})$</p>
+<p>$I(L) := \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m}|i) \cdot u(m, \hat{m})$</p>
 
 <p><em>Bounds</em>:
     A perfectly informative (=1.0) language can be constructed with a exactly one expression for each meaning.</p>
@@ -323,7 +323,7 @@
 </span><span id="communicative_success-92"><a href="#communicative_success-92"><span class="linenos"> 92</span></a>
 </span><span id="communicative_success-93"><a href="#communicative_success-93"><span class="linenos"> 93</span></a><span class="sd">    $ = \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m} |i) \cdot u(m, m&#39;)$</span>
 </span><span id="communicative_success-94"><a href="#communicative_success-94"><span class="linenos"> 94</span></a>
-</span><span id="communicative_success-95"><a href="#communicative_success-95"><span class="linenos"> 95</span></a><span class="sd">    $ = \sum diag(p)SR \odot U $</span>
+</span><span id="communicative_success-95"><a href="#communicative_success-95"><span class="linenos"> 95</span></a><span class="sd">    $ = \sum \\text{diag}(p)SR \odot U $</span>
 </span><span id="communicative_success-96"><a href="#communicative_success-96"><span class="linenos"> 96</span></a>
 </span><span id="communicative_success-97"><a href="#communicative_success-97"><span class="linenos"> 97</span></a><span class="sd">    For more details, see [docs/vectorized_informativity](https://github.com/CLMBRs/altk/blob/main/docs/vectorized_informativity.pdf).</span>
 </span><span id="communicative_success-98"><a href="#communicative_success-98"><span class="linenos"> 98</span></a>
@@ -349,7 +349,7 @@
 
 <p>$ = \sum_{m \in M} p(m) \sum_{i \in L} p(i|m) \sum_{\hat{m} \in i} p(\hat{m} |i) \cdot u(m, m')$</p>
 
-<p>$ = \sum diag(p)SR \odot U $</p>
+<p>$ = \sum \text{diag}(p)SR \odot U $</p>
 
 <p>For more details, see <a href="https://github.com/CLMBRs/altk/blob/main/docs/vectorized_informativity.pdf">docs/vectorized_informativity</a>.</p>
 
