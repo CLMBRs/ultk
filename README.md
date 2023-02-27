@@ -1,46 +1,23 @@
 # The Artificial Language ToolKit (ALTK)
 
-![](images/plots.jpeg)
-*Four examples of many recent results showing that natural languages are optimized for efficient communication.*
+![Four examples of many recent results showing that natural languages are optimized for efficient communication.](https://github.com/CLMBRs/altk/blob/main/images/plots.jpeg)
 
 ## Introduction
 
 ALTK is a software library that aims to support research in [Unnatural Language Semantics](https://gu-clasp.github.io/static/951dfcd6d280ce7416e79e206c291358/clasp.pdf) -- a program in linguistics and cognitive science that tries to describe and explain the properties of natural languages by comparing them to the much larger set of mathematically possible languages.
 
-A current focus is on **_efficient communication_**: determining whether linguistic meanings are optimized for a trade-off between cognitive complexity and communicative precision.
+A current focus is on *efficient communication*: determining whether linguistic meanings are optimized for a trade-off between cognitive complexity and communicative precision.
 
 Key features:
 
 - Primitives for constructing semantic spaces, expressions, and languages
-- Simplified logic for measuring informativity of languages / communicative success of signaling agents
-- Methods for language population sampling and optimization w.r.t Pareto fronts
+- Tools for measuring informativity of languages, communicative success of RSA speakers and listeners
+- Language population sampling and optimization w.r.t Pareto fronts
+- Rate-Distortion and Information Bottleneck style analyses
 
-See the [docs](https://nathimel.github.io/altk/altk.html).
+ALTK is a long term project and it is currently in its early stages. It is intended to help lower the barrier to entry for certain research in computational semantics, and to unify methodologies. If you find something confusing, please open an issue. If you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on, please contact the contributors.
 
-## Future work
-
-ALTK is a long term project and it is currently in its early stages.
-
-However, it is intended to help lower the barrier to entry for certain research in computational semantics, and to unify methodologies. So if you find something confusing or would like to collaborate, please contact the developers or open an issue. If you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on, we are very interested in helping.
-
-<details>
-<summary> Goals for future work</summary>
-<br>
-
-Immediate goals include reproducing the efficient communication analyses for domains such as:
-
-- color terms
-- quantifiers
-- numerals
-
-Longer term goals for ALTK include providing support for:
-
-- other causal analyses of linguistic domains, e.g. explanations from ease of learnability
-- building blocks to support closer integration of linguistics, emergent communication and NLP
-- generating artificial data for NLP experiments
-- constructing languages for psycholinguistics research
-
-</details>
+Read the [documentation](https://clmbr.shane.st/altk/altk.html).
 
 ## Installing ALTK
 
@@ -56,30 +33,41 @@ Longer term goals for ALTK include providing support for:
 
 ## Getting started
 
+- Check out the basic [signaling game](src/examples/signaling_game) example and its [documentation](https://clmbr.shane.st/altk/examples/signaling_game.html).
+- To see more scaled up usage examples, visit the codebase for an efficient communication analysis of [modals](https://github.com/nathimel/modals-effcomm) or [sim-max games](https://github.com/nathimel/rdsg).
 - For an introduction to efficient communication research, here is a [survey paper](https://www.annualreviews.org/doi/abs/10.1146/annurev-linguistics-011817-045406) of the field.
 - For an introduction to the RSA framework, see [this online textbook](http://www.problang.org/).
-- Check out the basic [signaling game](src/examples/signaling_game) example.
-- To see more scaled up usage examples, visit the codebase for an efficient communication analysis of [modals](https://github.com/nathimel/modals-effcomm) or [sim-max games](https://github.com/nathimel/rdsg).
+
+## Modules
+
+There are two modules. The first is [altk.effcomm](https://clmbr.shane.st/altk/altk/effcomm.html), which includes methods for measuring informativity of languages and/or communicative success of Rational Speech Act agents, and for language population sampling and optimization w.r.t Pareto fronts.
+
+The second module is [altk.language](https://clmbr.shane.st/altk/altk/language.html), which contains primitives for constructing semantic spaces, expressions, and languages.
+
+The source code is available on github [here](https://github.com/CLMBRs/altk).
 
 ## References
 
-Figures:
+<details>
+<summary>Figures:</summary>
 
-> Kemp, Charles & Terry Regier. 2012. Kinship categories across languages reflect
-general communicative principles. Science (New York, N.Y.) 336(6084). 1049–1054. doi:10.1126/science.1218811.
+> Kinship Categories Across Languages Reflect General Communicative Principles | Science. (n.d.). Retrieved February 27, 2023, from https://www.science.org/doi/10.1126/science.1218811
 
-> Denic, Milica, Shane Steinert-Threlkeld & Jakub Szymanik. 2022. Indefinite Pronouns Optimize the Simplicity/Informativeness Trade-Off. Cognitive Science 46(5). e13142. doi:10.1111/cogs.13142
+> Zaslavsky, N., Kemp, C., Regier, T., & Tishby, N. (2018). Efficient compression in color naming and its evolution. Proceedings of the National Academy of Sciences, 115(31), 7937–7942. https://doi.org/10.1073/pnas.1800521115
 
-> Zaslavsky, Noga, Charles Kemp, Terry Regier & Naftali Tishby. 2018. Efficient
-compression in color naming and its evolution. Proceedings of the National
-Academy of Sciences 115(31). 7937–7942. doi:10.1073/pnas.1800521115. 
+> Denić, M., Steinert-Threlkeld, S., & Szymanik, J. (2022). Indefinite Pronouns Optimize the Simplicity/Informativeness Trade-Off. Cognitive Science, 46(5), e13142. https://doi.org/10.1111/cogs.13142
 
-> Steinert-Threlkeld, Shane. 2021. Quantifiers in Natural Language: Efficient Communication and Degrees of Semantic Universals. Entropy. An International and Interdisciplinary Journal of Entropy and Information Studies 23(10). 1335. doi:10.3390/e23101335.
+> Steinert-Threlkeld, S. (2021). Quantifiers in Natural Language: Efficient Communication and Degrees of Semantic Universals. Entropy, 23(10), Article 10. https://doi.org/10.3390/e23101335
 
-Links:
+</details>
 
-> Kemp, Charles, Yang Xu & Terry Regier. 2018. Semantic typology and efficient
-communication. Annual Review of Linguistics 1–23. doi:10.1146/annurev-linguistics-011817-045406
+<details>
+<summary>Links:</summary>
 
-> N. Imel and S. Steinert-Threlkeld, Modals in natural language optimize the simplicity/informativeness
-trade-off, in Proceedings of Semantics and Linguistic Theory (SALT 32), 2022.
+> Imel, N. (2023). The evolution of efficient compression in signaling games. PsyArXiv. https://doi.org/10.31234/osf.io/b62de
+
+> Imel, N., & Steinert-Threlkeld, S. (2022). Modal semantic universals optimize the simplicity/informativeness trade-off. Semantics and Linguistic Theory, 1(0), Article 0. https://doi.org/10.3765/salt.v1i0.5346
+
+> Kemp, C., Xu, Y., & Regier, T. (2018). Semantic Typology and Efficient Communication. Annual Review of Linguistics, 4(1), 109–128. https://doi.org/10.1146/annurev-linguistics-011817-045406
+
+</details>
