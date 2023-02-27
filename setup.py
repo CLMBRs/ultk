@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name="altk",
     version="1.0.0",
-    author="Nathaniel Imel",
-    author_email="nimel@uw.edu",
+    author="Nathaniel Imel, Shane Steinert-Threlkeld",
+    author_email="nimel@uci.edu, shanest@uw.edu",
     description="The Artificial Language ToolKit",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -23,4 +23,5 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
+    install_requires=["numpy","nltk","pyyaml","pandas","pygmo","plotnine","pathos"]
 )
