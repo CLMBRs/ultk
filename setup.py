@@ -23,5 +23,5 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
-    install_requires=["numpy","nltk","pyyaml","pandas","pygmo","plotnine","pathos","embo"]
+    install_requires=["numpy","nltk","pyyaml","pandas","plotnine","pathos","embo"]
 )
