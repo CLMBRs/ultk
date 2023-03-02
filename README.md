@@ -31,6 +31,10 @@ Read the [documentation](https://clmbr.shane.st/altk/altk.html).
 
     `pip install -e .`
 
+4. Install pygmo via conda (because pip packages for OSX and Windows are not supported, see more [here](https://esa.github.io/pygmo2/install.html#).)
+
+    `conda install pygmo`
+
 ## Getting started
 
 - Check out the basic [signaling game](src/examples/signaling_game) example.
