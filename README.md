@@ -1,6 +1,6 @@
 # The Artificial Language ToolKit (ALTK)
 
-![Four examples of many recent results showing that natural languages are optimized for efficient communication.](https://github.com/CLMBRs/altk/blob/main/images/plots.jpeg)
+![Four examples of many recent results showing that natural languages are optimized for efficient communication.](https://raw.githubusercontent.com/CLMBRs/altk/main/images/plots.jpeg)
 
 ## Introduction
 
@@ -17,7 +17,7 @@ Key features:
 
 ALTK is a long term project and it is currently in its early stages. It is intended to help lower the barrier to entry for certain research in computational semantics, and to unify methodologies. If you find something confusing, please open an issue. If you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on, please contact the contributors.
 
-Read the [documentation](https://clmbr.shane.st/altk/altk.html).
+Read the [documentation](https://clmbr.shane.st/altk).
 
 ## Installing ALTK
 
@@ -37,7 +37,7 @@ Read the [documentation](https://clmbr.shane.st/altk/altk.html).
 
 ## Getting started
 
-- Check out the basic [signaling game](src/examples/signaling_game) example.
+- Check out the [examples](https://github.com/CLMBRs/altk/tree/main/src/examples), starting with a basic signaling game.
 - To see more scaled up usage examples, visit the codebase for an efficient communication analysis of [modals](https://github.com/nathimel/modals-effcomm) or [sim-max games](https://github.com/nathimel/rdsg).
 - For an introduction to efficient communication research, here is a [survey paper](https://www.annualreviews.org/doi/abs/10.1146/annurev-linguistics-011817-045406) of the field.
 - For an introduction to the RSA framework, see [this online textbook](http://www.problang.org/).
