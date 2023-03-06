@@ -21,19 +21,11 @@ Read the [documentation](https://clmbr.shane.st/altk).
 
 ## Installing ALTK
 
-1. Download or clone this repository and navigate to the root folder.
+1. Download or clone this repository and navigate to the root folder. 
 
-2. Create a fresh conda environment with the required packages by runing
-
-    `conda env create --file environment.yml`
-
-3. Install ALTK
+2. Install ALTK (We recommend doing this inside a virtual environment)
 
     `pip install -e .`
-
-4. Install pygmo via conda (because pip packages for OSX and Windows are not supported, see more [here](https://esa.github.io/pygmo2/install.html#).)
-
-    `conda install pygmo`
 
 ## Getting started
 
