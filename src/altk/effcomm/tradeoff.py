@@ -3,7 +3,6 @@
 import numpy as np
 
 from altk.language.language import Language
-from pygmo import non_dominated_front_2d
 from typing import Callable, Any
 from tqdm import tqdm
 
@@ -78,8 +77,8 @@ def pareto_optimal_languages(
     y: str = "complexity",
     unique: bool = False,
 ) -> list[Language]:
-    """Use pygmo.non_dominated_front_2d to compute the Pareto languages."""
-    dominating_indices = non_dominated_front_2d(
+    """Use non_dominated_2d to compute the Pareto languages."""
+    dominating_languages = non_dominated_2d(
         list(
             zip(
                 [lang.data[x] for lang in languages],
@@ -87,7 +86,6 @@ def pareto_optimal_languages(
             )
         )
     )
-    dominating_languages = [languages[i] for i in dominating_indices]
     return list(set(dominating_languages)) if unique else dominating_languages
 
 
