@@ -18,6 +18,7 @@
 """
 
 from typing import Iterable
+import pandas as pd
 
 
 class Referent:
@@ -44,15 +45,29 @@ class Universe:
         self.referents = referents
 
     def __str__(self):
-        referents_str = ",\n".join([str(point) for point in self.referents])
-        return f"Universe: {referents_str}"
+        referents_str = ",\n\t".join([str(point) for point in self.referents])
+        return f"Universe:\n\t{referents_str}"
 
     def __eq__(self, __o: object) -> bool:
         """Returns true if the two universes are the same set."""
-        return self.referents == __o.referents
+        # TODO: may want to generalize to checking additional structure.  Or just leave that to sub-classes?
+        return set(self.referents) == set(__o.referents)
 
     def __len__(self) -> int:
         return len(self.referents)
+
+    @classmethod
+    def from_dataframe(cls, df: pd.DataFrame):
+        """Build a Universe from a DataFrame.
+        It's assumed that each row specifies one Referent, and each column will be a property
+        of that Referent.  We assume that `name` is one of the columns of the DataFrame.
+
+        Args:
+            a DataFrame representing the meaning space of interest, assumed to have a column `name`
+        """
+        records = df.to_dict("records")
+        referents = [Referent(record["name"], record) for record in records]
+        return cls(referents)
 
 
 class Meaning:
