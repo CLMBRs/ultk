@@ -41,7 +41,7 @@ class Rule:
         """Whether this is a terminal rule.  In our framework, this means that RHS is empty,
         i.e. there are no arguments to the function.
         """
-        return len(self.rhs) == 0
+        return self.rhs is None
 
     def __str__(self) -> str:
         out_str = f"{str(self.lhs)} -> {self.name}"
@@ -70,18 +70,19 @@ class GrammaticalExpression:
 
     def to_meaning(self, universe: Universe) -> Meaning:
         # TODO: this presupposes that the expression has type Referent -> bool.  Should we generalize?
+        # and that leaf nodes will take Referents as input...
         return Meaning(
             [referent for referent in universe.referents if self(referent)], universe
         )
 
-    def __call__(self, referent: Referent):
-        if len(self.children) == 0:
-            return self.func(referent)
-        return self.func(*(child(referent) for child in self.children))
+    def __call__(self, *args):
+        if self.children is None:
+            return self.func(*args)
+        return self.func(*(child(*args) for child in self.children))
 
     def __str__(self):
         out_str = self.name
-        if len(self.children) > 0:
+        if self.children is not None:
             out_str += f"({', '.join(str(child) for child in self.children)})"
         return out_str
 
@@ -131,7 +132,7 @@ class Grammar:
             re.escape(delimiter),
         )
         token_regex = re.compile(
-            f"[.]+{open_re}|[^{open_re}{close_re}{delimit_re}]+|{delimit_re}(\s)*|{close_re}"
+            rf".+{open_re}|[^{open_re}{close_re}{delimit_re}]+|{delimit_re}\s*|{close_re}"
         )
 
         # stack to store the tree being built
@@ -143,7 +144,9 @@ class Grammar:
             # start a new expression
             if token[-1] == opener:
                 name = token[:-1]
-                stack.append(GrammaticalExpression(name, self._rules_by_name[name].func, []))
+                stack.append(
+                    GrammaticalExpression(name, self._rules_by_name[name].func, [])
+                )
             # finish an expression
             elif token == delimiter or token == closer:
                 # finished a child expression
@@ -153,7 +156,7 @@ class Grammar:
             else:
                 # primitive, no children, just look up
                 stack.append(
-                    GrammaticalExpression(token, self._rules_by_name[token].func, [])
+                    GrammaticalExpression(token, self._rules_by_name[token].func, None)
                 )
         if len(stack) != 1:
             raise ValueError("Could not parse string {expression}")
@@ -200,7 +203,7 @@ class Grammar:
         if depth == 0:
             for rule in self._rules[lhs]:
                 if rule.is_terminal():
-                    yield GrammaticalExpression(rule.name, rule.func, [])
+                    yield GrammaticalExpression(rule.name, rule.func, None)
 
         for rule in self._rules[lhs]:
             # can't use terminal rules when depth > 0
