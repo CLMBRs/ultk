@@ -128,4 +128,8 @@ class Language:
         return len(self.expressions)
 
     def __str__(self) -> str:
-        return "---------\nExpressions:\n" + "\n-----\n".join(str(expression) for expression in self.expressions) + "\n---------"
+        return (
+            "---------\nExpressions:\n"
+            + "\n-----\n".join(str(expression) for expression in self.expressions)
+            + "\n---------"
+        )
