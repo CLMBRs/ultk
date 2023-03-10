@@ -45,7 +45,7 @@ class Universe:
         self.referents = referents
         # set to uniform prior if none specified
         size = len(referents)
-        prior = prior or {referent.name: 1/size for referent in referents}
+        prior = prior or {referent.name: 1 / size for referent in referents}
         self.set_prior(prior)
 
     def set_prior(self, prior: dict[str, float]):
@@ -133,3 +133,7 @@ class Meaning:
 
     def __eq__(self, other):
         return (self.referents, self.universe) == (other.referents, other.universe)
+
+    def __str__(self):
+        return f"Referents:\n\t{','.join(str(referent) for referent in self.referents)}\
+            \nDistribution:\n\t{self.dist}\n"
