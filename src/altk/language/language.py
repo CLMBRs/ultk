@@ -15,7 +15,7 @@ Example usage:
 import numpy as np
 from abc import abstractmethod
 from altk.language.semantics import Universe
-from altk.language.semantics import Meaning
+from altk.language.semantics import Meaning, Referent
 from typing import Callable
 
 
@@ -27,25 +27,22 @@ class Expression:
         self.form = form
         self.meaning = meaning
 
-    def can_express(self, m: Meaning) -> bool:
+    def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
-        return m in self.meaning.referents
+        return referent in self.meaning.referents
 
     @abstractmethod
     def yaml_rep(self):
         raise NotImplementedError()
 
-    @abstractmethod
     def __str__(self) -> str:
-        raise NotImplementedError()
+        return f"Expression {self.form}\nMeaning:\n\t{self.meaning}"
 
-    @abstractmethod
-    def __eq__(self, __o: object) -> bool:
-        raise NotImplementedError()
+    def __eq__(self, other: object) -> bool:
+        return (self.form, self.meaning) == (other.form, other.meaning)
 
-    @abstractmethod
     def __hash__(self) -> int:
-        raise NotImplementedError()
+        return hash((self.form, self.meaning))
 
 
 class Language:

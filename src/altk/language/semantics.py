@@ -17,7 +17,8 @@
         >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
 """
 
-from typing import Iterable, Union
+from itertools import chain, combinations
+from typing import Generator, Iterable, Union
 import pandas as pd
 
 
@@ -147,3 +148,17 @@ class Meaning:
     def __str__(self):
         return f"Referents:\n\t{','.join(str(referent) for referent in self.referents)}\
             \nDistribution:\n\t{self.dist}\n"
+
+
+def all_meanings(universe: Universe) -> Generator[Meaning, None, None]:
+    """Generate all Meanings (sets of Referents) from a given Universe."""
+    referents = universe.referents
+    # see itertools Recipes at
+    # https://docs.python.org/3/library/itertools.html#itertools-recipes
+    def powerset(iterable):
+        "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+        s = list(iterable)
+        return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+
+    for refset in powerset(referents):
+        yield Meaning(refset, universe)
