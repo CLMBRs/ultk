@@ -41,6 +41,9 @@ class Expression:
     def __eq__(self, other: object) -> bool:
         return (self.form, self.meaning) == (other.form, other.meaning)
 
+    def __lt__(self, other: object) -> bool:
+        return self.form < other.form
+
     def __hash__(self) -> int:
         return hash((self.form, self.meaning))
 
@@ -115,7 +118,6 @@ class Language:
         """Whether the language has the expression"""
         return expression in self.expressions
 
-    @abstractmethod
     def __hash__(self) -> int:
         return hash(tuple(sorted(self.expressions)))
 
@@ -124,3 +126,6 @@ class Language:
 
     def __len__(self) -> int:
         return len(self.expressions)
+
+    def __str__(self) -> str:
+        return "---------\nExpressions:\n" + "\n-----\n".join(str(expression) for expression in self.expressions) + "\n---------"

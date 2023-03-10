@@ -72,6 +72,9 @@ class Universe:
 
     def __len__(self) -> int:
         return len(self.referents)
+    
+    def __hash__(self) -> int:
+        return hash(self.referents)
 
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame):
@@ -86,7 +89,7 @@ class Universe:
         if "probability" in df.columns:
             prior = dict(zip(df["name"], df["probability"]))
         records = df.to_dict("records")
-        referents = [Referent(record["name"], record) for record in records]
+        referents = tuple(Referent(record["name"], record) for record in records)
         return cls(referents, prior)
 
 
@@ -148,3 +151,6 @@ class Meaning:
     def __str__(self):
         return f"Referents:\n\t{','.join(str(referent) for referent in self.referents)}\
             \nDistribution:\n\t{self.dist}\n"
+    
+    def __hash__(self):
+        return hash(tuple(self.referents))
