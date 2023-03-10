@@ -17,7 +17,7 @@
         >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
 """
 
-from typing import Iterable
+from typing import Iterable, Union
 import pandas as pd
 
 
@@ -43,6 +43,7 @@ class Universe:
 
     def __init__(self, referents: Iterable[Referent], prior: dict[str, float] = None):
         self.referents = referents
+        self._referents_by_name = {referent.name: referent for referent in referents}
         # set to uniform prior if none specified
         size = len(referents)
         prior = prior or {referent.name: 1 / size for referent in referents}
@@ -50,6 +51,14 @@ class Universe:
 
     def set_prior(self, prior: dict[str, float]):
         self._prior = prior
+
+    def __getitem__(self, key: Union[str, int]) -> Referent:
+        if type(key) is str:
+            return self._referents_by_name[key]
+        elif type(key) is int:
+            return self.referents[key]
+        else:
+            raise KeyError("Key must either be an int or str.")
 
     def __str__(self):
         referents_str = ",\n\t".join([str(point) for point in self.referents])
@@ -81,10 +90,11 @@ class Universe:
 
 
 class Meaning:
-
     """A meaning picks out a set of objects from the universe.
 
-    On one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe. Sometimes these different referents are not equally likely, in which it can be helpful to define a meaning explicitly as a distribution over the universe.
+    On one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe. 
+    Sometimes these different referents are not equally likely,
+    in which it can be helpful to define a meaning explicitly as a distribution over the universe.
     """
 
     def __init__(
