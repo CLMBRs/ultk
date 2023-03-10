@@ -43,6 +43,9 @@ class Universe:
 
     def __init__(self, referents: Iterable[Referent], prior: dict[str, float] = None):
         self.referents = referents
+        # set to uniform prior if none specified
+        size = len(referents)
+        prior = prior or {referent.name: 1/size for referent in referents}
         self.set_prior(prior)
 
     def set_prior(self, prior: dict[str, float]):
@@ -50,7 +53,7 @@ class Universe:
 
     def __str__(self):
         referents_str = ",\n\t".join([str(point) for point in self.referents])
-        return f"Universe:\n\t{referents_str}"
+        return f"Points:\n\t{referents_str}\nDistribution:\n\t{self._prior}"
 
     def __eq__(self, __o: object) -> bool:
         """Returns true if the two universes are the same set."""
