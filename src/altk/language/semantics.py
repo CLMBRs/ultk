@@ -41,8 +41,12 @@ class Universe:
 
     """The universe is the set of possible referent objects for a meaning."""
 
-    def __init__(self, referents: Iterable[Referent]):
+    def __init__(self, referents: Iterable[Referent], prior: dict[str, float] = None):
         self.referents = referents
+        self.set_prior(prior)
+
+    def set_prior(self, prior: dict[str, float]):
+        self._prior = prior
 
     def __str__(self):
         referents_str = ",\n\t".join([str(point) for point in self.referents])
@@ -65,9 +69,12 @@ class Universe:
         Args:
             a DataFrame representing the meaning space of interest, assumed to have a column `name`
         """
+        prior = None
+        if "probability" in df.columns:
+            prior = dict(zip(df["name"], df["probability"]))
         records = df.to_dict("records")
         referents = [Referent(record["name"], record) for record in records]
-        return cls(referents)
+        return cls(referents, prior)
 
 
 class Meaning:
