@@ -80,6 +80,13 @@ class GrammaticalExpression:
             return self.func(*args)
         return self.func(*(child(*args) for child in self.children))
 
+    def __len__(self):
+        length = 1
+        if self.children is not None:
+            length += sum(len(child) for child in self.children)
+        return length
+
+
     def __str__(self):
         out_str = self.name
         if self.children is not None:
