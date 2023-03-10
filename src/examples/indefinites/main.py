@@ -1,15 +1,8 @@
-from typing import Iterable, Generator
 import pandas as pd
-from altk.language.language import Expression
-from altk.language.semantics import Universe, Meaning, all_meanings
+from altk.language.sampling import all_expressions, all_meanings
 
 from grammar import indefinites_grammar
 from meaning import universe as indefinites_universe
-
-
-def all_expressions(meanings: Iterable[Meaning]) -> Generator[Expression, None, None]:
-    for idx, meaning in enumerate(meanings):
-        yield Expression(f"expr-{idx}", meaning)
 
 
 if __name__ == "__main__":
