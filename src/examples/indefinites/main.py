@@ -1,4 +1,4 @@
-import pandas as pd
+from altk.effcomm.informativity import informativity
 from altk.language.language import Language
 from altk.language.sampling import all_expressions, all_languages, all_meanings, generate_languages, random_languages
 
@@ -29,3 +29,7 @@ if __name__ == "__main__":
     languages = list(random_languages(expressions, 1000, max_size=7))
     print(len(languages))
     print([len(language) for language in languages])
+
+    language = languages[56]
+    print(language)
+    print(informativity(language, language.universe.prior_numpy()))

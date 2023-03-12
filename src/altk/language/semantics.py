@@ -17,8 +17,8 @@
         >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
 """
 
-from itertools import chain, combinations
-from typing import Generator, Iterable, Union
+from typing import Iterable, Union
+import numpy as np
 import pandas as pd
 
 
@@ -52,6 +52,9 @@ class Universe:
 
     def set_prior(self, prior: dict[str, float]):
         self._prior = prior
+
+    def prior_numpy(self) -> np.ndarray:
+        return np.array([self._prior[referent.name] for referent in self.referents])
 
     def __getitem__(self, key: Union[str, int]) -> Referent:
         if type(key) is str:
