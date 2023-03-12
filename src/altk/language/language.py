@@ -16,7 +16,7 @@ import numpy as np
 from abc import abstractmethod
 from altk.language.semantics import Universe
 from altk.language.semantics import Meaning, Referent
-from typing import Callable
+from typing import Callable, Iterable
 
 
 class Expression:
@@ -133,3 +133,14 @@ class Language:
             + "\n-----\n".join(str(expression) for expression in self.expressions)
             + "\n---------"
         )
+
+
+def aggregate_expression_complexity(
+    language: Language,
+    expression_complexity_func: Callable[[Expression], float],
+    aggregator: Callable[[Iterable[float]], float] = sum,
+) -> float:
+    return aggregator(
+        expression_complexity_func(expression) for expression in language.expressions
+    )
+
