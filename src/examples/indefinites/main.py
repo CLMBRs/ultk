@@ -1,5 +1,5 @@
 from altk.effcomm.informativity import informativity
-from altk.language.language import Language
+from altk.language.language import Language, aggregate_expression_complexity
 from altk.language.sampling import all_expressions, all_languages, all_meanings, generate_languages, random_languages
 
 from grammar import indefinites_grammar
@@ -33,3 +33,6 @@ if __name__ == "__main__":
     language = languages[56]
     print(language)
     print(informativity(language, language.universe.prior_numpy()))
+
+    def complexity(language):
+        return aggregate_expression_complexity(language, lambda gram_expr: len(gram_expr))
