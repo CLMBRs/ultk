@@ -9,11 +9,18 @@ from tqdm import tqdm
 
 
 def powerset(iterable: Iterable, max_size: int = None) -> Iterable:
-    """Enumerate all _non-empty_ subsets of an iterable up to a given max_size, e.g.: 
+    """Enumerate all _non-empty_ subsets of an iterable up to a given maximum size, e.g.: 
     powerset([1,2,3]) --> (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)
     
     lightly adapted from itertools Recipes at
     https://docs.python.org/3/library/itertools.html#itertools-recipes
+
+    Args:
+        iterable: elements from which to form subsets
+        max_size: largest subsets (inclusive) to return
+
+    Returns:
+        iterator over all subsets from size 1 to `max_size` of elements from `iterable`
     """
     s = list(iterable)
     if max_size is None:
@@ -29,15 +36,27 @@ def all_meanings(universe: Universe) -> Generator[Meaning, None, None]:
 
 
 def all_expressions(meanings: Iterable[Meaning]) -> Generator[Expression, None, None]:
+    """Generate Expressions from an iterable of Meanings."""
+    # TODO: allow different subclasses of Expression, and kwargs?
     for idx, meaning in enumerate(meanings):
         yield Expression(f"expr-{idx}", meaning)
 
 
 def all_languages(
-    language_class: Type[Language],
     expressions: Iterable[Expression],
+    language_class: Type[Language] = Language,
     max_size: int = None,
 ) -> Generator[Language, None, None]:
+    """Generate all Languages (sets of Expressions) from a given set of Expressions.
+
+    Args:
+        expressions: iterable of all possible expressions
+        language_class: the type of language to generate
+        max_size: largest size for a language; if None, all subsets of expressions will be used
+    
+    Yields:
+        Languages with subsets of Expressions from `expressions`
+    """
     for exprset in powerset(expressions, max_size):
         yield language_class(tuple(exprset))
 
@@ -45,24 +64,38 @@ def all_languages(
 def upto_comb(num: int, max_k: int) -> int:
     """Return the number of ways of choosing _up to max_k_ items from 
     n items without repetition.  Just an iterator of math.comb for n from
-    1 to num."""
+    1 to max_k."""
     return sum(comb(num, k) for k in range(1, max_k + 1))
 
 
 def random_languages(
-    language_class: Type[Language],
     expressions: Iterable[Expression],
     sample_size: int,
+    language_class: Type[Language] = Language,
     max_size: int = None,
 ) -> list[Language]:
+    """Generate Languages by randomly sampling subsets of Expressions.
+    If there are fewer than `sample_size` possible Languages up to size `max_size`,
+    this method will just return all languages up to that size (and so the sample may
+    be smaller than `sample_size`).
+
+    Args:
+        expressions: all possible expressions
+        sample_size: how many languages to return
+        language_class: type of Language
+        max_size: largest possible Language to generate
+
+    Returns:
+        a list of randomly sampled Languages
+    """
     expressions = list(expressions)
     num_expr = len(expressions)
     if max_size is None:
         max_size = num_expr
     num_subsets = upto_comb(num_expr, max_size)
     if num_subsets < sample_size:
-        # TODO: fall back on enumeration here
-        raise ValueError(f"There are less than {sample_size} unique languages.")
+        print(f"{sample_size} languages requested, but there are only {num_subsets} posible languages.  Returning all languages.")
+        return list(all_languages(expressions, language_class=language_class, max_size=max_size))
     languages = []
     subsets = set()
     while len(languages) < sample_size:
