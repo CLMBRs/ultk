@@ -71,12 +71,14 @@ class GrammaticalExpression(Expression):
         self.func = func
         self.children = children
 
-    def evaluate(self, universe: Universe):
+    def evaluate(self, universe: Universe) -> Meaning:
         # TODO: this presupposes that the expression has type Referent -> bool.  Should we generalize?
         # and that leaf nodes will take Referents as input...
-        self.meaning = Meaning(
-            [referent for referent in universe.referents if self(referent)], universe
-        )
+        if self.meaning is None:
+            self.meaning = Meaning(
+                [referent for referent in universe.referents if self(referent)], universe
+            )
+        return self.meaning
 
     def __call__(self, *args):
         if self.children is None:
