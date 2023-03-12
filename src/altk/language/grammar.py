@@ -4,6 +4,7 @@ from collections import defaultdict
 from itertools import product
 from typing import Any, Callable, Generator, Iterable
 
+from altk.language.language import Expression
 from altk.language.semantics import Meaning, Referent, Universe
 
 
@@ -50,7 +51,7 @@ class Rule:
         return out_str
 
 
-class GrammaticalExpression:
+class GrammaticalExpression(Expression):
     """A GrammaticalExpression has been built up from a Grammar by applying a sequence of Rules.
     Crucially, it is _callable_, using the functions corresponding to each rule.
 
@@ -63,15 +64,17 @@ class GrammaticalExpression:
         children: child expressions (possibly empty)
     """
 
-    def __init__(self, name: str, func: Callable, children: Iterable):
-        self.name = name
+    def __init__(
+        self, form: str, func: Callable, children: Iterable, meaning: Meaning = None
+    ):
+        super().__init__(form, meaning)
         self.func = func
         self.children = children
 
-    def to_meaning(self, universe: Universe) -> Meaning:
+    def evaluate(self, universe: Universe):
         # TODO: this presupposes that the expression has type Referent -> bool.  Should we generalize?
         # and that leaf nodes will take Referents as input...
-        return Meaning(
+        self.meaning = Meaning(
             [referent for referent in universe.referents if self(referent)], universe
         )
 
@@ -86,9 +89,8 @@ class GrammaticalExpression:
             length += sum(len(child) for child in self.children)
         return length
 
-
     def __str__(self):
-        out_str = self.name
+        out_str = self.form
         if self.children is not None:
             out_str += f"({', '.join(str(child) for child in self.children)})"
         return out_str
