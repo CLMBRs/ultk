@@ -10,11 +10,10 @@ if __name__ == "__main__":
 
     print(indefinites_universe)
 
-    """
-    for exp in indefinites_grammar.enumerate(3):
+    for exp in indefinites_grammar.enumerate(2):
         print(exp)
-        print(exp.to_meaning(indefinites_universe))
-    """
+        exp.evaluate(indefinites_universe)
+        print(exp.meaning)
 
     expressions = list(all_expressions(all_meanings(indefinites_universe)))
     for exp in expressions:
