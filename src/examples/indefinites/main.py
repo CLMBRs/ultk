@@ -24,9 +24,9 @@ if __name__ == "__main__":
     print(len(languages))
     print([len(language) for language in languages])
 
-    languages = list(all_languages(Language, expressions, 3))
+    languages = list(all_languages(expressions, max_size=3))
     print(len(languages))
 
-    languages = list(random_languages(Language, expressions, 1000, 7))
+    languages = list(random_languages(expressions, 1000, max_size=7))
     print(len(languages))
     print([len(language) for language in languages])
