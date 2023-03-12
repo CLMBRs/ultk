@@ -21,16 +21,38 @@ from altk.language.language import Expression, Language
 
 class Mutation:
     @abstractmethod
-    def precondition(self, language: Language, **kwargs) -> bool:
+    @staticmethod
+    def precondition(language: Language, **kwargs) -> bool:
         """Whether a mutation is allowed to apply to a language."""
         raise NotImplementedError
 
     @abstractmethod
-    def mutate(
-        self, language: Language, expressions: list[Expression], **kwargs
-    ) -> Language:
+    @staticmethod
+    def mutate(language: Language, expressions: list[Expression], **kwargs) -> Language:
         """Mutate the language, possibly using a list of expressions."""
         raise NotImplementedError()
+
+
+class RemoveExpression(Mutation):
+    @staticmethod
+    def precondition(language: Language, **kwargs) -> bool:
+        return len(language) > 1
+
+    @staticmethod
+    def mutate(language: Language, expressions: list[Expression], **kwargs) -> Language:
+        language.expressions.pop(random.randrange(len(language)))
+        return language
+
+
+class AddExpression(Mutation):
+    @staticmethod
+    def precondition(language: Language, **kwargs) -> bool:
+        return True
+
+    @staticmethod
+    def mutate(language: Language, expressions: list[Expression], **kwargs) -> Language:
+        language.add_expression(random.choice(expressions))
+        return language
 
 
 ##############################################################################
@@ -136,10 +158,7 @@ class EvolutionaryOptimizer:
 
             # Mutate dominating individuals
             mutated_result = self.sample_mutated(
-                parent_languages,
-                self.sample_size,
-                self.expressions,
-                id_start,
+                parent_languages, self.sample_size, self.expressions, id_start
             )
             languages = mutated_result["languages"]
             id_start = mutated_result["id_start"]
@@ -207,10 +226,7 @@ class EvolutionaryOptimizer:
 
         mutated_languages.extend(languages)
 
-        return {
-            "languages": mutated_languages,
-            "id_start": id_start,
-        }
+        return {"languages": mutated_languages, "id_start": id_start}
 
     def mutate(self, language: Language, expressions: list[Expression]) -> Language:
         """Randomly selects a mutation that is allowed to apply and applies it to a language.
@@ -228,9 +244,7 @@ class EvolutionaryOptimizer:
             mutation
             for mutation in self.mutations
             if mutation.precondition(
-                language,
-                lang_size=self.lang_size,
-                objectives=self.objectives,
+                language, lang_size=self.lang_size, objectives=self.objectives
             )
         ]
         mutation = random.choice(possible_mutations)
@@ -283,7 +297,5 @@ def sample_parents(
         lang.data["name"] = rename_id(lang.data["name"], id_start)
         parent_languages.append(lang)
 
-    return {
-        "languages": parent_languages,
-        "id_start": id_start,
-    }
+    return {"languages": parent_languages, "id_start": id_start}
+
