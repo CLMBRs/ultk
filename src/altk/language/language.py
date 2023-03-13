@@ -24,8 +24,11 @@ class Expression:
     """Minimally contains a form and a meaning."""
 
     def __init__(self, form: str = None, meaning: Meaning = None):
-        self.form = form
-        self.meaning = meaning
+        # gneric/dummy form and meaning if not specified
+        # useful for hashing in certain cases
+        # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
+        self.form = form or ''
+        self.meaning = meaning or Meaning([], Universe([]))
 
     def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
@@ -43,6 +46,9 @@ class Expression:
 
     def __lt__(self, other: object) -> bool:
         return self.form < other.form
+
+    def __bool__(self) -> bool:
+        return self.form and self.meaning
 
     def __hash__(self) -> int:
         return hash((self.form, self.meaning))

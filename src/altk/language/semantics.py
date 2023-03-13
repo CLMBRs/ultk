@@ -148,6 +148,9 @@ class Meaning:
                 ref.name: 1 / len(self.referents) for ref in self.referents
             } | zeros
 
+    def __bool__(self):
+        return bool(self.referents) and bool(self.universe)
+
     def __eq__(self, other):
         return (self.referents, self.universe) == (other.referents, other.universe)
 
