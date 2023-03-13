@@ -71,6 +71,8 @@ class Language:
         if "data" in kwargs:
             self.data = kwargs["data"]
 
+        self.__dict__.update(**kwargs)
+
     @property
     def expressions(self) -> list[Expression]:
         return self._expressions

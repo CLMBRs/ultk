@@ -16,7 +16,7 @@ if __name__ == "__main__":
         lambda num: int(num != 6)
     )
     output_data = pd.DataFrame()
-    output_data["langauge"] = haspelmath_data["LANG"].str.lower()
+    output_data["language"] = haspelmath_data["LANG"].str.lower()
     output_data["expression"] = haspelmath_data["ITEM"]
     output_data["specific-known"] = haspelmath_data["spec.know"]
     output_data["specific-unknown"] = haspelmath_data["spec.unkn"]
