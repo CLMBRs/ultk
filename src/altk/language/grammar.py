@@ -76,7 +76,8 @@ class GrammaticalExpression(Expression):
         # and that leaf nodes will take Referents as input...
         if self.meaning is None:
             self.meaning = Meaning(
-                [referent for referent in universe.referents if self(referent)], universe
+                [referent for referent in universe.referents if self(referent)],
+                universe,
             )
         return self.meaning
 
@@ -188,10 +189,15 @@ class Grammar:
             [self.generate(child_lhs) for child_lhs in the_rule.rhs],
         )
 
-    # TODO: add filtering to enumeration in order to only add GrammaticalExpressions with a unique Meaning? (or any other filter)
     def enumerate(
-        self, depth: int = 8, lhs: Any = None
-    ) -> Generator[GrammaticalExpression, None, None]:
+        self,
+        depth: int = 8,
+        lhs: Any = None,
+        unique_key: Callable[[GrammaticalExpression], Any] = None,
+        compare_func: Callable[
+            [GrammaticalExpression, GrammaticalExpression], bool
+        ] = None,
+    ) -> tuple[list[GrammaticalExpression], dict[GrammaticalExpression, Any]]:
         """Enumerate all expressions from the grammar up to a given depth from a given LHS.
 
         Args:
@@ -201,20 +207,56 @@ class Grammar:
         Yields:
             all GrammaticalExpressions up to depth
         """
+        # TODO: update docstring!
         if lhs is None:
             lhs = self._start
+        unique_exprs = {}
+        all_exprs = []
         for num in range(depth):
-            for expr in self.enumerate_at_depth(num, lhs):
-                yield expr
+            all_exprs.extend(
+                self.enumerate_at_depth(
+                    num,
+                    lhs,
+                    unique_dict=unique_exprs,
+                    unique_key=unique_key,
+                    compare_func=compare_func,
+                )
+            )
+        return all_exprs, unique_exprs
 
     def enumerate_at_depth(
-        self, depth: int, lhs: Any
-    ) -> Generator[GrammaticalExpression, None, None]:
+        self,
+        depth: int,
+        lhs: Any,
+        unique_dict: dict[GrammaticalExpression, Any] = None,
+        unique_key: Callable[[GrammaticalExpression], Any] = None,
+        compare_func: Callable[
+            [GrammaticalExpression, GrammaticalExpression], bool
+        ] = None,
+    ) -> list[GrammaticalExpression]:
         """Enumerate GrammaticalExpressions for this Grammar _at_ a fixed depth."""
+
+        do_unique = unique_key is not None and compare_func is not None
+
+        def add_unique(expression: GrammaticalExpression) -> None:
+            expr_key = unique_key(expression)
+            # if the current expression has not been generated yet
+            # OR it is "less than" the current entry, add this one
+            if expr_key not in unique_dict or compare_func(
+                expression, unique_dict[expr_key]
+            ):
+                unique_dict[expr_key] = expression
+
+        expressions = []
+
         if depth == 0:
             for rule in self._rules[lhs]:
                 if rule.is_terminal():
-                    yield GrammaticalExpression(rule.name, rule.func, None)
+                    cur_expr = GrammaticalExpression(rule.name, rule.func, None)
+                    expressions.append(cur_expr)
+                    if do_unique:
+                        add_unique(cur_expr)
+            return expressions
 
         for rule in self._rules[lhs]:
             # can't use terminal rules when depth > 0
@@ -233,7 +275,11 @@ class Grammar:
                     ]
                 )
                 for children in children_iter:
-                    yield GrammaticalExpression(rule.name, rule.func, children)
+                    cur_expr = GrammaticalExpression(rule.name, rule.func, children)
+                    expressions.append(cur_expr)
+                    if do_unique:
+                        add_unique(cur_expr)
+        return expressions
 
     def get_all_rules(self) -> list[Rule]:
         """Get all rules as a list."""

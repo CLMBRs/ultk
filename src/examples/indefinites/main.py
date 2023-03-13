@@ -1,6 +1,12 @@
 from altk.effcomm.informativity import informativity
 from altk.language.language import Language, aggregate_expression_complexity
-from altk.language.sampling import all_expressions, all_languages, all_meanings, generate_languages, random_languages
+from altk.language.sampling import (
+    all_expressions,
+    all_languages,
+    all_meanings,
+    generate_languages,
+    random_languages,
+)
 
 from grammar import indefinites_grammar
 from meaning import universe as indefinites_universe
@@ -10,7 +16,15 @@ if __name__ == "__main__":
 
     print(indefinites_universe)
 
-    for exp in indefinites_grammar.enumerate(2):
+    all_exprs, unique_exprs = indefinites_grammar.enumerate(
+        3,
+        unique_key=lambda expr: expr.evaluate(indefinites_universe),
+        compare_func=lambda e1, e2: len(e1) < len(e2),
+    )
+    print(len(all_exprs))
+    print(len(unique_exprs))
+    """
+    for exp in all_exprs:
         print(exp)
         exp.evaluate(indefinites_universe)
         print(exp.meaning)
@@ -35,4 +49,8 @@ if __name__ == "__main__":
     print(informativity(language, language.universe.prior_numpy()))
 
     def complexity(language):
-        return aggregate_expression_complexity(language, lambda gram_expr: len(gram_expr))
+        return aggregate_expression_complexity(
+            language, lambda gram_expr: len(gram_expr)
+        )
+    """
+
