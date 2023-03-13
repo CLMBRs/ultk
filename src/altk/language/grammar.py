@@ -109,7 +109,9 @@ class GrammaticalExpression(Expression):
         )
 
     def __hash__(self) -> int:
-        return hash((self.form, self.func, self.children))
+        # when self.children is None...
+        children = self.children or tuple([])
+        return hash((self.form, self.func, tuple(children)))
 
     def __str__(self):
         out_str = self.rule_name
