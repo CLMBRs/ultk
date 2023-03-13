@@ -7,7 +7,7 @@ from altk.language.sampling import all_languages, random_languages
 
 from ..grammar import indefinites_grammar
 from ..meaning import universe as indefinites_universe
-from ..util import read_natural_languages
+from ..util import read_expressions, read_natural_languages
 
 if __name__ == "__main__":
 
@@ -23,12 +23,10 @@ if __name__ == "__main__":
     )
 
     expressions = list(meanings_by_expressions.values())
+    expressions = read_expressions("indefinites/outputs/generated_expressions.yml")#, universe=indefinites_universe)
+    print(expressions)
 
     seed_languages = list(random_languages(expressions, 1000, max_size=8))
-
-    language = languages[56]
-    print(language)
-    print(informativity(language, language.universe.prior_numpy()))
 
     def complexity(language):
         return aggregate_expression_complexity(

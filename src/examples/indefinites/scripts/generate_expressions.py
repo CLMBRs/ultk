@@ -1,4 +1,9 @@
-import pandas as pd
+from yaml import dump
+
+try:
+    from yaml import CDumper as Dumper
+except ImportError:
+    from yaml import Dumper
 
 from ..grammar import indefinites_grammar
 from ..meaning import universe as indefinites_universe
@@ -13,14 +18,12 @@ if __name__ == "__main__":
         compare_func=lambda e1, e2: len(e1) < len(e2),
     )
 
-    expressions_dicts = [
-        {
-            "grammatical_form": str(expressions_by_meaning[meaning]),
-            "flavors": [referent.name for referent in meaning.referents],
-            "complexity": len(expressions_by_meaning[meaning]),
-        }
-        for meaning in expressions_by_meaning
-    ]
-
-    pd.DataFrame.from_records(expressions_dicts).to_csv("indefinites/outputs/generated_expressions.csv", index=False)
-
+    with open("indefinites/outputs/generated_expressions.yml", "w") as outfile:
+        dump(
+            [
+                expressions_by_meaning[meaning].to_dict()
+                for meaning in expressions_by_meaning
+            ],
+            outfile,
+            Dumper=Dumper,
+        )
