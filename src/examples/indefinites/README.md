@@ -8,4 +8,4 @@ This README will be updated in due time!
 
 From the `src/examples` directory:
 1. `python -m indefinites.scripts.convert_haspelmath`: generates `data/natural_language_indefinites.csv`
-2. `python -m indefinites.scripts.read_natural_languages`: generates `data/natural_language_indefinites.csv`
+2. `python -m indefinites.scripts.generate_expressions`: generates `outputs/generated_expressions.csv`
