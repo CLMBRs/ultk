@@ -74,7 +74,9 @@ class GrammaticalExpression(Expression):
     def evaluate(self, universe: Universe) -> Meaning:
         # TODO: this presupposes that the expression has type Referent -> bool.  Should we generalize?
         # and that leaf nodes will take Referents as input...
-        if self.meaning is None:
+        # NB: important to use `not self.meaning` and not `self.meaning is None` because of how
+        # Expression.__init__ initializes an "empty" meaning if `None` is passed
+        if not self.meaning:
             self.meaning = Meaning(
                 [referent for referent in universe.referents if self(referent)],
                 universe,
@@ -92,11 +94,18 @@ class GrammaticalExpression(Expression):
             length += sum(len(child) for child in self.children)
         return length
 
+    def __eq__(self, other) -> bool:
+        return (self.form, self.func, self.children) == (other.form, other.func, other.children)
+    
+    def __hash__(self) -> int:
+        return hash((self.form, self.func, self.children))
+
     def __str__(self):
         out_str = self.form
         if self.children is not None:
             out_str += f"({', '.join(str(child) for child in self.children)})"
         return out_str
+
 
 
 class Grammar:
@@ -197,7 +206,7 @@ class Grammar:
         compare_func: Callable[
             [GrammaticalExpression, GrammaticalExpression], bool
         ] = None,
-    ) -> tuple[list[GrammaticalExpression], dict[GrammaticalExpression, Any]]:
+    ) -> tuple[set[GrammaticalExpression], dict[GrammaticalExpression, Any]]:
         """Enumerate all expressions from the grammar up to a given depth from a given LHS.
 
         Args:
@@ -211,16 +220,14 @@ class Grammar:
         if lhs is None:
             lhs = self._start
         unique_exprs = {}
-        all_exprs = []
+        all_exprs = set()
         for num in range(depth):
-            all_exprs.extend(
-                self.enumerate_at_depth(
-                    num,
-                    lhs,
-                    unique_dict=unique_exprs,
-                    unique_key=unique_key,
-                    compare_func=compare_func,
-                )
+            all_exprs |= self.enumerate_at_depth(
+                num,
+                lhs,
+                unique_dict=unique_exprs,
+                unique_key=unique_key,
+                compare_func=compare_func,
             )
         return all_exprs, unique_exprs
 
@@ -233,7 +240,7 @@ class Grammar:
         compare_func: Callable[
             [GrammaticalExpression, GrammaticalExpression], bool
         ] = None,
-    ) -> list[GrammaticalExpression]:
+    ) -> set[GrammaticalExpression]:
         """Enumerate GrammaticalExpressions for this Grammar _at_ a fixed depth."""
 
         do_unique = unique_key is not None and compare_func is not None
@@ -247,15 +254,15 @@ class Grammar:
             ):
                 unique_dict[expr_key] = expression
 
-        expressions = []
+        expressions = set()
 
         if depth == 0:
             for rule in self._rules[lhs]:
                 if rule.is_terminal():
                     cur_expr = GrammaticalExpression(rule.name, rule.func, None)
-                    expressions.append(cur_expr)
                     if do_unique:
                         add_unique(cur_expr)
+                    expressions.add(cur_expr)
             return expressions
 
         for rule in self._rules[lhs]:
@@ -276,9 +283,9 @@ class Grammar:
                 )
                 for children in children_iter:
                     cur_expr = GrammaticalExpression(rule.name, rule.func, children)
-                    expressions.append(cur_expr)
                     if do_unique:
                         add_unique(cur_expr)
+                    expressions.add(cur_expr)
         return expressions
 
     def get_all_rules(self) -> list[Rule]:

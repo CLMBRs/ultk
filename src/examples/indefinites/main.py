@@ -17,9 +17,9 @@ if __name__ == "__main__":
     print(indefinites_universe)
 
     all_exprs, unique_exprs = indefinites_grammar.enumerate(
-        3,
-        unique_key=lambda expr: expr.evaluate(indefinites_universe),
-        compare_func=lambda e1, e2: len(e1) < len(e2),
+        4,
+        #unique_key=lambda expr: expr.evaluate(indefinites_universe),
+        #compare_func=lambda e1, e2: len(e1) < len(e2),
     )
     print(len(all_exprs))
     print(len(unique_exprs))
