@@ -1,0 +1,63 @@
+grammatical_form,flavors,complexity
+K+,['specific-known'],1
+K-,"['specific-unknown', 'nonspecific', 'freechoice', 'negative-indefinite', 'npi']",1
+S+,"['specific-known', 'specific-unknown']",1
+S-,"['nonspecific', 'freechoice', 'negative-indefinite', 'npi']",1
+SE+,"['freechoice', 'negative-indefinite', 'npi']",1
+SE-,"['specific-known', 'specific-unknown', 'nonspecific']",1
+N+,['negative-indefinite'],1
+N-,"['specific-known', 'specific-unknown', 'nonspecific', 'freechoice', 'npi']",1
+R+,"['negative-indefinite', 'npi']",1
+R-,['freechoice'],1
+"and(K+, K-)",[],3
+"and(K-, S+)",['specific-unknown'],3
+"and(K-, SE-)","['specific-unknown', 'nonspecific']",3
+"and(K-, N-)","['specific-unknown', 'nonspecific', 'freechoice', 'npi']",3
+"and(S-, SE-)",['nonspecific'],3
+"and(S-, N-)","['nonspecific', 'freechoice', 'npi']",3
+"and(SE+, N-)","['freechoice', 'npi']",3
+"and(N-, R+)",['npi'],3
+"or(K+, K-)","['specific-known', 'specific-unknown', 'nonspecific', 'freechoice', 'negative-indefinite', 'npi']",3
+"or(K+, S-)","['specific-known', 'nonspecific', 'freechoice', 'negative-indefinite', 'npi']",3
+"or(K+, SE+)","['specific-known', 'freechoice', 'negative-indefinite', 'npi']",3
+"or(K+, N+)","['specific-known', 'negative-indefinite']",3
+"or(K+, R+)","['specific-known', 'negative-indefinite', 'npi']",3
+"or(K+, R-)","['specific-known', 'freechoice']",3
+"or(S+, SE+)","['specific-known', 'specific-unknown', 'freechoice', 'negative-indefinite', 'npi']",3
+"or(S+, N+)","['specific-known', 'specific-unknown', 'negative-indefinite']",3
+"or(S+, R+)","['specific-known', 'specific-unknown', 'negative-indefinite', 'npi']",3
+"or(S+, R-)","['specific-known', 'specific-unknown', 'freechoice']",3
+"or(SE-, N+)","['specific-known', 'specific-unknown', 'nonspecific', 'negative-indefinite']",3
+not(R-),"['specific-known', 'specific-unknown', 'nonspecific', 'negative-indefinite', 'npi']",2
+not(R+),"['specific-known', 'specific-unknown', 'nonspecific', 'freechoice']",2
+"or(N+, R-)","['freechoice', 'negative-indefinite']",3
+"and(K-, or(S+, SE+))","['specific-unknown', 'freechoice', 'negative-indefinite', 'npi']",5
+"and(K-, or(S+, N+))","['specific-unknown', 'negative-indefinite']",5
+"and(K-, or(S+, R+))","['specific-unknown', 'negative-indefinite', 'npi']",5
+"and(K-, or(S+, R-))","['specific-unknown', 'freechoice']",5
+"and(K-, or(SE-, N+))","['specific-unknown', 'nonspecific', 'negative-indefinite']",5
+"and(K-, not(R-))","['specific-unknown', 'nonspecific', 'negative-indefinite', 'npi']",4
+"and(K-, not(R+))","['specific-unknown', 'nonspecific', 'freechoice']",4
+"and(S-, or(SE-, N+))","['nonspecific', 'negative-indefinite']",5
+"and(S-, not(R-))","['nonspecific', 'negative-indefinite', 'npi']",4
+"and(S-, not(R+))","['nonspecific', 'freechoice']",4
+"and(SE-, or(K+, S-))","['specific-known', 'nonspecific']",5
+"and(N-, or(K+, S-))","['specific-known', 'nonspecific', 'freechoice', 'npi']",5
+"and(N-, or(K+, SE+))","['specific-known', 'freechoice', 'npi']",5
+"and(N-, or(K+, R+))","['specific-known', 'npi']",5
+"and(N-, or(S+, SE+))","['specific-known', 'specific-unknown', 'freechoice', 'npi']",5
+"and(N-, or(S+, R+))","['specific-known', 'specific-unknown', 'npi']",5
+"and(N-, not(R-))","['specific-known', 'specific-unknown', 'nonspecific', 'npi']",4
+"and(and(K-, N-), or(S+, SE+))","['specific-unknown', 'freechoice', 'npi']",7
+"and(and(K-, N-), or(S+, R+))","['specific-unknown', 'npi']",7
+"and(and(K-, N-), not(R-))","['specific-unknown', 'nonspecific', 'npi']",6
+"and(and(S-, N-), not(R-))","['nonspecific', 'npi']",6
+"and(or(K+, S-), or(SE-, N+))","['specific-known', 'nonspecific', 'negative-indefinite']",7
+"and(or(K+, S-), not(R-))","['specific-known', 'nonspecific', 'negative-indefinite', 'npi']",6
+"and(or(K+, S-), not(R+))","['specific-known', 'nonspecific', 'freechoice']",6
+"or(K+, or(N+, R-))","['specific-known', 'freechoice', 'negative-indefinite']",5
+"or(S+, or(N+, R-))","['specific-known', 'specific-unknown', 'freechoice', 'negative-indefinite']",5
+"or(N+, not(R+))","['specific-known', 'specific-unknown', 'nonspecific', 'freechoice', 'negative-indefinite']",4
+"or(and(K-, S+), or(N+, R-))","['specific-unknown', 'freechoice', 'negative-indefinite']",7
+"or(and(K-, SE-), or(N+, R-))","['specific-unknown', 'nonspecific', 'freechoice', 'negative-indefinite']",7
+"or(and(S-, SE-), or(N+, R-))","['nonspecific', 'freechoice', 'negative-indefinite']",7
