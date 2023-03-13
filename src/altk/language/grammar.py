@@ -125,7 +125,7 @@ class Grammar:
         self._rules[rule.lhs].append(rule)
         if rule.name in self._rules_by_name:
             raise ValueError(
-                f"Rules of a grammar must have unique names. This grammar already has a rule named {name}."
+                f"Rules of a grammar must have unique names. This grammar already has a rule named {rule.name}."
             )
         self._rules_by_name[rule.name] = rule
 
@@ -298,6 +298,7 @@ class Grammar:
         self,
         depth: int,
         lhs: Any = None,
+        max_size: float = float("inf"),
         unique_key: Callable[[GrammaticalExpression], Any] = None,
         compare_func: Callable[
             [GrammaticalExpression, GrammaticalExpression], bool
@@ -331,6 +332,8 @@ class Grammar:
             unique_key=unique_key,
             compare_func=compare_func,
         ):
+            if len(unique_dict) == max_size:
+                break
             pass
         return unique_dict
 
