@@ -23,8 +23,11 @@ if __name__ == "__main__":
     )
 
     expressions = list(meanings_by_expressions.values())
-    expressions = read_expressions("indefinites/outputs/generated_expressions.yml")#, universe=indefinites_universe)
+    expressions = read_expressions(
+        "indefinites/outputs/generated_expressions.yml", universe=indefinites_universe
+    )
     print(expressions)
+    print(expressions[23].meaning)
 
     seed_languages = list(random_languages(expressions, 1000, max_size=8))
 
