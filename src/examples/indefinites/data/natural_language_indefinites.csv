@@ -1,4 +1,4 @@
-langauge,expression,specific-known,specific-unknown,nonspecific,freechoice,negative-indefinite,npi
+language,expression,specific-known,specific-unknown,nonspecific,freechoice,negative-indefinite,npi
 german,01n,False,False,False,False,True,False
 german,01e,True,True,True,False,False,False
 german,01i,False,True,True,True,False,True
