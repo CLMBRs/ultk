@@ -95,8 +95,12 @@ class GrammaticalExpression(Expression):
         return length
 
     def __eq__(self, other) -> bool:
-        return (self.form, self.func, self.children) == (other.form, other.func, other.children)
-    
+        return (self.form, self.func, self.children) == (
+            other.form,
+            other.func,
+            other.children,
+        )
+
     def __hash__(self) -> int:
         return hash((self.form, self.func, self.children))
 
@@ -105,7 +109,6 @@ class GrammaticalExpression(Expression):
         if self.children is not None:
             out_str += f"({', '.join(str(child) for child in self.children)})"
         return out_str
-
 
 
 class Grammar:
@@ -202,40 +205,47 @@ class Grammar:
         self,
         depth: int = 8,
         lhs: Any = None,
+        unique_dict: dict[Any, GrammaticalExpression] = None,
         unique_key: Callable[[GrammaticalExpression], Any] = None,
         compare_func: Callable[
             [GrammaticalExpression, GrammaticalExpression], bool
         ] = None,
-    ) -> tuple[set[GrammaticalExpression], dict[GrammaticalExpression, Any]]:
+    ) -> Generator[GrammaticalExpression, None, None]:
         """Enumerate all expressions from the grammar up to a given depth from a given LHS.
+        This method also can update a specified dictionary to store only unique expressions, with
+        a user-specified criterion of uniqueness.
 
         Args:
             depth: how deep the trees should be
             lhs: left hand side to start from; defaults to the grammar's start symbol
+            unique_dict: a dictionary in which to store unique Expressions
+            unique_key: a function used to evaluate uniqueness
+            compare_func: a comparison function, used to decide which Expression to add to the dict
+                new Expressions will be added as values to `unique_dict` only if they are minimal
+                among those sharing the same key (by `unique_key`) according to this func
 
         Yields:
             all GrammaticalExpressions up to depth
         """
         # TODO: update docstring!
+        # TODO: package uniqueness stuff in one dict arg?
         if lhs is None:
             lhs = self._start
-        unique_exprs = {}
-        all_exprs = set()
         for num in range(depth):
-            all_exprs |= self.enumerate_at_depth(
+            for expr in self.enumerate_at_depth(
                 num,
                 lhs,
-                unique_dict=unique_exprs,
+                unique_dict=unique_dict,
                 unique_key=unique_key,
                 compare_func=compare_func,
-            )
-        return all_exprs, unique_exprs
+            ):
+                yield expr
 
     def enumerate_at_depth(
         self,
         depth: int,
         lhs: Any,
-        unique_dict: dict[GrammaticalExpression, Any] = None,
+        unique_dict: dict[Any, GrammaticalExpression] = None,
         unique_key: Callable[[GrammaticalExpression], Any] = None,
         compare_func: Callable[
             [GrammaticalExpression, GrammaticalExpression], bool
@@ -254,16 +264,13 @@ class Grammar:
             ):
                 unique_dict[expr_key] = expression
 
-        expressions = set()
-
         if depth == 0:
             for rule in self._rules[lhs]:
                 if rule.is_terminal():
                     cur_expr = GrammaticalExpression(rule.name, rule.func, None)
                     if do_unique:
                         add_unique(cur_expr)
-                    expressions.add(cur_expr)
-            return expressions
+                    yield cur_expr
 
         for rule in self._rules[lhs]:
             # can't use terminal rules when depth > 0
@@ -285,8 +292,47 @@ class Grammar:
                     cur_expr = GrammaticalExpression(rule.name, rule.func, children)
                     if do_unique:
                         add_unique(cur_expr)
-                    expressions.add(cur_expr)
-        return expressions
+                    yield cur_expr
+
+    def get_unique_expressions(
+        self,
+        depth: int,
+        lhs: Any = None,
+        unique_key: Callable[[GrammaticalExpression], Any] = None,
+        compare_func: Callable[
+            [GrammaticalExpression, GrammaticalExpression], bool
+        ] = None,
+    ) -> dict[GrammaticalExpression, Any]:
+        """Get all unique GrammaticalExpressions, up to a certain depth, with a user-specified criterion
+        of uniqueness, and a specified comparison function for determining which Expression to save when there's a clash.
+        This can be used, for instance, to measure the minimum description length of some
+        Meanings, by using expression.evaluate(), which produces a Meaning for an Expression, as the
+        key for determining uniqueness, and length of the expression as comparison.
+
+        This is a wrapper around `enumerate`, but which produces the dictionary of key->Expression entries
+        and returns it.  (`enumerate` is a generator with side effects).
+
+        For Args, see the docstring for `enumerate`.
+
+        Note: if you additionally want to store _all_ expressions, and not just the unique ones, you should
+        directly use `enumerate`.
+
+        Returns:
+            dictionary of {key: GrammaticalExpression}, where the keys are generated by `unique_key`
+            The GrammticalExpression which is the value will be the one that is minimum among
+            `compare_func` amongst all Expressions up to `depth` which share the same key
+        """
+        unique_dict = {}
+        # run through generator, each iteration will update unique_dict
+        for _ in self.enumerate(
+            depth,
+            lhs=lhs,
+            unique_dict=unique_dict,
+            unique_key=unique_key,
+            compare_func=compare_func,
+        ):
+            pass
+        return unique_dict
 
     def get_all_rules(self) -> list[Rule]:
         """Get all rules as a list."""
