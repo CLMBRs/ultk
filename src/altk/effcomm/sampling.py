@@ -1,6 +1,7 @@
 """Functions for sampling expressions into languages.
 """
 import copy
+from typing import Any
 import numpy as np
 from altk.language.language import Language
 from altk.effcomm.agent import Speaker, LiteralSpeaker
