@@ -65,9 +65,10 @@ class GrammaticalExpression(Expression):
     """
 
     def __init__(
-        self, form: str, func: Callable, children: Iterable, meaning: Meaning = None
+        self, rule_name: str, func: Callable, children: Iterable, meaning: Meaning = None, form: str = None
     ):
         super().__init__(form, meaning)
+        self.rule_name = rule_name
         self.func = func
         self.children = children
 
@@ -82,6 +83,12 @@ class GrammaticalExpression(Expression):
                 universe,
             )
         return self.meaning
+
+    def to_dict(self) -> dict:
+        the_dict = super().to_dict()
+        the_dict["grammatical_expression"] = str(self)
+        the_dict["length"] = len(self)
+        return the_dict
 
     def __call__(self, *args):
         if self.children is None:
@@ -105,7 +112,7 @@ class GrammaticalExpression(Expression):
         return hash((self.form, self.func, self.children))
 
     def __str__(self):
-        out_str = self.form
+        out_str = self.rule_name
         if self.children is not None:
             out_str += f"({', '.join(str(child) for child in self.children)})"
         return out_str
@@ -155,16 +162,17 @@ class Grammar:
             re.escape(closer),
             re.escape(delimiter),
         )
+        name_pattern = f"[^{open_re}{close_re}{delimit_re}]+"
         token_regex = re.compile(
-            rf".+{open_re}|[^{open_re}{close_re}{delimit_re}]+|{delimit_re}\s*|{close_re}"
+            rf"{name_pattern}{open_re}|{name_pattern}|{delimit_re}\s*|{close_re}"
         )
 
         # stack to store the tree being built
         stack = []
 
-        for token in token_regex.finditer(expression):
+        for match in token_regex.finditer(expression):
             # strip trailing whitespace if needed
-            token = token.group().strip()
+            token = match.group().strip()
             # start a new expression
             if token[-1] == opener:
                 name = token[:-1]

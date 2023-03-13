@@ -1,6 +1,15 @@
+from yaml import load 
+
+try:
+    from yaml import CLoader as Loader 
+except ImportError:
+    from yaml import Loader
+
+from altk.language.grammar import GrammaticalExpression
 from altk.language.language import Expression, Language
 from altk.language.semantics import Meaning
 
+from .grammar import indefinites_grammar
 from .meaning import universe as indefinites_universe
 
 
@@ -21,3 +30,9 @@ def read_natural_languages(filename: str) -> list[Language]:
             cur_expressions.append(Expression(item.expression, cur_meaning))
         languages.add(Language(cur_expressions, name=lang, natural=True))
     return languages
+
+def read_expressions(filename: str) -> list[GrammaticalExpression]:
+    with open(filename, 'r') as f:
+        expression_list = load(f, Loader=Loader)
+    [print(expr_dict["grammatical_expression"]) for expr_dict in expression_list]
+    return [indefinites_grammar.parse(expr_dict["grammatical_expression"]) for expr_dict in expression_list]

@@ -34,6 +34,9 @@ class Referent:
         self.name = name
         self.__dict__.update(properties, **kwargs)
 
+    def to_dict(self) -> dict:
+        return self.__dict__
+
     def __str__(self) -> str:
         return str(self.__dict__)
 
@@ -75,7 +78,7 @@ class Universe:
 
     def __len__(self) -> int:
         return len(self.referents)
-    
+
     def __hash__(self) -> int:
         return hash(self.referents)
 
@@ -148,6 +151,9 @@ class Meaning:
                 ref.name: 1 / len(self.referents) for ref in self.referents
             } | zeros
 
+    def to_dict(self) -> dict:
+        return {"referents": [referent.to_dict() for referent in self.referents]}
+
     def __bool__(self):
         return bool(self.referents) and bool(self.universe)
 
@@ -157,6 +163,6 @@ class Meaning:
     def __str__(self):
         return f"Referents:\n\t{','.join(str(referent) for referent in self.referents)}\
             \nDistribution:\n\t{self.dist}\n"
-    
+
     def __hash__(self):
         return hash(tuple(self.referents))
