@@ -68,6 +68,8 @@ class Language:
 
         if "data" in kwargs:
             self.data = kwargs["data"]
+        else:
+            self.data = {}
 
         self.__dict__.update(**kwargs)
 
