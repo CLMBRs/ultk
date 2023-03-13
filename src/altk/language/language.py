@@ -13,7 +13,6 @@ Example usage:
 """
 
 import numpy as np
-from abc import abstractmethod
 from altk.language.semantics import Universe
 from altk.language.semantics import Meaning, Referent
 from typing import Callable, Iterable
@@ -28,15 +27,14 @@ class Expression:
         # useful for hashing in certain cases
         # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
         self.form = form or ''
-        self.meaning = meaning or Meaning([], Universe([]))
+        self.meaning = meaning or Meaning(tuple([]), Universe(tuple([])))
 
     def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
         return referent in self.meaning.referents
 
-    @abstractmethod
-    def yaml_rep(self):
-        raise NotImplementedError()
+    def to_dict(self) -> dict:
+        return {"form": self.form, "meaning": self.meaning.to_dict()}
 
     def __str__(self) -> str:
         return f"Expression {self.form}\nMeaning:\n\t{self.meaning}"
