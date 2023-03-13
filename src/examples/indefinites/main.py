@@ -10,8 +10,8 @@ from altk.language.sampling import (
 
 import timeit
 
-from grammar import indefinites_grammar
-from meaning import universe as indefinites_universe
+from .grammar import indefinites_grammar
+from .meaning import universe as indefinites_universe
 
 from tqdm import tqdm
 

@@ -3,7 +3,7 @@ import pandas as pd
 
 if __name__ == "__main__":
 
-    haspelmath_data = pd.read_csv("languages_real_40_updated.csv")
+    haspelmath_data = pd.read_csv("indefinites/data/raw/languages_real_40_updated.csv")
     # restrict to person
     haspelmath_data = haspelmath_data[haspelmath_data["PERSON"] == 1]
     # convert 6 -> 0 so that binary ops work properly
@@ -47,4 +47,17 @@ if __name__ == "__main__":
             & ~haspelmath_data["free.ch"]
         )
     )
-    output_data.to_csv("natural_lanaguage_indefinites.csv")
+    output_data = output_data.astype(
+        {
+            flavor: bool
+            for flavor in (
+                "specific-known",
+                "specific-unknown",
+                "nonspecific",
+                "freechoice",
+                "negative-indefinite",
+                "npi",
+            )
+        }
+    )
+    output_data.to_csv("indefinites/data/natural_language_indefinites.csv", index=False)
