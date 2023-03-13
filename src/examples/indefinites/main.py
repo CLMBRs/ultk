@@ -11,17 +11,22 @@ from altk.language.sampling import (
 from grammar import indefinites_grammar
 from meaning import universe as indefinites_universe
 
+from tqdm import tqdm
 
 if __name__ == "__main__":
 
     print(indefinites_universe)
 
-    all_exprs, unique_exprs = indefinites_grammar.enumerate(
+    unique_exprs = {}
+    all_exprs = set()
+    for expr in tqdm(indefinites_grammar.enumerate(
         4,
-        #unique_key=lambda expr: expr.evaluate(indefinites_universe),
-        #compare_func=lambda e1, e2: len(e1) < len(e2),
-    )
-    print(len(all_exprs))
+        unique_dict = unique_exprs,
+        unique_key=lambda expr: expr.evaluate(indefinites_universe),
+        compare_func=lambda e1, e2: len(e1) < len(e2),
+    )):
+        all_exprs.add(expr)
+        pass
     print(len(unique_exprs))
     """
     for exp in all_exprs:
