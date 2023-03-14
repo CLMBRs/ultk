@@ -29,7 +29,7 @@ Read the [documentation](https://clmbr.shane.st/altk).
 
 ## Getting started
 
-- Check out the [examples](https://github.com/CLMBRs/altk/tree/main/src/examples), starting with a basic signaling game.
+- Check out the [examples](https://github.com/CLMBRs/altk/tree/main/src/examples), starting with a basic signaling game.  The examples folder also contains a simiple efficient communication analysis of [indefinites](https://github.com/CLMBRs/altk/tree/main/src/examples/indefinites).
 - To see more scaled up usage examples, visit the codebase for an efficient communication analysis of [modals](https://github.com/nathimel/modals-effcomm) or [sim-max games](https://github.com/nathimel/rdsg).
 - For an introduction to efficient communication research, here is a [survey paper](https://www.annualreviews.org/doi/abs/10.1146/annurev-linguistics-011817-045406) of the field.
 - For an introduction to the RSA framework, see [this online textbook](http://www.problang.org/).
@@ -38,7 +38,7 @@ Read the [documentation](https://clmbr.shane.st/altk).
 
 There are two modules. The first is [altk.effcomm](https://clmbr.shane.st/altk/altk/effcomm.html), which includes methods for measuring informativity of languages and/or communicative success of Rational Speech Act agents, and for language population sampling and optimization w.r.t Pareto fronts.
 
-The second module is [altk.language](https://clmbr.shane.st/altk/altk/language.html), which contains primitives for constructing semantic spaces, expressions, and languages.
+The second module is [altk.language](https://clmbr.shane.st/altk/altk/language.html), which contains primitives for constructing semantic spaces, expressions, and languages.  It also has a `grammar` module which can be used for building expressions in a Language of Thought and measuring complexity in terms of minimum description length, as well as for natural language syntax.
 
 The source code is available on github [here](https://github.com/CLMBRs/altk).
 
