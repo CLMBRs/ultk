@@ -1,10 +1,9 @@
-from altk.effcomm.informativity import informativity
 from altk.effcomm.optimization import EvolutionaryOptimizer
-from altk.language.language import aggregate_expression_complexity
 from altk.language.sampling import random_languages
 
 
 from ..meaning import universe as indefinites_universe
+from ..measures import comm_cost, complexity
 from ..util import read_expressions, write_languages
 
 if __name__ == "__main__":
@@ -17,18 +16,11 @@ if __name__ == "__main__":
 
     seed_languages = random_languages(expressions, 1000, max_size=10)
 
-    def complexity(language):
-        return aggregate_expression_complexity(
-            language, lambda expr: len(expressions_by_meaning[expr.meaning])
-        )
-
-    prior = indefinites_universe.prior_numpy()
-
-    def comm_cost(language):
-        return 1 - informativity(language, prior)
+    def lang_complexity(language):
+        return complexity(language, expressions_by_meaning)
 
     optimizer = EvolutionaryOptimizer(
-        [complexity, comm_cost], expressions, 1000, 3, 50, 10
+        [lang_complexity, comm_cost], expressions, 1000, 3, 50, 10
     )
     result = optimizer.fit(seed_languages)
 
@@ -38,6 +30,8 @@ if __name__ == "__main__":
         {
             "name": lambda idx, _: f"dominating-{idx}",
             "type": lambda _1, _2: "artificial",
+            "complexity": lambda _, lang: lang_complexity(lang),
+            "comm_cost": lambda _, lang: comm_cost(lang)
         },
     )
     write_languages(
@@ -46,5 +40,7 @@ if __name__ == "__main__":
         {
             "name": lambda idx, _: f"explored-{idx}",
             "type": lambda _1, _2: "artificial",
+            "complexity": lambda _, lang: lang_complexity(lang),
+            "comm_cost": lambda _, lang: comm_cost(lang)
         },
     )

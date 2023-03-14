@@ -37,7 +37,8 @@ class Expression:
         return {"form": self.form, "meaning": self.meaning.to_dict()}
 
     def __str__(self) -> str:
-        return f"Expression {self.form}\nMeaning:\n\t{self.meaning}"
+        return self.form
+        # return f"Expression {self.form}\nMeaning:\n\t{self.meaning}"
 
     def __eq__(self, other: object) -> bool:
         return (self.form, self.meaning) == (other.form, other.meaning)
@@ -117,8 +118,8 @@ class Language:
         self._universe = val
 
     def to_dict(self, **kwargs) -> dict:
-        the_dict = kwargs or {}
-        the_dict["expressions"] = [str(expr) for expr in self.expressions]
+        the_dict = {"expressions": [str(expr) for expr in self.expressions]}
+        the_dict.update(kwargs)
         return the_dict
 
     def __contains__(self, expression) -> bool:
