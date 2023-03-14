@@ -22,6 +22,7 @@ if __name__ == "__main__":
         "indefinites/outputs/natural_languages.yml",
         {
             "name": lambda _, lang: lang.name,
+            "type": lambda _1, _2: "natural",
             "lot_expressions": lambda _, lang: [
                 str(expressions_by_meaning[expr.meaning]) for expr in lang.expressions
             ],
