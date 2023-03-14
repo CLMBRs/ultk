@@ -30,24 +30,21 @@ if __name__ == "__main__":
         "indefinites/outputs/generated_expressions.yml", universe=indefinites_universe
     )
     expressions_by_meaning = {expression.meaning: expression for expression in expressions}
-    print(len(expressions_by_meaning))
 
-    seed_languages = list(random_languages(expressions, 1000, max_size=8))
-    print(all(expr.meaning in expressions_by_meaning for seed_language in seed_languages for expr in seed_language.expressions))
+    seed_languages = list(set(random_languages(expressions, 1000, max_size=10)))
 
     def complexity(language):
         return aggregate_expression_complexity(
             # TODO: change this measure to closer match the paper?
             language,
             lambda expr: len(expressions_by_meaning[expr.meaning])
-            # lambda expression: len(expressions_by_meaning[expression.meaning]),
         )
 
     prior = indefinites_universe.prior_numpy()
     def comm_cost(language):
         return 1 - informativity(language, prior)
 
-    optimizer = EvolutionaryOptimizer([complexity, comm_cost], expressions, 500, 3, 50, 10)
+    optimizer = EvolutionaryOptimizer([complexity, comm_cost], expressions, 1000, 3, 50, 10)
     result = optimizer.fit(seed_languages)
     # TODO: uniqueness issue here?!?!
     for lang in result["dominating_languages"]:
@@ -56,4 +53,9 @@ if __name__ == "__main__":
         print(comm_cost(lang))
         print(complexity(lang))
 
-    
+    print(any(lang1 == lang2 for lang1 in result["dominating_languages"] for lang2 in result["dominating_languages"]))
+
+    print(f"Explored {len(result['explored_languages'])} langs")
+
+    print(len(result['dominating_languages']))
+    print(len(list(set(result['dominating_languages']))))
