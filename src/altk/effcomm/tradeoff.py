@@ -35,57 +35,55 @@ def dominates(p1: list[float], p2: list[float]) -> bool:
     )
 
 
-def non_dominated_2d(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+def non_dominated_2d(points: list[tuple[float, float]]) -> list[int]:
     """Return the non-dominated (Pareto) front of a list of 2-D points, using Kung's algorithm.
 
     Args:
         points: A list of 2-D points
 
     Returns:
-        a list, the subset of `points` for which no other point is as good on all dimensions
+        a list, the indices of `points` for which no other point is as good on all dimensions
         and better on at least one
     """
+    if len(points) == 0:
+        return []
+
     # sort list in ascending order on first dimension
     # NB: ascending order because we are assuming lower is better
     # NB: lexicographic, i.e. will sort on 2nd dim if tie on 1st dim, as desired
-    points.sort()
+    # points.sort()
+    indices = list(range(len(points)))
+    indices.sort(key = lambda x: points[x])
 
-    # recursive helper function
-    def front(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
-        if len(points) == 1:
-            return points
-        split = int(len(points) / 2)
-        top = front(points[:split])
-        bottom = front(points[split:])
-        merged = top
-        for point in bottom:
-            dominated = False
-            for top_point in merged:
-                if dominates(top_point, point):
-                    dominated = True
-                    break
-            if not dominated:
-                merged.append(point)
-        return merged
+    front = []
+    for idx in indices:
+        dominated = False
+        for bot_idx in front:
+            if dominates(points[bot_idx], points[idx]):
+                dominated = True
+                break
+        if not dominated:
+            front.append(idx)
 
-    return front(points)
+    return front
 
 
 def pareto_optimal_languages(
     languages: list[Language],
-    x: str = "comm_cost",
-    y: str = "complexity",
+    objectives: list[Callable[[Language], Any]],
     unique: bool = False,
 ) -> list[Language]:
     """Use non_dominated_2d to compute the Pareto languages."""
-    dominating_languages = non_dominated_2d(
+    assert len(objectives) == 2, "Can only do pareto optimization in two dimensions."
+    dominating_indices = non_dominated_2d(
         list(
             zip(
-                [lang.data[x] for lang in languages],
-                [lang.data[y] for lang in languages],
+                [objectives[0](lang) for lang in languages],
+                [objectives[1](lang) for lang in languages],
             )
         )
     )
+    dominating_languages = [languages[idx] for idx in dominating_indices]
     return list(set(dominating_languages)) if unique else dominating_languages
 
 
