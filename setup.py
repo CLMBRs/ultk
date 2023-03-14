@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="altk",
-    version="1.0.0",
+    version="0.0.1",
     author="Nathaniel Imel, Shane Steinert-Threlkeld",
     author_email="nimel@uci.edu, shanest@uw.edu",
     description="The Artificial Language ToolKit",
