@@ -7,5 +7,5 @@ This README will be updated in due time!
 ## Usage
 
 From the `src/examples` directory:
-1. `python -m indefinites.scripts.convert_haspelmath`: generates `data/natural_language_indefinites.csv`
-2. `python -m indefinites.scripts.generate_expressions`: generates `outputs/generated_expressions.csv`
+0. `python -m indefinites.scripts.convert_haspelmath`: generates `data/natural_language_indefinites.csv`
+1. `python -m indefinites.scripts.generate_expressions`: generates `outputs/generated_expressions.yml`

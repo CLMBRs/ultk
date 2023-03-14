@@ -1,18 +1,11 @@
-from yaml import dump
-
-try:
-    from yaml import CDumper as Dumper
-except ImportError:
-    from yaml import Dumper
-
 from altk.effcomm.informativity import informativity
 from altk.effcomm.optimization import EvolutionaryOptimizer
-from altk.language.language import Language, aggregate_expression_complexity
+from altk.language.language import aggregate_expression_complexity
 from altk.language.sampling import random_languages
 
 
 from ..meaning import universe as indefinites_universe
-from ..util import read_expressions
+from ..util import read_expressions, write_languages
 
 if __name__ == "__main__":
 
@@ -39,30 +32,19 @@ if __name__ == "__main__":
     )
     result = optimizer.fit(seed_languages)
 
-    def write_languages(
-        languages: list[Language], filename: str, name_prefix: str = "", **kwargs
-    ) -> None:
-        lang_dicts = [
-            languages[idx].to_dict(
-                name=f"{name_prefix}-{idx}",
-                complexity=complexity(languages[idx]),
-                comm_cost=comm_cost(languages[idx]),
-                **kwargs,
-            )
-            for idx in range(len(languages))
-        ]
-        with open(filename, "w+") as f:
-            dump(lang_dicts, f, Dumper=Dumper)
-
     write_languages(
         result["dominating_languages"],
         "indefinites/outputs/dominating_languages.yml",
-        name_prefix="dominating",
-        type="artificial",
+        {
+            "name": lambda idx, _: f"dominating-{idx}",
+            "type": lambda _1, _2: "artificial",
+        },
     )
     write_languages(
         result["explored_languages"],
         "indefinites/outputs/explored_languages.yml",
-        name_prefix="explored",
-        type="artificial",
+        {
+            "name": lambda idx, _: f"explored-{idx}",
+            "type": lambda _1, _2: "artificial",
+        },
     )
