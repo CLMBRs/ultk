@@ -13,10 +13,9 @@ Example usage:
 """
 
 import numpy as np
-from abc import abstractmethod
 from altk.language.semantics import Universe
-from altk.language.semantics import Meaning
-from typing import Callable
+from altk.language.semantics import Meaning, Referent
+from typing import Callable, Iterable
 
 
 class Expression:
@@ -24,60 +23,64 @@ class Expression:
     """Minimally contains a form and a meaning."""
 
     def __init__(self, form: str = None, meaning: Meaning = None):
-        self.form = form
-        self.meaning = meaning
+        # gneric/dummy form and meaning if not specified
+        # useful for hashing in certain cases
+        # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
+        self.form = form or ""
+        self.meaning = meaning or Meaning(tuple([]), Universe(tuple([])))
 
-    def can_express(self, m: Meaning) -> bool:
+    def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
-        return m in self.meaning.referents
+        return referent in self.meaning.referents
 
-    @abstractmethod
-    def yaml_rep(self):
-        raise NotImplementedError()
+    def to_dict(self) -> dict:
+        return {"form": self.form, "meaning": self.meaning.to_dict()}
 
-    @abstractmethod
     def __str__(self) -> str:
-        raise NotImplementedError()
+        return self.form
+        # return f"Expression {self.form}\nMeaning:\n\t{self.meaning}"
 
-    @abstractmethod
-    def __eq__(self, __o: object) -> bool:
-        raise NotImplementedError()
+    def __eq__(self, other: object) -> bool:
+        return (self.form, self.meaning) == (other.form, other.meaning)
 
-    @abstractmethod
+    def __lt__(self, other: object) -> bool:
+        return (self.form, other.meaning) < (other.form, other.meaning)
+
+    def __bool__(self) -> bool:
+        return self.form and self.meaning
+
     def __hash__(self) -> int:
-        raise NotImplementedError()
+        return hash((self.form, self.meaning))
 
 
 class Language:
-
     """Minimally contains Expression objects."""
 
-    def __init__(self, expressions: list[Expression], **kwargs):
+    def __init__(self, expressions: Iterable[Expression], **kwargs):
         # Check that all expressions have the same universe
         if len(set([e.meaning.universe for e in expressions])) != 1:
             raise ValueError(
                 f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}"
             )
 
-        self.expressions = expressions
+        self.expressions = tuple(sorted(expressions))
         self.universe = expressions[0].meaning.universe
 
-        if "data" in kwargs:
-            self.data = kwargs["data"]
+        self.__dict__.update(**kwargs)
 
     @property
-    def expressions(self) -> list[Expression]:
+    def expressions(self) -> tuple[Expression]:
         return self._expressions
 
     @expressions.setter
-    def expressions(self, val: list[Expression]) -> None:
+    def expressions(self, val: tuple[Expression]) -> None:
         if not val:
             raise ValueError("list of Expressions must not be empty.")
         self._expressions = val
 
     def add_expression(self, e: Expression):
         """Add an expression to the list of expressions in a language."""
-        self.expressions = self.expressions + [e]
+        self.expressions = tuple(sorted(self.expressions + (e,)))
 
     def pop(self, index: int) -> Expression:
         """Removes an expression at the specified index of the list of expressions, and returns it."""
@@ -114,16 +117,41 @@ class Language:
     def universe(self, val) -> None:
         self._universe = val
 
+    def to_dict(self, **kwargs) -> dict:
+        the_dict = {"expressions": [str(expr) for expr in self.expressions]}
+        the_dict.update(kwargs)
+        return the_dict
+
     def __contains__(self, expression) -> bool:
         """Whether the language has the expression"""
         return expression in self.expressions
 
-    @abstractmethod
     def __hash__(self) -> int:
-        return hash(tuple(sorted(self.expressions)))
+        return hash(self.expressions)
 
     def __eq__(self, __o: object) -> bool:
         return self.expressions == __o.expressions
 
     def __len__(self) -> int:
         return len(self.expressions)
+
+    def __lt__(self, other) -> bool:
+        return self.expressions < other.expressions
+
+    def __str__(self) -> str:
+        return (
+            "---------\nExpressions:\n"
+            + "\n-----\n".join(str(expression) for expression in self.expressions)
+            + "\n---------"
+        )
+
+
+def aggregate_expression_complexity(
+    language: Language,
+    expression_complexity_func: Callable[[Expression], float],
+    aggregator: Callable[[Iterable[float]], float] = sum,
+) -> float:
+    return aggregator(
+        expression_complexity_func(expression) for expression in language.expressions
+    )
+
