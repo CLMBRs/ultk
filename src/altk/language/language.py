@@ -116,6 +116,11 @@ class Language:
     def universe(self, val) -> None:
         self._universe = val
 
+    def to_dict(self, **kwargs) -> dict:
+        the_dict = kwargs or {}
+        the_dict["expressions"] = [str(expr) for expr in self.expressions]
+        return the_dict
+
     def __contains__(self, expression) -> bool:
         """Whether the language has the expression"""
         return expression in self.expressions
