@@ -26,7 +26,7 @@ class Expression:
         # gneric/dummy form and meaning if not specified
         # useful for hashing in certain cases
         # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
-        self.form = form or ''
+        self.form = form or ""
         self.meaning = meaning or Meaning(tuple([]), Universe(tuple([])))
 
     def can_express(self, referent: Referent) -> bool:
@@ -54,6 +54,7 @@ class Expression:
 
 class Language:
     """Minimally contains Expression objects."""
+
     def __init__(self, expressions: Iterable[Expression], **kwargs):
         # Check that all expressions have the same universe
         if len(set([e.meaning.universe for e in expressions])) != 1:
@@ -63,11 +64,6 @@ class Language:
 
         self.expressions = tuple(sorted(expressions))
         self.universe = expressions[0].meaning.universe
-
-        if "data" in kwargs:
-            self.data = kwargs["data"]
-        else:
-            self.data = {}
 
         self.__dict__.update(**kwargs)
 

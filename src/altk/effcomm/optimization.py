@@ -110,7 +110,7 @@ class EvolutionaryOptimizer:
 
     def fit(
         self, seed_population: list[Language], explore: float = 0.0
-    ) -> dict[str, Any]:
+    ) -> dict[str, list[Language]]:
         """Computes the Pareto frontier, a set languages which cannot be both more simple and more informative.
 
         Uses pygmo's nondominated_front method for computing a population's best solutions to a multi-objective optimization problem.
@@ -132,12 +132,15 @@ class EvolutionaryOptimizer:
         explored_languages = []
 
         for _ in tqdm(range(self.generations)):
-            # Measure each generation
 
+            # Keep track of visited
             explored_languages.extend(copy.copy(languages))
 
             # Calculate dominating individuals
-            dominating_languages = pareto_optimal_languages(languages, self.objectives, unique=True)
+            dominating_languages = pareto_optimal_languages(
+                languages, self.objectives, unique=True
+            )
+            # Possibly explore
             parent_languages = sample_parents(
                 dominating_languages, explored_languages, explore
             )
@@ -149,17 +152,20 @@ class EvolutionaryOptimizer:
 
             languages = mutated_result
 
+        # update with final generation
+        explored_languages.extend(copy.copy(languages))
+        dominating_languages = pareto_optimal_languages(
+            languages, self.objectives, unique=True
+        )
+
         return {
             "dominating_languages": dominating_languages,
-            "explored_languages": list(set(explored_languages))
+            "explored_languages": list(set(explored_languages)),
         }
 
     def sample_mutated(
-        self,
-        languages: list[Language],
-        amount: int,
-        expressions: list[Expression],
-    ) -> dict[str, Any]:
+        self, languages: list[Language], amount: int, expressions: list[Expression]
+    ) -> list[Language]:
         """
         Arguments:
             languages: dominating languages of a generation
@@ -225,7 +231,7 @@ def sample_parents(
     dominating_languages: set[Language],
     explored_languages: set[Language],
     explore: float,
-) -> set[Language]:
+) -> list[Language]:
     """Use the explore parameter to explore possibly suboptimal areas of the language space.
 
     Args:
