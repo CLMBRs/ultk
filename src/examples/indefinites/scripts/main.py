@@ -48,4 +48,3 @@ if __name__ == "__main__":
         [complexity, comm_cost], expressions, 1000, 3, 50, 10
     )
     result = optimizer.fit(seed_languages)
-

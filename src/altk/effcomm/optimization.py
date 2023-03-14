@@ -146,10 +146,7 @@ class EvolutionaryOptimizer:
             )
 
             # Mutate dominating individuals
-            mutated_result = self.sample_mutated(
-                parent_languages, self.sample_size, self.expressions
-            )
-
+            mutated_result = self.sample_mutated(parent_languages)
             languages = mutated_result
 
         # update with final generation
@@ -163,9 +160,7 @@ class EvolutionaryOptimizer:
             "explored_languages": list(set(explored_languages)),
         }
 
-    def sample_mutated(
-        self, languages: list[Language], amount: int, expressions: list[Expression]
-    ) -> list[Language]:
+    def sample_mutated(self, languages: list[Language]) -> list[Language]:
         """
         Arguments:
             languages: dominating languages of a generation
@@ -178,6 +173,7 @@ class EvolutionaryOptimizer:
         Returns:
             list of updated languages
         """
+        amount = self.sample_size
         amount -= len(languages)
         amount_per_lang = int(math.floor(amount / len(languages)))
         amount_random = amount % len(languages)
@@ -191,20 +187,20 @@ class EvolutionaryOptimizer:
                 mutated_language = language
 
                 for _ in range(num_mutations):
-                    mutated_language = self.mutate(mutated_language, expressions)
+                    mutated_language = self.mutate(mutated_language)
                 mutated_languages.append(mutated_language)
 
         # Ensure the number of languages per generation is constant
 
         for _ in range(amount_random):
             language = random.choice(languages)
-            mutated_languages.append(self.mutate(language, expressions))
+            mutated_languages.append(self.mutate(language))
 
         mutated_languages.extend(languages)
 
         return list(set(mutated_languages))
 
-    def mutate(self, language: Language, expressions: list[Expression]) -> Language:
+    def mutate(self, language: Language) -> Language:
         """Randomly selects a mutation that is allowed to apply and applies it to a language.
 
         Args:
@@ -224,7 +220,7 @@ class EvolutionaryOptimizer:
             )
         ]
         mutation = random.choice(possible_mutations)
-        return mutation.mutate(language, expressions)
+        return mutation.mutate(language, self.expressions)
 
 
 def sample_parents(
