@@ -29,7 +29,7 @@ if __name__ == "__main__":
         "indefinites/outputs/dominating_languages.yml",
         {
             "name": lambda idx, _: f"dominating-{idx}",
-            "type": lambda _1, _2: "artificial",
+            "type": lambda _1, _2: "dominant",
             "complexity": lambda _, lang: lang_complexity(lang),
             "comm_cost": lambda _, lang: comm_cost(lang)
         },
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         "indefinites/outputs/explored_languages.yml",
         {
             "name": lambda idx, _: f"explored-{idx}",
-            "type": lambda _1, _2: "artificial",
+            "type": lambda _1, _2: "explored",
             "complexity": lambda _, lang: lang_complexity(lang),
             "comm_cost": lambda _, lang: comm_cost(lang)
         },
