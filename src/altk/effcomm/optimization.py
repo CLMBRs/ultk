@@ -37,8 +37,9 @@ class RemoveExpression(Mutation):
 
     @staticmethod
     def mutate(language: Language, expressions: list[Expression], **kwargs) -> Language:
-        language.expressions.pop(random.randrange(len(language)))
-        return language
+        new_expressions = list(language.expressions)
+        new_expressions.pop(random.randrange(len(language)))
+        return type(language)(tuple(sorted(new_expressions)))
 
 
 class AddExpression(Mutation):
@@ -48,8 +49,9 @@ class AddExpression(Mutation):
 
     @staticmethod
     def mutate(language: Language, expressions: list[Expression], **kwargs) -> Language:
-        language.add_expression(random.choice(expressions))
-        return language
+        new_expressions = list(language.expressions)
+        new_expressions.append(random.choice(expressions))
+        return type(language)(tuple(sorted(new_expressions)))
 
 
 ##############################################################################
@@ -149,7 +151,7 @@ class EvolutionaryOptimizer:
 
         return {
             "dominating_languages": dominating_languages,
-            "explored_languages": explored_languages,
+            "explored_languages": list(set(explored_languages))
         }
 
     def sample_mutated(
@@ -180,7 +182,7 @@ class EvolutionaryOptimizer:
             for _ in range(amount_per_lang):
                 num_mutations = random.randint(1, self.max_mutations)
 
-                mutated_language = copy.copy(language)
+                mutated_language = language
 
                 for _ in range(num_mutations):
                     mutated_language = self.mutate(mutated_language, expressions)
@@ -189,12 +191,12 @@ class EvolutionaryOptimizer:
         # Ensure the number of languages per generation is constant
 
         for _ in range(amount_random):
-            language = copy.copy(random.choice(languages))
+            language = random.choice(languages)
             mutated_languages.append(self.mutate(language, expressions))
 
         mutated_languages.extend(languages)
 
-        return mutated_languages
+        return list(set(mutated_languages))
 
     def mutate(self, language: Language, expressions: list[Expression]) -> Language:
         """Randomly selects a mutation that is allowed to apply and applies it to a language.
