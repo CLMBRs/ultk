@@ -12,3 +12,4 @@ From the `src/examples` directory:
 2. `python -m indefinites.scripts.esimate_pareto`: generates `outputs/dominating_languages.yml` and `outputs/explored_languages.yml`
 3. `python -m indefinites.scripts.measure_natural_languages`: generates `outputs/natural_languages.yml`
 4. `python -m indefinites.scripts.combine_data`: generates `outputs/combined_data.csv`
+5. `python -m indefinites.scripts.analyze`: generates `outputs/plot.png`
