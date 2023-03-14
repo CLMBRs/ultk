@@ -43,7 +43,7 @@ class Expression:
         return (self.form, self.meaning) == (other.form, other.meaning)
 
     def __lt__(self, other: object) -> bool:
-        return self.form < other.form
+        return (self.form, other.meaning) < (other.form, other.meaning)
 
     def __bool__(self) -> bool:
         return self.form and self.meaning
@@ -53,17 +53,15 @@ class Expression:
 
 
 class Language:
-
     """Minimally contains Expression objects."""
-
-    def __init__(self, expressions: list[Expression], **kwargs):
+    def __init__(self, expressions: Iterable[Expression], **kwargs):
         # Check that all expressions have the same universe
         if len(set([e.meaning.universe for e in expressions])) != 1:
             raise ValueError(
                 f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}"
             )
 
-        self.expressions = expressions
+        self.expressions = tuple(sorted(expressions))
         self.universe = expressions[0].meaning.universe
 
         if "data" in kwargs:
@@ -85,7 +83,7 @@ class Language:
 
     def add_expression(self, e: Expression):
         """Add an expression to the list of expressions in a language."""
-        self.expressions = self.expressions + [e]
+        self.expressions = tuple(sorted(self.expressions + (e,)))
 
     def pop(self, index: int) -> Expression:
         """Removes an expression at the specified index of the list of expressions, and returns it."""

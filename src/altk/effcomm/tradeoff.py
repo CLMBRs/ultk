@@ -64,6 +64,7 @@ def non_dominated_2d(points: list[tuple[float, float]]) -> list[int]:
                 break
         if not dominated:
             front.append(idx)
+
     return front
 
 

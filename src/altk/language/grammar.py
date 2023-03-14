@@ -65,7 +65,12 @@ class GrammaticalExpression(Expression):
     """
 
     def __init__(
-        self, rule_name: str, func: Callable, children: Iterable, meaning: Meaning = None, form: str = None
+        self,
+        rule_name: str,
+        func: Callable,
+        children: Iterable,
+        meaning: Meaning = None,
+        form: str = None,
     ):
         super().__init__(form, meaning)
         self.rule_name = rule_name
@@ -102,7 +107,8 @@ class GrammaticalExpression(Expression):
         return length
 
     def __eq__(self, other) -> bool:
-        return (self.form, self.func, self.children) == (
+        return (self.rule_name, self.form, self.func, self.children) == (
+            other.rule_name,
             other.form,
             other.func,
             other.children,
@@ -111,7 +117,17 @@ class GrammaticalExpression(Expression):
     def __hash__(self) -> int:
         # when self.children is None...
         children = self.children or tuple([])
-        return hash((self.form, self.func, tuple(children)))
+        return hash((self.rule_name, self.form, self.func, tuple(children)))
+
+    def __lt__(self, other) -> bool:
+        children = self.children or tuple([])
+        other_children = other.children or tuple([])
+        return (self.rule_name, self.form, self.func, children) < (
+            other.rule_name,
+            other.form,
+            other.func,
+            other_children,
+        )
 
     def __str__(self):
         out_str = self.rule_name
