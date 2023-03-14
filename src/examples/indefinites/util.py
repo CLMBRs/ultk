@@ -33,8 +33,8 @@ def read_natural_languages(filename: str) -> list[Language]:
 
 
 def read_expressions(
-    filename: str, universe: Universe = None
-) -> list[GrammaticalExpression]:
+    filename: str, universe: Universe = None, return_by_meaning = True
+) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
     with open(filename, "r") as f:
         expression_list = load(f, Loader=Loader)
     parsed_exprs = [
@@ -43,4 +43,7 @@ def read_expressions(
     ]
     if universe is not None:
         [expr.evaluate(universe) for expr in parsed_exprs]
-    return parsed_exprs
+    by_meaning = {}
+    if return_by_meaning:
+        by_meaning = {expr.meaning: expr for expr in parsed_exprs}
+    return parsed_exprs, by_meaning
