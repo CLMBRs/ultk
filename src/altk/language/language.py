@@ -135,6 +135,9 @@ class Language:
     def __len__(self) -> int:
         return len(self.expressions)
 
+    def __lt__(self, other) -> bool:
+        return self.expressions < other.expressions
+
     def __str__(self) -> str:
         return (
             "---------\nExpressions:\n"

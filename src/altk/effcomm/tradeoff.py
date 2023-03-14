@@ -69,16 +69,16 @@ def non_dominated_2d(points: list[tuple[float, float]]) -> list[int]:
 
 def pareto_optimal_languages(
     languages: list[Language],
-    x: str = "comm_cost",
-    y: str = "complexity",
+    objectives: list[Callable[[Language], Any]],
     unique: bool = False,
 ) -> list[Language]:
     """Use non_dominated_2d to compute the Pareto languages."""
+    assert len(objectives) == 2, "Can only do pareto optimization in two dimensions."
     dominating_indices = non_dominated_2d(
         list(
             zip(
-                [lang.data[x] for lang in languages],
-                [lang.data[y] for lang in languages],
+                [objectives[0](lang) for lang in languages],
+                [objectives[1](lang) for lang in languages],
             )
         )
     )

@@ -62,15 +62,13 @@ class EvolutionaryOptimizer:
 
     def __init__(
         self,
-        objectives: dict[str, Callable[[Language], Any]],
+        objectives: list[Callable[[Language], Any]],
         expressions: list[Expression],
         sample_size: int,
         max_mutations: int,
         generations: int,
         lang_size: int,
         mutations: list[Mutation] = [AddExpression, RemoveExpression],
-        x: str = "comm_cost",
-        y: str = "complexity",
     ):
         """Initialize the evolutionary algorithm configurations.
 
@@ -97,8 +95,6 @@ class EvolutionaryOptimizer:
             mutations: (optional) a list of Mutation objects, defaults to add/remove expression
         """
         self.objectives = objectives
-        self.x = x
-        self.y = y
         self.expressions = expressions
         self.mutations = mutations
 
@@ -130,21 +126,16 @@ class EvolutionaryOptimizer:
                 "explored_languages": list of all the languages explored during the evolutionary algorithm,
                 }
         """
-        languages = seed_population
+        languages = copy.copy(seed_population)
         explored_languages = []
 
-        for gen in tqdm(range(self.generations)):
-            print(f"Starting generation {gen}")
+        for _ in tqdm(range(self.generations)):
             # Measure each generation
-            for lang in languages:
-                for m in self.objectives:
-                    lang.data[m] = self.objectives[m](lang)
 
-            explored_languages.extend(copy.deepcopy(languages))
+            explored_languages.extend(copy.copy(languages))
 
             # Calculate dominating individuals
-            dominating_languages = pareto_optimal_languages(languages, self.x, self.y)
-            print(len(dominating_languages))
+            dominating_languages = pareto_optimal_languages(languages, self.objectives, unique=True)
             parent_languages = sample_parents(
                 dominating_languages, explored_languages, explore
             )
@@ -229,10 +220,10 @@ class EvolutionaryOptimizer:
 
 
 def sample_parents(
-    dominating_languages: list[Language],
-    explored_languages: list[Language],
+    dominating_languages: set[Language],
+    explored_languages: set[Language],
     explore: float,
-) -> list[Language]:
+) -> set[Language]:
     """Use the explore parameter to explore possibly suboptimal areas of the language space.
 
     Args:
@@ -247,13 +238,10 @@ def sample_parents(
     """
     total_fit = len(dominating_languages)
     num_explore = int(explore * total_fit)
+    num_fit = total_fit - num_explore
 
-    fit_indices = list(range(total_fit))
-    random.shuffle(fit_indices)
-    fit_indices = fit_indices[: total_fit - num_explore]
-
-    parent_languages = [dominating_languages[idx] for idx in fit_indices]
+    parent_languages = random.sample(dominating_languages, num_fit)
     parent_languages.extend(random.sample(explored_languages, num_explore))
 
-    return parent_languages
+    return list(set(parent_languages))
 
