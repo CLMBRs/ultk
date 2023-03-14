@@ -47,12 +47,13 @@ if __name__ == "__main__":
     def comm_cost(language):
         return 1 - informativity(language, prior)
 
-    optimizer = EvolutionaryOptimizer({"complexity": complexity, "comm_cost": comm_cost}, expressions, 200, 3, 10, 10)
+    optimizer = EvolutionaryOptimizer([complexity, comm_cost], expressions, 500, 3, 50, 10)
     result = optimizer.fit(seed_languages)
     # TODO: uniqueness issue here?!?!
     for lang in result["dominating_languages"]:
         print()
-        print(lang.data["comm_cost"], lang.data["complexity"]) 
         [print(expr) for expr in lang.expressions]
+        print(comm_cost(lang))
+        print(complexity(lang))
 
     
