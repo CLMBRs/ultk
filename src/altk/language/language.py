@@ -68,11 +68,11 @@ class Language:
         self.__dict__.update(**kwargs)
 
     @property
-    def expressions(self) -> list[Expression]:
+    def expressions(self) -> tuple[Expression]:
         return self._expressions
 
     @expressions.setter
-    def expressions(self, val: list[Expression]) -> None:
+    def expressions(self, val: tuple[Expression]) -> None:
         if not val:
             raise ValueError("list of Expressions must not be empty.")
         self._expressions = val
@@ -121,7 +121,7 @@ class Language:
         return expression in self.expressions
 
     def __hash__(self) -> int:
-        return hash(tuple(sorted(self.expressions)))
+        return hash(self.expressions)
 
     def __eq__(self, __o: object) -> bool:
         return self.expressions == __o.expressions
