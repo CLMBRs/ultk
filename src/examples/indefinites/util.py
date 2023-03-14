@@ -1,9 +1,11 @@
-from yaml import load
+from typing import Callable, Any
+
+from yaml import load, dump
 
 try:
-    from yaml import CLoader as Loader
+    from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
-    from yaml import Loader
+    from yaml import Loader, Dumper
 
 from altk.language.grammar import GrammaticalExpression
 from altk.language.language import Expression, Language
@@ -33,7 +35,7 @@ def read_natural_languages(filename: str) -> list[Language]:
 
 
 def read_expressions(
-    filename: str, universe: Universe = None, return_by_meaning = True
+    filename: str, universe: Universe = None, return_by_meaning=True
 ) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
     with open(filename, "r") as f:
         expression_list = load(f, Loader=Loader)
@@ -47,3 +49,18 @@ def read_expressions(
     if return_by_meaning:
         by_meaning = {expr.meaning: expr for expr in parsed_exprs}
     return parsed_exprs, by_meaning
+
+
+def write_languages(
+    languages: list[Language],
+    filename: str,
+    properties_to_add: dict[str, Callable[[int, Language], Any]] = None,
+) -> None:
+    lang_dicts = [
+        language.to_dict(
+            **{key: properties_to_add[key](idx, language) for key in properties_to_add}
+        )
+        for idx, language in enumerate(languages)
+    ]
+    with open(filename, "w+") as f:
+        dump(lang_dicts, f, Dumper=Dumper)
