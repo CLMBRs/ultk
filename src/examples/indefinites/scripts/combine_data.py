@@ -19,5 +19,5 @@ if __name__ == '__main__':
     dominating_languages = yaml_to_dataframe("indefinites/outputs/dominating_languages.yml", keys)
     explored_languages = yaml_to_dataframe("indefinites/outputs/explored_languages.yml", keys)
     natural_languages = yaml_to_dataframe("indefinites/outputs/natural_languages.yml", keys)
-    all_data = pd.concat([dominating_languages, natural_languages, explored_languages], ignore_index=True)
+    all_data = pd.concat([explored_languages, dominating_languages, natural_languages], ignore_index=True)
     all_data.to_csv("indefinites/outputs/combined_data.csv", index=False)
