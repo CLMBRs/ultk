@@ -1,30 +1,20 @@
-import pandas as pd
+from yaml import dump
+
+try:
+    from yaml import CDumper as Dumper
+except ImportError:
+    from yaml import Dumper
 
 from altk.effcomm.informativity import informativity
 from altk.effcomm.optimization import EvolutionaryOptimizer
-from altk.language.language import aggregate_expression_complexity
-from altk.language.sampling import all_languages, random_languages
+from altk.language.language import Language, aggregate_expression_complexity
+from altk.language.sampling import random_languages
 
 
-from ..grammar import indefinites_grammar
 from ..meaning import universe as indefinites_universe
-from ..util import read_expressions, read_natural_languages
+from ..util import read_expressions
 
 if __name__ == "__main__":
-
-    # NB: in a larger-scale study, you would probably want to do this once and save
-    # the resulting dictionary as a file.  We are not doing that in the present case
-    # because it is faster to just generate from scratch than to read from a file and
-    # re-parse the inputs.
-    """
-    meanings_by_expressions = indefinites_grammar.get_unique_expressions(
-        3,
-        max_size=2 ** len(indefinites_universe),
-        unique_key=lambda expr: expr.evaluate(indefinites_universe),
-        compare_func=lambda e1, e2: len(e1) < len(e2),
-    )
-    expressions = list(meanings_by_expressions.values())
-    """
 
     expressions, expressions_by_meaning = read_expressions(
         "indefinites/outputs/generated_expressions.yml",
@@ -48,3 +38,31 @@ if __name__ == "__main__":
         [complexity, comm_cost], expressions, 1000, 3, 50, 10
     )
     result = optimizer.fit(seed_languages)
+
+    def write_languages(
+        languages: list[Language], filename: str, name_prefix: str = "", **kwargs
+    ) -> None:
+        lang_dicts = [
+            languages[idx].to_dict(
+                name=f"{name_prefix}-{idx}",
+                complexity=complexity(languages[idx]),
+                comm_cost=comm_cost(languages[idx]),
+                **kwargs,
+            )
+            for idx in range(len(languages))
+        ]
+        with open(filename, "w+") as f:
+            dump(lang_dicts, f, Dumper=Dumper)
+
+    write_languages(
+        result["dominating_languages"],
+        "indefinites/outputs/dominating_languages.yml",
+        name_prefix="dominating",
+        type="artificial",
+    )
+    write_languages(
+        result["explored_languages"],
+        "indefinites/outputs/explored_languages.yml",
+        name_prefix="explored",
+        type="artificial",
+    )
