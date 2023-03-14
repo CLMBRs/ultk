@@ -18,6 +18,12 @@ if __name__ == "__main__":
         compare_func=lambda e1, e2: len(e1) < len(e2),
     )
 
+    # filter out the trivial meaning, results in NaNs
+    # iterate over keys, since we need to change the dict itself
+    for meaning in list(expressions_by_meaning.keys()):
+        if len(meaning.referents) == 0:
+            del expressions_by_meaning[meaning]
+
     with open("indefinites/outputs/generated_expressions.yml", "w") as outfile:
         dump(
             [

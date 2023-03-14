@@ -144,6 +144,7 @@ class EvolutionaryOptimizer:
 
             # Calculate dominating individuals
             dominating_languages = pareto_optimal_languages(languages, self.x, self.y)
+            print(len(dominating_languages))
             parent_languages = sample_parents(
                 dominating_languages, explored_languages, explore
             )
@@ -154,7 +155,6 @@ class EvolutionaryOptimizer:
             )
 
             languages = mutated_result
-            print(len(languages))
 
         return {
             "dominating_languages": dominating_languages,

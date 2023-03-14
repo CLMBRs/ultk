@@ -88,11 +88,6 @@
     referents:
     - *id004
 - form: ''
-  grammatical_expression: and(K+, K-)
-  length: 3
-  meaning:
-    referents: []
-- form: ''
   grammatical_expression: and(K-, S+)
   length: 3
   meaning:

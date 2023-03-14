@@ -36,24 +36,23 @@ if __name__ == "__main__":
     print(all(expr.meaning in expressions_by_meaning for seed_language in seed_languages for expr in seed_language.expressions))
 
     def complexity(language):
-        def single_complexity(expr):
-            if expr.meaning not in expressions_by_meaning:
-                print(expr)
-                print(expr.meaning)
-                print(len(expressions_by_meaning))
-            return len(expressions_by_meaning[expr.meaning])
         return aggregate_expression_complexity(
             # TODO: change this measure to closer match the paper?
             language,
-            single_complexity
+            lambda expr: len(expressions_by_meaning[expr.meaning])
             # lambda expression: len(expressions_by_meaning[expression.meaning]),
         )
 
-    prior = expressions[0].meaning.universe.prior_numpy()
+    prior = indefinites_universe.prior_numpy()
     def comm_cost(language):
         return 1 - informativity(language, prior)
 
     optimizer = EvolutionaryOptimizer({"complexity": complexity, "comm_cost": comm_cost}, expressions, 200, 3, 10, 10)
-    optimizer.fit(seed_languages)
+    result = optimizer.fit(seed_languages)
+    # TODO: uniqueness issue here?!?!
+    for lang in result["dominating_languages"]:
+        print()
+        print(lang.data["comm_cost"], lang.data["complexity"]) 
+        [print(expr) for expr in lang.expressions]
 
     
