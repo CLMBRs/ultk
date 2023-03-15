@@ -4,6 +4,11 @@ See [the paper](https://doi.org/10.1111/cogs.13142) and [the corresponding origi
 
 This README will continue to be updated!
 
+This example creates a "conceptual" / miniature replication of the above paper using the tools provided by the ALTK library.  Right now, the final analysis produces the following plot:
+![a plot showing communicative cost and complexity of natural, explored, and dominant languages](https://github.com/CLMBRs/altk/blob/main/src/examples/indefinites/outputs/plot.png?raw=true)
+
+This README first explains the contents of this example directory, focusing on what the user has to provide that's specific to the indefinites case study, before then explaining the concrete steps taken to produce the above plot.  After that, there is some discussion of what's missing from the above paper and other next steps for this example.
+
 ## Contents
 
 - `data`: various pieces of data to be used in the analysis
@@ -18,7 +23,7 @@ This README will continue to be updated!
 - `meaning.py`: this file defines the meaning space (a `Universe` in ALTK terms) of the six flavors defined in `referents.csv` together with their prior
 - `grammar.py`: defines the Language of Thought grammar (an ALTK `Grammar`) for this domain, using basic propositional logic and the five semantic features identified in Haspelmath 1997.
 - `measures.py`: the measures of simplicity and informativity.  These are basic wrappers around tools from ALTK, linking them to the indefinites grammar and universe.
-- `util.py`: utilities for reading and writing ALTK `Expression`s and `Language`s, as well as the natural language data
+- `util.py`: utilities for reading and writing ALTK `Expression`s and `Language`s, as well as the natural language data.
 
 ## Usage
 
@@ -41,3 +46,16 @@ From the `src/examples` directory:
 6. `python -m indefinites.scripts.analyze`: consumes `outputs/combined_data.csv` and generates `outputs/plot.png`
 
     For now, this simply reads in the data and generates a complexity-cost trade-off plot, showing where the natural, explored, and dominant languages lie.  Soon, it will include more thorough statistical analyses.
+
+## Comparison to Denic et al 2022
+
+This example is a kind of "minimal" replication of Experiment 1 from Denic et al 2022.  Because the primary focus of this reproduction is to demonstrate how to use ALTK and its primitives, there are some differences to keep in mind.
+1. We have not here implemented the controls for coverage and synonymy that are used in the paper.  These could, however, easily be added by reading in `outputs/explored_languages.yml`, applying the optimization algorithm from the paper, and re-writing the subset of languages back out.
+2. We have used only 3-operator complexity (not 2-operator complexity).  Additionally, we have not added the restriction that the `R` features in the grammar can only occur with `SE+`.  See the discussion in the comments in `grammar.py` for more information.
+3. We have not done the analyses with pragmatic speakers and listeners.  ALTK, however, makes this very easy to do!  See `altk.effcomm.agent.PragmaticSpeaker` and `altk.effcomm.agent.PragmaticListener`.  In particular, the `altk.effcomm.informativity.informativity` method that we use takes an argument `agent_type`.  It defaults to "literal"; but passing in `agent_type="pragmatic"` to this method in the `estimate_pareto` and `measure_natural_languages` scripts would measure with pragmatic agents.
+
+## TODOs for this example
+
+1. Add configuration files (ideally yml using [hydra](https://hydra.cc)), to keep track of filenames and allow for easy experimentation with different parameter settings.
+2. Measure optimality and run statistical tests in `scripts/analyze.py`.
+3. ...
