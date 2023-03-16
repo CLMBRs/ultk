@@ -11,7 +11,7 @@
         >>> # construct the meaning space for numerals
         >>> numerals_universe = NumeralUniverse(referents=[NumeralReferent(str(i)) for i in range(1, 100)])
         >>> # construct a list of referents for the expression 'a few'
-        >>> a_few_refs = [NumeralRefernt(name=str(i)) for i in range(2, 6)]
+        >>> a_few_refs = [NumeralReferent(name=str(i)) for i in range(2, 6)]
         >>> a_few_meaning = NumeralMeaning(referents=a_few_refs, universe=numerals_universe)
         >>> # define the expression
         >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
