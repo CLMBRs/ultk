@@ -151,6 +151,16 @@ def aggregate_expression_complexity(
     expression_complexity_func: Callable[[Expression], float],
     aggregator: Callable[[Iterable[float]], float] = sum,
 ) -> float:
+    """Aggregate complexities for individual `Expression`s into a complexity for a `Language`.
+
+    Args:
+        language: the Language to measure
+        expression_complexity_func: the function that returns the complexity of an individual expression
+        aggregator: (optional, default = sum) the function that aggregates individual complexities
+
+    Returns:
+        a float, the complexity of a language
+    """
     return aggregator(
         expression_complexity_func(expression) for expression in language.expressions
     )
