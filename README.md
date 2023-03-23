@@ -4,9 +4,7 @@
 
 ## Introduction
 
-ALTK is a software library that aims to support research in [Unnatural Language Semantics](https://gu-clasp.github.io/static/951dfcd6d280ce7416e79e206c291358/clasp.pdf) -- a program in linguistics and cognitive science that tries to describe and explain the properties of natural languages by comparing them to the much larger set of mathematically possible languages.
-
-A current focus is on *efficient communication*: determining whether linguistic meanings are optimized for a trade-off between cognitive complexity and communicative precision.
+ALTK is a software library that aims to support [efficient communication analyses](images/mit-altk.pdf) of natural language. This is a line of research that aims to explain why natural languages have the structure that they do in terms competing pressures to minimize cognitive complexity and maximize communicative accuracy.
 
 Key features:
 
