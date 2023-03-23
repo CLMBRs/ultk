@@ -16,10 +16,15 @@ from altk.effcomm.agent import (
 from altk.effcomm.util import build_utility_matrix
 
 
+def indicator_utility(ref1: Referent, ref2: Referent) -> float:
+    """Indicator utility function, i.e. delta.  Returns 1.0 iff ref1 equals ref2."""
+    return float(ref1 == ref2)
+
+
 def informativity(
     language: Language,
     prior: np.ndarray,
-    utility: Callable[[Referent, Referent], float],
+    utility: Callable[[Referent, Referent], float] = indicator_utility,
     agent_type: str = "literal",
 ) -> float:
     """The informativity of a language is identified with the successful communication between a speaker and a listener.
@@ -29,9 +34,9 @@ def informativity(
     Args:
         language: the language to compute informativity of.
 
-        prior: a probability distribution representing communicative need (frequency) for meanings.
+        prior: a probability distribution representing communicative need (frequency) for Referents.
 
-        utility: a function representing the usefulness of listener guesses about speaker meanings, e.g. meaning similarity. To reward only exact recovery of meanings, pass the an indicator function.
+        utility: a function representing the usefulness of listener guesses about speaker Referents, e.g. Referent similarity. To reward only exact recovery of meanings, use the indicator function (default).
 
         kind: {"literal, pragmatic"} Whether to measure informativity using literal or pragmatic agents, as canonically described in the Rational Speech Act framework. The default is "literal".
 
