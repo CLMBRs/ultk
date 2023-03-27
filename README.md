@@ -4,7 +4,7 @@
 
 ## Introduction
 
-ALTK is a software library that aims to support [efficient communication analyses](images/mit-altk.pdf) of natural language. This is a line of research that aims to explain why natural languages have the structure that they do in terms competing pressures to minimize cognitive complexity and maximize communicative accuracy.
+ALTK is a software library that aims to support [efficient communication analyses](https://github.com/CLMBRs/altk/blob/main/images/mit-altk.pdf) of natural language. This is a line of research that aims to explain why natural languages have the structure that they do in terms competing pressures to minimize cognitive complexity and maximize communicative accuracy.
 
 Key features:
 
