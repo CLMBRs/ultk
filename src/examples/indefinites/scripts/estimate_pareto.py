@@ -7,7 +7,6 @@ from ..measures import comm_cost, complexity
 from ..util import read_expressions, write_languages
 
 if __name__ == "__main__":
-
     expressions, expressions_by_meaning = read_expressions(
         "indefinites/outputs/generated_expressions.yml",
         universe=indefinites_universe,

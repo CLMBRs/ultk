@@ -133,7 +133,6 @@ class EvolutionaryOptimizer:
         explored_languages = []
 
         for _ in tqdm(range(self.generations)):
-
             # Keep track of visited
             explored_languages.extend(copy.copy(languages))
 

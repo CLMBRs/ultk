@@ -23,7 +23,7 @@ def information_rate(source: np.ndarray, encoder: np.ndarray) -> float:
 def get_rd_curve(
     prior: np.ndarray,
     dist_mat: np.ndarray,
-    betas: np.ndarray = np.linspace(start=0, stop=2 ** 7, num=1500),
+    betas: np.ndarray = np.linspace(start=0, stop=2**7, num=1500),
 ) -> list[tuple[float]]:
     """Use the Blahut Arimoto algorithm to obtain a list of (rate, distortion) points."""
     rd = lambda beta: blahut_arimoto(dist_mat, p_x=prior, beta=beta)["final"]
