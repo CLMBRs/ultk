@@ -9,9 +9,9 @@ from tqdm import tqdm
 
 
 def powerset(iterable: Iterable, max_size: int = None) -> Iterable:
-    """Enumerate all _non-empty_ subsets of an iterable up to a given maximum size, e.g.: 
+    """Enumerate all _non-empty_ subsets of an iterable up to a given maximum size, e.g.:
     powerset([1,2,3]) --> (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)
-    
+
     lightly adapted from itertools Recipes at
     https://docs.python.org/3/library/itertools.html#itertools-recipes
 
@@ -53,7 +53,7 @@ def all_languages(
         expressions: iterable of all possible expressions
         language_class: the type of language to generate
         max_size: largest size for a language; if None, all subsets of expressions will be used
-    
+
     Yields:
         Languages with subsets of Expressions from `expressions`
     """
@@ -62,7 +62,7 @@ def all_languages(
 
 
 def upto_comb(num: int, max_k: int) -> int:
-    """Return the number of ways of choosing _up to max_k_ items from 
+    """Return the number of ways of choosing _up to max_k_ items from
     n items without repetition.  Just an iterator of math.comb for n from
     1 to max_k."""
     return sum(comb(num, k) for k in range(1, max_k + 1))

@@ -57,7 +57,7 @@ def read_expressions(
 ) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
     """Read expressions from a YAML file.
     Assumes that the file is a list, and that each item in the list has a field
-    "grammatical_expression" with an expression that can be parsed by the 
+    "grammatical_expression" with an expression that can be parsed by the
     indefinites_grammar.
     """
     with open(filename, "r") as f:

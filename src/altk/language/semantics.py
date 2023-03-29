@@ -113,7 +113,7 @@ class Universe:
 class Meaning:
     """A meaning picks out a set of objects from the universe.
 
-    On one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe. 
+    On one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
     Sometimes these different referents are not equally likely,
     in which it can be helpful to define a meaning explicitly as a distribution over the universe.
     """

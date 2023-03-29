@@ -17,7 +17,6 @@ def yaml_to_dataframe(filename: str, keys: list[str]) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-
     keys = ["name", "comm_cost", "complexity", "type"]
     dominating_languages = yaml_to_dataframe(
         "indefinites/outputs/dominating_languages.yml", keys

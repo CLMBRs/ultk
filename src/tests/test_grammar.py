@@ -3,7 +3,6 @@ from altk.language.semantics import Meaning, Referent, Universe
 
 
 class TestGrammar:
-
     referents = [Referent(str(num), {"num": num}) for num in range(4)]
     universe = Universe(referents)
 
