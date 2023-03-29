@@ -53,7 +53,7 @@ def non_dominated_2d(points: list[tuple[float, float]]) -> list[int]:
     # NB: lexicographic, i.e. will sort on 2nd dim if tie on 1st dim, as desired
     # points.sort()
     indices = list(range(len(points)))
-    indices.sort(key = lambda x: points[x])
+    indices.sort(key=lambda x: points[x])
 
     front = []
     for idx in indices:
@@ -161,14 +161,7 @@ def interpolate_data(
 
     pareto_costs = list(set(np.linspace(min_cost, max_cost, num=num).tolist()))
     pareto_complexities = interpolated(pareto_costs)
-    interpolated_points = np.array(
-        list(
-            zip(
-                pareto_costs,
-                pareto_complexities,
-            )
-        )
-    )
+    interpolated_points = np.array(list(zip(pareto_costs, pareto_complexities)))
     return interpolated_points
 
 
@@ -224,7 +217,4 @@ def tradeoff(
     for i, lang in enumerate(tqdm(languages)):
         # warning: yaml that saves lang must use float, not numpy.float64 !
         lang.data["optimality"] = 1 - float(min_distances[i])
-    return {
-        "languages": languages,
-        "dominating_languages": dominating_languages,
-    }
+    return {"languages": languages, "dominating_languages": dominating_languages}

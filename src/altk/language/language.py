@@ -164,4 +164,3 @@ def aggregate_expression_complexity(
     return aggregator(
         expression_complexity_func(expression) for expression in language.expressions
     )
-

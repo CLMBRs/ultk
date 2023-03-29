@@ -80,10 +80,7 @@ class Signal(Expression):
 
     def yaml_rep(self):
         """Convert to a dictionary representation of the expression for compact saving to .yml files."""
-        return {
-            "form": self.form,
-            "meaning": self.meaning.yaml_rep(),
-        }
+        return {"form": self.form, "meaning": self.meaning.yaml_rep()}
 
     def __str__(self) -> str:
         return self.form
@@ -101,11 +98,7 @@ class SignalingLanguage(Language):
     def __init__(
         self,
         signals: list[Signal],
-        data: dict = {
-            "complexity": None,
-            "accuracy": None,
-            "name": None,
-        },
+        data: dict = {"complexity": None, "accuracy": None, "name": None},
     ):
         super().__init__(signals, data=data)
 
@@ -118,6 +111,6 @@ class SignalingLanguage(Language):
             self.data["name"]: {
                 "expressions": [e.yaml_rep() for e in self.expressions],
                 "data": self.data,  # e.g., complexity and informativity
-            },
+            }
         }
         return data
