@@ -36,6 +36,7 @@ class CommunicativeAgent:
         self.shape = None
         self.weights = None
 
+        # TODO: just self.__dict__.update(kwargs)?
         if "name" in kwargs:
             self.name = kwargs["name"]
 
@@ -260,6 +261,7 @@ class PragmaticSpeaker(Speaker):
         self,
         language: Language,
         listener: Listener,
+        temperature: float = 1.0,
         **kwargs,
     ):
         """Initialize the |M|-by-|E| matrix, S, corresponding to the pragmatic speaker's conditional probability distribution over expressions given meanings.
@@ -280,10 +282,6 @@ class PragmaticSpeaker(Speaker):
             temperature: a float \in [0,1], representing how `optimally rational' the pragmatic speaker is; 1.0 is chosen when no particular assumptions about rationality are made.
         """
         super().__init__(language, **kwargs)
-
-        temperature = 1.0
-        if "temperature" in kwargs:
-            temperature = kwargs["temperature"]
 
         # Row vector \propto column vector of literal R
         self.S = softmax(np.nan_to_num(np.log(listener.R.T)) * temperature, axis=1)
