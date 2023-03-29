@@ -94,8 +94,12 @@ def random_languages(
         max_size = num_expr
     num_subsets = upto_comb(num_expr, max_size)
     if num_subsets < sample_size:
-        print(f"{sample_size} languages requested, but there are only {num_subsets} posible languages.  Returning all languages.")
-        return list(all_languages(expressions, language_class=language_class, max_size=max_size))
+        print(
+            f"{sample_size} languages requested, but there are only {num_subsets} posible languages.  Returning all languages."
+        )
+        return list(
+            all_languages(expressions, language_class=language_class, max_size=max_size)
+        )
     languages = []
     subsets = set()
     while len(languages) < sample_size:
