@@ -4,6 +4,13 @@ from collections import defaultdict
 from itertools import product
 from typing import Any, Callable, Generator, Iterable
 
+from yaml import load, dump
+
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
+
 from altk.language.language import Expression
 from altk.language.semantics import Meaning, Referent, Universe
 
@@ -220,12 +227,13 @@ class Grammar:
         the_rule = random.choices(rules, weights=[rule.weight for rule in rules], k=1)[
             0
         ]
-        # if the rule is terminal, rhs will be empty, so no recursive calls to generate will be made in this comprehension
-        return GrammaticalExpression(
-            the_rule.name,
-            the_rule.func,
-            [self.generate(child_lhs) for child_lhs in the_rule.rhs],
+        children = (
+            None
+            if the_rule.rhs is None
+            else [self.generate(child_lhs) for child_lhs in the_rule.rhs]
         )
+        # if the rule is terminal, rhs will be empty, so no recursive calls to generate will be made in this comprehension
+        return GrammaticalExpression(the_rule.name, the_rule.func, children)
 
     def enumerate(
         self,
@@ -372,3 +380,21 @@ class Grammar:
 
     def __str__(self):
         return "Rules:\n" + "\n".join(f"\t{rule}" for rule in self.get_all_rules())
+
+    @classmethod
+    def from_yaml(cls, filename: str):
+        with open(filename, "r") as f:
+            grammar_dict = load(f, Loader=Loader)
+        grammar = cls(grammar_dict["start"])
+        for rule_dict in grammar_dict["rules"]:
+            grammar.add_rule(
+                Rule(
+                    rule_dict["name"],
+                    rule_dict["lhs"],
+                    rule_dict["rhs"],
+                    # TODO: look-up functions from a registry as well?
+                    eval(rule_dict["function"]),
+                )
+            )
+        return grammar
+
