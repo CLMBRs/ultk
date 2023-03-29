@@ -383,6 +383,25 @@ class Grammar:
 
     @classmethod
     def from_yaml(cls, filename: str):
+        """Read a grammar specified in a simple YAML format.
+
+        Expected format:
+
+        > start: bool
+        > rules:
+        > - lhs: bool 
+        > - rhs:
+            - bool
+            - bool
+        > - name: "and"
+        > - function: "lambda p1, p2 : p1 and p2"
+
+        Note that for each fule, the value for `function` will be passed to 
+        `eval`, so be careful!
+
+        Arguments:
+            filename: file containing a grammar in the above format
+        """
         with open(filename, "r") as f:
             grammar_dict = load(f, Loader=Loader)
         grammar = cls(grammar_dict["start"])
