@@ -101,6 +101,14 @@ class Universe:
         referents = tuple(Referent(record["name"], record) for record in records)
         return cls(referents, prior)
 
+    @classmethod
+    def from_csv(cls, filename: str):
+        """Build a Universe from a CSV file.  This is a small wrapper around
+        `Universe.from_dataframe`, so see that documentation for more information.
+        """
+        df = pd.read_csv(filename)
+        return cls.from_dataframe(df)
+
 
 class Meaning:
     """A meaning picks out a set of objects from the universe.
