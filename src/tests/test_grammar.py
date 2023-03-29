@@ -34,4 +34,3 @@ class TestGrammar:
     def test_length(self):
         parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
         assert len(parsed_expression) == 5
-

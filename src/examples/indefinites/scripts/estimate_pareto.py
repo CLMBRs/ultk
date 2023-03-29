@@ -31,7 +31,7 @@ if __name__ == "__main__":
             "name": lambda idx, _: f"dominating-{idx}",
             "type": lambda _1, _2: "dominant",
             "complexity": lambda _, lang: lang_complexity(lang),
-            "comm_cost": lambda _, lang: comm_cost(lang)
+            "comm_cost": lambda _, lang: comm_cost(lang),
         },
     )
     write_languages(
@@ -41,6 +41,6 @@ if __name__ == "__main__":
             "name": lambda idx, _: f"explored-{idx}",
             "type": lambda _1, _2: "explored",
             "complexity": lambda _, lang: lang_complexity(lang),
-            "comm_cost": lambda _, lang: comm_cost(lang)
+            "comm_cost": lambda _, lang: comm_cost(lang),
         },
     )

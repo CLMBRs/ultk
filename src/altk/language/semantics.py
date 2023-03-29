@@ -39,7 +39,7 @@ class Referent:
 
     def __str__(self) -> str:
         return str(self.__dict__)
-    
+
     def __lt__(self, other):
         return self.name < other.name
 

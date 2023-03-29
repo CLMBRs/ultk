@@ -424,4 +424,3 @@ class Grammar:
                 )
             )
         return grammar
-

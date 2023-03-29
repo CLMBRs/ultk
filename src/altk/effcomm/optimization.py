@@ -118,7 +118,8 @@ class EvolutionaryOptimizer:
         Args:
             seed_population: a list of languages representing the population at generation 0 of the algorithm.
 
-            explore: a float in [0,1] representing how much to optimize for fitness (optimality wrt pareto front of complexity and comm_cost), and how much to randomly explore.
+            explore: a float in [0,1] representing how much to optimize for fitness
+                (optimality wrt pareto front of complexity and comm_cost), and how much to randomly explore.
 
         Returns:
             a dict of the estimated optimization solutions, as well as points explored along the way; of the form
@@ -206,7 +207,8 @@ class EvolutionaryOptimizer:
         Args:
             language: the Language to mutate
 
-            expressions: the list of all possible expressions. Some mutations need access to this list, so it is part of the mutation api.
+            expressions: the list of all possible expressions.
+                Some mutations need access to this list, so it is part of the mutation api.
 
         Returns:
             the mutated Language
@@ -235,7 +237,8 @@ def sample_parents(
 
         explored_languages: a list of all languages encountered during the evolutionary algorithm.
 
-        explore: a float in `[0,1]` specifying how much to explore possibly suboptimal languages. If set to 0, `parent_languages` is just `dominating_languages`.
+        explore: a float in `[0,1]` specifying how much to explore possibly suboptimal languages.
+            If set to 0, `parent_languages` is just `dominating_languages`.
 
     Returns:
         the languages to serve as the next generation (after possible mutations)
@@ -248,4 +251,3 @@ def sample_parents(
     parent_languages.extend(random.sample(explored_languages, num_explore))
 
     return list(set(parent_languages))
-
