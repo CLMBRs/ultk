@@ -1,0 +1,49 @@
+start: bool
+rules:
+# boolean / propositional logic rules
+- lhs: bool
+  rhs:
+    - bool
+    - bool
+  name: "and"
+  function: |
+    lambda p1 , p2 : p1 and p2
+- lhs: bool
+  rhs:
+    - bool
+    - bool
+  name: "or"
+  function: |
+    lambda p1 , p2 : p1 or p2
+- lhs: bool
+  rhs:
+    - bool
+  name: "not"
+  function: |
+    lambda p : not p
+# primitive / feature rules
+# We include "positive" and "negative" features as primitives (instead of definining the latter via negation) for two reasons.
+# (1) Conceptually, it's not clear that the positive ones are any more basic than the negative ones.  But defining them in
+# terms of negation would make them more complex according to our measure.
+# (2) Computationally, this greatly shrinks the space of grammatical expressions that need to be explored before finding one
+# that expresses each meaning.  Better search and/or minimization algorithms would help here.
+- lhs: bool
+  rhs: 
+  name: "K+"
+  function: |
+    lambda point: point.name == "specific-known"
+- lhs: bool
+  rhs: 
+  name: "K-"
+  function: |
+    lambda point: point.name != "specific-known"
+- lhs: bool
+  rhs:
+  name: "S+"
+  function: |
+    lambda point: point.name in ("specific-known", "specific-unknown")
+- lhs: bool
+  rhs:
+  name: "S-"
+  function: |
+    lambda point: point.name not in ("specific-known", "specific-unknown")
