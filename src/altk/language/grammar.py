@@ -387,14 +387,22 @@ class Grammar:
 
         Expected format:
 
-        > start: bool
-        > rules:
-        > - lhs: bool 
-        >   rhs:
-        >   - bool
-        >   - bool
-        >   name: "and"
-        >   function: "lambda p1, p2 : p1 and p2"
+        ```
+        start: bool
+        rules:
+        - lhs: bool 
+          rhs:
+          - bool
+          - bool
+          name: "and"
+          function: "lambda p1, p2 : p1 and p2"
+        - lhs: bool 
+          rhs:
+          - bool
+          - bool
+          name: "or"
+          function: "lambda p1, p2 : p1 or p2"
+        ```
 
         Note that for each fule, the value for `function` will be passed to 
         `eval`, so be careful!
