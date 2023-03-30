@@ -1,7 +1,7 @@
 """Various helper functions for computing complexity and informativity."""
 import numpy as np
 from scipy.special import logsumexp
-from altk.language.semantics import Universe, Meaning
+from altk.language.semantics import Universe, Referent
 from typing import Callable
 
 ##############################################################################
@@ -36,13 +36,13 @@ def rows_zero_to_uniform(mat: np.ndarray) -> np.ndarray:
 
 
 def build_utility_matrix(
-    universe: Universe, utility: Callable[[Meaning, Meaning], float]
+    universe: Universe, utility: Callable[[Referent, Referent], float]
 ) -> np.ndarray:
     """Construct the square matrix specifying the utility function defined for pairs of meanings, used for computing communicative success."""
     return np.array(
         [
-            [utility(meaning, meaning_) for meaning_ in universe.referents]
-            for meaning in universe.referents
+            [utility(ref, ref_) for ref_ in universe.referents]
+            for ref in universe.referents
         ]
     )
 
