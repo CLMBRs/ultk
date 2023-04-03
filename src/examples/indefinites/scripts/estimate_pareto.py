@@ -13,13 +13,19 @@ if __name__ == "__main__":
         return_by_meaning=True,
     )
 
-    seed_languages = random_languages(expressions, sampling_strategy="stratified", sample_size=1000, max_size=10)
+    seed_languages = random_languages(
+        expressions, sampling_strategy="stratified", sample_size=1000, max_size=10
+    )
 
     def lang_complexity(language):
         return complexity(language, expressions_by_meaning)
 
     optimizer = EvolutionaryOptimizer(
-        [lang_complexity, comm_cost], expressions, 1000, 3, 50, 10
+        [lang_complexity, comm_cost],
+        expressions,
+        1000,
+        3,
+        50,
     )
     result = optimizer.fit(seed_languages)
 
