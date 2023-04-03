@@ -115,9 +115,7 @@ def random_languages(
         max_size = num_expr
     num_subsets = upto_comb(num_expr, max_size)
     if sample_size is None or num_subsets < sample_size:
-        print(
-            f"Due to argument combination, returning all languages."
-        )
+        print(f"Due to argument combination, returning all languages.")
         return list(
             all_languages(expressions, language_class=language_class, max_size=max_size)
         )
@@ -128,7 +126,9 @@ def random_languages(
             lang_size = random.randint(1, max_size)
             expr_indices = tuple(sorted(random.sample(range(num_expr), lang_size)))
         elif sampling_strategy == "uniform":
-            expr_indices = tuple([idx for idx in range(num_expr) if random.choice((True, False))])
+            expr_indices = tuple(
+                [idx for idx in range(num_expr) if random.choice((True, False))]
+            )
         if expr_indices not in subsets:
             subsets.add(expr_indices)
             languages.append(language_class([expressions[idx] for idx in expr_indices]))
