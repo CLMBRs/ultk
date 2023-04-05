@@ -81,13 +81,16 @@ def random_languages(
     be smaller than `sample_size`).
 
     Some use cases:
-        - With `sample_size=None`, get all languages.
-            >>> random_languages(expressions)
-        - With `sample_size` and uniform sampling, get random languages:
-            >>> random_languages(expressions, sample_size=1000)
-        - Stratified sampling, with and without a `max_size`:
-            >>> random_languages(expressions, sample_size=1000, sampling_strategy="stratified")
-            >>> random_languages(expressions, sample_size=1000, sampling_strategy="stratified", max_size=10)
+
+    With `sample_size=None`, get all languages.
+    >>> random_languages(expressions)
+
+    With `sample_size` and uniform sampling, get random languages:
+    >>> random_languages(expressions, sample_size=1000)
+
+    Stratified sampling, with and without a `max_size`:
+    >>> random_languages(expressions, sample_size=1000, sampling_strategy="stratified")
+    >>> random_languages(expressions, sample_size=1000, sampling_strategy="stratified", max_size=10)
 
     Args:
         expressions: all possible expressions
