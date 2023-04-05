@@ -69,7 +69,7 @@ class EvolutionaryOptimizer:
         sample_size: int,
         max_mutations: int,
         generations: int,
-        lang_size: int,
+        lang_size: int = None,
         mutations: list[Mutation] = [AddExpression, RemoveExpression],
     ):
         """Initialize the evolutionary algorithm configurations.
@@ -103,7 +103,8 @@ class EvolutionaryOptimizer:
         self.sample_size = sample_size
         self.max_mutations = max_mutations
         self.generations = generations
-        self.lang_size = lang_size
+        # set max lang size to # expressions if none provided
+        self.lang_size = lang_size or len(expressions)
 
         self.dominating_languages = None
         self.explored_languages = None
