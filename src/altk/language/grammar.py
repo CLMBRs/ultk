@@ -4,15 +4,15 @@ from collections import defaultdict
 from itertools import product
 from typing import Any, Callable, Generator, Iterable
 
-from yaml import load, dump
+from yaml import load
 
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
+    from yaml import CLoader as Loader
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import Loader
 
 from altk.language.language import Expression
-from altk.language.semantics import Meaning, Referent, Universe
+from altk.language.semantics import Meaning, Universe
 
 
 class Rule:
