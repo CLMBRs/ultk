@@ -10,9 +10,8 @@ if __name__ == "__main__":
             combined_data[combined_data["type"] == "natural"],
             pn.aes(label="name"),
             ha="left",
-            size=6, 
+            size=6,
             nudge_x=0.5,
         )
     )
     plot.save("indefinites/outputs/plot.png", width=8, height=6, dpi=300)
-

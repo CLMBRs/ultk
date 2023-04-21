@@ -42,10 +42,7 @@ def simulate_learning(g: SignalingGame, num_rounds: int, learning_rate=1.0) -> N
         # track accuracy and complexity
         g.data["accuracy"].append(
             communicative_success(
-                speaker=g.sender,
-                listener=g.receiver,
-                utility=g.utility,
-                prior=g.prior,
+                speaker=g.sender, listener=g.receiver, utility=g.utility, prior=g.prior
             )
         )
         g.data["complexity"].append(

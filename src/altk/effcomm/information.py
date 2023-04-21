@@ -38,11 +38,7 @@ def expected_distortion(
     return np.sum(p_x @ (p_xhat_x * dist_mat))
 
 
-def compute_rate_distortion(
-    p_x,
-    p_xhat_x,
-    dist_mat,
-) -> tuple[np.ndarray]:
+def compute_rate_distortion(p_x, p_xhat_x, dist_mat) -> tuple[np.ndarray]:
     """Compute the information rate $I(X;\hat{X})$ and total distortion $D[X, \hat{X}]$ of a joint distribution defind by $P(X)$ and $P(\hat{X}|X)$.
 
     Args:
@@ -127,10 +123,7 @@ def blahut_arimoto(
         else:
             converged = it == max_it or np.abs(distortion - distortion_prev) < eps
 
-    return {
-        "final": (rate, distortion),
-        "trajectory": traj,
-    }
+    return {"final": (rate, distortion), "trajectory": traj}
 
 
 ##############################################################################
@@ -179,18 +172,12 @@ def get_ib_curve(
     return points
 
 
-def ib_complexity(
-    language: Language,
-    prior: np.ndarray,
-) -> float:
+def ib_complexity(language: Language, prior: np.ndarray) -> float:
     """Compute the IB encoder complexity of a language $I[M:W]$."""
     return float(
         information_rate(
             source=prior,
-            encoder=language_to_ib_encoder_decoder(
-                language,
-                prior,
-            )["encoder"],
+            encoder=language_to_ib_encoder_decoder(language, prior)["encoder"],
         )
     )
 
@@ -283,18 +270,14 @@ def language_to_joint_distributions(
     p_w = util.marginalize(encoder, prior)
     joint_pwu = util.joint(conditional_puw, p_w)
 
-    return {
-        "joint_pmu": joint_pmu,
-        "joint_pwu": joint_pwu,
-    }
+    return {"joint_pmu": joint_pmu, "joint_pwu": joint_pwu}
 
 
 # === IB Helpers ===
 
 
 def language_to_ib_encoder_decoder(
-    language: Language,
-    prior: np.ndarray,
+    language: Language, prior: np.ndarray
 ) -> dict[str, np.ndarray]:
     """Convert a Language, a mapping of words to meanings, to IB encoder, q(w|m) and IB decoder q(m|w).
 
@@ -337,9 +320,7 @@ def deterministic_decoder(
 
 
 def generate_meaning_distributions(
-    space: Universe,
-    decay: float,
-    cost: Callable[[Referent, Referent], float],
+    space: Universe, decay: float, cost: Callable[[Referent, Referent], float]
 ) -> np.ndarray:
     """Generate a conditional distribution over world states given meanings, $p(u|m)$, for each meaning.
 

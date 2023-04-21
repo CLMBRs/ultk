@@ -39,7 +39,7 @@ class Referent:
 
     def __str__(self) -> str:
         return str(self.__dict__)
-    
+
     def __lt__(self, other):
         return self.name < other.name
 
@@ -101,11 +101,19 @@ class Universe:
         referents = tuple(Referent(record["name"], record) for record in records)
         return cls(referents, prior)
 
+    @classmethod
+    def from_csv(cls, filename: str):
+        """Build a Universe from a CSV file.  This is a small wrapper around
+        `Universe.from_dataframe`, so see that documentation for more information.
+        """
+        df = pd.read_csv(filename)
+        return cls.from_dataframe(df)
+
 
 class Meaning:
     """A meaning picks out a set of objects from the universe.
 
-    On one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe. 
+    On one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
     Sometimes these different referents are not equally likely,
     in which it can be helpful to define a meaning explicitly as a distribution over the universe.
     """

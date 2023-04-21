@@ -7,12 +7,7 @@ from typing import Any
 class Sender(Speaker):
     """A Sender agent in a signaling game chooses a signal given an observed state of nature, according to P(signal | state)."""
 
-    def __init__(
-        self,
-        language: SignalingLanguage,
-        weights=None,
-        name: str = None,
-    ):
+    def __init__(self, language: SignalingLanguage, weights=None, name: str = None):
         super().__init__(language, name=name)
         self.shape = (len(self.language.universe), len(self.language))
         self.initialize_weights(weights)

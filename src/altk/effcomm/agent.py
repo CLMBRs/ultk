@@ -36,6 +36,7 @@ class CommunicativeAgent:
         self.shape = None
         self.weights = None
 
+        # TODO: just self.__dict__.update(kwargs)?
         if "name" in kwargs:
             self.name = kwargs["name"]
 
@@ -74,11 +75,7 @@ class CommunicativeAgent:
                 self.weights = np.ones(self.shape)
             # initialize from uniform distribution
             elif initial == "random":
-                self.weights = np.random.uniform(
-                    low=0.0,
-                    high=1.0,
-                    size=self.shape,
-                )
+                self.weights = np.random.uniform(low=0.0, high=1.0, size=self.shape)
             else:
                 raise ValueError(
                     f"Inappropriate value received for argument `initial`. Possible values are {'ones', 'random'}, but received: {initial}. "
@@ -117,17 +114,11 @@ class CommunicativeAgent:
         """
         choices = self.weights[index]
         choices_normalized = choices / choices.sum()
-        return np.random.choice(
-            a=range(len(choices)),
-            p=choices_normalized,
-        )
+        return np.random.choice(a=range(len(choices)), p=choices_normalized)
 
     def to_language(
         self,
-        data: dict = {
-            "complexity": None,
-            "accuracy": None,
-        },
+        data: dict = {"complexity": None, "accuracy": None},
         threshold: float = 0.1,
     ) -> Language:
         """Get a language from the agent, representing its current (possibly learned) communicative behavior.
@@ -170,10 +161,7 @@ class CommunicativeAgent:
 
             meaning = meaning_type(referents, self.language.universe)
             # construct the updated expression as a new form-meaning mapping
-            expression = expression_type(
-                form=old_expression.form,
-                meaning=meaning,
-            )
+            expression = expression_type(form=old_expression.form, meaning=meaning)
             expressions.append(expression)
 
         if "name" not in data:
@@ -257,10 +245,7 @@ class PragmaticSpeaker(Speaker):
     """A pragmatic speaker chooses utterances based on how a listener would interpret them. A pragmatic speaker may be initialized with any kind of listener, e.g. literal or pragmatic -- meaning the recursive reasoning can be modeled up to arbitrary depth."""
 
     def __init__(
-        self,
-        language: Language,
-        listener: Listener,
-        **kwargs,
+        self, language: Language, listener: Listener, temperature: float = 1.0, **kwargs
     ):
         """Initialize the |M|-by-|E| matrix, S, corresponding to the pragmatic speaker's conditional probability distribution over expressions given meanings.
 
@@ -281,10 +266,6 @@ class PragmaticSpeaker(Speaker):
         """
         super().__init__(language, **kwargs)
 
-        temperature = 1.0
-        if "temperature" in kwargs:
-            temperature = kwargs["temperature"]
-
         # Row vector \propto column vector of literal R
         self.S = softmax(np.nan_to_num(np.log(listener.R.T)) * temperature, axis=1)
 
@@ -293,11 +274,7 @@ class PragmaticListener(Listener):
     """A pragmatic listener interprets utterances based on their expectations about a pragmatic speaker's decisions. A pragmatic listener may be initialized with any kind of speaker, e.g. literal or pragmatic -- meaning the recursive reasoning can be modeled up to arbitrary depth."""
 
     def __init__(
-        self,
-        language: Language,
-        speaker: Speaker,
-        prior: np.ndarray,
-        **kwargs,
+        self, language: Language, speaker: Speaker, prior: np.ndarray, **kwargs
     ):
         """Initialize the |E|-by-|M| matrix, R, corresponding to the pragmatic listener's conditional probability distribution over meanings given expressions.
 

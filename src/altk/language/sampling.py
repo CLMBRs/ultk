@@ -9,9 +9,9 @@ from tqdm import tqdm
 
 
 def powerset(iterable: Iterable, max_size: int = None) -> Iterable:
-    """Enumerate all _non-empty_ subsets of an iterable up to a given maximum size, e.g.: 
+    """Enumerate all _non-empty_ subsets of an iterable up to a given maximum size, e.g.:
     powerset([1,2,3]) --> (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)
-    
+
     lightly adapted from itertools Recipes at
     https://docs.python.org/3/library/itertools.html#itertools-recipes
 
@@ -53,7 +53,7 @@ def all_languages(
         expressions: iterable of all possible expressions
         language_class: the type of language to generate
         max_size: largest size for a language; if None, all subsets of expressions will be used
-    
+
     Yields:
         Languages with subsets of Expressions from `expressions`
     """
@@ -62,7 +62,7 @@ def all_languages(
 
 
 def upto_comb(num: int, max_k: int) -> int:
-    """Return the number of ways of choosing _up to max_k_ items from 
+    """Return the number of ways of choosing _up to max_k_ items from
     n items without repetition.  Just an iterator of math.comb for n from
     1 to max_k."""
     return sum(comb(num, k) for k in range(1, max_k + 1))
@@ -70,37 +70,68 @@ def upto_comb(num: int, max_k: int) -> int:
 
 def random_languages(
     expressions: Iterable[Expression],
-    sample_size: int,
+    sampling_strategy: str = "uniform",
+    sample_size: int = None,
     language_class: Type[Language] = Language,
     max_size: int = None,
 ) -> list[Language]:
-    """Generate Languages by randomly sampling subsets of Expressions.
+    """Generate unique Languages by randomly sampling subsets of Expressions, either in a uniform or stratified way.
     If there are fewer than `sample_size` possible Languages up to size `max_size`,
     this method will just return all languages up to that size (and so the sample may
     be smaller than `sample_size`).
 
+    Some use cases:
+
+    With `sample_size=None`, get all languages.
+    >>> random_languages(expressions)
+
+    With `sample_size` and uniform sampling, get random languages:
+    >>> random_languages(expressions, sample_size=1000)
+
+    Stratified sampling, with and without a `max_size`:
+    >>> random_languages(expressions, sample_size=1000, sampling_strategy="stratified")
+    >>> random_languages(expressions, sample_size=1000, sampling_strategy="stratified", max_size=10)
+
     Args:
         expressions: all possible expressions
+        sampling_strategy: how to sample subsets of expressions
+            uniform: for every expression, choose whether or not to include it in a given language
+            stratified: first sample a size for a Language, then choose that many random Expressions
+                (i) this has the effect of "upsampling" from smaller Language sizes
+                (ii) this can be used with `max_size` to only generate Languages up to a given number of expressions
         sample_size: how many languages to return
+            if None, will return all languages up to `max_size`
         language_class: type of Language
         max_size: largest possible Language to generate
+            if None, will be the length of `expressions`
+            NB: this argument has no effect when `sampling_strategy` is "uniform"
 
     Returns:
         a list of randomly sampled Languages
     """
+    # TODO: update docstring
+    if sampling_strategy not in ("uniform", "stratified"):
+        raise ValueError("Only 'uniform' and 'stratified' sampling are supported.")
     expressions = list(expressions)
     num_expr = len(expressions)
     if max_size is None:
         max_size = num_expr
     num_subsets = upto_comb(num_expr, max_size)
-    if num_subsets < sample_size:
-        print(f"{sample_size} languages requested, but there are only {num_subsets} posible languages.  Returning all languages.")
-        return list(all_languages(expressions, language_class=language_class, max_size=max_size))
+    if sample_size is None or num_subsets < sample_size:
+        print(f"Due to argument combination, returning all languages.")
+        return list(
+            all_languages(expressions, language_class=language_class, max_size=max_size)
+        )
     languages = []
     subsets = set()
     while len(languages) < sample_size:
-        lang_size = random.randint(1, max_size)
-        expr_indices = tuple(sorted(random.sample(range(num_expr), lang_size)))
+        if sampling_strategy == "stratified":
+            lang_size = random.randint(1, max_size)
+            expr_indices = tuple(sorted(random.sample(range(num_expr), lang_size)))
+        elif sampling_strategy == "uniform":
+            expr_indices = tuple(
+                [idx for idx in range(num_expr) if random.choice((True, False))]
+            )
         if expr_indices not in subsets:
             subsets.add(expr_indices)
             languages.append(language_class([expressions[idx] for idx in expr_indices]))
