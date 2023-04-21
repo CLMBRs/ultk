@@ -38,7 +38,11 @@ def expected_distortion(
     return np.sum(p_x @ (p_xhat_x * dist_mat))
 
 
-def compute_rate_distortion(p_x, p_xhat_x, dist_mat) -> tuple[np.ndarray]:
+def compute_rate_distortion(
+    p_x,
+    p_xhat_x,
+    dist_mat,
+) -> tuple[np.ndarray]:
     """Compute the information rate $I(X;\hat{X})$ and total distortion $D[X, \hat{X}]$ of a joint distribution defind by $P(X)$ and $P(\hat{X}|X)$.
 
     Args:
@@ -123,7 +127,10 @@ def blahut_arimoto(
         else:
             converged = it == max_it or np.abs(distortion - distortion_prev) < eps
 
-    return {"final": (rate, distortion), "trajectory": traj}
+    return {
+        "final": (rate, distortion),
+        "trajectory": traj,
+    }
 
 
 ##############################################################################
@@ -135,9 +142,7 @@ def blahut_arimoto(
 
 def get_ib_curve(
     prior: np.ndarray,
-    space: Universe,
-    decay: float,
-    cost: Callable[[Referent, Referent], float],
+    meaning_dists: np.ndarray,
     curve_type: str = "informativity",
 ) -> np.ndarray:
     """Compute the IB curve bound (I[M:W] vs. I[W:U]) for a given semantic space. We use the embo package, which does not allow one to specify the number of betas, which means some interpolation might be necessary later.
@@ -145,19 +150,14 @@ def get_ib_curve(
     Args:
         prior: array of shape `|meanings|`
 
-        space: the ModalMeaningSpace on which meanings are defined
-
-        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
-
-        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
+        meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
 
         curve_type: {'informativity', 'comm_cost'} specifies whether to return the (classic) IB axes of informativity vs. complexity, or the more Rate-Distortion Theory aligned axes of comm_cost vs. complexity. The latter can be obtained easily from the former by subtracting each informativity value from I[M:U], which is a constant for all languages in the same domain.
 
     Returns:
         an array of shape `(num_points, 2)` representing the list of (accuracy/comm_cost, complexity) points on the information plane.
     """
-    conditional_pum = generate_meaning_distributions(space, decay, cost)
-    joint_pmu = util.joint(conditional_pum, prior)  # P(u) = P(m)
+    joint_pmu = util.joint(meaning_dists, prior)  # P(u) = P(m)
     I_mu = util.MI(joint_pmu)
 
     # I[M:W], I[W:U], H[W], beta
@@ -172,12 +172,18 @@ def get_ib_curve(
     return points
 
 
-def ib_complexity(language: Language, prior: np.ndarray) -> float:
+def ib_complexity(
+    language: Language,
+    prior: np.ndarray,
+) -> float:
     """Compute the IB encoder complexity of a language $I[M:W]$."""
     return float(
         information_rate(
             source=prior,
-            encoder=language_to_ib_encoder_decoder(language, prior)["encoder"],
+            encoder=language_to_ib_encoder_decoder(
+                language,
+                prior,
+            )["encoder"],
         )
     )
 
@@ -185,8 +191,7 @@ def ib_complexity(language: Language, prior: np.ndarray) -> float:
 def ib_informativity(
     language: Language,
     prior: np.ndarray,
-    decay: float,
-    cost: Callable[[Referent, Referent], float],
+    meaning_dists: np.ndarray,
 ) -> float:
     """Compute the expected informativity (accuracy) $I[W:U]$ of a lexicon.
 
@@ -195,16 +200,14 @@ def ib_informativity(
 
         prior: communicative need distribution
 
-        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
-
-        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
+        meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
 
     Returns:
         the informativity of the language I[W:U] in bits.
     """
     return float(
         util.MI(
-            language_to_joint_distributions(language, prior, decay, cost)["joint_pwu"]
+            language_to_joint_distributions(language, prior, meaning_dists)["joint_pwu"]
         )
     )
 
@@ -212,8 +215,7 @@ def ib_informativity(
 def ib_comm_cost(
     language: Language,
     prior: np.ndarray,
-    decay: float,
-    cost: Callable[[Referent, Referent], float],
+    meaning_dists: np.ndarray,
 ) -> float:
     """Compute the IB communicative cost, i.e. expected KL-divergence betweeen speaker and listener meanings, for a language.
 
@@ -222,22 +224,19 @@ def ib_comm_cost(
 
         prior: communicative need distribution
 
-        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
-
-        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
+        meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
 
     Returns:
         the communicative cost, $\mathbb{E}[D_{KL}[M || \hat{M}]] = I[M:U] - I[W:U]$ in bits.
     """
-    dists = language_to_joint_distributions(language, prior, decay, cost)
+    dists = language_to_joint_distributions(language, prior, meaning_dists)
     return float(util.MI(dists["joint_pmu"]) - util.MI(dists["joint_pwu"]))
 
 
 def language_to_joint_distributions(
     language: Language,
     prior: np.ndarray,
-    decay: float,
-    cost: Callable[[Referent, Referent], float],
+    meaning_dists: np.ndarray,
 ) -> float:
     """Given a Language, get P(M,U) the joint distribution over meanings and referents, and P(W,U) the joint distribution over words and referents.
 
@@ -246,10 +245,8 @@ def language_to_joint_distributions(
 
         prior: communicative need distribution
 
-        decay: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
-
-        cost: parameter for meaning distribution p(u|m) generation. See `generate_meaning_distributions`.
-
+        meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
+        
     Returns:
         a dict of the form
 
@@ -262,22 +259,25 @@ def language_to_joint_distributions(
     system = language_to_ib_encoder_decoder(language, prior)
     encoder = system["encoder"]
     decoder = system["decoder"]
-    space = language.universe
 
-    conditional_pum = generate_meaning_distributions(space, decay, cost)
+    conditional_pum = meaning_dists
     conditional_puw = deterministic_decoder(decoder, conditional_pum)
     joint_pmu = util.joint(conditional_pum, prior)
     p_w = util.marginalize(encoder, prior)
     joint_pwu = util.joint(conditional_puw, p_w)
 
-    return {"joint_pmu": joint_pmu, "joint_pwu": joint_pwu}
+    return {
+        "joint_pmu": joint_pmu,
+        "joint_pwu": joint_pwu,
+    }
 
 
 # === IB Helpers ===
 
 
 def language_to_ib_encoder_decoder(
-    language: Language, prior: np.ndarray
+    language: Language,
+    prior: np.ndarray,
 ) -> dict[str, np.ndarray]:
     """Convert a Language, a mapping of words to meanings, to IB encoder, q(w|m) and IB decoder q(m|w).
 
@@ -317,32 +317,3 @@ def deterministic_decoder(
         array of shape `(|words|, |meanings|)` representing the 'optimal' deterministic decoder
     """
     return decoder @ meaning_distributions
-
-
-def generate_meaning_distributions(
-    space: Universe, decay: float, cost: Callable[[Referent, Referent], float]
-) -> np.ndarray:
-    """Generate a conditional distribution over world states given meanings, $p(u|m)$, for each meaning.
-
-    Args:
-        space: the ModalMeaningSpace on which meanings are defined
-
-        decay: a float in [0,1]. controls informativity, by decaying how much probability mass is assigned to perfect recoveries. As decay approaches 0, only perfect recovery is rewarded (which overrides any partial credit structure built into the utility/cost function). As decay approaches 1, the worst guesses become most likely.
-
-        cost: a cost function defining the pairwise communicative cost for confusing one Referent in the Universe with another. If you have a (scaled) communicative utility matrix, a natural choice for cost might be `lambda x, y: 1 - utility(x, y)`.
-
-    Returns:
-        p_u_m: an array of shape `(|space.referents|, |space.referents|)`
-    """
-
-    # construct p(u|m) for each meaning
-    meaning_distributions = np.array(
-        [[decay ** cost(m, u) for u in space.referents] for m in space.referents]
-    )
-    # each row sums to 1.0
-    np.seterr(divide="ignore", invalid="ignore")
-    meaning_distributions = np.nan_to_num(
-        meaning_distributions / meaning_distributions.sum(axis=1, keepdims=True)
-    )
-
-    return meaning_distributions
