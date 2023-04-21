@@ -1,9 +1,10 @@
-from . import util
-from . import vis
-from .agents import Receiver, Sender
-from .game import distribution_over_states, SignalingGame, indicator
-from .languages import State, StateSpace, Signal, SignalMeaning, SignalingLanguage
-from .learning import simulate_learning
+# from . import util
+import util
+import vis
+from agents import Receiver, Sender
+from game import distribution_over_states, SignalingGame, indicator
+from languages import State, StateSpace, Signal, SignalMeaning, SignalingLanguage
+from learning import simulate_learning
 
 
 def main(args):
@@ -29,7 +30,7 @@ def main(args):
     universe = StateSpace([State(name=name) for name in state_names])
 
     # All meanings are dummy placeholders at this stage, but they can be substantive once agents are given a weight matrix.
-    dummy_meaning = SignalMeaning(states=[], universe=universe)
+    dummy_meaning = SignalMeaning(states=universe.referents, universe=universe)
     signals = [Signal(form=name, meaning=dummy_meaning) for name in signal_names]
 
     # Create a seed language to initialize agents.
