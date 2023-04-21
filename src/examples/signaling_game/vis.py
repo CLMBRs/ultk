@@ -1,7 +1,7 @@
 import plotnine as pn
 import pandas as pd
 import numpy as np
-from .util import save_plot
+from util import save_plot
 
 
 def plot_accuracy(fn: str, accuracies: list[float]) -> None:

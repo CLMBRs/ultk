@@ -1,35 +1,37 @@
 languages:
 - sender:
     data:
-      accuracy: 0.7425310919850912
+      accuracy: 0.8806295779018745
       name: sender
     expressions:
     - form: signal_1
       meaning:
       - state_2
+      - state_4
     - form: signal_2
       meaning:
+      - state_2
       - state_3
     - form: signal_3
-      meaning: []
-    - form: signal_4
       meaning:
       - state_1
+    - form: signal_4
+      meaning:
       - state_4
 - receiver:
     data:
-      accuracy: 0.7425310919850912
+      accuracy: 0.8806295779018745
       name: receiver
     expressions:
     - form: signal_1
       meaning:
-      - state_2
+      - state_4
     - form: signal_2
       meaning:
       - state_3
     - form: signal_3
       meaning:
-      - state_2
+      - state_1
     - form: signal_4
       meaning:
-      - state_1
+      - state_4

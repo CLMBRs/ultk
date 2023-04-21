@@ -1,6 +1,6 @@
 from altk.effcomm.agent import CommunicativeAgent, Speaker, Listener
 from altk.language.semantics import Meaning
-from .languages import Signal, SignalMeaning, SignalingLanguage
+from languages import Signal, SignalMeaning, SignalingLanguage
 from typing import Any
 
 
@@ -14,14 +14,14 @@ class Sender(Speaker):
 
     def encode(self, state: Meaning) -> Signal:
         """Choose a signal given the state of nature observed, e.g. encode a discrete input as a discrete symbol."""
-        index = self.sample_policy(index=self.referent_to_index(state))
+        index = self.sample_strategy(index=self.referent_to_index(state))
         return self.index_to_expression(index)
 
-    def policy_to_indices(self, policy: dict[str, Any]) -> tuple[int]:
-        """Map a state -> signal policy to `(referent, expression)` indices."""
+    def strategy_to_indices(self, strategy: dict[str, Any]) -> tuple[int]:
+        """Map a state -> signal strategy to `(referent, expression)` indices."""
         return (
-            self.referent_to_index(policy["referent"]),
-            self.expression_to_index(policy["expression"]),
+            self.referent_to_index(strategy["referent"]),
+            self.expression_to_index(strategy["expression"]),
         )
 
 
@@ -35,12 +35,12 @@ class Receiver(Listener):
 
     def decode(self, signal: Signal) -> SignalMeaning:
         """Choose an action given the signal received, e.g. decode a target state given its discrete encoding."""
-        index = self.sample_policy(index=self.expression_to_index(signal))
+        index = self.sample_strategy(index=self.expression_to_index(signal))
         return self.index_to_referent(index)
 
-    def policy_to_indices(self, policy: dict[str, Any]) -> tuple[int]:
-        """Map a signal -> state policy to `(expression, referent)` indices."""
+    def strategy_to_indices(self, strategy: dict[str, Any]) -> tuple[int]:
+        """Map a signal -> state strategy to `(expression, referent)` indices."""
         return (
-            self.expression_to_index(policy["expression"]),
-            self.referent_to_index(policy["referent"]),
+            self.expression_to_index(strategy["expression"]),
+            self.referent_to_index(strategy["referent"]),
         )
