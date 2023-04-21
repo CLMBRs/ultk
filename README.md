@@ -21,7 +21,7 @@ Read the [documentation](https://clmbr.shane.st/altk).
 
 First, set up a virtual environment (e.g. via [miniconda](https://docs.conda.io/en/latest/miniconda.html), `conda create -n altk python=3.11`, and `conda activate altk`).
 
-1. Download or clone this repository and navigate to the root folder. 
+1. Download or clone this repository and navigate to the root folder.
 
 2. Install ALTK (We recommend doing this inside a virtual environment)
 
