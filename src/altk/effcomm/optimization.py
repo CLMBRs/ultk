@@ -69,7 +69,7 @@ class EvolutionaryOptimizer:
         sample_size: int,
         max_mutations: int,
         generations: int,
-        lang_size: int,
+        lang_size: int = None,
         mutations: list[Mutation] = [AddExpression, RemoveExpression],
     ):
         """Initialize the evolutionary algorithm configurations.
@@ -103,7 +103,8 @@ class EvolutionaryOptimizer:
         self.sample_size = sample_size
         self.max_mutations = max_mutations
         self.generations = generations
-        self.lang_size = lang_size
+        # set max lang size to # expressions if none provided
+        self.lang_size = lang_size or len(expressions)
 
         self.dominating_languages = None
         self.explored_languages = None
@@ -118,7 +119,8 @@ class EvolutionaryOptimizer:
         Args:
             seed_population: a list of languages representing the population at generation 0 of the algorithm.
 
-            explore: a float in [0,1] representing how much to optimize for fitness (optimality wrt pareto front of complexity and comm_cost), and how much to randomly explore.
+            explore: a float in [0,1] representing how much to optimize for fitness
+                (optimality wrt pareto front of complexity and comm_cost), and how much to randomly explore.
 
         Returns:
             a dict of the estimated optimization solutions, as well as points explored along the way; of the form
@@ -132,7 +134,6 @@ class EvolutionaryOptimizer:
         explored_languages = []
 
         for _ in tqdm(range(self.generations)):
-
             # Keep track of visited
             explored_languages.extend(copy.copy(languages))
 
@@ -206,7 +207,8 @@ class EvolutionaryOptimizer:
         Args:
             language: the Language to mutate
 
-            expressions: the list of all possible expressions. Some mutations need access to this list, so it is part of the mutation api.
+            expressions: the list of all possible expressions.
+                Some mutations need access to this list, so it is part of the mutation api.
 
         Returns:
             the mutated Language
@@ -235,7 +237,8 @@ def sample_parents(
 
         explored_languages: a list of all languages encountered during the evolutionary algorithm.
 
-        explore: a float in `[0,1]` specifying how much to explore possibly suboptimal languages. If set to 0, `parent_languages` is just `dominating_languages`.
+        explore: a float in `[0,1]` specifying how much to explore possibly suboptimal languages.
+            If set to 0, `parent_languages` is just `dominating_languages`.
 
     Returns:
         the languages to serve as the next generation (after possible mutations)
@@ -248,4 +251,3 @@ def sample_parents(
     parent_languages.extend(random.sample(explored_languages, num_explore))
 
     return list(set(parent_languages))
-

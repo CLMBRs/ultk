@@ -10,7 +10,6 @@ from ..meaning import universe as indefinites_universe
 
 
 if __name__ == "__main__":
-
     expressions_by_meaning = indefinites_grammar.get_unique_expressions(
         3,
         max_size=2 ** len(indefinites_universe),
