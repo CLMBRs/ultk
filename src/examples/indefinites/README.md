@@ -21,7 +21,7 @@ This README first explains the contents of this example directory, focusing on w
 
     This is a very simple example, with six discrete points which have only on property (a name).  In general, ALTK expects each row to correspond to a unique `Referent` and each column to a feature of that point, with no constraint on the number or type of features.  A `name` column is expected.  See `altk.language.semantics.Universe.from_dataframe` for more details.
 - `meaning.py`: this file defines the meaning space (a `Universe` in ALTK terms) of the six flavors defined in `referents.csv` together with their prior
-- `grammar.py`: defines the Language of Thought grammar (an ALTK `Grammar`) for this domain, using basic propositional logic and the five semantic features identified in Haspelmath 1997.
+- `grammar.yml`: defines the Language of Thought grammar (an ALTK `Grammar` is created from this file in one line in `grammar.py`) for this domain, using basic propositional logic and the five semantic features identified in Haspelmath 1997.
 - `measures.py`: the measures of simplicity and informativity.  These are basic wrappers around tools from ALTK, linking them to the indefinites grammar and universe.
 - `util.py`: utilities for reading and writing ALTK `Expression`s and `Language`s, as well as the natural language data.
 

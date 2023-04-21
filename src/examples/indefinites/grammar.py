@@ -1,5 +1,10 @@
 from altk.language.grammar import Grammar, Rule
 
+indefinites_grammar = Grammar.from_yaml("indefinites/grammar.yml")
+
+
+"""
+# this defines the grammar "manually" instead of using the YAML text format
 
 indefinites_grammar = Grammar(bool)
 # basic propositional logic
@@ -67,3 +72,4 @@ indefinites_grammar.add_rule(
 indefinites_grammar.add_rule(
     Rule("R-", bool, None, lambda point: point.name == "freechoice")
 )
+"""

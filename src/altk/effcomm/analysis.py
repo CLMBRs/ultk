@@ -98,8 +98,7 @@ def pearson_analysis(
             )
             try:
                 rho, _ = pearsonr(
-                    bootstrap_sample[property],
-                    bootstrap_sample[predictor],
+                    bootstrap_sample[property], bootstrap_sample[predictor]
                 )
             except ValueError:
                 print("MINIMUM SIZE OF DATA: ", int(2 / min_percent))

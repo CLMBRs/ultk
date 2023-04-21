@@ -3,7 +3,6 @@ from altk.language.semantics import Meaning, Referent, Universe
 
 
 class TestGrammar:
-
     referents = [Referent(str(num), {"num": num}) for num in range(4)]
     universe = Universe(referents)
 
@@ -35,3 +34,6 @@ class TestGrammar:
         parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
         assert len(parsed_expression) == 5
 
+    def test_yield(self):
+        parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
+        assert parsed_expression.yield_string() == "n11"
