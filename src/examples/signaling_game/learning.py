@@ -4,7 +4,7 @@ import numpy as np
 from altk.effcomm.agent import CommunicativeAgent
 from altk.effcomm.informativity import communicative_success
 from altk.effcomm.information import information_rate
-from .game import SignalingGame
+from game import SignalingGame
 from tqdm import tqdm
 from typing import Any
 
@@ -30,12 +30,12 @@ def simulate_learning(g: SignalingGame, num_rounds: int, learning_rate=1.0) -> N
         # update agents
         reward(
             agent=g.sender,
-            policy={"referent": target, "expression": signal},
+            strategy={"referent": target, "expression": signal},
             amount=amount,
         )
         reward(
             agent=g.receiver,
-            policy={"referent": output, "expression": signal},
+            strategy={"referent": output, "expression": signal},
             amount=amount,
         )
 
@@ -52,20 +52,20 @@ def simulate_learning(g: SignalingGame, num_rounds: int, learning_rate=1.0) -> N
     return g
 
 
-def reward(agent: CommunicativeAgent, policy: dict[str, Any], amount: float) -> None:
+def reward(agent: CommunicativeAgent, strategy: dict[str, Any], amount: float) -> None:
     """Reward an agent for a particular referent-expression behavior.
 
     In a signaling game, the communicative success of Sender and Receiver language protocols evolve under simple reinforcement learning dynamics. The reward function increments an agent's weight matrix at the specified location by the specified amount.
 
     Args:
-        policy: a dict of the form {"referent": referent, "expression": Expression}
+        strategy: a dict of the form {"referent": referent, "expression": Expression}
 
         amount: a positive number reprsenting how much to reward the behavior
     """
-    if set(policy.keys()) != {"referent", "expression"}:
+    if set(strategy.keys()) != {"referent", "expression"}:
         raise ValueError(
-            f"The argument `policy` must take a dict with keys 'referent' and 'expression'. Received: {policy.keys()}'"
+            f"The argument `strategy` must take a dict with keys 'referent' and 'expression'. Received: {strategy.keys()}'"
         )
     if amount < 0:
         raise ValueError(f"Amount to reinforce weight must be a positive number.")
-    agent.weights[agent.policy_to_indices(policy)] += amount
+    agent.weights[agent.strategy_to_indices(strategy)] += amount

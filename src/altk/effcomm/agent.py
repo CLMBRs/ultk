@@ -93,18 +93,18 @@ class CommunicativeAgent:
     def index_to_expression(self, index: int) -> Expression:
         return self._index_to_expression[index]
 
-    def policy_to_indices(self, policy: dict[str, Any]) -> tuple[int]:
-        """Maps communicative policies to weights.
+    def strategy_to_indices(self, strategy: dict[str, Any]) -> tuple[int]:
+        """Maps communicative strategies to weights.
 
         Given a expression and referent, access the corresponding weight coordinate.
 
         Args:
-            policy: a dict of the form {"referent": Referent, "expression": expression} representing an instance of communicative behavior, which we may call a communicative action policy for this agent.
+            strategy: a dict of the form {"referent": Referent, "expression": expression} representing an instance of communicative behavior, which we may call a communicative strategy for this agent.
         """
         raise NotImplementedError
 
-    def sample_policy(self, index: int) -> int:
-        """Sample a communicative policy by uniformly sampling from a row vector of the agent's weight matrix specified by the index.
+    def sample_strategy(self, index: int) -> int:
+        """Sample a communicative strategy (e.g., a word for Speaker's intended referent, or interpretation for Listener's heard word) by uniformly sampling from a row vector of the agent's weight matrix specified by the index.
 
         Args:
             index: the integer index representing a row of the weight matrix.
@@ -152,8 +152,8 @@ class CommunicativeAgent:
                 referent
                 for referent in self.language.universe.referents
                 if policies[
-                    self.policy_to_indices(
-                        policy={"referent": referent, "expression": old_expression}
+                    self.strategy_to_indices(
+                        strategy={"referent": referent, "expression": old_expression}
                     )
                 ]
                 > threshold  # if probability of referent is high enough
