@@ -272,6 +272,19 @@ def language_to_joint_distributions(
     }
 
 
+def ib_encoder_decoder_to_point(
+    encoder: np.ndarray,
+    decoder: np.ndarray,
+    meaning_dists: np.ndarray,
+    prior: np.ndarray,
+) -> tuple[float]:
+    """Return (complexity, accuracy) IB coordinate."""
+    conditional_puw = decoder @ meaning_dists
+    p_w = util.marginalize(encoder, prior)
+    joint_pwu = util.joint(conditional_puw, p_w)
+    return information_rate(prior, encoder), util.MI(joint_pwu)
+
+
 # === IB Helpers ===
 
 
