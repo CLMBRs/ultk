@@ -16,8 +16,8 @@ jobs:
         run: git status
       - name: add name to repo
         run: |
-          git config --global user.name 'Mickey Shi'
-          git config --global user.email "mickeyshi96@yahoo.com"
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: stage changed files
         run: git add .
       - name: commit changed files
