@@ -8,6 +8,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
       - name: switching from HTTPS to SSH
         run: git remote set-url origin https://github.com/mickeyshi/altk-actions.git
       - name: check for changes
@@ -20,4 +22,3 @@ jobs:
         run: git fetch origin main
       - name: push code to main
         run: git push origin HEAD:main
-        
