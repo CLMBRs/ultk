@@ -8,3 +8,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: psf/black@stable
+      - name: switching from HTTPS to SSH
+        run: git remote set-url origin https://github.com/mickeyshi/altk-actions.git
+      - name: check for changes
+        run: git status
+      - name: stage changed files
+        run: git add .
+      - name: commit changed files
+        run: git commit -m "Update after linting"
+      - name: fetch from master
+        run: git fetch origin master
+      - name: push code to master
+        run: git push origin HEAD:master
