@@ -2,7 +2,7 @@ from altk.language.grammar import Grammar, GrammaticalExpression, Rule
 from altk.language.semantics import Meaning, Referent, Universe
 
 
-#Run with pytest for the purposes of testing
+# Run with pytest for the purposes of testing
 
 
 class TestGrammar:
