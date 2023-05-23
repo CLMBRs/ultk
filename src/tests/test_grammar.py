@@ -2,6 +2,9 @@ from altk.language.grammar import Grammar, GrammaticalExpression, Rule
 from altk.language.semantics import Meaning, Referent, Universe
 
 
+#Run with pytest
+
+
 class TestGrammar:
     referents = [Referent(str(num), {"num": num}) for num in range(4)]
     universe = Universe(referents)
