@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: psf/black@stable
         with:
-          options: "--check --verbose"
+          options: ""
       - name: switching from HTTPS to SSH
         run: git remote set-url origin https://github.com/mickeyshi/altk-actions.git
       - name: check for changes
