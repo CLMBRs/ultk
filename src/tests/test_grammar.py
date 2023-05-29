@@ -2,8 +2,6 @@ from altk.language.grammar import Grammar, GrammaticalExpression, Rule
 from altk.language.semantics import Meaning, Referent, Universe
 
 
-# Run with pytest for the purposes of testing
-
 
 class TestGrammar:
     referents = [Referent(str(num), {"num": num}) for num in range(4)]
