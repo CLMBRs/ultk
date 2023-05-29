@@ -2,3 +2,10 @@
 .vscode/
 .DS_Store
 src/altk.egg-info
+
+
+# Distribution/build
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
