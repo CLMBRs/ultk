@@ -1,3 +1,22 @@
 [build-system]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "clmbr-altk"
+version = "0.0.1"
+authors = [
+  { name="Shane Steinert-Threlkeld", email="shanest@uw.edu" },
+]
+description = "ALTK is a software library that aims to support efficient communication analyses of natural language. This is a line of research that aims to explain why natural languages have the structure that they do in terms competing pressures to minimize cognitive complexity and maximize communicative accuracy."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/mickeyshi/altk-actions"
+"Bug Tracker" = "https://github.com/mickeyshi/altk-actions/altk-actions"
