@@ -18,7 +18,8 @@ jobs:
       with:
           python-version: '3.11'
     - name: Install package 
-      run:  pip install -e .
+      run:  pip install --upgrade build
+            pip install -e .
     - name: Build dist
       run:  python -m build
     - name: Publish package distributions to PyPI
