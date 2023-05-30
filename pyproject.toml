@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clmbr-altk"
-version = "0.0.1"
+version = "0.0.1a"
 authors = [
   { name="Shane Steinert-Threlkeld", email="shanest@uw.edu" },
 ]
