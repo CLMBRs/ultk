@@ -10,8 +10,8 @@ jobs:
       - uses: psf/black@stable
         with:
           options: ""
-      - name: switching from HTTPS to SSH
-        run: git remote set-url origin https://github.com/mickeyshi/altk-actions.git
+      - name: set get remote
+        run: git remote set-url origin https://github.com/CLMBRs/altk.git
       - name: check for changes
         run: git status
       - name: add name to repo
