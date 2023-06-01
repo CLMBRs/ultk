@@ -1,6 +1,6 @@
 name: Build dist and publish to PyPI
 
-on: [push, pull_request]
+on: [release]
 
 jobs:
   pypi-publish:
