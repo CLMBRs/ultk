@@ -4,8 +4,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="altk",
-    version="0.0.1",
+    name="clmbr-altk",
+    version="0.0.1a",
     author="Nathaniel Imel, Shane Steinert-Threlkeld",
     author_email="nimel@uci.edu, shanest@uw.edu",
     description="The Artificial Language ToolKit",
