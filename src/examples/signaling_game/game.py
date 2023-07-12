@@ -7,7 +7,7 @@ from typing import Callable
 class SignalingGame:
     """A signaling game is a tuple $(S, M, A, \sigma, \rho, u, P)$ of states, messages, acts, a sender, a receiver, a utility function, and a distribution over states. The sender and receiver have a common payoff, given by a communicative success function.
 
-    In this signaling game, we identify the acts with the states. For more detail on the communicative success function, see altk.effcomm.informativity.communicative_success.
+    In this signaling game, we identify the acts with the states. For more detail on the communicative success function, see ultk.effcomm.informativity.communicative_success.
     """
 
     def __init__(

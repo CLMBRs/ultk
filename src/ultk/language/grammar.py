@@ -11,12 +11,12 @@ try:
 except ImportError:
     from yaml import Loader
 
-from altk.language.language import Expression
-from altk.language.semantics import Meaning, Universe
+from ultk.language.language import Expression
+from ultk.language.semantics import Meaning, Universe
 
 
 class Rule:
-    """Basic class for a grammar rule.  Grammar rules in ALTK correspond
+    """Basic class for a grammar rule.  Grammar rules in ULTK correspond
     to functions.  One can think of a grammar as generating complex functions from
     more basic ones.
 

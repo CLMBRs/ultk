@@ -7,9 +7,9 @@ import math
 from typing import Callable
 from tqdm import tqdm
 from typing import Any
-from altk.language.sampling import rename_id
-from altk.effcomm.tradeoff import pareto_optimal_languages
-from altk.language.language import Expression, Language
+from ultk.language.sampling import rename_id
+from ultk.effcomm.tradeoff import pareto_optimal_languages
+from ultk.language.language import Expression, Language
 
 ##############################################################################
 # Mutation
