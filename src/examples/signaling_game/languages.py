@@ -1,6 +1,6 @@
 from typing import Iterable
-from altk.language.language import Language, Expression
-from altk.language.semantics import Universe, Meaning, Referent
+from ultk.language.language import Language, Expression
+from ultk.language.semantics import Universe, Meaning, Referent
 
 
 class State(Referent):
@@ -42,7 +42,7 @@ class SignalMeaning(Meaning):
     def __init__(self, states: list[State], universe: StateSpace) -> None:
         """Construct the meaning of a signal as the set of states it can refer to.
 
-        In altk, Meanings can be generalized from a set of referents to distributions over those referents. by default, we let be a peaked distribution over a single point, where one state has probability 1.0, and all others 0.0.
+        In ultk, Meanings can be generalized from a set of referents to distributions over those referents. by default, we let be a peaked distribution over a single point, where one state has probability 1.0, and all others 0.0.
 
         Args:
 

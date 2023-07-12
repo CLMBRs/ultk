@@ -1,5 +1,5 @@
 import pandas as pd
-from altk.language.semantics import Universe
+from ultk.language.semantics import Universe
 
 referents = pd.read_csv("indefinites/referents.csv")
 prior = pd.read_csv("indefinites/data/Beekhuizen_priors.csv")

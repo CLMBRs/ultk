@@ -1,5 +1,5 @@
-from altk.effcomm.agent import CommunicativeAgent, Speaker, Listener
-from altk.language.semantics import Meaning
+from ultk.effcomm.agent import CommunicativeAgent, Speaker, Listener
+from ultk.language.semantics import Meaning
 from languages import Signal, SignalMeaning, SignalingLanguage
 from typing import Any
 

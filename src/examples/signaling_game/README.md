@@ -4,9 +4,9 @@
 
 A signaling game is a an evolutionary game theoretic model, wherein a Sender and Receiver aim to maximize a joint payoff by coordinating on signals. When strategies evolve towards such coordination over repeated plays of the game, this can model the emergence of communication.
 
-This example repo exists to demo simulations of the evolution of meaning using very simple reinforcement learning and ALTK tools. We use various altk modules for the game objects and for analysis (esp. [altk.effcomm.agent](../../altk/effcomm/agent.py)).
+This example repo exists to demo simulations of the evolution of meaning using very simple reinforcement learning and ULTK tools. We use various ultk modules for the game objects and for analysis (esp. [ultk.effcomm.agent](../../ultk/effcomm/agent.py)).
 
-See the [docs](https://nathimel.github.io/altk/examples/signaling_game.html).
+See the [docs](https://nathimel.github.io/ultk/examples/signaling_game.html).
 
 ## Running a simulation
 
@@ -23,7 +23,7 @@ This will produce results in the folders `outputs/default` or `outputs/example`,
 ## Experimenting
 
 <details>
-<summary> Adjusting parameters and using ALTK more generally to do signaling games.
+<summary> Adjusting parameters and using ULTK more generally to do signaling games.
 </summary>
 
 ### Existing game parameters
@@ -35,9 +35,9 @@ Run different games by supplying command line arguments, described in `python3 m
 - the number of rounds in a game
 - the learning rate
 
-### Using ALTK for signaling games
+### Using ULTK for signaling games
 
-The most general aspects of the communicative agents, measures of communicative success and the language primitives are implemented in ALTK. Some signaling-specific concepts and wrappers implemented in the `.py` files.
+The most general aspects of the communicative agents, measures of communicative success and the language primitives are implemented in ULTK. Some signaling-specific concepts and wrappers implemented in the `.py` files.
 
 This example is limited for simplicity, but is also intended to be an recylable outline for additional analyses, such as:
 

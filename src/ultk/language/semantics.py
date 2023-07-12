@@ -6,8 +6,8 @@
 
     Examples:
 
-        >>> from altk.language.semantics import Referent, Meaning, Universe
-        >>> from altk.language.language import Expression
+        >>> from ultk.language.semantics import Referent, Meaning, Universe
+        >>> from ultk.language.language import Expression
         >>> # construct the meaning space for numerals
         >>> numerals_universe = NumeralUniverse(referents=[NumeralReferent(str(i)) for i in range(1, 100)])
         >>> # construct a list of referents for the expression 'a few'

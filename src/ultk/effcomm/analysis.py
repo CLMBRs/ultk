@@ -2,7 +2,7 @@
 
 import numpy as np
 import pandas as pd
-from altk.language.language import Language
+from ultk.language.language import Language
 from scipy.stats import pearsonr, scoreatpercentile, ttest_1samp
 from typing import Any
 
