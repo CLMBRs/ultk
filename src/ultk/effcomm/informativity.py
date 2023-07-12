@@ -3,9 +3,9 @@
 import numpy as np
 from cmath import isclose
 from typing import Callable
-from altk.language.language import Language
-from altk.language.semantics import Referent
-from altk.effcomm.agent import (
+from ultk.language.language import Language
+from ultk.language.semantics import Referent
+from ultk.effcomm.agent import (
     Speaker,
     Listener,
     LiteralListener,
@@ -13,7 +13,7 @@ from altk.effcomm.agent import (
     PragmaticSpeaker,
     PragmaticListener,
 )
-from altk.effcomm.util import build_utility_matrix
+from ultk.effcomm.util import build_utility_matrix
 
 
 def indicator_utility(ref1: Referent, ref2: Referent) -> float:

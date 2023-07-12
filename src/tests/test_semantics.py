@@ -1,7 +1,7 @@
 import itertools
 import pandas as pd
 
-from altk.language.semantics import Universe
+from ultk.language.semantics import Universe
 
 
 forces = ("weak", "strong")

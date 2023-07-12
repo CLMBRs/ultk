@@ -1,7 +1,7 @@
 """Various helper functions for computing complexity and informativity."""
 import numpy as np
 from scipy.special import logsumexp
-from altk.language.semantics import Universe, Referent
+from ultk.language.semantics import Universe, Referent
 from typing import Callable
 
 ##############################################################################

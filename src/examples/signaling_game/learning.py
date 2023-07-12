@@ -1,9 +1,9 @@
 """Simple Roth-Erev reinforcement learning dynamic for agents of a signaling game."""
 
 import numpy as np
-from altk.effcomm.agent import CommunicativeAgent
-from altk.effcomm.informativity import communicative_success
-from altk.effcomm.information import information_rate
+from ultk.effcomm.agent import CommunicativeAgent
+from ultk.effcomm.informativity import communicative_success
+from ultk.effcomm.information import information_rate
 from game import SignalingGame
 from tqdm import tqdm
 from typing import Any

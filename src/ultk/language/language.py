@@ -2,7 +2,7 @@
 
 Example usage:
 
-    >>> from altk.language.language import Expression, Language
+    >>> from ultk.language.language import Expression, Language
     >>> # assuming the meaning `a_few_meaning` has already been constructed
     >>> # define the expression
     >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
@@ -13,8 +13,8 @@ Example usage:
 """
 
 import numpy as np
-from altk.language.semantics import Universe
-from altk.language.semantics import Meaning, Referent
+from ultk.language.semantics import Universe
+from ultk.language.semantics import Meaning, Referent
 from typing import Callable, Iterable
 
 

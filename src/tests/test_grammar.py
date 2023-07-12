@@ -1,5 +1,5 @@
-from altk.language.grammar import Grammar, GrammaticalExpression, Rule
-from altk.language.semantics import Meaning, Referent, Universe
+from ultk.language.grammar import Grammar, GrammaticalExpression, Rule
+from ultk.language.semantics import Meaning, Referent, Universe
 
 
 class TestGrammar:

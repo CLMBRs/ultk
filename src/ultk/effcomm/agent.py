@@ -3,9 +3,9 @@
 from typing import Any
 import numpy as np
 from scipy.special import softmax
-from altk.language.language import Expression, Language
-from altk.language.semantics import Referent
-from altk.effcomm.util import bayes
+from ultk.language.language import Expression, Language
+from ultk.language.semantics import Referent
+from ultk.effcomm.util import bayes
 
 ##############################################################################
 # Base communicative agent class
@@ -307,7 +307,7 @@ class BayesianListener(Listener):
 
     $\hat{m}_{w}(u) = \sum_m p(m|w) \cdot m(u)$
 
-    See altk.effcomm.information for more details.
+    See ultk.effcomm.information for more details.
     """
 
     def __init__(self, speaker: Speaker, prior: np.ndarray, name: str = None):

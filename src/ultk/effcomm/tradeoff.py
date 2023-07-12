@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from altk.language.language import Language
+from ultk.language.language import Language
 from typing import Callable, Any
 from tqdm import tqdm
 
