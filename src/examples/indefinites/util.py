@@ -8,9 +8,9 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
-from altk.language.grammar import GrammaticalExpression
-from altk.language.language import Expression, Language
-from altk.language.semantics import Meaning, Universe
+from ultk.language.grammar import GrammaticalExpression
+from ultk.language.language import Expression, Language
+from ultk.language.semantics import Meaning, Universe
 
 from .grammar import indefinites_grammar
 from .meaning import universe as indefinites_universe
