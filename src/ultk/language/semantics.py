@@ -43,9 +43,11 @@ class Referent:
     def __lt__(self, other):
         return self.name < other.name
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.name == other.name and self.__dict__ == other.__dict__
     
+    def __hash__(self) -> int:
+        return hash((self.name, tuple(self.__dict__)))
 
 
     
