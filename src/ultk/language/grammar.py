@@ -325,7 +325,7 @@ class Grammar:
 
             # get lists of possible depths for each child
             for child_depths in product(range(depth), repeat=len(rule.rhs)):
-                if max(child_depths) < depth - 1:
+                if len(child_depths) == 0 or max(child_depths) < depth - 1:
                     continue
                 # get all possible children of the relevant depths
                 children_iter = product(

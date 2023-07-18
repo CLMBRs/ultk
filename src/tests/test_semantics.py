@@ -16,18 +16,35 @@ class TestSemantics:
         ]
     dataframe = pd.DataFrame(points)
     universe = Universe.from_dataframe(dataframe)
-    
+
+    ref1 = Referent(name="weak+epistemic", properties={"force":"weak", "flavor":"epistemic"})
 
     def test_universe_from_df(self):
         assert TestSemantics.points == [referent.__dict__ for referent in TestSemantics.universe.referents]
 
-    def check_universe_match(self):
+    def test_referent_match(self):
+        ref2 = Referent(name="weak+epistemic", properties={"force":"weak", "flavor":"epistemic"})
+        assert TestSemantics.ref1 == ref2
+
+    def test_referent_mismatch(self):
+        ref3 = Referent(name="neutral+epistemic", properties={"force":"neutral", "flavor":"epistemic"})
+        assert TestSemantics.ref1 != ref3
+
+    def test_universe_match(self):
         second_dataframe = pd.DataFrame(TestSemantics.points)
         assert Universe.from_dataframe(second_dataframe) == TestSemantics.universe
+
+    def test_universe_mismatch(self):
+        ref_list = [TestSemantics.ref1]
+        assert Universe(ref_list) != TestSemantics.universe
         
-    def test_meaning_match(self):
-        ref_list = (Referent(name="weak+epistemic", properties={"force":"weak", "flavor":"epistemic"}))
+        
+    def test_meaning_subset(self):
+        
+        ref_list = [TestSemantics.ref1]
         meaning = Meaning(ref_list, TestSemantics.universe) #This meaning should exist within the set of semantics
+        assert TestSemantics.ref1 in meaning.referents
+
         with pytest.raises(ValueError):
             ref_list.append(Referent(name="neutral+epistemic", properties={"force":"neutral", "flavor":"epistemic"}))
             meaning = Meaning(ref_list, TestSemantics.universe) #This meaning should not
