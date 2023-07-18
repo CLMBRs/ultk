@@ -49,7 +49,7 @@ def expected_distortion(
     p_x: np.ndarray, p_xhat_x: np.ndarray, dist_mat: np.ndarray
 ) -> float:
     """$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) \cdot d(x, \hat{x})$"""
-    return np.sum(p_x @ (p_xhat_x * dist_mat))
+    return np.sum(np.diag(p_x) @ (p_xhat_x * dist_mat))
 
 
 def compute_rate_distortion(
