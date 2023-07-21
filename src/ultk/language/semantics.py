@@ -91,7 +91,7 @@ class Universe:
         return len(self.referents)
 
     def __hash__(self) -> int:
-        return hash(self.referents)
+        return hash(tuple(self.referents))
 
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame):
