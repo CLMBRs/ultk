@@ -4,15 +4,15 @@ import numpy as np
 from ultk.language.language import Language
 from ultk.language.semantics import Universe, Referent
 from ultk.effcomm.agent import LiteralSpeaker, BayesianListener
-from ultk.effcomm import util
+from ultk.effcomm import probability
 from embo import InformationBottleneck
 from typing import Callable
 
 
 def information_rate(source: np.ndarray, encoder: np.ndarray) -> float:
     """Compute the information rate / complexity of the encoder q(w|m) as $I[W:M]$."""
-    pXY = util.joint(pY_X=encoder, pX=source)
-    return util.MI(pXY=pXY)
+    pXY = probability.joint(pY_X=encoder, pX=source)
+    return probability.MI(pXY=pXY)
 
 
 ##############################################################################
@@ -49,8 +49,7 @@ def expected_distortion(
     p_x: np.ndarray, p_xhat_x: np.ndarray, dist_mat: np.ndarray
 ) -> float:
     """$D[X, \hat{X}] = \sum_x p(x) \sum_{\hat{x}} p(\hat{x}|x) \cdot d(x, \hat{x})$"""
-    return np.sum(p_x @ (p_xhat_x * dist_mat))
-
+    return np.sum(np.diag(p_x) @ (p_xhat_x * dist_mat))
 
 def compute_rate_distortion(
     p_x,
@@ -242,8 +241,8 @@ def get_bottleneck(
     prior = np.array(prior)
     meaning_dists = np.array(meaning_dists)
 
-    joint_pmu = util.joint(meaning_dists, prior)  # P(u) = P(m)
-    I_mu = util.MI(joint_pmu)
+    joint_pmu = probability.joint(meaning_dists, prior)  # P(u) = P(m)
+    I_mu = probability.MI(joint_pmu)
 
     # I[M:W], I[W:U], H[W], beta
     I_mw, I_wu, _, _ = InformationBottleneck(
@@ -291,7 +290,7 @@ def ib_informativity(
         the informativity of the language I[W:U] in bits.
     """
     return float(
-        util.MI(
+        probability.MI(
             language_to_joint_distributions(language, prior, meaning_dists)["joint_pwu"]
         )
     )
@@ -315,7 +314,7 @@ def ib_comm_cost(
         the communicative cost, $\mathbb{E}[D_{KL}[M || \hat{M}]] = I[M:U] - I[W:U]$ in bits.
     """
     dists = language_to_joint_distributions(language, prior, meaning_dists)
-    return float(util.MI(dists["joint_pmu"]) - util.MI(dists["joint_pwu"]))
+    return float(probability.MI(dists["joint_pmu"]) - probability.MI(dists["joint_pwu"]))
 
 
 def language_to_joint_distributions(
@@ -375,9 +374,9 @@ def encoder_decoder_to_joint_distributions(
             }
     """
     conditional_puw = deterministic_decoder(decoder, meaning_dists)
-    joint_pmu = util.joint(meaning_dists, prior)
-    p_w = util.marginalize(encoder, prior)
-    joint_pwu = util.joint(conditional_puw, p_w)
+    joint_pmu = probability.joint(meaning_dists, prior)
+    p_w = probability.marginalize(encoder, prior)
+    joint_pwu = probability.joint(conditional_puw, p_w)
     return {
         "joint_pmu": joint_pmu,
         "joint_pwu": joint_pwu,
@@ -408,15 +407,15 @@ def ib_encoder_to_point(
     if decoder is not None:
         decoder = np.array(decoder)
     else:
-        decoder = util.bayes(encoder, prior)
+        decoder = probability.bayes(encoder, prior)
 
     dists = encoder_decoder_to_joint_distributions(
         encoder, decoder, meaning_dists, prior
     )
 
     complexity = information_rate(prior, encoder)
-    accuracy = util.MI(dists["joint_pwu"])
-    distortion = util.MI(dists["joint_pmu"]) - accuracy
+    accuracy = probability.MI(dists["joint_pwu"])
+    distortion = probability.MI(dists["joint_pmu"]) - accuracy
 
     return (complexity, accuracy, distortion)
 
@@ -444,7 +443,7 @@ def language_to_ib_encoder_decoder(
     """
     # In the IB framework, the encoder is _typically_ a literal speaker and the decoder is a bayes optimal listener.
     speaker = LiteralSpeaker(language)
-    speaker.weights = util.rows_zero_to_uniform(speaker.normalized_weights())
+    speaker.weights = probability.rows_zero_to_uniform(speaker.normalized_weights())
     listener = BayesianListener(speaker, prior)
     return {
         "encoder": speaker.normalized_weights(),
