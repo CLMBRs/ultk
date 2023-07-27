@@ -408,6 +408,7 @@ def ib_encoder_to_point(
     if decoder is not None:
         decoder = np.array(decoder)
     else:
+        # BUG: This is wrong! See BayesianListener in agent for details.
         decoder = util.bayes(encoder, prior)
 
     dists = encoder_decoder_to_joint_distributions(
