@@ -117,6 +117,9 @@ def bayes(pY_X, pX):
     """
     pXY = joint(pY_X, pX)
     pY = marginalize(pY_X, pX)
+    # NOTE: original line gave shape errors for broadcasting pXY / pY,
+    # return np.where(pY > PRECISION, pXY.T / pY, 1 / pXY.shape[0])
+    # but the below line still needs to be checked.
     return np.where(pY > PRECISION, pXY / pY, 1 / pXY.shape[0]).T
 
 
