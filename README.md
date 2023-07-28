@@ -42,6 +42,10 @@ The second module is [altk.language](https://clmbr.shane.st/altk/altk/language.h
 
 The source code is available on github [here](https://github.com/CLMBRs/altk).
 
+## Testing
+
+Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and executed via running `pytest` in the `src/tests` folder. 
+
 ## References
 
 <details>
