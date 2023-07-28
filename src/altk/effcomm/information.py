@@ -474,4 +474,5 @@ def deterministic_decoder(
     """
     # BUG: obviously this is wrong
     # return decoder @ meaning_distributions
+    # actually I think it's right lol, see https://github.com/nogazs/ib-color-naming/blob/master/src/ib_naming_model.py#L40
     raise NotImplementedError
