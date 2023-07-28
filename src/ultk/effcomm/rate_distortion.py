@@ -407,7 +407,9 @@ def ib_encoder_to_point(
     if decoder is not None:
         decoder = np.array(decoder)
     else:
-        decoder = probability.bayes(encoder, prior)
+        # BUG: deterministic decoder
+        raise NotImplementedError
+        # decoder = util.bayes(encoder, prior)
 
     dists = encoder_decoder_to_joint_distributions(
         encoder, decoder, meaning_dists, prior
@@ -444,7 +446,9 @@ def language_to_ib_encoder_decoder(
     # In the IB framework, the encoder is _typically_ a literal speaker and the decoder is a bayes optimal listener.
     speaker = LiteralSpeaker(language)
     speaker.weights = probability.rows_zero_to_uniform(speaker.normalized_weights())
-    listener = BayesianListener(speaker, prior)
+    # BUG: make deterministic decoder
+    raise NotImplementedError
+    # listener = BayesianListener(speaker, prior)
     return {
         "encoder": speaker.normalized_weights(),
         "decoder": listener.normalized_weights(),
