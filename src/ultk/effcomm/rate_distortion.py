@@ -464,4 +464,6 @@ def deterministic_decoder(
     Returns:
         array of shape `(|words|, |meanings|)` representing the 'optimal' deterministic decoder
     """
-    return decoder @ meaning_distributions
+    # BUG: obviously this is wrong
+    # return decoder @ meaning_distributions
+    raise NotImplementedError
