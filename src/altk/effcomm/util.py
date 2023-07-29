@@ -17,6 +17,7 @@ def rows_zero_to_uniform(mat: np.ndarray) -> np.ndarray:
     Args:
         mat: a 2D numpy array that should be normalized so that each row is a probability distribution.
     """
+    mat = np.array(mat)
 
     threshold = 1e-5
 
