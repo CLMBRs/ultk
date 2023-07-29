@@ -29,11 +29,13 @@ def get_rd_curve(
     if betas is None:
         # B-A gets a bit sparse in low-rate regions for just one np.linspace
         # betas = np.linspace(start=0, stop=2**7, num=50)
-        betas = np.concatenate([
-            np.linspace(start=0, stop=0.29, num=333),
-            np.linspace(start=0.3, stop=0.9, num=333),
-            np.linspace(start=1.0, stop=2**7, num=334),
-        ])
+        betas = np.concatenate(
+            [
+                np.linspace(start=0, stop=0.29, num=333),
+                np.linspace(start=0.3, stop=0.9, num=333),
+                np.linspace(start=1.0, stop=2**7, num=334),
+            ]
+        )
     # TODO: unify or something
     prior = np.array(prior)
     dist_mat = np.array(dist_mat)
@@ -152,14 +154,15 @@ def blahut_arimoto(
 
 # === Main IB methods ===
 
+
 def get_ib_curve(
     prior: np.ndarray,
     meaning_dists: np.ndarray,
     maxbeta: float,
     minbeta: float,
     numbeta: float,
-    processes: int = 1, 
-    curve_type: str = "informativity",        
+    processes: int = 1,
+    curve_type: str = "informativity",
 ) -> tuple[float]:
     """Get a list of (complexity, accuracy) or (complexity, distortion) points. A minimal wrapper of `get_bottleneck.`
 
@@ -176,26 +179,36 @@ def get_ib_curve(
 
         numbeta: the number of (equally-spaced) beta values to consider to compute the curve.
 
-        processes: number of cpu threads to run in parallel (default = 1)    
+        processes: number of cpu threads to run in parallel (default = 1)
 
     Returns:
         an array of shape `(num_points, 2)` representing the list of (accuracy/comm_cost, complexity) points on the information plane.
     """
 
-    complexity, accuracy, distortion = get_bottleneck(prior, meaning_dists, maxbeta, minbeta, numbeta, processes)
+    complexity, accuracy, distortion = get_bottleneck(
+        prior, meaning_dists, maxbeta, minbeta, numbeta, processes
+    )
     if curve_type == "comm_cost":
-        return np.array(list(zip(
-            distortion,
-            complexity,
-        ))) # expected kl divergence, complexity
+        return np.array(
+            list(
+                zip(
+                    distortion,
+                    complexity,
+                )
+            )
+        )  # expected kl divergence, complexity
 
     else:
-        points = np.array(list(zip(
-            accuracy,
-            complexity,
-        ))) # informativity, complexity
+        points = np.array(
+            list(
+                zip(
+                    accuracy,
+                    complexity,
+                )
+            )
+        )  # informativity, complexity
     return points
-    
+
 
 def get_bottleneck(
     prior: np.ndarray,
@@ -245,8 +258,8 @@ def get_bottleneck(
         minbeta=minbeta,
         numbeta=numbeta,
         processes=processes,
-        ).get_bottleneck()
-    
+    ).get_bottleneck()
+
     def normalize_rows(mat: np.ndarray):
         return mat / mat.sum(1, keepdims=True)
 
@@ -256,7 +269,7 @@ def get_bottleneck(
     # encoders = np.array([normalize_rows(encoder) for encoder in encoders])
     # points = [ib_encoder_to_point(meaning_dists, prior, encoder)[:-1] for encoder in encoders]
     # I_mw, I_wu = tuple(zip(*points))
-    
+
     coordinates = list(zip(*(I_mw, I_wu, I_mu - I_wu)))
 
     return {
@@ -265,9 +278,11 @@ def get_bottleneck(
         "betas": beta,
     }
 
+
 ##############################################################################
 # Using altk.Language
 ##############################################################################
+
 
 def ib_complexity(
     language: Language,
@@ -329,10 +344,11 @@ def ib_comm_cost(
         the communicative cost, $\mathbb{E}[D_{KL}[M || \hat{M}]] = I[M:U] - I[W:U]$ in bits.
     """
     return ib_distortion(
-        language_to_ib_encoder_decoder(language, prior)["encoder"], 
-        prior, 
+        language_to_ib_encoder_decoder(language, prior)["encoder"],
+        prior,
         meaning_dists,
     )
+
 
 def language_to_ib_encoder_decoder(
     language: Language,
@@ -366,7 +382,10 @@ def language_to_ib_encoder_decoder(
 # Without using altk.Language
 ##############################################################################
 
-def ib_accuracy(encoder: np.ndarray, prior: np.ndarray, meaning_dists: np.ndarray) -> float:
+
+def ib_accuracy(
+    encoder: np.ndarray, prior: np.ndarray, meaning_dists: np.ndarray
+) -> float:
     """Return the accuracy of the lexicon I[W:U]
 
     Args:
@@ -378,7 +397,7 @@ def ib_accuracy(encoder: np.ndarray, prior: np.ndarray, meaning_dists: np.ndarra
 
         prior: array of shape `|M|` representing P(M)
 
-    Returns: 
+    Returns:
         the accuracy of the lexicon I[W:U]
     """
     pMW = util.joint(encoder, prior)
@@ -386,7 +405,9 @@ def ib_accuracy(encoder: np.ndarray, prior: np.ndarray, meaning_dists: np.ndarra
     return util.MI(pWU)
 
 
-def ib_distortion(encoder: np.ndarray, prior: np.ndarray, meaning_dists: np.ndarray) -> float:
+def ib_distortion(
+    encoder: np.ndarray, prior: np.ndarray, meaning_dists: np.ndarray
+) -> float:
     """Return the IB distortion measure E[DKL[ M || M_hat ]]
 
     Args:
@@ -398,7 +419,7 @@ def ib_distortion(encoder: np.ndarray, prior: np.ndarray, meaning_dists: np.ndar
 
         prior: array of shape `|M|` representing P(M)
 
-    Returns: 
+    Returns:
         the distortion E[DKL[ M || M_hat ]] = I[M:U] - I[W:U]
     """
     pMU = util.joint(meaning_dists, prior)
@@ -406,17 +427,17 @@ def ib_distortion(encoder: np.ndarray, prior: np.ndarray, meaning_dists: np.ndar
     accuracy = ib_accuracy(encoder, prior, meaning_dists)
     return I_mu - accuracy
 
-    
+
 def ib_encoder_to_point(
     meaning_dists: np.ndarray,
     prior: np.ndarray,
     encoder: np.ndarray,
-    decoder: np.ndarray = None,    
+    decoder: np.ndarray = None,
 ) -> tuple[float]:
     """Return (complexity, accuracy, comm_cost) IB coordinates.
-    
+
     Args:
-        meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.        
+        meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
 
         prior: array of shape `|M|` representing the cognitive source
 
@@ -424,7 +445,7 @@ def ib_encoder_to_point(
 
         decoder: array of shape `(|W|, |M|)` representing P(M | W).  By default is None, and the Bayesian optimal decoder will be inferred.
     """
-    # TODO: be consistent about tensors vs arrays 
+    # TODO: be consistent about tensors vs arrays
     encoder = np.array(encoder)
     meaning_dists = np.array(meaning_dists)
     prior = np.array(prior)
@@ -444,7 +465,7 @@ def ib_encoder_to_point(
 
 
 def ib_optimal_decoder(
-    encoder: np.ndarray, 
+    encoder: np.ndarray,
     prior: np.ndarray,
     meaning_dists: np.ndarray,
 ) -> np.ndarray:
