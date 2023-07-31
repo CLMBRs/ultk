@@ -17,6 +17,7 @@ from ultk.language.semantics import Universe
 from ultk.language.semantics import Meaning, Referent
 from typing import Callable, Iterable
 
+
 class Expression:
 
     """Minimally contains a form and a meaning."""
@@ -57,7 +58,7 @@ class Language:
 
     def __init__(self, expressions: Iterable[Expression], **kwargs):
         # Check that all expressions have the same universe
-        
+
         if len(set([e.meaning.universe for e in expressions])) != 1:
             raise ValueError(
                 f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}"
@@ -90,7 +91,7 @@ class Language:
         popped = expressions.pop(index)
         self.expressions = expressions
         return popped
-    
+
     def degree_property(self, property: Callable[[Expression], bool]) -> float:
         """Count what percentage of expressions in a language have a given property."""
         return sum([property(item) for item in self.expressions]) / len(self)
