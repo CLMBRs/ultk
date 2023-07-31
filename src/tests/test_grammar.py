@@ -39,8 +39,10 @@ class TestGrammar:
         assert parsed_expression.yield_string() == "n11"
 
     def test_enumerate(self):
-        enumed_grammar = TestGrammar.grammar.get_unique_expressions(depth=1, lhs=(int, int))
-        print("Enumed Grammar Rules with len" )
+        enumed_grammar = TestGrammar.grammar.get_unique_expressions(
+            depth=1, lhs=(int, int)
+        )
+        print("Enumed Grammar Rules with len")
         print(enumed_grammar)
-        for rule in enumed_grammar: 
+        for rule in enumed_grammar:
             print(rule)
