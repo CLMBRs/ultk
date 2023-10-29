@@ -6,7 +6,7 @@ A signaling game is a an evolutionary game theoretic model, wherein a Sender and
 
 This example repo exists to demo simulations of the evolution of meaning using very simple reinforcement learning and ALTK tools. We use various altk modules for the game objects and for analysis (esp. [altk.effcomm.agent](../../altk/effcomm/agent.py)).
 
-See the [docs](https://nathimel.github.io/altk/examples/signaling_game.html).
+See a more scaled-up [example](https://github.com/nathimel/rdsg) of signaling game simulations using altk.
 
 ## Running a simulation
 
