@@ -21,6 +21,7 @@ def rows_zero_to_uniform(mat: np.ndarray) -> np.ndarray:
 
     threshold = 1e-5
 
+    # Ensure if p(.|meaning) sums to > 0 at all, it must sum to 1.
     for row in mat:
         # less than 1.0
         if row.sum() and 1.0 - row.sum() > threshold:
