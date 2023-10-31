@@ -1,0 +1,91 @@
+start: bool
+rules:
+# boolean / propositional logic rules
+- lhs: bool
+  rhs:
+    - bool
+    - bool
+  name: "and"
+  function: |
+    lambda p1 , p2 : p1 and p2
+- lhs: bool
+  rhs:
+    - bool
+    - bool
+  name: "or"
+  function: |
+    lambda p1 , p2 : p1 or p2
+- lhs: bool
+  rhs:
+    - bool
+  name: "not"
+  function: |
+    lambda p : not p
+# set logic rules
+- lhs: set
+  rhs:
+    - set
+    - set
+  name: "union"
+  function: |
+    lambda s1, s2 : s1 | s2
+- lhs: set
+  rhs:
+    - set
+    - set
+  name: "intersection"
+  function: |
+    lambda s1, s2 : s1 & s2
+- lhs: set
+  rhs:
+    - set
+    - set
+  name: "difference"
+  function: |
+    lambda s1, s2 : s1 - s2
+- lhs: set
+  rhs:
+    - int
+    - set
+  name: "index"
+  function: |
+    lambda i, s: set(x for x in s if x.index == i)
+- lhs: int
+  rhs:
+    - set
+  name: "cardinality"
+  function: |
+    lambda s: s.len()
+- lhs: bool
+  rhs:
+    - set
+    - set
+  name: "subset_eq"
+  function: |
+    lambda s1, s2: s1.issubset(s2)
+# integer logical rules
+- lhs: bool
+  rhs:
+    - int
+    - int
+  name: "equals"
+  function: |
+    lambda i1, i2: i1 == i2
+- lhs: bool
+  rhs:
+    - int
+    - int
+  name: "greater_than"
+  function: |
+    lambda i1, i2: i1 > i2
+# primitive
+- lhs: set
+  rhs: 
+  name: "A"
+  function: |
+    lambda point: point.pertinence in ['A', "both"]
+- lhs: set
+  rhs: 
+  name: "B"
+  function: |
+    lambda point: point.pertinence in ['B', "both"]
