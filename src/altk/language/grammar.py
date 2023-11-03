@@ -75,7 +75,7 @@ class GrammaticalExpression(Expression):
         self,
         rule_name: str,
         func: Callable,
-        children: Iterable,
+        children: tuple,
         meaning: Meaning = None,
         form: str = None,
     ):
@@ -107,6 +107,12 @@ class GrammaticalExpression(Expression):
                 universe,
             )
         return self.meaning
+
+    def add_child(self, child) -> None:
+        if self.children is None:
+            self.children = tuple([child])
+        else:
+            self.children = self.children + (child,)
 
     def to_dict(self) -> dict:
         the_dict = super().to_dict()
@@ -160,9 +166,9 @@ class Grammar:
 
     def __init__(self, start: Any):
         # _rules: nonterminals -> list of rules
-        self._rules = defaultdict(list)
+        self._rules: dict[Any, list[Rule]] = defaultdict(list)
         # name -> rule, for fast lookup in parsing
-        self._rules_by_name = {}
+        self._rules_by_name: dict[str, Rule] = {}
         self._start = start
 
     def add_rule(self, rule: Rule):
@@ -214,14 +220,14 @@ class Grammar:
             if token[-1] == opener:
                 name = token[:-1]
                 stack.append(
-                    GrammaticalExpression(name, self._rules_by_name[name].func, [])
+                    GrammaticalExpression(name, self._rules_by_name[name].func, tuple())
                 )
             # finish an expression
             elif token == delimiter or token == closer:
                 # finished a child expression
                 # TODO: are there edge cases that distinguish delimiter from closer?
                 child = stack.pop()
-                stack[-1].children.append(child)
+                stack[-1].add_child(child)
             else:
                 # primitive, no children, just look up
                 stack.append(
@@ -242,7 +248,7 @@ class Grammar:
         children = (
             None
             if the_rule.rhs is None
-            else [self.generate(child_lhs) for child_lhs in the_rule.rhs]
+            else tuple([self.generate(child_lhs) for child_lhs in the_rule.rhs])
         )
         # if the rule is terminal, rhs will be empty, so no recursive calls to generate will be made in this comprehension
         return GrammaticalExpression(the_rule.name, the_rule.func, children)
@@ -369,7 +375,7 @@ class Grammar:
             The GrammticalExpression which is the value will be the one that is minimum among
             `compare_func` amongst all Expressions up to `depth` which share the same key
         """
-        unique_dict = {}
+        unique_dict: dict[GrammaticalExpression, Any] = {}
         # run through generator, each iteration will update unique_dict
         for _ in self.enumerate(
             depth,
@@ -426,6 +432,8 @@ class Grammar:
             grammar_dict = load(f, Loader=Loader)
         grammar = cls(grammar_dict["start"])
         for rule_dict in grammar_dict["rules"]:
+            # TODO: update to incorporate weights
+            # eval function first, then just ** the dict
             grammar.add_rule(
                 Rule(
                     rule_dict["name"],
