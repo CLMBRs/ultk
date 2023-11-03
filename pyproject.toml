@@ -27,6 +27,7 @@ dependencies = [
     "pathos",
     "embo",
     "pytest",
+    "mypy"
 ]
 
 [project.urls]
