@@ -76,8 +76,8 @@ class GrammaticalExpression(Expression):
         rule_name: str,
         func: Callable,
         children: tuple,
-        meaning: Meaning = None,
-        form: str = None,
+        meaning: Meaning | None = None,
+        form: str | None = None,
     ):
         super().__init__(form, meaning)
         self.rule_name = rule_name
@@ -257,11 +257,10 @@ class Grammar:
         self,
         depth: int = 8,
         lhs: Any = None,
-        unique_dict: dict[Any, GrammaticalExpression] = None,
-        unique_key: Callable[[GrammaticalExpression], Any] = None,
-        compare_func: Callable[
-            [GrammaticalExpression, GrammaticalExpression], bool
-        ] = None,
+        unique_dict: dict[Any, GrammaticalExpression] | None = None,
+        unique_key: Callable[[GrammaticalExpression], Any] | None = None,
+        compare_func: Callable[[GrammaticalExpression, GrammaticalExpression], bool]
+        | None = None,
     ) -> Generator[GrammaticalExpression, None, None]:
         """Enumerate all expressions from the grammar up to a given depth from a given LHS.
         This method also can update a specified dictionary to store only unique expressions, with
