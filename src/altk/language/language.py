@@ -22,7 +22,7 @@ class Expression:
 
     """Minimally contains a form and a meaning."""
 
-    def __init__(self, form: str = None, meaning: Meaning = None):
+    def __init__(self, form: str | None = None, meaning: Meaning | None = None):
         # gneric/dummy form and meaning if not specified
         # useful for hashing in certain cases
         # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
@@ -41,13 +41,19 @@ class Expression:
         # return f"Expression {self.form}\nMeaning:\n\t{self.meaning}"
 
     def __eq__(self, other: object) -> bool:
-        return (self.form, self.meaning) == (other.form, other.meaning)
+        return isinstance(other, Expression) and (self.form, self.meaning) == (
+            other.form,
+            other.meaning,
+        )
 
     def __lt__(self, other: object) -> bool:
-        return (self.form, other.meaning) < (other.form, other.meaning)
+        return isinstance(other, Expression) and (self.form, other.meaning) < (
+            other.form,
+            other.meaning,
+        )
 
     def __bool__(self) -> bool:
-        return self.form and self.meaning
+        return bool(self.form and self.meaning)
 
     def __hash__(self) -> int:
         return hash((self.form, self.meaning))
@@ -56,7 +62,7 @@ class Expression:
 class Language:
     """Minimally contains Expression objects."""
 
-    def __init__(self, expressions: Iterable[Expression], **kwargs):
+    def __init__(self, expressions: tuple[Expression, ...], **kwargs):
         # Check that all expressions have the same universe
         if len(set([e.meaning.universe for e in expressions])) != 1:
             raise ValueError(
@@ -69,7 +75,7 @@ class Language:
         self.__dict__.update(**kwargs)
 
     @property
-    def expressions(self) -> tuple[Expression]:
+    def expressions(self) -> tuple[Expression, ...]:
         return self._expressions
 
     @expressions.setter
@@ -86,9 +92,8 @@ class Language:
         """Removes an expression at the specified index of the list of expressions, and returns it."""
         if not len(self):
             raise Exception("Cannot pop expressions from an empty language.")
-        expressions = self.expressions
-        popped = expressions.pop(index)
-        self.expressions = expressions
+        popped = self.expressions[index]
+        self.expressions = self.expressions[:index] + self.expressions[index + 1 :]
         return popped
 
     def is_natural(self) -> bool:
@@ -130,7 +135,7 @@ class Language:
         return hash(self.expressions)
 
     def __eq__(self, __o: object) -> bool:
-        return self.expressions == __o.expressions
+        return isinstance(__o, Language) and self.expressions == __o.expressions
 
     def __len__(self) -> int:
         return len(self.expressions)
