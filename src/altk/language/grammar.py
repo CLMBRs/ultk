@@ -1,8 +1,9 @@
 import random
 import re
 from collections import defaultdict
+from collections.abc import Sequence
 from itertools import product
-from typing import Any, Callable, Generator, Iterable
+from typing import Any, Callable, Generator
 
 from yaml import load
 
@@ -35,7 +36,7 @@ class Rule:
         self,
         name: str,
         lhs: Any,
-        rhs: Iterable[Any],
+        rhs: Sequence | None,
         func: Callable = lambda *args: None,
         weight: float = 1.0,
     ):
@@ -53,7 +54,7 @@ class Rule:
 
     def __str__(self) -> str:
         out_str = f"{str(self.lhs)} -> {self.name}"
-        if not self.is_terminal():
+        if self.rhs is not None:
             out_str += f"({', '.join(str(typ) for typ in self.rhs)})"
         return out_str
 
@@ -75,7 +76,7 @@ class GrammaticalExpression(Expression):
         self,
         rule_name: str,
         func: Callable,
-        children: tuple,
+        children: tuple | None,
         meaning: Meaning | None = None,
         form: str | None = None,
     ):
@@ -296,24 +297,27 @@ class Grammar:
         self,
         depth: int,
         lhs: Any,
-        unique_dict: dict[Any, GrammaticalExpression] = None,
-        unique_key: Callable[[GrammaticalExpression], Any] = None,
-        compare_func: Callable[
-            [GrammaticalExpression, GrammaticalExpression], bool
-        ] = None,
+        unique_dict: dict[Any, GrammaticalExpression] | None = None,
+        unique_key: Callable[[GrammaticalExpression], Any] | None = None,
+        compare_func: Callable[[GrammaticalExpression, GrammaticalExpression], bool]
+        | None = None,
     ) -> set[GrammaticalExpression]:
         """Enumerate GrammaticalExpressions for this Grammar _at_ a fixed depth."""
 
-        do_unique = unique_key is not None and compare_func is not None
+        do_unique = False
 
-        def add_unique(expression: GrammaticalExpression) -> None:
-            expr_key = unique_key(expression)
-            # if the current expression has not been generated yet
-            # OR it is "less than" the current entry, add this one
-            if expr_key not in unique_dict or compare_func(
-                expression, unique_dict[expr_key]
-            ):
-                unique_dict[expr_key] = expression
+        if unique_key is not None and compare_func is not None:
+            do_unique = True
+            unique_dict = unique_dict or {}
+
+            def add_unique(expression: GrammaticalExpression) -> None:
+                expr_key = unique_key(expression)
+                # if the current expression has not been generated yet
+                # OR it is "less than" the current entry, add this one
+                if expr_key not in unique_dict or compare_func(
+                    expression, unique_dict[expr_key]
+                ):
+                    unique_dict[expr_key] = expression
 
         if depth == 0:
             for rule in self._rules[lhs]:
@@ -325,7 +329,7 @@ class Grammar:
 
         for rule in self._rules[lhs]:
             # can't use terminal rules when depth > 0
-            if rule.is_terminal():
+            if rule.rhs is None:
                 continue
 
             # get lists of possible depths for each child
@@ -350,10 +354,9 @@ class Grammar:
         depth: int,
         lhs: Any = None,
         max_size: float = float("inf"),
-        unique_key: Callable[[GrammaticalExpression], Any] = None,
-        compare_func: Callable[
-            [GrammaticalExpression, GrammaticalExpression], bool
-        ] = None,
+        unique_key: Callable[[GrammaticalExpression], Any] | None = None,
+        compare_func: Callable[[GrammaticalExpression, GrammaticalExpression], bool]
+        | None = None,
     ) -> dict[GrammaticalExpression, Any]:
         """Get all unique GrammaticalExpressions, up to a certain depth, with a user-specified criterion
         of uniqueness, and a specified comparison function for determining which Expression to save when there's a clash.
