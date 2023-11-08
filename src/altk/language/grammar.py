@@ -166,6 +166,7 @@ class UniquenessArgs(TypedDict):
     """Arguments for specifying uniqueness of GrammaticalExpressions in a Grammar.
 
     Attributes:
+        unique_expressions: a dictionary in which to store unique Expressions
         key: a function used to evaluate uniqueness
         compare_func: a comparison function, used to decide which Expression to add to the dict
             new Expressions will be added as values to `unique_dict` only if they are minimal
@@ -276,23 +277,22 @@ class Grammar:
         uniqueness_args: UniquenessArgs | None = None,
     ) -> Generator[GrammaticalExpression, None, None]:
         """Enumerate all expressions from the grammar up to a given depth from a given LHS.
-        This method also can update a specified dictionary to store only unique expressions, with
+        This method also can update a specified dictionary to store only _unique_ expressions, with
         a user-specified criterion of uniqueness.
 
         Args:
             depth: how deep the trees should be
             lhs: left hand side to start from; defaults to the grammar's start symbol
-            unique_dict: a dictionary in which to store unique Expressions
-            unique_key: a function used to evaluate uniqueness
-            compare_func: a comparison function, used to decide which Expression to add to the dict
-                new Expressions will be added as values to `unique_dict` only if they are minimal
-                among those sharing the same key (by `unique_key`) according to this func
+            uniqueness_args: a dictionary specifying the parameters for uniqueness:
+                unique_dict: a dictionary in which to store unique Expressions
+                key: a function used to evaluate uniqueness
+                compare_func: a comparison function, used to decide which Expression to add to the dict
+                    new Expressions will be added as values to `unique_dict` only if they are _minimal_
+                    among those sharing the same key (by `unique_key`) according to this func
 
         Yields:
             all GrammaticalExpressions up to depth
         """
-        # TODO: update docstring!
-        # TODO: package uniqueness stuff in one dict arg?
         if lhs is None:
             lhs = self._start
         cache: defaultdict = defaultdict(list)
@@ -308,15 +308,15 @@ class Grammar:
     ) -> Generator[GrammaticalExpression, None, None]:
         """Enumerate GrammaticalExpressions for this Grammar _at_ a fixed depth."""
 
-        do_unique = uniqueness_args is not None
         if cache is None:
             cache = defaultdict(list)
 
-        # enumerate from cache if exists
+        # enumerate from cache if we've seen these args before
         args_tuple = (depth, lhs)
         if args_tuple in cache:
             yield from cache[args_tuple]
         else:
+            do_unique = uniqueness_args is not None
             if uniqueness_args is not None:
                 unique_dict = uniqueness_args["unique_expressions"]
 
@@ -352,7 +352,6 @@ class Grammar:
                         if max(child_depths) < depth - 1:
                             continue
                         # get all possible children of the relevant depths
-                        # TODO: figure out how to actually enumerate over unique only.....
                         # unique by depth?!?!
                         children_iter = product(
                             *[
