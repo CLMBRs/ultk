@@ -37,12 +37,12 @@ class Rule:
         name: str,
         lhs: Any,
         rhs: Sequence | None,
-        func: Callable = lambda *args: None,
+        function: Callable = lambda *args: None,
         weight: float = 1.0,
     ):
         self.lhs = lhs
         self.rhs = rhs
-        self.func = func
+        self.func = function
         self.name = name
         self.weight = weight
 
@@ -458,15 +458,10 @@ class Grammar:
             grammar_dict = load(f, Loader=Loader)
         grammar = cls(grammar_dict["start"])
         for rule_dict in grammar_dict["rules"]:
-            # TODO: update to incorporate weights
-            # eval function first, then just ** the dict
-            grammar.add_rule(
-                Rule(
-                    rule_dict["name"],
-                    rule_dict["lhs"],
-                    rule_dict["rhs"],
-                    # TODO: look-up functions from a registry as well?
-                    eval(rule_dict["function"]),
-                )
-            )
+            if "function" in rule_dict:
+                # TODO: look-up functions from a registry as well?
+                rule_dict["function"] = eval(rule_dict["function"])
+            if "weight" in rule_dict:
+                rule_dict["weight"] = float(rule_dict["weight"])
+            grammar.add_rule(Rule(**rule_dict))
         return grammar
