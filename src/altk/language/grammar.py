@@ -173,7 +173,7 @@ class UniquenessArgs(TypedDict):
             among those sharing the same key (by `unique_key`) according to this func
     """
 
-    unique_expressions: dict[Any, GrammaticalExpression]
+    unique_expressions: dict[Any, dict[Any, GrammaticalExpression]]
     key: Callable[[GrammaticalExpression], Any]
     compare_func: Callable[[GrammaticalExpression, GrammaticalExpression], bool]
 
@@ -319,17 +319,18 @@ class Grammar:
             do_unique = uniqueness_args is not None
             if uniqueness_args is not None:
                 unique_dict = uniqueness_args["unique_expressions"]
+                key = uniqueness_args["key"]
 
                 def add_unique(expression: GrammaticalExpression) -> bool:
                     """Add an expression to the unique_dict, if it is unique and shortest by the compare_func.
                     Return the outcome boolean."""
-                    expr_key = uniqueness_args["key"](expression)
+                    expr_key = key(expression)
                     # if the current expression has not been generated yet
                     # OR it is "less than" the current entry, add this one
-                    if expr_key not in unique_dict or uniqueness_args["compare_func"](
-                        expression, unique_dict[expr_key]
-                    ):
-                        unique_dict[expr_key] = expression
+                    if expr_key not in unique_dict[lhs] or uniqueness_args[
+                        "compare_func"
+                    ](expression, unique_dict[lhs][expr_key]):
+                        unique_dict[lhs][expr_key] = expression
                         return True
                     return False
 
@@ -398,12 +399,14 @@ class Grammar:
             The GrammticalExpression which is the value will be the one that is minimum among
             `compare_func` amongst all Expressions up to `depth` which share the same key
         """
-        unique_dict: dict[GrammaticalExpression, Any] = {}
+        unique_dict: dict[Any, dict[Any, GrammaticalExpression]] = defaultdict(dict)
         uniqueness_args: UniquenessArgs = {
             "unique_expressions": unique_dict,
             "key": unique_key,
             "compare_func": compare_func,
         }
+        if lhs is None:
+            lhs = self._start
         # run through generator, each iteration will update unique_dict
         for _ in self.enumerate(
             depth,
@@ -413,7 +416,7 @@ class Grammar:
             if len(unique_dict) == max_size:
                 break
             pass
-        return unique_dict
+        return unique_dict[lhs]
 
     def get_all_rules(self) -> list[Rule]:
         """Get all rules as a list."""

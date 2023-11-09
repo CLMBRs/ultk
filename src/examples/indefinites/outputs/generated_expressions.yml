@@ -509,8 +509,8 @@
     - *id003
     - *id006
 - form: ''
-  grammatical_expression: and(or(K+, S-), or(SE-, or(N+, R-)))
-  length: 9
+  grammatical_expression: and(or(K+, S-), or(N+, not(R+)))
+  length: 8
   meaning:
     referents:
     - *id001
