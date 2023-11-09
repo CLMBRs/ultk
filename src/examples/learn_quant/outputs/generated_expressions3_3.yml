@@ -1,9 +1,9 @@
 - form: ''
-  grammatical_expression: subset_eq(A, A)
-  length: 3
+  grammatical_expression: A
+  length: 1
   meaning:
     referents:
-    - &id040
+    - &id060
       A: !!set
         0: null
       B: !!set {}
@@ -11,13 +11,6 @@
         0: null
       name: '0'
     - &id001
-      A: !!set {}
-      B: !!set
-        0: null
-      M: !!set
-        0: null
-      name: '1'
-    - &id002
       A: !!set
         0: null
       B: !!set
@@ -25,13 +18,7 @@
       M: !!set
         0: null
       name: '2'
-    - &id003
-      A: !!set {}
-      B: !!set {}
-      M: !!set
-        0: null
-      name: '3'
-    - &id041
+    - &id062
       A: !!set
         0: null
         1: null
@@ -40,7 +27,7 @@
         0: null
         1: null
       name: '00'
-    - &id065
+    - &id002
       A: !!set
         0: null
       B: !!set
@@ -49,7 +36,7 @@
         0: null
         1: null
       name: '01'
-    - &id042
+    - &id003
       A: !!set
         0: null
         1: null
@@ -59,7 +46,7 @@
         0: null
         1: null
       name: '02'
-    - &id043
+    - &id063
       A: !!set
         0: null
       B: !!set {}
@@ -67,7 +54,7 @@
         0: null
         1: null
       name: '03'
-    - &id066
+    - &id004
       A: !!set
         1: null
       B: !!set
@@ -76,15 +63,6 @@
         0: null
         1: null
       name: '10'
-    - &id004
-      A: !!set {}
-      B: !!set
-        0: null
-        1: null
-      M: !!set
-        0: null
-        1: null
-      name: '11'
     - &id005
       A: !!set
         1: null
@@ -96,14 +74,6 @@
         1: null
       name: '12'
     - &id006
-      A: !!set {}
-      B: !!set
-        0: null
-      M: !!set
-        0: null
-        1: null
-      name: '13'
-    - &id044
       A: !!set
         0: null
         1: null
@@ -143,7 +113,7 @@
         0: null
         1: null
       name: '23'
-    - &id045
+    - &id066
       A: !!set
         1: null
       B: !!set {}
@@ -152,14 +122,6 @@
         1: null
       name: '30'
     - &id010
-      A: !!set {}
-      B: !!set
-        1: null
-      M: !!set
-        0: null
-        1: null
-      name: '31'
-    - &id011
       A: !!set
         1: null
       B: !!set
@@ -168,14 +130,7 @@
         0: null
         1: null
       name: '32'
-    - &id012
-      A: !!set {}
-      B: !!set {}
-      M: !!set
-        0: null
-        1: null
-      name: '33'
-    - &id046
+    - &id068
       A: !!set
         0: null
         1: null
@@ -186,7 +141,7 @@
         1: null
         2: null
       name: '000'
-    - &id067
+    - &id011
       A: !!set
         0: null
         1: null
@@ -197,7 +152,7 @@
         1: null
         2: null
       name: '001'
-    - &id047
+    - &id012
       A: !!set
         0: null
         1: null
@@ -209,7 +164,7 @@
         1: null
         2: null
       name: '002'
-    - &id048
+    - &id069
       A: !!set
         0: null
         1: null
@@ -219,7 +174,7 @@
         1: null
         2: null
       name: '003'
-    - &id068
+    - &id013
       A: !!set
         0: null
         2: null
@@ -230,7 +185,7 @@
         1: null
         2: null
       name: '010'
-    - &id069
+    - &id014
       A: !!set
         0: null
       B: !!set
@@ -241,7 +196,7 @@
         1: null
         2: null
       name: '011'
-    - &id070
+    - &id015
       A: !!set
         0: null
         2: null
@@ -253,7 +208,7 @@
         1: null
         2: null
       name: '012'
-    - &id071
+    - &id016
       A: !!set
         0: null
       B: !!set
@@ -263,7 +218,7 @@
         1: null
         2: null
       name: '013'
-    - &id049
+    - &id017
       A: !!set
         0: null
         1: null
@@ -275,7 +230,7 @@
         1: null
         2: null
       name: '020'
-    - &id072
+    - &id018
       A: !!set
         0: null
         1: null
@@ -287,7 +242,7 @@
         1: null
         2: null
       name: '021'
-    - &id050
+    - &id019
       A: !!set
         0: null
         1: null
@@ -300,7 +255,7 @@
         1: null
         2: null
       name: '022'
-    - &id051
+    - &id020
       A: !!set
         0: null
         1: null
@@ -311,7 +266,7 @@
         1: null
         2: null
       name: '023'
-    - &id052
+    - &id070
       A: !!set
         0: null
         2: null
@@ -321,7 +276,7 @@
         1: null
         2: null
       name: '030'
-    - &id073
+    - &id021
       A: !!set
         0: null
       B: !!set
@@ -331,7 +286,7 @@
         1: null
         2: null
       name: '031'
-    - &id053
+    - &id022
       A: !!set
         0: null
         2: null
@@ -342,7 +297,7 @@
         1: null
         2: null
       name: '032'
-    - &id054
+    - &id071
       A: !!set
         0: null
       B: !!set {}
@@ -351,7 +306,7 @@
         1: null
         2: null
       name: '033'
-    - &id074
+    - &id023
       A: !!set
         1: null
         2: null
@@ -362,7 +317,7 @@
         1: null
         2: null
       name: '100'
-    - &id075
+    - &id024
       A: !!set
         1: null
       B: !!set
@@ -373,7 +328,7 @@
         1: null
         2: null
       name: '101'
-    - &id076
+    - &id025
       A: !!set
         1: null
         2: null
@@ -385,7 +340,7 @@
         1: null
         2: null
       name: '102'
-    - &id077
+    - &id026
       A: !!set
         1: null
       B: !!set
@@ -395,7 +350,7 @@
         1: null
         2: null
       name: '103'
-    - &id078
+    - &id027
       A: !!set
         2: null
       B: !!set
@@ -406,18 +361,7 @@
         1: null
         2: null
       name: '110'
-    - &id013
-      A: !!set {}
-      B: !!set
-        0: null
-        1: null
-        2: null
-      M: !!set
-        0: null
-        1: null
-        2: null
-      name: '111'
-    - &id014
+    - &id028
       A: !!set
         2: null
       B: !!set
@@ -429,17 +373,7 @@
         1: null
         2: null
       name: '112'
-    - &id015
-      A: !!set {}
-      B: !!set
-        0: null
-        1: null
-      M: !!set
-        0: null
-        1: null
-        2: null
-      name: '113'
-    - &id079
+    - &id029
       A: !!set
         1: null
         2: null
@@ -451,7 +385,7 @@
         1: null
         2: null
       name: '120'
-    - &id016
+    - &id030
       A: !!set
         1: null
       B: !!set
@@ -463,7 +397,7 @@
         1: null
         2: null
       name: '121'
-    - &id017
+    - &id031
       A: !!set
         1: null
         2: null
@@ -476,7 +410,7 @@
         1: null
         2: null
       name: '122'
-    - &id018
+    - &id032
       A: !!set
         1: null
       B: !!set
@@ -487,7 +421,7 @@
         1: null
         2: null
       name: '123'
-    - &id080
+    - &id033
       A: !!set
         2: null
       B: !!set
@@ -497,17 +431,7 @@
         1: null
         2: null
       name: '130'
-    - &id019
-      A: !!set {}
-      B: !!set
-        0: null
-        2: null
-      M: !!set
-        0: null
-        1: null
-        2: null
-      name: '131'
-    - &id020
+    - &id034
       A: !!set
         2: null
       B: !!set
@@ -518,16 +442,7 @@
         1: null
         2: null
       name: '132'
-    - &id021
-      A: !!set {}
-      B: !!set
-        0: null
-      M: !!set
-        0: null
-        1: null
-        2: null
-      name: '133'
-    - &id055
+    - &id035
       A: !!set
         0: null
         1: null
@@ -539,7 +454,7 @@
         1: null
         2: null
       name: '200'
-    - &id081
+    - &id036
       A: !!set
         0: null
         1: null
@@ -551,7 +466,7 @@
         1: null
         2: null
       name: '201'
-    - &id056
+    - &id037
       A: !!set
         0: null
         1: null
@@ -564,7 +479,7 @@
         1: null
         2: null
       name: '202'
-    - &id057
+    - &id038
       A: !!set
         0: null
         1: null
@@ -575,7 +490,7 @@
         1: null
         2: null
       name: '203'
-    - &id082
+    - &id039
       A: !!set
         0: null
         2: null
@@ -587,7 +502,7 @@
         1: null
         2: null
       name: '210'
-    - &id022
+    - &id040
       A: !!set
         0: null
       B: !!set
@@ -599,7 +514,7 @@
         1: null
         2: null
       name: '211'
-    - &id023
+    - &id041
       A: !!set
         0: null
         2: null
@@ -612,7 +527,7 @@
         1: null
         2: null
       name: '212'
-    - &id024
+    - &id042
       A: !!set
         0: null
       B: !!set
@@ -623,7 +538,7 @@
         1: null
         2: null
       name: '213'
-    - &id058
+    - &id043
       A: !!set
         0: null
         1: null
@@ -636,7 +551,7 @@
         1: null
         2: null
       name: '220'
-    - &id025
+    - &id044
       A: !!set
         0: null
         1: null
@@ -649,7 +564,7 @@
         1: null
         2: null
       name: '221'
-    - &id026
+    - &id045
       A: !!set
         0: null
         1: null
@@ -663,7 +578,7 @@
         1: null
         2: null
       name: '222'
-    - &id027
+    - &id046
       A: !!set
         0: null
         1: null
@@ -675,7 +590,7 @@
         1: null
         2: null
       name: '223'
-    - &id059
+    - &id047
       A: !!set
         0: null
         2: null
@@ -686,7 +601,7 @@
         1: null
         2: null
       name: '230'
-    - &id028
+    - &id048
       A: !!set
         0: null
       B: !!set
@@ -697,7 +612,7 @@
         1: null
         2: null
       name: '231'
-    - &id029
+    - &id049
       A: !!set
         0: null
         2: null
@@ -709,7 +624,7 @@
         1: null
         2: null
       name: '232'
-    - &id030
+    - &id050
       A: !!set
         0: null
       B: !!set
@@ -719,7 +634,7 @@
         1: null
         2: null
       name: '233'
-    - &id060
+    - &id076
       A: !!set
         1: null
         2: null
@@ -729,7 +644,7 @@
         1: null
         2: null
       name: '300'
-    - &id083
+    - &id051
       A: !!set
         1: null
       B: !!set
@@ -739,7 +654,7 @@
         1: null
         2: null
       name: '301'
-    - &id061
+    - &id052
       A: !!set
         1: null
         2: null
@@ -750,7 +665,7 @@
         1: null
         2: null
       name: '302'
-    - &id062
+    - &id077
       A: !!set
         1: null
       B: !!set {}
@@ -759,7 +674,7 @@
         1: null
         2: null
       name: '303'
-    - &id084
+    - &id053
       A: !!set
         2: null
       B: !!set
@@ -769,17 +684,7 @@
         1: null
         2: null
       name: '310'
-    - &id031
-      A: !!set {}
-      B: !!set
-        1: null
-        2: null
-      M: !!set
-        0: null
-        1: null
-        2: null
-      name: '311'
-    - &id032
+    - &id054
       A: !!set
         2: null
       B: !!set
@@ -790,16 +695,7 @@
         1: null
         2: null
       name: '312'
-    - &id033
-      A: !!set {}
-      B: !!set
-        1: null
-      M: !!set
-        0: null
-        1: null
-        2: null
-      name: '313'
-    - &id063
+    - &id055
       A: !!set
         1: null
         2: null
@@ -810,7 +706,7 @@
         1: null
         2: null
       name: '320'
-    - &id034
+    - &id056
       A: !!set
         1: null
       B: !!set
@@ -821,7 +717,7 @@
         1: null
         2: null
       name: '321'
-    - &id035
+    - &id057
       A: !!set
         1: null
         2: null
@@ -833,7 +729,7 @@
         1: null
         2: null
       name: '322'
-    - &id036
+    - &id058
       A: !!set
         1: null
       B: !!set
@@ -843,7 +739,7 @@
         1: null
         2: null
       name: '323'
-    - &id064
+    - &id080
       A: !!set
         2: null
       B: !!set {}
@@ -852,16 +748,7 @@
         1: null
         2: null
       name: '330'
-    - &id037
-      A: !!set {}
-      B: !!set
-        2: null
-      M: !!set
-        0: null
-        1: null
-        2: null
-      name: '331'
-    - &id038
+    - &id059
       A: !!set
         2: null
       B: !!set
@@ -871,7 +758,270 @@
         1: null
         2: null
       name: '332'
-    - &id039
+- form: ''
+  grammatical_expression: B
+  length: 1
+  meaning:
+    referents:
+    - &id061
+      A: !!set {}
+      B: !!set
+        0: null
+      M: !!set
+        0: null
+      name: '1'
+    - *id001
+    - *id002
+    - *id003
+    - *id004
+    - &id064
+      A: !!set {}
+      B: !!set
+        0: null
+        1: null
+      M: !!set
+        0: null
+        1: null
+      name: '11'
+    - *id005
+    - &id065
+      A: !!set {}
+      B: !!set
+        0: null
+      M: !!set
+        0: null
+        1: null
+      name: '13'
+    - *id006
+    - *id007
+    - *id008
+    - *id009
+    - &id067
+      A: !!set {}
+      B: !!set
+        1: null
+      M: !!set
+        0: null
+        1: null
+      name: '31'
+    - *id010
+    - *id011
+    - *id012
+    - *id013
+    - *id014
+    - *id015
+    - *id016
+    - *id017
+    - *id018
+    - *id019
+    - *id020
+    - *id021
+    - *id022
+    - *id023
+    - *id024
+    - *id025
+    - *id026
+    - *id027
+    - &id072
+      A: !!set {}
+      B: !!set
+        0: null
+        1: null
+        2: null
+      M: !!set
+        0: null
+        1: null
+        2: null
+      name: '111'
+    - *id028
+    - &id073
+      A: !!set {}
+      B: !!set
+        0: null
+        1: null
+      M: !!set
+        0: null
+        1: null
+        2: null
+      name: '113'
+    - *id029
+    - *id030
+    - *id031
+    - *id032
+    - *id033
+    - &id074
+      A: !!set {}
+      B: !!set
+        0: null
+        2: null
+      M: !!set
+        0: null
+        1: null
+        2: null
+      name: '131'
+    - *id034
+    - &id075
+      A: !!set {}
+      B: !!set
+        0: null
+      M: !!set
+        0: null
+        1: null
+        2: null
+      name: '133'
+    - *id035
+    - *id036
+    - *id037
+    - *id038
+    - *id039
+    - *id040
+    - *id041
+    - *id042
+    - *id043
+    - *id044
+    - *id045
+    - *id046
+    - *id047
+    - *id048
+    - *id049
+    - *id050
+    - *id051
+    - *id052
+    - *id053
+    - &id078
+      A: !!set {}
+      B: !!set
+        1: null
+        2: null
+      M: !!set
+        0: null
+        1: null
+        2: null
+      name: '311'
+    - *id054
+    - &id079
+      A: !!set {}
+      B: !!set
+        1: null
+      M: !!set
+        0: null
+        1: null
+        2: null
+      name: '313'
+    - *id055
+    - *id056
+    - *id057
+    - *id058
+    - &id081
+      A: !!set {}
+      B: !!set
+        2: null
+      M: !!set
+        0: null
+        1: null
+        2: null
+      name: '331'
+    - *id059
+- form: ''
+  grammatical_expression: subset_eq(A, A)
+  length: 3
+  meaning:
+    referents:
+    - *id060
+    - *id061
+    - *id001
+    - &id082
+      A: !!set {}
+      B: !!set {}
+      M: !!set
+        0: null
+      name: '3'
+    - *id062
+    - *id002
+    - *id003
+    - *id063
+    - *id004
+    - *id064
+    - *id005
+    - *id065
+    - *id006
+    - *id007
+    - *id008
+    - *id009
+    - *id066
+    - *id067
+    - *id010
+    - &id083
+      A: !!set {}
+      B: !!set {}
+      M: !!set
+        0: null
+        1: null
+      name: '33'
+    - *id068
+    - *id011
+    - *id012
+    - *id069
+    - *id013
+    - *id014
+    - *id015
+    - *id016
+    - *id017
+    - *id018
+    - *id019
+    - *id020
+    - *id070
+    - *id021
+    - *id022
+    - *id071
+    - *id023
+    - *id024
+    - *id025
+    - *id026
+    - *id027
+    - *id072
+    - *id028
+    - *id073
+    - *id029
+    - *id030
+    - *id031
+    - *id032
+    - *id033
+    - *id074
+    - *id034
+    - *id075
+    - *id035
+    - *id036
+    - *id037
+    - *id038
+    - *id039
+    - *id040
+    - *id041
+    - *id042
+    - *id043
+    - *id044
+    - *id045
+    - *id046
+    - *id047
+    - *id048
+    - *id049
+    - *id050
+    - *id076
+    - *id051
+    - *id052
+    - *id077
+    - *id053
+    - *id078
+    - *id054
+    - *id079
+    - *id055
+    - *id056
+    - *id057
+    - *id058
+    - *id080
+    - *id081
+    - *id059
+    - &id084
       A: !!set {}
       B: !!set {}
       M: !!set
@@ -884,463 +1034,500 @@
   length: 3
   meaning:
     referents:
+    - *id061
     - *id001
-    - *id002
-    - *id003
-    - *id004
+    - *id082
+    - *id064
     - *id005
-    - *id006
+    - *id065
     - *id007
     - *id008
     - *id009
+    - *id067
     - *id010
-    - *id011
-    - *id012
-    - *id013
-    - *id014
-    - *id015
-    - *id016
-    - *id017
-    - *id018
-    - *id019
-    - *id020
-    - *id021
-    - *id022
-    - *id023
-    - *id024
-    - *id025
-    - *id026
-    - *id027
+    - *id083
+    - *id072
     - *id028
-    - *id029
+    - *id073
     - *id030
     - *id031
     - *id032
-    - *id033
+    - *id074
     - *id034
-    - *id035
-    - *id036
-    - *id037
-    - *id038
-    - *id039
+    - *id075
+    - *id040
+    - *id041
+    - *id042
+    - *id044
+    - *id045
+    - *id046
+    - *id048
+    - *id049
+    - *id050
+    - *id078
+    - *id054
+    - *id079
+    - *id056
+    - *id057
+    - *id058
+    - *id081
+    - *id059
+    - *id084
 - form: ''
   grammatical_expression: subset_eq(B, A)
   length: 3
   meaning:
     referents:
-    - *id040
-    - *id002
+    - *id060
+    - *id001
+    - *id082
+    - *id062
     - *id003
-    - *id041
-    - *id042
-    - *id043
-    - *id044
+    - *id063
+    - *id006
     - *id008
     - *id009
-    - *id045
-    - *id011
+    - *id066
+    - *id010
+    - *id083
+    - *id068
     - *id012
+    - *id069
+    - *id017
+    - *id019
+    - *id020
+    - *id070
+    - *id022
+    - *id071
+    - *id035
+    - *id037
+    - *id038
+    - *id043
+    - *id045
     - *id046
     - *id047
-    - *id048
     - *id049
     - *id050
-    - *id051
+    - *id076
     - *id052
-    - *id053
-    - *id054
+    - *id077
     - *id055
-    - *id056
     - *id057
     - *id058
-    - *id026
-    - *id027
+    - *id080
     - *id059
-    - *id029
-    - *id030
-    - *id060
-    - *id061
-    - *id062
-    - *id063
-    - *id035
-    - *id036
-    - *id064
-    - *id038
-    - *id039
+    - *id084
 - form: ''
   grammatical_expression: and(subset_eq(A, B), subset_eq(B, A))
   length: 7
   meaning:
     referents:
-    - *id002
-    - *id003
+    - *id001
+    - *id082
     - *id008
     - *id009
-    - *id011
-    - *id012
-    - *id026
-    - *id027
-    - *id029
-    - *id030
-    - *id035
-    - *id036
-    - *id038
-    - *id039
+    - *id010
+    - *id083
+    - *id045
+    - *id046
+    - *id049
+    - *id050
+    - *id057
+    - *id058
+    - *id059
+    - *id084
 - form: ''
   grammatical_expression: or(subset_eq(A, B), subset_eq(B, A))
   length: 7
   meaning:
     referents:
-    - *id040
+    - *id060
+    - *id061
     - *id001
-    - *id002
+    - *id082
+    - *id062
     - *id003
-    - *id041
-    - *id042
-    - *id043
-    - *id004
+    - *id063
+    - *id064
     - *id005
+    - *id065
     - *id006
-    - *id044
     - *id007
     - *id008
     - *id009
-    - *id045
+    - *id066
+    - *id067
     - *id010
-    - *id011
+    - *id083
+    - *id068
     - *id012
-    - *id046
-    - *id047
-    - *id048
-    - *id049
-    - *id050
-    - *id051
-    - *id052
-    - *id053
-    - *id054
-    - *id013
-    - *id014
-    - *id015
-    - *id016
+    - *id069
     - *id017
-    - *id018
     - *id019
     - *id020
-    - *id021
-    - *id055
-    - *id056
-    - *id057
+    - *id070
     - *id022
-    - *id023
-    - *id024
-    - *id058
-    - *id025
-    - *id026
-    - *id027
-    - *id059
+    - *id071
+    - *id072
     - *id028
-    - *id029
+    - *id073
     - *id030
-    - *id060
-    - *id061
-    - *id062
     - *id031
     - *id032
-    - *id033
-    - *id063
+    - *id074
     - *id034
+    - *id075
     - *id035
-    - *id036
-    - *id064
     - *id037
     - *id038
-    - *id039
-- form: ''
-  grammatical_expression: not(subset_eq(A, B))
-  length: 4
-  meaning:
-    referents:
     - *id040
     - *id041
-    - *id065
     - *id042
     - *id043
-    - *id066
     - *id044
     - *id045
     - *id046
-    - *id067
     - *id047
     - *id048
-    - *id068
-    - *id069
-    - *id070
-    - *id071
     - *id049
-    - *id072
     - *id050
-    - *id051
-    - *id052
-    - *id073
-    - *id053
-    - *id054
-    - *id074
-    - *id075
     - *id076
+    - *id052
     - *id077
     - *id078
+    - *id054
     - *id079
-    - *id080
     - *id055
-    - *id081
     - *id056
     - *id057
-    - *id082
     - *id058
+    - *id080
+    - *id081
     - *id059
-    - *id060
-    - *id083
-    - *id061
-    - *id062
     - *id084
-    - *id063
-    - *id064
 - form: ''
-  grammatical_expression: not(subset_eq(B, A))
-  length: 4
+  grammatical_expression: difference(A, B)
+  length: 3
   meaning:
     referents:
-    - *id001
-    - *id065
-    - *id066
+    - *id060
+    - *id062
+    - *id002
+    - *id003
+    - *id063
     - *id004
-    - *id005
     - *id006
-    - *id007
-    - *id010
-    - *id067
+    - *id066
     - *id068
+    - *id011
+    - *id012
     - *id069
-    - *id070
-    - *id071
-    - *id072
-    - *id073
-    - *id074
-    - *id075
-    - *id076
-    - *id077
-    - *id078
     - *id013
     - *id014
     - *id015
-    - *id079
     - *id016
     - *id017
     - *id018
-    - *id080
     - *id019
     - *id020
+    - *id070
     - *id021
-    - *id081
-    - *id082
     - *id022
+    - *id071
     - *id023
     - *id024
     - *id025
+    - *id026
+    - *id027
+    - *id029
+    - *id033
+    - *id035
+    - *id036
+    - *id037
+    - *id038
+    - *id039
+    - *id043
+    - *id047
+    - *id076
+    - *id051
+    - *id052
+    - *id077
+    - *id053
+    - *id055
+    - *id080
+- form: ''
+  grammatical_expression: difference(B, A)
+  length: 3
+  meaning:
+    referents:
+    - *id061
+    - *id002
+    - *id004
+    - *id064
+    - *id005
+    - *id065
+    - *id007
+    - *id067
+    - *id011
+    - *id013
+    - *id014
+    - *id015
+    - *id016
+    - *id018
+    - *id021
+    - *id023
+    - *id024
+    - *id025
+    - *id026
+    - *id027
+    - *id072
     - *id028
-    - *id083
-    - *id084
+    - *id073
+    - *id029
+    - *id030
     - *id031
     - *id032
     - *id033
+    - *id074
     - *id034
+    - *id075
+    - *id036
+    - *id039
+    - *id040
+    - *id041
+    - *id042
+    - *id044
+    - *id048
+    - *id051
+    - *id053
+    - *id078
+    - *id054
+    - *id079
+    - *id056
+    - *id081
+- form: ''
+  grammatical_expression: union(A, B)
+  length: 3
+  meaning:
+    referents:
+    - *id060
+    - *id061
+    - *id001
+    - *id062
+    - *id002
+    - *id003
+    - *id063
+    - *id004
+    - *id064
+    - *id005
+    - *id065
+    - *id006
+    - *id007
+    - *id008
+    - *id009
+    - *id066
+    - *id067
+    - *id010
+    - *id068
+    - *id011
+    - *id012
+    - *id069
+    - *id013
+    - *id014
+    - *id015
+    - *id016
+    - *id017
+    - *id018
+    - *id019
+    - *id020
+    - *id070
+    - *id021
+    - *id022
+    - *id071
+    - *id023
+    - *id024
+    - *id025
+    - *id026
+    - *id027
+    - *id072
+    - *id028
+    - *id073
+    - *id029
+    - *id030
+    - *id031
+    - *id032
+    - *id033
+    - *id074
+    - *id034
+    - *id075
+    - *id035
+    - *id036
     - *id037
+    - *id038
+    - *id039
+    - *id040
+    - *id041
+    - *id042
+    - *id043
+    - *id044
+    - *id045
+    - *id046
+    - *id047
+    - *id048
+    - *id049
+    - *id050
+    - *id076
+    - *id051
+    - *id052
+    - *id077
+    - *id053
+    - *id078
+    - *id054
+    - *id079
+    - *id055
+    - *id056
+    - *id057
+    - *id058
+    - *id080
+    - *id081
+    - *id059
+- form: ''
+  grammatical_expression: intersection(A, B)
+  length: 3
+  meaning:
+    referents:
+    - *id001
+    - *id003
+    - *id005
+    - *id006
+    - *id007
+    - *id008
+    - *id009
+    - *id010
+    - *id012
+    - *id015
+    - *id017
+    - *id018
+    - *id019
+    - *id020
+    - *id022
+    - *id025
+    - *id028
+    - *id029
+    - *id030
+    - *id031
+    - *id032
+    - *id034
+    - *id035
+    - *id036
+    - *id037
+    - *id038
+    - *id039
+    - *id040
+    - *id041
+    - *id042
+    - *id043
+    - *id044
+    - *id045
+    - *id046
+    - *id047
+    - *id048
+    - *id049
+    - *id050
+    - *id052
+    - *id054
+    - *id055
+    - *id056
+    - *id057
+    - *id058
+    - *id059
 - form: ''
   grammatical_expression: subset_eq(A, difference(A, A))
   length: 5
   meaning:
     referents:
-    - *id001
-    - *id003
-    - *id004
-    - *id006
-    - *id010
-    - *id012
-    - *id013
-    - *id015
-    - *id019
-    - *id021
-    - *id031
-    - *id033
-    - *id037
-    - *id039
+    - *id061
+    - *id082
+    - *id064
+    - *id065
+    - *id067
+    - *id083
+    - *id072
+    - *id073
+    - *id074
+    - *id075
+    - *id078
+    - *id079
+    - *id081
+    - *id084
 - form: ''
   grammatical_expression: subset_eq(A, difference(A, B))
   length: 5
   meaning:
     referents:
-    - *id040
-    - *id001
-    - *id003
-    - *id041
-    - *id065
-    - *id043
-    - *id066
+    - *id060
+    - *id061
+    - *id082
+    - *id062
+    - *id002
+    - *id063
     - *id004
-    - *id006
-    - *id045
-    - *id010
-    - *id012
-    - *id046
+    - *id064
+    - *id065
+    - *id066
     - *id067
-    - *id048
+    - *id083
     - *id068
+    - *id011
     - *id069
+    - *id013
+    - *id014
+    - *id016
+    - *id070
+    - *id021
     - *id071
-    - *id052
+    - *id023
+    - *id024
+    - *id026
+    - *id027
+    - *id072
     - *id073
-    - *id054
+    - *id033
     - *id074
     - *id075
+    - *id076
+    - *id051
     - *id077
+    - *id053
     - *id078
-    - *id013
-    - *id015
+    - *id079
     - *id080
-    - *id019
-    - *id021
-    - *id060
-    - *id083
-    - *id062
+    - *id081
     - *id084
-    - *id031
-    - *id033
-    - *id064
-    - *id037
-    - *id039
 - form: ''
   grammatical_expression: subset_eq(B, difference(A, A))
   length: 5
   meaning:
     referents:
-    - *id040
-    - *id003
-    - *id041
-    - *id043
-    - *id045
-    - *id012
-    - *id046
-    - *id048
-    - *id052
-    - *id054
     - *id060
+    - *id082
     - *id062
-    - *id064
-    - *id039
+    - *id063
+    - *id066
+    - *id083
+    - *id068
+    - *id069
+    - *id070
+    - *id071
+    - *id076
+    - *id077
+    - *id080
+    - *id084
 - form: ''
   grammatical_expression: subset_eq(union(A, B), difference(A, A))
   length: 7
   meaning:
     referents:
-    - *id003
-    - *id012
-    - *id039
-- form: ''
-  grammatical_expression: equals(cardinality(A), cardinality(B))
-  length: 5
-  meaning:
-    referents:
-    - *id002
-    - *id003
-    - *id065
-    - *id066
-    - *id008
-    - *id009
-    - *id011
-    - *id012
-    - *id070
-    - *id071
-    - *id072
-    - *id073
-    - *id076
-    - *id077
-    - *id079
-    - *id080
-    - *id081
     - *id082
-    - *id026
-    - *id027
-    - *id029
-    - *id030
     - *id083
     - *id084
-    - *id035
-    - *id036
-    - *id038
-    - *id039
-- form: ''
-  grammatical_expression: greater_than(cardinality(A), cardinality(B))
-  length: 5
-  meaning:
-    referents:
-    - *id040
-    - *id041
-    - *id042
-    - *id043
-    - *id044
-    - *id045
-    - *id046
-    - *id067
-    - *id047
-    - *id048
-    - *id068
-    - *id049
-    - *id050
-    - *id051
-    - *id052
-    - *id053
-    - *id054
-    - *id074
-    - *id055
-    - *id056
-    - *id057
-    - *id058
-    - *id059
-    - *id060
-    - *id061
-    - *id062
-    - *id063
-    - *id064
-- form: ''
-  grammatical_expression: greater_than(cardinality(B), cardinality(A))
-  length: 5
-  meaning:
-    referents:
-    - *id001
-    - *id004
-    - *id005
-    - *id006
-    - *id007
-    - *id010
-    - *id069
-    - *id075
-    - *id078
-    - *id013
-    - *id014
-    - *id015
-    - *id016
-    - *id017
-    - *id018
-    - *id019
-    - *id020
-    - *id021
-    - *id022
-    - *id023
-    - *id024
-    - *id025
-    - *id028
-    - *id031
-    - *id032
-    - *id033
-    - *id034
-    - *id037
