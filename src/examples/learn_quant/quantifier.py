@@ -5,14 +5,14 @@ import pandas as pd
 from altk.language.semantics import Referent
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(eq=False)
 class QuantifierModel(Referent):
     """A quantifier model is a single referent that captures a particular interpretation of a quantifier meaning, which is a set of quantifier referents."""
 
-    name: str() = None
-    M: set() = None
-    A: set() = None
-    B: set() = None
+    name: str = None
+    M: set = None
+    A: set = None
+    B: set = None
 
     def __post_init__(self):
 
@@ -21,7 +21,6 @@ class QuantifierModel(Referent):
         
         if self.M and self.A and self.B:
             self._update_name()
-
         elif self.name:
             self._update_sets()
     

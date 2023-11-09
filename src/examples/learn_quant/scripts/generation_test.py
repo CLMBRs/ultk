@@ -9,4 +9,5 @@ from examples.learn_quant.grammar import quantifiers_grammar
 from examples.learn_quant.meaning import quantifiers_universe
 
 if __name__ == "__main__":
-    quantifiers_grammar.generate()
+    out = quantifiers_grammar.generate()
+    print(out)

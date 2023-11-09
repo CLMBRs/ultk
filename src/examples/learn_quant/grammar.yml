@@ -8,6 +8,7 @@ rules:
   name: "and"
   function: |
     lambda p1 , p2 : p1 and p2
+  weight: 1.0
 - lhs: bool
   rhs:
     - bool
@@ -15,12 +16,14 @@ rules:
   name: "or"
   function: |
     lambda p1 , p2 : p1 or p2
+  weight: 1.0
 - lhs: bool
   rhs:
     - bool
   name: "not"
   function: |
     lambda p : not p
+  weight: 1.0
 # set logic rules
 - lhs: set
   rhs:
@@ -29,6 +32,7 @@ rules:
   name: "union"
   function: |
     lambda s1, s2 : s1 | s2
+  weight: 1.0
 - lhs: set
   rhs:
     - set
@@ -36,6 +40,7 @@ rules:
   name: "intersection"
   function: |
     lambda s1, s2 : s1 & s2
+  weight: 1.0
 - lhs: set
   rhs:
     - set
@@ -43,19 +48,22 @@ rules:
   name: "difference"
   function: |
     lambda s1, s2 : s1 - s2
+  weight: 1.0
 - lhs: set
   rhs:
     - int
     - set
   name: "index"
   function: |
-    lambda i, s: sorted(s)[i]
+    lambda i, s: set([sorted(s)[i]]) if i < len(s) else set()
+  weight: 1.0
 - lhs: int
   rhs:
     - set
   name: "cardinality"
   function: |
-    lambda s: s.len()
+    lambda s: len(s)
+  weight: 1.0
 - lhs: bool
   rhs:
     - set
@@ -63,6 +71,7 @@ rules:
   name: "subset_eq"
   function: |
     lambda s1, s2: s1.issubset(s2)
+  weight: 1.0
 # integer logical rules
 - lhs: bool
   rhs:
@@ -71,6 +80,7 @@ rules:
   name: "equals"
   function: |
     lambda i1, i2: i1 == i2
+  weight: 1.0
 - lhs: bool
   rhs:
     - int
@@ -78,14 +88,17 @@ rules:
   name: "greater_than"
   function: |
     lambda i1, i2: i1 > i2
+  weight: 1.0
 # primitive
 - lhs: set
   rhs: 
   name: "A"
   function: |
-    lambda point: quantifier.A
+    lambda q: q.A
+  weight: 10.0
 - lhs: set
   rhs: 
   name: "B"
   function: |
-    lambda point: quantifier.B
+    lambda q: q.B
+  weight: 10.0
