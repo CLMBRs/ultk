@@ -9,11 +9,7 @@ from dataclasses import dataclass
 class QuantifierModel(Referent):
     """A quantifier model is a single referent that captures a particular interpretation of a quantifier meaning, which is a set of quantifier referents.
 
-    Every quantifier model is a quadruple <M, A, B, X>, where M corresponds to all possible quantifier referents for a given communicative situation, A and B are differents sets of quantifier referents that correspond to the items of comparison in quantificational logic, and X corresponds to the space of all possible referents that are a superset or equal to the referents in M. That is, X is conceptually the set of possible referents in any quantification expression modeled in the universe.
-
-    A scalar index (single referent in a set M, A, B) from [0, X) corresponds to a unique referent in a quantifier model.
-
-    X is conceptually a set but is listed as an integer that denotes the length of an array [0, X).
+    Every quantifier model is a quadruple <M, A, B>, where M corresponds to all possible quantifier referents for a given communicative situation, A and B are differents sets of quantifier referents that correspond to the items of comparison in quantificational logic.
     """
 
     name: str = None
@@ -25,7 +21,7 @@ class QuantifierModel(Referent):
     def __post_init__(self):
 
         if not self.name and not (self.M and self.A and self.B):
-            raise ValueError("Must initialize with either a 'name' of length X or sets for <M, A, B> and an int value for X")
+            raise ValueError("Must initialize with either a name or sets for <M, A, B>")
         
         if self.M and self.A and self.B:
             self._update_name()
@@ -58,11 +54,13 @@ class QuantifierModel(Referent):
                 
     def _update_name(self, **kwargs):
 
-        allowed_keys = {"M", "A", "B", "X"}
+        allowed_keys = {"M", "A", "B"}
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in allowed_keys)
 
+        max_index = max(self.M | self.A | self.B)
+
         name_seq = []
-        for i in range(0, self.X):
+        for i in range(0, max_index + 1):
             in_both = i in self.A and i in self.B
             in_A = i in self.A and not in_both
             in_B = i in self.B and not in_both
@@ -80,15 +78,13 @@ class QuantifierModel(Referent):
                 name_seq.append("3")
             if in_neither and not in_M:
                 name_seq.append("4")
-
-        assert len(name_seq) == self.X
             
         self.name = "".join(name_seq)
 
     def update(self, **kwargs):
 
         self.__dict__.update((key, kwargs[key])
-            for key in ('name', 'M', 'A', 'B', "X") if key in kwargs)
+            for key in ('name', 'M', 'A', 'B') if key in kwargs)
         self._update_name()
         self._update_sets()
 
@@ -96,9 +92,9 @@ class QuantifierModel(Referent):
         return {"M": len(self.M), 
                 "A": len(self.A), 
                 "B": len(self.B), 
-                "X": self.X}
-    
-"""
+                }
+
+"""   
 qm = QuantifierModel(M=set([1,2,3,4]), A=set([1,4]), B=set([2,3]))
 qm.name
 

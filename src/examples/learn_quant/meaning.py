@@ -5,13 +5,15 @@ from itertools import product, combinations, permutations
 from altk.language.sampling import powerset
 import random
 
-M_SIZE = 4
-X_SIZE = 6
+"""
+0 : A
+1 : B
+2 : A | B
+3 : M - (A | B)
+4 : X - (M | A | B)
+"""
 
-
-referent_pertinence = {"value": ["A", "B", "both", "neither"]}
-
-def create_universe(referent_pertinence, M_SIZE, X_SIZE):
+def create_universe(M_SIZE, X_SIZE):
     quantifiers_list = []
     for m_size in range(M_SIZE):
         quantifiers_at_msize = []
@@ -22,8 +24,15 @@ def create_universe(referent_pertinence, M_SIZE, X_SIZE):
             for (A, B) in combs_A_B_for_M:
                 quantifiers_at_msize.append([set(M), A, B])
         quantifiers_list.extend(quantifiers_at_msize)
-    quantifier_models_list = [QuantifierModel(M=m, A=a, B=b, X=X_SIZE) for (m, a, b) in quantifiers_list]
-    return quantifier_models_list
+    quantifier_universe = Universe([QuantifierModel(M=m, A=a, B=b) for (m, a, b) in quantifiers_list])
+    return quantifier_universe
 
-quantifier_universe = create_universe(referent_pertinence, M_SIZE, X_SIZE)
-print("The size of the universe is {}".format(len(quantifier_universe)))
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Generate expressions')
+    parser.add_argument('--m_size', type=int, default=8, help='maximum size of the universe')
+    parser.add_argument('--x_size', type=int, default=8, help='number of unique referents from which M may be comprised')
+    args = parser.parse_args()
+
+    quantifier_universe = create_universe(M_SIZE, X_SIZE)
+    print("The size of the universe is {}".format(len(quantifier_universe)))
