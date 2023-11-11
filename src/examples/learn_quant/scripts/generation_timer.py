@@ -46,7 +46,8 @@ if __name__ == "__main__":
             creation_elapsed = time() - creation_start
             print("The size of the universe is {}".format(len(quantifier_universe)))
 
-            for depth in range(1, args.depth+1):
+            # Don't consider depth=1, as depth is not deep enough to generate and expression 
+            for depth in range(2, args.depth+1):
 
                 enumeration_start = time()
                 print("msize: ", m_size)
@@ -62,6 +63,7 @@ if __name__ == "__main__":
                 outpath = Path("learn_quant/outputs") / Path("M"+str(m_size)) / Path("X"+str(args.x_size)) / Path(str("d"+str(depth))) / Path("generated_expressions.yml")
                 Path(outpath).parent.mkdir(parents=True, exist_ok=True)
 
+                print("Saving generated expressions...")
                 save_quantifiers(expressions_by_meaning, outpath)
 
                 writer.writerow([m_size, args.x_size, depth, len(quantifier_universe), enumerate_elapsed, creation_elapsed])
