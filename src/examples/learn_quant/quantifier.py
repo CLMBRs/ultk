@@ -16,7 +16,6 @@ class QuantifierModel(Referent):
     M: set = None
     A: set = None
     B: set = None
-    X: int = None
 
     def __post_init__(self):
 
@@ -32,8 +31,6 @@ class QuantifierModel(Referent):
 
         if name:
             self.name = name
-
-        self.X = len(name)
 
         self.M = set() 
         self.A = set()

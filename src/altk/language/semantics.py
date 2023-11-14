@@ -49,8 +49,9 @@ class Universe:
     """The universe is the set of possible referent objects for a meaning."""
 
     def __init__(self, referents: Iterable[Referent], prior: dict[str, float] = None):
-        self.referents = referents
         self._referents_by_name = {referent.name: referent for referent in referents}
+        # Referents must be unique
+        self.referents = [referent for referent in self._referents_by_name.values()]
         # set to uniform prior if none specified
         size = len(referents)
         prior = prior or {referent.name: 1 / size for referent in referents}
