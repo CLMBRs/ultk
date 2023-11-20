@@ -2,8 +2,9 @@
 from typing import Iterable, Union
 import numpy as np
 import pandas as pd
-from altk.language.semantics import Referent
-from dataclasses import dataclass
+from altk.language.semantics import Referent, Universe
+from dataclasses import dataclass, field
+from concepts.contexts import Context
 
 @dataclass(eq=True, frozen=True)
 class QuantifierModel(Referent):
@@ -16,9 +17,25 @@ class QuantifierModel(Referent):
     M: frozenset = None
     A: frozenset = None
     B: frozenset = None
+    tv: tuple[bool] = field(init=False)
+
+    def __post_init__(self):
+        object.__setattr__(self, 'tv', tuple(True if x == '2' else False for x in self.name))
 
     def get_cardinalities(self) -> dict:
         return {"M": len(self.M), 
                 "A": len(self.A), 
                 "B": len(self.B), 
                 }
+    
+    def get_truth_vector(self) -> list:
+        return self.tv
+
+
+class QuantifierUniverse(Universe):
+
+    def __init__(self, referents: Iterable[QuantifierModel], m_size: int, x_size: int, prior: dict[str, float] = None):
+        super().__init__(referents, prior)
+        self.m_size = m_size
+        self.x_size = x_size
+

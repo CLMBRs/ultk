@@ -43,7 +43,6 @@ class Referent:
     def __lt__(self, other):
         return self.name < other.name
 
-
 class Universe:
 
     """The universe is the set of possible referent objects for a meaning."""
@@ -147,6 +146,7 @@ class Meaning:
 
         self.referents = referents
         self.universe = universe
+        self.names = set(referent.name for referent in referents)
 
         zeros = {
             ref.name: 0.0 for ref in set(self.universe.referents) - set(self.referents)
@@ -171,6 +171,9 @@ class Meaning:
 
     def __eq__(self, other):
         return (self.referents, self.universe) == (other.referents, other.universe)
+    
+    def __len__(self) -> int:
+        return len(self.referents)
 
     def __str__(self):
         return f"Referents:\n\t{','.join(str(referent) for referent in self.referents)}\

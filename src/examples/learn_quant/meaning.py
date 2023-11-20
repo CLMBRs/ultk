@@ -1,6 +1,5 @@
 import pandas as pd
-from altk.language.semantics import Universe
-from learn_quant.quantifier import QuantifierModel
+from learn_quant.quantifier import QuantifierModel, QuantifierUniverse
 from itertools import product, combinations_with_replacement, permutations
 from altk.language.sampling import powerset
 import random
@@ -42,7 +41,7 @@ def create_universe(M_SIZE, X_SIZE):
             if name[index] == "3":
                 M.append(int(index))
         quantifier_models.add(QuantifierModel(name=name, M=frozenset(M), A=frozenset(A), B=frozenset(B)))
-    return Universe(quantifier_models)
+    return QuantifierUniverse(quantifier_models, M_SIZE, X_SIZE)
 
 if __name__ == "__main__":
 
@@ -54,3 +53,4 @@ if __name__ == "__main__":
 
     quantifier_universe = create_universe(M_SIZE, X_SIZE)
     print("The size of the universe is {}".format(len(quantifier_universe)))
+    
