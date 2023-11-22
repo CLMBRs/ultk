@@ -86,7 +86,7 @@ class Language:
 
     def add_expression(self, e: Expression):
         """Add an expression to the list of expressions in a language."""
-        self.expressions = tuple(sorted(self.expressions + (e,)))
+        self.expressions = tuple(sorted(tuple(self.expressions) + (e,)))
 
     def pop(self, index: int) -> Expression:
         """Removes an expression at the specified index of the list of expressions, and returns it."""
