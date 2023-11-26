@@ -17,22 +17,17 @@ class QuantifierModel(Referent):
     M: frozenset = field(init=False)
     A: frozenset = field(init=False)
     B: frozenset = field(init=False)
-    tv: tuple[bool] = field(init=False)
 
     def __post_init__(self):
         object.__setattr__(self, 'A', frozenset([i if x in ['0','2'] for i, x in enumerate(self.name)]))
         object.__setattr__(self, 'B', frozenset([i if x in ['1','2'] for i, x in enumerate(self.name)]))
         object.__setattr__(self, 'M', frozenset([i if x in ['0','1','2','3'] for i, x in enumerate(self.name)]))
-        object.__setattr__(self, 'tv', tuple(True if x == '2' else False for x in self.name))
 
     def get_cardinalities(self) -> dict:
         return {"M": len(self.M), 
                 "A": len(self.A), 
                 "B": len(self.B), 
                 }
-    
-    def get_truth_vector(self) -> list:
-        return self.tv
 
 
 class QuantifierUniverse(Universe):

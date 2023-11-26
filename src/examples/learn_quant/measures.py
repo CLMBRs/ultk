@@ -48,7 +48,8 @@ class MonotonicityMeasurer:
         """
         truth_array = []
         for quantifier_model in self.universe.referents:
-            truth_array.append(quantifier_model.get_truth_vector())
+            truth_vector = tuple(True if x == '2' else False for x in quantifier_model.name)
+            truth_array.append(truth_vector)
         truth_df = pd.concat([pd.DataFrame(self._get_names()).rename(columns={0: 'names'}), pd.DataFrame(truth_array)], axis=1).set_index("names")
         return truth_df
 
