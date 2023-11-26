@@ -16,6 +16,7 @@ from learn_quant.quantifier import QuantifierModel
 from learn_quant.scripts.generate_expressions import enumerate_quantifiers, save_quantifiers
 
 from ..meaning import create_universe
+from ..grammar import quantifiers_grammar
 
 if __name__ == "__main__":
 
@@ -23,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('--m_size', type=int, default=8, help='maximum size of the universe')
     parser.add_argument('--x_size', type=int, default=8, help='number of unique referents from which M may be comprised')
     parser.add_argument('--depth', type=int, default=4, help='maximum depth of the expressions')
+    parser.add_argument('--weight', type=float, default=2.0, help='weight of the index primitives')
     args = parser.parse_args()
 
     import os
@@ -41,7 +43,12 @@ if __name__ == "__main__":
         for m_size in range(1, args.m_size+1):
             
             print("Generating a universe where x_size={} and m_size={}.".format(args.x_size, m_size))
+
+            # Ensure that primitives are added to the grammar up to `m_size`
             creation_start = time()
+            quantifiers_grammar.add_indices_as_primitives(m_size, args.weight)
+
+            # Create the universe
             quantifier_universe = create_universe(m_size, args.x_size)
             creation_elapsed = time() - creation_start
             print("The size of the universe is {}".format(len(quantifier_universe)))

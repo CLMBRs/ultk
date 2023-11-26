@@ -16,6 +16,7 @@ import numpy as np
 from tqdm import tqdm
 from scipy import sparse
 
+
 class MonotonicityMeasurer:
     
     def __init__(self, universe: QuantifierUniverse, monotone_set: str ='A', down: bool = False):
@@ -128,7 +129,7 @@ class MonotonicityMeasurer:
 
         return True if len(self._get_sub_structure_in_meaning(name, meaning)) > 0 else False
     
-    def upward_monotonicity_entropy(all_models, quantifier):
+    def upward_monotonicity_entropy(self, all_models, quantifier):
         """Measures degree of upward monotonicity of a quantifiers as
         1 - H(Q | true_pred) / H(Q) where H is (conditional) entropy, and true_pred is the
         variable over models saying whether there's a true _predecessor_ in the
@@ -157,7 +158,8 @@ class MonotonicityMeasurer:
         def has_true_pred(num_arr, y):
             return np.any(y * num_arr)    
 
-        true_preds = np.where(np.dot(mm.submembership, quantifier) >= 1, 1, 0)
+        # where necessary?
+        true_preds = np.where(np.dot(self.submembership, quantifier) >= 1, 1, 0)
 
         p_pred = sum(true_preds) / len(true_preds)
         p_nopred = 1 - p_pred
@@ -202,4 +204,4 @@ class MonotonicityMeasurer:
 
         for expression_id, quantifier_expression in enumerate(expressions):
             print("Calculating monotonicity for: ", quantifier_expression)
-            self.metrics[str(quantifier_expression)]["monotonicity"] = upward_monotonicity_entropy(self.submembership, self.membership[:, expression_id])
+            self.metrics[str(quantifier_expression)]["monotonicity"] = self.upward_monotonicity_entropy(self.submembership, self.membership[:, expression_id])

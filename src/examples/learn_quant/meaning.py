@@ -24,23 +24,7 @@ def create_universe(M_SIZE, X_SIZE):
 
     quantifier_models = set()
     for name in possible_quantifiers_name:
-        M = []
-        A = []
-        B = []
-        for index, i in enumerate(name):
-            if name[index] == "0":
-                A.append(int(index))
-                M.append(int(index))
-            if name[index] == "1":
-                B.append(int(index))
-                M.append(int(index))
-            if name[index] == "2":
-                A.append(int(index))
-                B.append(int(index))
-                M.append(int(index))
-            if name[index] == "3":
-                M.append(int(index))
-        quantifier_models.add(QuantifierModel(name=name, M=frozenset(M), A=frozenset(A), B=frozenset(B)))
+        quantifier_models.add(QuantifierModel(name=name))
     return QuantifierUniverse(quantifier_models, M_SIZE, X_SIZE)
 
 if __name__ == "__main__":

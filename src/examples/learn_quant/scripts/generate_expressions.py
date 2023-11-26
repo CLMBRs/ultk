@@ -5,10 +5,11 @@ try:
 except ImportError:
     from yaml import Dumper
 
-from ..grammar import quantifiers_grammar
+from ..quantifier import QuantifierUniverse
+from ..grammar import QuantifierGrammar, quantifiers_grammar
 from ..meaning import create_universe
 
-def enumerate_quantifiers(depth, quantifiers_universe):
+def enumerate_quantifiers(depth, quantifiers_universe: QuantifierUniverse, quantifiers_grammar: QuantifierGrammar):
 
     expressions_by_meaning = quantifiers_grammar.get_unique_expressions(
         depth,
@@ -40,14 +41,14 @@ def save_quantifiers(expressions_by_meaning,
 
 if __name__ == "__main__":
 
-    from ..grammar import quantifiers_grammar
-
     parser = argparse.ArgumentParser(description='Generate expressions')
     parser.add_argument('--m_size', type=int, default=8, help='maximum size of the universe')
     parser.add_argument('--x_size', type=int, default=8, help='number of unique referents from which M may be comprised')
     parser.add_argument('--depth', type=int, default=4, help='maximum depth of the expressions')
+    parser.add_argument('--weight', type=float, default=2.0, help='weight of the index primitives')
     args = parser.parse_args()
 
+    quantifiers_grammar.add_indices_as_primitives(args.m_size, args.weight)
     quantifiers_universe = create_universe(args.m_size, args.x_size)
-    expressions_by_meaning = enumerate_quantifiers(args.depth, quantifiers_universe)
+    expressions_by_meaning = enumerate_quantifiers(args.depth, quantifiers_universe, quantifiers_grammar)
     save_quantifiers(expressions_by_meaning)
