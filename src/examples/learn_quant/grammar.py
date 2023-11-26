@@ -23,7 +23,7 @@ class QuantifierGrammar(Grammar):
             weight (float): Weight of the rule.
         """
         self.add_rule(Rule(name="{}".format(index),
-                           lhs=int,
+                           lhs="int",
                            rhs=None,
                            function=lambda i: index,
                            weight=weight))
@@ -40,11 +40,10 @@ class QuantifierGrammar(Grammar):
         """
 
         if isinstance(indices, int):
-            for index in range(indices) + 1:
+            for index in range(indices + 1):
                 self.add_index_primitive(index, weight)
         elif isinstance(indices, list):
             for index in indices:
                 self.add_index_primitive(index, weight)
-        return self
 
 quantifiers_grammar = QuantifierGrammar.from_yaml("learn_quant/grammar.yml")

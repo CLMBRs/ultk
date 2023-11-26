@@ -5,6 +5,7 @@ import pandas as pd
 from time import time
 import csv
 import argparse
+from copy import deepcopy
 
 try:
     from yaml import CDumper as Dumper
@@ -45,10 +46,11 @@ if __name__ == "__main__":
             print("Generating a universe where x_size={} and m_size={}.".format(args.x_size, m_size))
 
             # Ensure that primitives are added to the grammar up to `m_size`
-            creation_start = time()
-            quantifiers_grammar.add_indices_as_primitives(m_size, args.weight)
+            quantifiers_grammar_at_depth = deepcopy(quantifiers_grammar)
+            quantifiers_grammar_at_depth.add_indices_as_primitives(args.m_size, args.weight)
 
             # Create the universe
+            creation_start = time()
             quantifier_universe = create_universe(m_size, args.x_size)
             creation_elapsed = time() - creation_start
             print("The size of the universe is {}".format(len(quantifier_universe)))
@@ -60,7 +62,7 @@ if __name__ == "__main__":
                 print("msize: ", m_size)
                 print("depth: ", depth)
 
-                expressions_by_meaning = enumerate_quantifiers(depth, quantifier_universe)
+                expressions_by_meaning = enumerate_quantifiers(depth, quantifier_universe, quantifiers_grammar_at_depth)
 
                 enumerate_elapsed = time() - enumeration_start
                 print(enumerate_elapsed)

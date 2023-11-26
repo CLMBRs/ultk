@@ -188,6 +188,15 @@ class Grammar:
         self._rules_by_name: dict[str, Rule] = {}
         self._start = start
 
+    def __iter__(self):
+        # Return an iterator object
+        return iter(self._rules_by_name.items())
+
+    def __next__(self):
+        # Return the next rule in the iterator
+        # Raise StopIteration if there are no more rules
+        raise StopIteration
+
     def add_rule(self, rule: Rule):
         self._rules[rule.lhs].append(rule)
         if rule.name in self._rules_by_name:

@@ -19,9 +19,9 @@ class QuantifierModel(Referent):
     B: frozenset = field(init=False)
 
     def __post_init__(self):
-        object.__setattr__(self, 'A', frozenset([i if x in ['0','2'] for i, x in enumerate(self.name)]))
-        object.__setattr__(self, 'B', frozenset([i if x in ['1','2'] for i, x in enumerate(self.name)]))
-        object.__setattr__(self, 'M', frozenset([i if x in ['0','1','2','3'] for i, x in enumerate(self.name)]))
+        object.__setattr__(self, 'A', frozenset([i for i, x in enumerate(self.name) if x in ['0','2']]))
+        object.__setattr__(self, 'B', frozenset([i for i, x in enumerate(self.name) if x in ['1','2']]))
+        object.__setattr__(self, 'M', frozenset([i for i, x in enumerate(self.name) if x in ['0','1','2','3']]))
 
     def get_cardinalities(self) -> dict:
         return {"M": len(self.M), 
