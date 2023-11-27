@@ -28,7 +28,7 @@ class QuantifierGrammar(Grammar):
                            function=lambda i: index,
                            weight=weight))
 
-    def add_indices_as_primitives(self, indices: Union[int, List[int]], weight: float) -> Grammar:
+    def add_indices_as_primitives(self, indices: Union[int, List[int]], weight: float = 2.0) -> Grammar:
         """Add indices as primitives to the grammar.
 
         Args:
@@ -40,7 +40,7 @@ class QuantifierGrammar(Grammar):
         """
 
         if isinstance(indices, int):
-            for index in range(indices + 1):
+            for index in range(indices):
                 self.add_index_primitive(index, weight)
         elif isinstance(indices, list):
             for index in indices:

@@ -3,14 +3,7 @@ from learn_quant.quantifier import QuantifierModel, QuantifierUniverse
 from itertools import product, combinations_with_replacement, permutations
 from altk.language.sampling import powerset
 import random
-
-"""
-0 : A
-1 : B
-2 : A | B
-3 : M - (A | B)
-4 : X - (M | A | B)
-"""
+import argparse
 
 def create_universe(M_SIZE, X_SIZE):
 

@@ -11,6 +11,13 @@ class QuantifierModel(Referent):
     """A quantifier model is a single referent that captures a particular interpretation of a quantifier meaning, which is a set of quantifier referents.
 
     Every quantifier model is a quadruple <M, A, B>, where M corresponds to all possible quantifier referents for a given communicative situation, A and B are differents sets of quantifier referents that correspond to the items of comparison in quantificational logic.
+    
+    0 => in A
+    1 => in B
+    2 => in (A | B)
+    3 => in M - (A | B)
+    4 => not in (M | A | B)
+    
     """
 
     name: str = None
