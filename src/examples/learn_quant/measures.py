@@ -118,7 +118,7 @@ class MonotonicityMeasurer:
 
         names = set(referent.name for referent in meaning.referents)
 
-        return self._get_sub_structures(name).intersection(names)
+        return self._get_sub_structures(name) & names
     
     def _has_sub_structure_in_meaning(self, name: list[str], meaning: Meaning) -> bool:
 

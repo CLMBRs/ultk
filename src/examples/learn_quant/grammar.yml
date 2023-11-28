@@ -7,7 +7,7 @@ rules:
     - bool
   name: "and"
   function: |
-    lambda p1 , p2 : p1 and p2
+    lambda p1, p2 : p1 and p2
   weight: 1.0
 - lhs: bool
   rhs:
@@ -15,7 +15,7 @@ rules:
     - bool
   name: "or"
   function: |
-    lambda p1 , p2 : p1 or p2
+    lambda p1, p2 : p1 or p2
   weight: 1.0
 - lhs: bool
   rhs:
@@ -70,7 +70,7 @@ rules:
     - frozenset
   name: "subset_eq"
   function: |
-    lambda s1, s2: s1.issubset(s2)
+    lambda s1, s2: s1 <= s2
   weight: 1.0
 # integer logical rules
 - lhs: bool
