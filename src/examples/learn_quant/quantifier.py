@@ -12,11 +12,15 @@ class QuantifierModel(Referent):
 
     Every quantifier model is a quadruple <M, A, B>, where M corresponds to all possible quantifier referents for a given communicative situation, A and B are differents sets of quantifier referents that correspond to the items of comparison in quantificational logic.
     
-    0 => in A
-    1 => in B
-    2 => in (A | B)
-    3 => in M - (A | B)
-    4 => not in (M | A | B)
+    X denotes the set of all possible quantifier referents in a given Universe. A and B are subsets of M and each of M, A, and B are subsets of X. 
+
+    For the purposes of this project, a QuantifierModel is a Referent (capital R), but the individual referents for a given model are the indices of the QuantifierModel's sets.
+
+    0 => A
+    1 => B
+    2 => A | B
+    3 => M - (A | B)
+    4 => X - (M | A | B)
     
     """
 
