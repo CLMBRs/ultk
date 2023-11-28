@@ -41,6 +41,10 @@ def read_expressions(
         by_meaning = {expr.meaning: expr for expr in parsed_exprs}
     return parsed_exprs, by_meaning
 
+def filter_expressions_by_rules(rules: list, expressions):
+    return list(filter(lambda x: str(x) in rules, expressions))
+
+
 """
 def express_as_bool_vectors(
     expressions: list[GrammaticalExpression]

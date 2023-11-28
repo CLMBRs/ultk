@@ -6,7 +6,7 @@ except ImportError:
     from yaml import Dumper
 
 from ..quantifier import QuantifierUniverse
-from ..grammar import QuantifierGrammar, quantifiers_grammar
+from ..grammar import QuantifierGrammar
 from ..meaning import create_universe
 
 def enumerate_quantifiers(depth, quantifiers_universe: QuantifierUniverse, quantifiers_grammar: QuantifierGrammar):
@@ -48,6 +48,7 @@ if __name__ == "__main__":
     parser.add_argument('--weight', type=float, default=2.0, help='weight of the index primitives')
     args = parser.parse_args()
 
+    from ..grammar import quantifiers_grammar
     quantifiers_grammar.add_indices_as_primitives(args.m_size, args.weight)
     quantifiers_universe = create_universe(args.m_size, args.x_size)
     expressions_by_meaning = enumerate_quantifiers(args.depth, quantifiers_universe, quantifiers_grammar)
