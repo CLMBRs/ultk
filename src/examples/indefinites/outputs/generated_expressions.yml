@@ -484,8 +484,8 @@
     - *id004
     - *id005
 - form: ''
-  grammatical_expression: or(and(K-, SE-), or(N+, R-))
-  length: 7
+  grammatical_expression: and(K-, or(N+, not(R+)))
+  length: 6
   meaning:
     referents:
     - *id002
@@ -493,10 +493,27 @@
     - *id004
     - *id005
 - form: ''
-  grammatical_expression: or(and(S-, SE-), or(N+, R-))
-  length: 7
+  grammatical_expression: and(S-, or(N+, not(R+)))
+  length: 6
   meaning:
     referents:
+    - *id003
+    - *id004
+    - *id005
+- form: ''
+  grammatical_expression: and(N-, and(or(K+, S-), not(R-)))
+  length: 8
+  meaning:
+    referents:
+    - *id001
+    - *id003
+    - *id006
+- form: ''
+  grammatical_expression: and(or(K+, S-), or(N+, not(R+)))
+  length: 8
+  meaning:
+    referents:
+    - *id001
     - *id003
     - *id004
     - *id005
