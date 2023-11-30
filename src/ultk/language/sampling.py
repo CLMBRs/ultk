@@ -1,8 +1,8 @@
 import random
 from math import comb
 import numpy as np
-from altk.language.language import Language, Expression
-from altk.language.semantics import Meaning, Universe
+from ultk.language.language import Language, Expression
+from ultk.language.semantics import Meaning, Universe
 from typing import Callable, Generator, Iterable, Type, Any
 from itertools import chain, combinations
 from tqdm import tqdm
@@ -301,7 +301,7 @@ def sample_lang_size(
     """Get a sample of languages each of exactly lang_size.
 
     Args:
-        language_class: a subclass of altk.Language
+        language_class: a subclass of ultk.Language
 
         expressions: a list of Expressions to sample from
 
