@@ -1,5 +1,5 @@
-from altk.language.grammar import Grammar, GrammaticalExpression, Rule
-from altk.language.semantics import Meaning, Referent, Universe
+from ultk.language.grammar import Grammar, GrammaticalExpression, Rule
+from ultk.language.semantics import Meaning, Referent, Universe
 
 
 class TestGrammar:
@@ -37,3 +37,15 @@ class TestGrammar:
     def test_yield(self):
         parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
         assert parsed_expression.yield_string() == "n11"
+
+    def test_enumerate(self):
+        enumed_grammar = TestGrammar.grammar.get_unique_expressions(
+            depth=1,
+            lhs=(int, int),
+            unique_key=lambda expr: expr.evaluate(self.universe),
+            compare_func=lambda e1, e2: len(e1) < len(e2),
+        )
+        print("Enumed Grammar Rules with len")
+        print(enumed_grammar)
+        for rule in enumed_grammar:
+            print(rule)
