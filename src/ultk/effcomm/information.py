@@ -1,10 +1,10 @@
 """Helper functions for Rate-Distortion based (including Information Bottleneck) efficient communication analyses."""
 
 import numpy as np
-from altk.language.language import Language
-from altk.language.semantics import Universe, Referent
-from altk.effcomm.agent import LiteralSpeaker, BayesianListener
-from altk.effcomm import util
+from ultk.language.language import Language
+from ultk.language.semantics import Universe, Referent
+from ultk.effcomm.agent import LiteralSpeaker, BayesianListener
+from ultk.effcomm import util
 from embo import InformationBottleneck
 from typing import Callable
 

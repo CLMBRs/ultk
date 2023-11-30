@@ -6,8 +6,8 @@
 
     Examples:
 
-        >>> from altk.language.semantics import Referent, Meaning, Universe
-        >>> from altk.language.language import Expression
+        >>> from ultk.language.semantics import Referent, Meaning, Universe
+        >>> from ultk.language.language import Expression
         >>> # construct the meaning space for numerals
         >>> numerals_universe = NumeralUniverse(referents=[NumeralReferent(str(i)) for i in range(1, 100)])
         >>> # construct a list of referents for the expression 'a few'
@@ -42,6 +42,12 @@ class Referent:
 
     def __lt__(self, other):
         return self.name < other.name
+
+    def __eq__(self, other) -> bool:
+        return self.name == other.name and self.__dict__ == other.__dict__
+
+    def __hash__(self) -> int:
+        return hash((self.name, tuple(self.__dict__)))
 
 
 class Universe:
@@ -83,7 +89,7 @@ class Universe:
         return len(self.referents)
 
     def __hash__(self) -> int:
-        return hash(self.referents)
+        return hash(tuple(self.referents))
 
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame):

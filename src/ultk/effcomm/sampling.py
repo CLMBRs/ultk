@@ -3,8 +3,8 @@
 import copy
 from typing import Any
 import numpy as np
-from altk.language.language import Language
-from altk.effcomm.agent import Speaker, LiteralSpeaker
+from ultk.language.language import Language
+from ultk.effcomm.agent import Speaker, LiteralSpeaker
 from math import comb
 from tqdm import tqdm
 

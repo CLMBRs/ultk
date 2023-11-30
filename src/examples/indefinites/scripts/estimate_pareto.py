@@ -1,5 +1,5 @@
-from altk.effcomm.optimization import EvolutionaryOptimizer
-from altk.language.sampling import random_languages
+from ultk.effcomm.optimization import EvolutionaryOptimizer
+from ultk.language.sampling import random_languages
 
 
 from ..meaning import universe as indefinites_universe
