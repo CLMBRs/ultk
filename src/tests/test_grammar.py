@@ -40,7 +40,10 @@ class TestGrammar:
 
     def test_enumerate(self):
         enumed_grammar = TestGrammar.grammar.get_unique_expressions(
-            depth=1, lhs=(int, int)
+            depth=1,
+            lhs=(int, int),
+            unique_key=lambda expr: expr.evaluate(self.universe),
+            compare_func=lambda e1, e2: len(e1) < len(e2),
         )
         print("Enumed Grammar Rules with len")
         print(enumed_grammar)
