@@ -109,6 +109,10 @@ class GrammaticalExpression(Expression):
             )
         return self.meaning
 
+    def call_on_universe(self, universe: Universe) -> tuple[Any, ...]:
+        """Call this expression on all elements of a universe, and return a tuple of the results."""
+        return tuple(self(referent) for referent in universe.referents)
+
     def add_child(self, child) -> None:
         if self.children is None:
             self.children = tuple([child])
