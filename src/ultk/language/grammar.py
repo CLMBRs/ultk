@@ -1,8 +1,9 @@
 import random
 import re
 from collections import defaultdict
+from collections.abc import Sequence
 from itertools import product
-from typing import Any, Callable, Generator, Iterable
+from typing import Any, Callable, Generator, TypedDict
 
 from yaml import load
 
@@ -35,13 +36,13 @@ class Rule:
         self,
         name: str,
         lhs: Any,
-        rhs: Iterable[Any],
-        func: Callable = lambda *args: None,
+        rhs: Sequence | None,
+        function: Callable = lambda *args: None,
         weight: float = 1.0,
     ):
         self.lhs = lhs
         self.rhs = rhs
-        self.func = func
+        self.func = function
         self.name = name
         self.weight = weight
 
@@ -53,7 +54,7 @@ class Rule:
 
     def __str__(self) -> str:
         out_str = f"{str(self.lhs)} -> {self.name}"
-        if not self.is_terminal():
+        if self.rhs is not None:
             out_str += f"({', '.join(str(typ) for typ in self.rhs)})"
         return out_str
 
@@ -75,9 +76,9 @@ class GrammaticalExpression(Expression):
         self,
         rule_name: str,
         func: Callable,
-        children: Iterable,
-        meaning: Meaning = None,
-        form: str = None,
+        children: tuple | None,
+        meaning: Meaning | None = None,
+        form: str | None = None,
     ):
         super().__init__(form, meaning)
         self.rule_name = rule_name
@@ -107,6 +108,12 @@ class GrammaticalExpression(Expression):
                 universe,
             )
         return self.meaning
+
+    def add_child(self, child) -> None:
+        if self.children is None:
+            self.children = tuple([child])
+        else:
+            self.children = self.children + (child,)
 
     def to_dict(self) -> dict:
         the_dict = super().to_dict()
@@ -155,14 +162,30 @@ class GrammaticalExpression(Expression):
         return out_str
 
 
+class UniquenessArgs(TypedDict):
+    """Arguments for specifying uniqueness of GrammaticalExpressions in a Grammar.
+
+    Attributes:
+        unique_expressions: a dictionary in which to store unique Expressions
+        key: a function used to evaluate uniqueness
+        compare_func: a comparison function, used to decide which Expression to add to the dict
+            new Expressions will be added as values to `unique_dict` only if they are minimal
+            among those sharing the same key (by `unique_key`) according to this func
+    """
+
+    unique_expressions: dict[Any, dict[Any, GrammaticalExpression]]
+    key: Callable[[GrammaticalExpression], Any]
+    compare_func: Callable[[GrammaticalExpression, GrammaticalExpression], bool]
+
+
 class Grammar:
     """At its core, a Grammar is a set of Rules with methods for generating GrammaticalExpressions."""
 
     def __init__(self, start: Any):
         # _rules: nonterminals -> list of rules
-        self._rules = defaultdict(list)
+        self._rules: dict[Any, list[Rule]] = defaultdict(list)
         # name -> rule, for fast lookup in parsing
-        self._rules_by_name = {}
+        self._rules_by_name: dict[str, Rule] = {}
         self._start = start
 
     def add_rule(self, rule: Rule):
@@ -214,14 +237,14 @@ class Grammar:
             if token[-1] == opener:
                 name = token[:-1]
                 stack.append(
-                    GrammaticalExpression(name, self._rules_by_name[name].func, [])
+                    GrammaticalExpression(name, self._rules_by_name[name].func, tuple())
                 )
             # finish an expression
             elif token == delimiter or token == closer:
                 # finished a child expression
                 # TODO: are there edge cases that distinguish delimiter from closer?
                 child = stack.pop()
-                stack[-1].children.append(child)
+                stack[-1].add_child(child)
             else:
                 # primitive, no children, just look up
                 stack.append(
@@ -242,7 +265,7 @@ class Grammar:
         children = (
             None
             if the_rule.rhs is None
-            else [self.generate(child_lhs) for child_lhs in the_rule.rhs]
+            else tuple([self.generate(child_lhs) for child_lhs in the_rule.rhs])
         )
         # if the rule is terminal, rhs will be empty, so no recursive calls to generate will be made in this comprehension
         return GrammaticalExpression(the_rule.name, the_rule.func, children)
@@ -251,104 +274,111 @@ class Grammar:
         self,
         depth: int = 8,
         lhs: Any = None,
-        unique_dict: dict[Any, GrammaticalExpression] = None,
-        unique_key: Callable[[GrammaticalExpression], Any] = None,
-        compare_func: Callable[
-            [GrammaticalExpression, GrammaticalExpression], bool
-        ] = None,
+        uniqueness_args: UniquenessArgs | None = None,
     ) -> Generator[GrammaticalExpression, None, None]:
         """Enumerate all expressions from the grammar up to a given depth from a given LHS.
-        This method also can update a specified dictionary to store only unique expressions, with
+        This method also can update a specified dictionary to store only _unique_ expressions, with
         a user-specified criterion of uniqueness.
 
         Args:
             depth: how deep the trees should be
             lhs: left hand side to start from; defaults to the grammar's start symbol
-            unique_dict: a dictionary in which to store unique Expressions
-            unique_key: a function used to evaluate uniqueness
-            compare_func: a comparison function, used to decide which Expression to add to the dict
-                new Expressions will be added as values to `unique_dict` only if they are minimal
-                among those sharing the same key (by `unique_key`) according to this func
+            uniqueness_args: a dictionary specifying the parameters for uniqueness:
+                unique_dict: a dictionary in which to store unique Expressions
+                key: a function used to evaluate uniqueness
+                compare_func: a comparison function, used to decide which Expression to add to the dict
+                    new Expressions will be added as values to `unique_dict` only if they are _minimal_
+                    among those sharing the same key (by `unique_key`) according to this func
 
         Yields:
             all GrammaticalExpressions up to depth
         """
-        # TODO: update docstring!
-        # TODO: package uniqueness stuff in one dict arg?
         if lhs is None:
             lhs = self._start
+        cache: defaultdict = defaultdict(list)
         for num in range(depth):
-            for expr in self.enumerate_at_depth(
-                num,
-                lhs,
-                unique_dict=unique_dict,
-                unique_key=unique_key,
-                compare_func=compare_func,
-            ):
-                yield expr
+            yield from self.enumerate_at_depth(num, lhs, uniqueness_args, cache)
 
     def enumerate_at_depth(
         self,
         depth: int,
         lhs: Any,
-        unique_dict: dict[Any, GrammaticalExpression] = None,
-        unique_key: Callable[[GrammaticalExpression], Any] = None,
-        compare_func: Callable[
-            [GrammaticalExpression, GrammaticalExpression], bool
-        ] = None,
-    ) -> set[GrammaticalExpression]:
+        uniqueness_args: UniquenessArgs | None = None,
+        cache: dict | None = None,
+    ) -> Generator[GrammaticalExpression, None, None]:
         """Enumerate GrammaticalExpressions for this Grammar _at_ a fixed depth."""
 
-        do_unique = unique_key is not None and compare_func is not None
+        if cache is None:
+            cache = defaultdict(list)
 
-        def add_unique(expression: GrammaticalExpression) -> None:
-            expr_key = unique_key(expression)
-            # if the current expression has not been generated yet
-            # OR it is "less than" the current entry, add this one
-            if expr_key not in unique_dict or compare_func(
-                expression, unique_dict[expr_key]
-            ):
-                unique_dict[expr_key] = expression
+        # enumerate from cache if we've seen these args before
+        args_tuple = (depth, lhs)
+        if args_tuple in cache:
+            yield from cache[args_tuple]
+        else:
+            do_unique = uniqueness_args is not None
+            if uniqueness_args is not None:
+                unique_dict = uniqueness_args["unique_expressions"]
+                key = uniqueness_args["key"]
 
-        if depth == 0:
-            for rule in self._rules[lhs]:
-                if rule.is_terminal():
-                    cur_expr = GrammaticalExpression(rule.name, rule.func, None)
-                    if do_unique:
-                        add_unique(cur_expr)
-                    yield cur_expr
+                def add_unique(expression: GrammaticalExpression) -> bool:
+                    """Add an expression to the unique_dict, if it is unique and shortest by the compare_func.
+                    Return the outcome boolean."""
+                    expr_key = key(expression)
+                    # if the current expression has not been generated yet
+                    # OR it is "less than" the current entry, add this one
+                    if expr_key not in unique_dict[lhs] or uniqueness_args[
+                        "compare_func"
+                    ](expression, unique_dict[lhs][expr_key]):
+                        unique_dict[lhs][expr_key] = expression
+                        return True
+                    return False
 
-        for rule in self._rules[lhs]:
-            # can't use terminal rules when depth > 0
-            if rule.is_terminal():
-                continue
+            # keep a meaning -> expr dict but also depth -> expr dict
+            if depth == 0:
+                for rule in self._rules[lhs]:
+                    if rule.is_terminal():
+                        cur_expr = GrammaticalExpression(rule.name, rule.func, None)
+                        if not do_unique or add_unique(cur_expr):
+                            cache[args_tuple].append(cur_expr)
+                            yield cur_expr
+            else:
+                for rule in self._rules[lhs]:
+                    # can't use terminal rules when depth > 0
+                    if rule.rhs is None:
+                        continue
 
-            # get lists of possible depths for each child
-            for child_depths in product(range(depth), repeat=len(rule.rhs)):
-                if len(child_depths) == 0 or max(child_depths) < depth - 1:
-                    continue
-                # get all possible children of the relevant depths
-                children_iter = product(
-                    *[
-                        self.enumerate_at_depth(child_depth, child_lhs)
-                        for child_depth, child_lhs in zip(child_depths, rule.rhs)
-                    ]
-                )
-                for children in children_iter:
-                    cur_expr = GrammaticalExpression(rule.name, rule.func, children)
-                    if do_unique:
-                        add_unique(cur_expr)
-                    yield cur_expr
+                    # get lists of possible depths for each child
+                    for child_depths in product(range(depth), repeat=len(rule.rhs)):
+                        if max(child_depths) < depth - 1:
+                            continue
+                        # get all possible children of the relevant depths
+                        # unique by depth?!?!
+                        children_iter = product(
+                            *[
+                                self.enumerate_at_depth(
+                                    child_depth, child_lhs, uniqueness_args, cache
+                                )
+                                for child_depth, child_lhs in zip(
+                                    child_depths, rule.rhs
+                                )
+                            ]
+                        )
+                        for children in children_iter:
+                            cur_expr = GrammaticalExpression(
+                                rule.name, rule.func, children
+                            )
+                            if not do_unique or add_unique(cur_expr):
+                                cache[args_tuple].append(cur_expr)
+                                yield cur_expr
 
     def get_unique_expressions(
         self,
         depth: int,
+        unique_key: Callable[[GrammaticalExpression], Any],
+        compare_func: Callable[[GrammaticalExpression, GrammaticalExpression], bool],
         lhs: Any = None,
         max_size: float = float("inf"),
-        unique_key: Callable[[GrammaticalExpression], Any] = None,
-        compare_func: Callable[
-            [GrammaticalExpression, GrammaticalExpression], bool
-        ] = None,
     ) -> dict[GrammaticalExpression, Any]:
         """Get all unique GrammaticalExpressions, up to a certain depth, with a user-specified criterion
         of uniqueness, and a specified comparison function for determining which Expression to save when there's a clash.
@@ -369,19 +399,24 @@ class Grammar:
             The GrammticalExpression which is the value will be the one that is minimum among
             `compare_func` amongst all Expressions up to `depth` which share the same key
         """
-        unique_dict = {}
+        unique_dict: dict[Any, dict[Any, GrammaticalExpression]] = defaultdict(dict)
+        uniqueness_args: UniquenessArgs = {
+            "unique_expressions": unique_dict,
+            "key": unique_key,
+            "compare_func": compare_func,
+        }
+        if lhs is None:
+            lhs = self._start
         # run through generator, each iteration will update unique_dict
         for _ in self.enumerate(
             depth,
             lhs=lhs,
-            unique_dict=unique_dict,
-            unique_key=unique_key,
-            compare_func=compare_func,
+            uniqueness_args=uniqueness_args,
         ):
             if len(unique_dict) == max_size:
                 break
             pass
-        return unique_dict
+        return unique_dict[lhs]
 
     def get_all_rules(self) -> list[Rule]:
         """Get all rules as a list."""
@@ -426,13 +461,10 @@ class Grammar:
             grammar_dict = load(f, Loader=Loader)
         grammar = cls(grammar_dict["start"])
         for rule_dict in grammar_dict["rules"]:
-            grammar.add_rule(
-                Rule(
-                    rule_dict["name"],
-                    rule_dict["lhs"],
-                    rule_dict["rhs"],
-                    # TODO: look-up functions from a registry as well?
-                    eval(rule_dict["function"]),
-                )
-            )
+            if "function" in rule_dict:
+                # TODO: look-up functions from a registry as well?
+                rule_dict["function"] = eval(rule_dict["function"])
+            if "weight" in rule_dict:
+                rule_dict["weight"] = float(rule_dict["weight"])
+            grammar.add_rule(Rule(**rule_dict))
         return grammar
