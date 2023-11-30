@@ -96,6 +96,10 @@ class Language:
         popped = self.expressions[index]
         self.expressions = self.expressions[:index] + self.expressions[index + 1 :]
         return popped
+    
+    def is_natural(self) -> bool:
+        """Whether a language represents a human natural language."""
+        raise NotImplementedError
 
     def degree_property(self, property: Callable[[Expression], bool]) -> float:
         """Count what percentage of expressions in a language have a given property."""
