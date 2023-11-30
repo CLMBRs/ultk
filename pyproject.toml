@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "ultk"
 version = "0.0.1c"
 authors = [
+  { name="Chris Haberland", email="haberc@uw.edu"}
   { name="Nathaniel Imel", email="nimel@uci.edu"},
   { name="Shane Steinert-Threlkeld", email="shanest@uw.edu" },
 ]
