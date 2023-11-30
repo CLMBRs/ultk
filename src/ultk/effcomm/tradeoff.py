@@ -205,7 +205,9 @@ def tradeoff(
             lang.data[prop] = properties[prop](lang)
         points.append((lang.data[x], lang.data[y]))
 
-    dominating_languages = pareto_optimal_languages(languages, objectives=[properties[x], properties[y]], unique=True)
+    dominating_languages = pareto_optimal_languages(
+        languages, objectives=[properties[x], properties[y]], unique=True
+    )
     dominant_points = [(lang.data[x], lang.data[y]) for lang in dominating_languages]
 
     if frontier is not None:
