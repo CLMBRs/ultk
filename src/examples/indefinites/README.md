@@ -58,5 +58,4 @@ This example is a kind of "minimal" replication of Experiment 1 from Denic et al
 
 1. Add configuration files (ideally yml using [hydra](https://hydra.cc)), to keep track of filenames and allow for easy experimentation with different parameter settings.
 2. Measure optimality and run statistical tests in `scripts/analyze.py`.
-3. Read grammar in from a plain text file (should be easy to specify in YAML syntax; need to add `ultk.grammar.Grammar.from_yaml`)
-4. ...
+3. ...
