@@ -13,7 +13,7 @@ from ultk.effcomm.agent import (
     PragmaticSpeaker,
     PragmaticListener,
 )
-from ultk.effcomm.probability import build_utility_matrix
+from ultk.effcomm.util import build_utility_matrix
 
 
 def indicator_utility(ref1: Referent, ref2: Referent) -> float:
