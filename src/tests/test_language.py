@@ -5,6 +5,7 @@ import pytest
 from ultk.language.language import Expression, Language
 from ultk.language.semantics import Referent, Universe, Meaning
 
+
 class TestLanguage:
     pairs = {
         "shroom": "fungus",
@@ -13,10 +14,7 @@ class TestLanguage:
         "cat": "animal",
         "bird": "animal",
     }
-    pairs2 = {"shroom": "fungus", 
-              "dog": "animal",
-              "tree": "plant",
-              "bird": "bird"}
+    pairs2 = {"shroom": "fungus", "dog": "animal", "tree": "plant", "bird": "bird"}
 
     uni_refs = [Referent(key, {"phylum": val}) for (key, val) in pairs.items()]
     uni = Universe(uni_refs)
