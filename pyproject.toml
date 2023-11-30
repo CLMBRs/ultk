@@ -32,5 +32,5 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://clmbr.shane.st/altk"
-"Bug Tracker" = "https://github.com/CLMBRs/altk/issues"
+"Homepage" = "https://clmbr.shane.st/ultk"
+"Bug Tracker" = "https://github.com/CLMBRs/ultk/issues"
