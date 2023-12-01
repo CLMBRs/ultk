@@ -9,11 +9,11 @@ class TestGrammar:
     grammar = Grammar(bool)
     grammar.add_rule(Rule(">", bool, (int, int), lambda x, y: x > y))
     grammar.add_rule(Rule("+", int, (int, int), lambda x, y: x + y))
-    grammar.add_rule(Rule("n", int, (), lambda model: model.num))
-    grammar.add_rule(Rule(f"0", int, (), lambda *args: 0))
-    grammar.add_rule(Rule(f"1", int, (), lambda *args: 1))
-    grammar.add_rule(Rule(f"2", int, (), lambda *args: 2))
-    grammar.add_rule(Rule(f"3", int, (), lambda *args: 3))
+    grammar.add_rule(Rule("n", int, None, lambda model: model.num))
+    grammar.add_rule(Rule(f"0", int, None, lambda *args: 0))
+    grammar.add_rule(Rule(f"1", int, None, lambda *args: 1))
+    grammar.add_rule(Rule(f"2", int, None, lambda *args: 2))
+    grammar.add_rule(Rule(f"3", int, None, lambda *args: 3))
 
     geq2_expr_str = ">(n, +(1, 1))"
 
