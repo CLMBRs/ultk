@@ -17,16 +17,20 @@
         >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
 """
 
-from typing import Iterable, Union
+from typing import Any, Iterable, Union
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 class Referent:
-    """A referent is some object in the universe for a language."""
+    """A referent is some object in the universe for a language.
 
-    def __init__(self, name: str, properties: dict = {}, **kwargs) -> None:
+    Conceptually, a Referent can be any kind of object.  This functions like a generic python object that is _immutable_ after initialization.
+    At initialization, properties can be specified either by passing a dictionary or by keyword arguments.
+    """
+
+    def __init__(self, name: str, properties: dict[str, Any] = {}, **kwargs) -> None:
         """Initialize a referent.
 
         Args:
@@ -34,6 +38,13 @@ class Referent:
         """
         self.name = name
         self.__dict__.update(properties, **kwargs)
+        self._frozen = True
+
+    def __setattr__(self, __name: str, __value: Any) -> None:
+        if hasattr(self, "_frozen") and self._frozen:
+            raise AttributeError("Referents are immutable.")
+        else:
+            object.__setattr__(self, __name, __value)
 
     def to_dict(self) -> dict:
         return self.__dict__
@@ -43,13 +54,13 @@ class Referent:
 
     def __lt__(self, other):
         return self.name < other.name
-    
+
     def __eq__(self, other) -> bool:
         return self.name == other.name and self.__dict__ == other.__dict__
 
     def __hash__(self) -> int:
         return hash((self.name, tuple(self.__dict__)))
-    
+
 
 @dataclass(frozen=True)
 class Universe:
@@ -62,15 +73,15 @@ class Universe:
     @property
     def _referents_by_name(self):
         return {referent.name: referent for referent in self.referents}
-    
+
     @property
     def _prior(self):
         return self.prior or {referent.name: 1 / size for referent in self.referents}
-    
+
     @property
     def size(self):
         return len(self.referents)
-    
+
     def prior_numpy(self) -> np.ndarray:
         return np.array([self._prior[referent.name] for referent in self.referents])
 
@@ -134,7 +145,7 @@ class Meaning:
 
         dist: a dict of with Referent names as keys and weights or probabilities as values, representing the distribution over referents to associate with the meaning. By default is None, and the distribution will be uniform over the passed referents, and any remaining referents are assigned 0 probability.
     """
-    
+
     def __post_init__(self):
         if not set(self.referents).issubset(set(self.universe.referents)):
             print("referents:")
@@ -153,7 +164,9 @@ class Meaning:
         if self._dist is not None:
             # normalize weights to distribution
             total_weight = sum(self._dist.values())
-            return {ref.name: self._dist[ref.name] / total_weight for ref in self.referents} | zeros
+            return {
+                ref.name: self._dist[ref.name] / total_weight for ref in self.referents
+            } | zeros
         else:
             return {ref.name: 1 / len(self.referents) for ref in self.referents} | zeros
 
