@@ -4,7 +4,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from itertools import product
 from typing import Any, Callable, Generator, TypedDict
-
+from dataclasses import dataclass, field
 from yaml import load
 
 try:
@@ -15,7 +15,7 @@ except ImportError:
 from ultk.language.language import Expression
 from ultk.language.semantics import Meaning, Universe
 
-
+@dataclass(frozen=True)
 class Rule:
     """Basic class for a grammar rule.  Grammar rules in ULTK correspond
     to functions.  One can think of a grammar as generating complex functions from
@@ -31,20 +31,12 @@ class Rule:
         weight: a relative weight to assign to this rule
             when added to a grammar, all rules with the same LHS will be weighted together
     """
-
-    def __init__(
-        self,
-        name: str,
-        lhs: Any,
-        rhs: Sequence | None,
-        function: Callable = lambda *args: None,
-        weight: float = 1.0,
-    ):
-        self.lhs = lhs
-        self.rhs = rhs
-        self.func = function
-        self.name = name
-        self.weight = weight
+    
+    name: str
+    lhs: Any
+    rhs: Sequence | None
+    func: Callable = lambda *args: None
+    weight: float = 1.0
 
     def is_terminal(self) -> bool:
         """Whether this is a terminal rule.  In our framework, this means that RHS is empty,
@@ -59,6 +51,7 @@ class Rule:
         return out_str
 
 
+@dataclass(eq=True, frozen=True)
 class GrammaticalExpression(Expression):
     """A GrammaticalExpression has been built up from a Grammar by applying a sequence of Rules.
     Crucially, it is _callable_, using the functions corresponding to each rule.
@@ -72,19 +65,10 @@ class GrammaticalExpression(Expression):
         children: child expressions (possibly empty)
     """
 
-    def __init__(
-        self,
-        rule_name: str,
-        func: Callable,
-        children: tuple | None,
-        meaning: Meaning | None = None,
-        form: str | None = None,
-    ):
-        super().__init__(form, meaning)
-        self.rule_name = rule_name
-        self.func = func
-        self.children = children
-
+    rule_name: str
+    func: Callable
+    children: tuple | None
+    
     def yield_string(self) -> str:
         """Get the 'yield' string of this term, i.e. the concatenation
         of the leaf nodes.
@@ -135,19 +119,6 @@ class GrammaticalExpression(Expression):
         if self.children is not None:
             length += sum(len(child) for child in self.children)
         return length
-
-    def __eq__(self, other) -> bool:
-        return (self.rule_name, self.form, self.func, self.children) == (
-            other.rule_name,
-            other.form,
-            other.func,
-            other.children,
-        )
-
-    def __hash__(self) -> int:
-        # when self.children is None...
-        children = self.children or tuple([])
-        return hash((self.rule_name, self.form, self.func, tuple(children)))
 
     def __lt__(self, other) -> bool:
         children = self.children or tuple([])
