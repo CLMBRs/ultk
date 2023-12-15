@@ -26,38 +26,38 @@ class TestLanguage:
     dog = Expression(
         form="dog",
         meaning=Meaning(
-            referents=[Referent("dog", {"phylum": "animal"})], universe=uni
+            referents=(Referent("dog", {"phylum": "animal"})), universe=uni
         ),
     )
     cat = Expression(
         form="cat",
         meaning=Meaning(
-            referents=[Referent("cat", {"phylum": "animal"})], universe=uni
+            referents=(Referent("cat", {"phylum": "animal"})), universe=uni
         ),
     )
     tree = Expression(
         form="tree",
         meaning=Meaning(
-            referents=[Referent("tree", {"phylum": "plant"})], universe=uni
+            referents=(Referent("tree", {"phylum": "plant"})), universe=uni
         ),
     )
     shroom = Expression(
         form="shroom",
         meaning=Meaning(
-            referents=[Referent("shroom", {"phylum": "fungus"})], universe=uni
+            referents=(Referent("shroom", {"phylum": "fungus"})), universe=uni
         ),
     )
     bird = Expression(
         form="bird",
         meaning=Meaning(
-            referents=[Referent("bird", {"phylum": "animal"})], universe=uni
+            referents=(Referent("bird", {"phylum": "animal"})), universe=uni
         ),
     )
 
-    lang = Language(expressions=[dog, cat, tree, shroom])
-    lang_one_different_expr = Language(expressions=[dog, cat, tree, bird])
-    lang_subset_expr = Language(expressions=[dog, cat, tree])
-    lang_of_different_order = Language(expressions=[dog, cat, shroom, tree])
+    lang = Language(expressions=(dog, cat, tree, shroom))
+    lang_one_different_expr = Language(expressions=(dog, cat, tree, bird))
+    lang_subset_expr = Language(expressions=(dog, cat, tree))
+    lang_of_different_order = Language(expressions=(dog, cat, shroom, tree))
 
     def test_exp_subset(self):
         assert TestLanguage.dog.can_express(Referent("dog", {"phylum": "animal"}))
