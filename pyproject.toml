@@ -3,13 +3,14 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "altk"
-version = "0.0.1"
+name = "ultk"
+version = "0.0.1c"
 authors = [
+  { name="Chris Haberland", email="haberc@uw.edu"},
   { name="Nathaniel Imel", email="nimel@uci.edu"},
   { name="Shane Steinert-Threlkeld", email="shanest@uw.edu" },
 ]
-description = "ALTK is a software library that aims to support efficient communication analyses of natural language. This is a line of research that aims to explain why natural languages have the structure that they do in terms competing pressures to minimize cognitive complexity and maximize communicative accuracy."
+description = "ULTK is a software library that aims to support efficient communication analyses of natural language. This is a line of research that aims to explain why natural languages have the structure that they do in terms competing pressures to minimize cognitive complexity and maximize communicative accuracy."
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [
@@ -31,5 +32,5 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://clmbr.shane.st/altk"
-"Bug Tracker" = "https://github.com/CLMBRs/altk/issues"
+"Homepage" = "https://clmbr.shane.st/ultk"
+"Bug Tracker" = "https://github.com/CLMBRs/ultk/issues"
