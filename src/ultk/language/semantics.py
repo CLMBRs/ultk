@@ -113,7 +113,8 @@ class Universe:
         if "probability" in df.columns:
             prior = dict(zip(df["name"], df["probability"]))
         records = df.to_dict("records")
-        referents = tuple(Referent(record["name"], record) for record in records)
+        print(records)
+        referents = tuple([Referent(record["name"], record) for record in records])
         return cls(referents, prior)
 
     @classmethod
