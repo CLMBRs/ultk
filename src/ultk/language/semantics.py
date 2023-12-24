@@ -76,7 +76,7 @@ class Universe:
 
     @property
     def _prior(self):
-        return self.prior or {referent.name: 1 / size for referent in self.referents}
+        return self.prior or {referent.name: 1 / self.size for referent in self.referents}
 
     @property
     def size(self):
@@ -149,9 +149,9 @@ class Meaning:
     def __post_init__(self):
         if not set(self.referents).issubset(set(self.universe.referents)):
             print("referents:")
-            print([str(r) for r in self.referents])
+            print(tuple(str(r) for r in self.referents))
             print("universe:")
-            print([str(r) for r in self.universe.referents])
+            print(tuple(str(r) for r in self.universe.referents))
             raise ValueError(
                 f"The set of referents for a meaning must be a subset of the universe of discourse."
             )
