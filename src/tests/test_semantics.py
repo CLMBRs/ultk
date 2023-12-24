@@ -1,6 +1,7 @@
 import itertools
 import pandas as pd
 import pytest
+from copy import deepcopy
 
 from ultk.language.semantics import Universe
 from ultk.language.semantics import Meaning
@@ -23,8 +24,15 @@ class TestSemantics:
     )
 
     def test_universe_from_df(self):
+
+        universe_referents = []
+        for referent in TestSemantics.universe.referents:
+            copied = deepcopy(referent.__dict__)
+            copied.pop("_frozen", None)
+            universe_referents.append(copied)
+
         assert TestSemantics.points == [
-            referent.__dict__ for referent in TestSemantics.universe.referents
+            referent for referent in universe_referents
         ]
 
     def test_referent_match(self):
