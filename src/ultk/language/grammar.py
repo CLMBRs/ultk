@@ -51,7 +51,7 @@ class Rule:
         return out_str
 
 
-@dataclass(eq=True, frozen=True, kw_only=True)
+@dataclass(eq=True, kw_only=True)
 class GrammaticalExpression(Expression):
     """A GrammaticalExpression has been built up from a Grammar by applying a sequence of Rules.
     Crucially, it is _callable_, using the functions corresponding to each rule.
