@@ -24,16 +24,13 @@ class TestSemantics:
     )
 
     def test_universe_from_df(self):
-
         universe_referents = []
         for referent in TestSemantics.universe.referents:
             copied = deepcopy(referent.__dict__)
             copied.pop("_frozen", None)
             universe_referents.append(copied)
 
-        assert TestSemantics.points == [
-            referent for referent in universe_referents
-        ]
+        assert TestSemantics.points == [referent for referent in universe_referents]
 
     def test_referent_match(self):
         ref2 = Referent(

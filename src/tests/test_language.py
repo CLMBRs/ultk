@@ -19,7 +19,9 @@ class TestLanguage:
     uni_refs = tuple(Referent(key, {"phylum": val}) for (key, val) in pairs.items())
     uni = Universe(uni_refs)
 
-    uni2 = Universe(tuple(Referent(key, {"phylum": val}) for (key, val) in pairs2.items()))
+    uni2 = Universe(
+        tuple(Referent(key, {"phylum": val}) for (key, val) in pairs2.items())
+    )
 
     meaning = Meaning(referents=uni_refs, universe=uni)
 

@@ -15,6 +15,7 @@ except ImportError:
 from ultk.language.language import Expression
 from ultk.language.semantics import Meaning, Universe
 
+
 @dataclass(frozen=True)
 class Rule:
     """Basic class for a grammar rule.  Grammar rules in ULTK correspond
@@ -31,7 +32,7 @@ class Rule:
         weight: a relative weight to assign to this rule
             when added to a grammar, all rules with the same LHS will be weighted together
     """
-    
+
     name: str
     lhs: Any
     rhs: Sequence | None
@@ -68,7 +69,7 @@ class GrammaticalExpression(Expression):
     rule_name: str
     func: Callable
     children: tuple | None
-    
+
     def yield_string(self) -> str:
         """Get the 'yield' string of this term, i.e. the concatenation
         of the leaf nodes.
@@ -212,7 +213,11 @@ class Grammar:
             if token[-1] == opener:
                 name = token[:-1]
                 stack.append(
-                    GrammaticalExpression(rule_name=name, func=self._rules_by_name[name].func, children=tuple())
+                    GrammaticalExpression(
+                        rule_name=name,
+                        func=self._rules_by_name[name].func,
+                        children=tuple(),
+                    )
                 )
             # finish an expression
             elif token == delimiter or token == closer:
@@ -223,7 +228,11 @@ class Grammar:
             else:
                 # primitive, no children, just look up
                 stack.append(
-                    GrammaticalExpression(rule_name=token, func=self._rules_by_name[token].func, children=None)
+                    GrammaticalExpression(
+                        rule_name=token,
+                        func=self._rules_by_name[token].func,
+                        children=None,
+                    )
                 )
         if len(stack) != 1:
             raise ValueError("Could not parse string {expression}")
@@ -243,7 +252,9 @@ class Grammar:
             else tuple([self.generate(child_lhs) for child_lhs in the_rule.rhs])
         )
         # if the rule is terminal, rhs will be empty, so no recursive calls to generate will be made in this comprehension
-        return GrammaticalExpression(rule_name=the_rule.name, func=the_rule.func, children=children)
+        return GrammaticalExpression(
+            rule_name=the_rule.name, func=the_rule.func, children=children
+        )
 
     def enumerate(
         self,
@@ -313,7 +324,9 @@ class Grammar:
             if depth == 0:
                 for rule in self._rules[lhs]:
                     if rule.is_terminal():
-                        cur_expr = GrammaticalExpression(rule_name=rule.name, func=rule.func, children=None)
+                        cur_expr = GrammaticalExpression(
+                            rule_name=rule.name, func=rule.func, children=None
+                        )
                         if not do_unique or add_unique(cur_expr):
                             cache[args_tuple].append(cur_expr)
                             yield cur_expr
