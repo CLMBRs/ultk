@@ -18,6 +18,7 @@ from ultk.language.semantics import Meaning, Referent
 from dataclasses import dataclass
 from typing import Callable, Iterable
 
+
 @dataclass()
 class Expression:
 
@@ -48,7 +49,7 @@ class Expression:
 
     def __bool__(self) -> bool:
         return bool(self.form and self.meaning)
-    
+
 
 class Language:
     """Minimally contains Expression objects."""
