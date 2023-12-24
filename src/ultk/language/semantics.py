@@ -76,7 +76,9 @@ class Universe:
 
     @property
     def _prior(self):
-        return self.prior or {referent.name: 1 / self.size for referent in self.referents}
+        return self.prior or {
+            referent.name: 1 / self.size for referent in self.referents
+        }
 
     @property
     def size(self):
