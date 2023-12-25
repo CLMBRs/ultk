@@ -27,10 +27,6 @@ First, set up a virtual environment (e.g. via [miniconda](https://docs.conda.io/
 
     `pip install -e .`
 
-3. In addition, this project requires [rdot](), a python library of rate-distortion optimization tools. When a stable version is available, we will add this to the ULTK `setup.py` file; for now, install via git:
-
-    `python3 -m pip install git+https://github.com/nathimel/rdot.git`
-
 ## Getting started
 
 - Check out the [examples](https://github.com/CLMBRs/ultk/tree/main/src/examples), starting with a basic signaling game.  The examples folder also contains a simiple efficient communication analysis of [indefinites](https://github.com/CLMBRs/ultk/tree/main/src/examples/indefinites).
@@ -48,7 +44,7 @@ The source code is available on github [here](https://github.com/CLMBRs/ultk).
 
 ## Testing
 
-Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and executed via running `pytest` in the `src/tests` folder. 
+Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and executed via running `pytest` in the `src/tests` folder.
 
 ## References
 
