@@ -24,7 +24,7 @@ def language_to_ib_coordinate(
 
         meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
 
-        prior: array of shape `|M|` representing the communicative need distribution
+        prior: array of shape `|meanings|` representing the communicative need distribution
 
     Returns:
         a tuple of floats `(complexity, accuracy, distortion)`, s.t.
@@ -92,11 +92,11 @@ def ib_encoder_to_point(
     Args:
         meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
 
-        prior: array of shape `|M|` representing the communicative need distribution
+        prior: array of shape `|meanings|` representing the communicative need distribution
 
-        encoder: array of shape `(|M|, |W|)` representing P(W | M)
+        encoder: array of shape `(|meanings|, |words|)` representing P(W | M)
 
-        decoder: array of shape `(|W|, |M|)` representing P(M | W).  By default is None, and the Bayesian optimal decoder will be inferred.
+        decoder: array of shape `(|words|, |meanings|)` representing P(M | W).  By default is None, and the Bayesian optimal decoder will be inferred.
     """
     if decoder is None:
         decoder = ib_optimal_decoder(encoder, prior, meaning_dists)
@@ -145,7 +145,7 @@ def get_ib_bound(
     Args:
         meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
 
-        prior: array of shape `|M|` representing the communicative need distribution
+        prior: array of shape `|meanings|` representing the communicative need distribution
 
     Returns:
         a list of `rdot.ba.IBResult` namedtuples.
