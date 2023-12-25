@@ -20,7 +20,7 @@ classifiers = [
 ]
 license = {file = "LICENSE.txt"}
 dependencies = [
-    "mypy"
+    "mypy",
     "numpy",
     "nltk",
     "pyyaml",
