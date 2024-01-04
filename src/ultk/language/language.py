@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from typing import Callable, Iterable
 
 
-@dataclass()
+@dataclass
 class Expression:
 
     """Minimally contains a form and a meaning."""
@@ -27,8 +27,8 @@ class Expression:
     # gneric/dummy form and meaning if not specified
     # useful for hashing in certain cases
     # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
-    form: str | None = ""
-    meaning: Meaning | None = Meaning(tuple(list()), Universe(tuple(list())))
+    form: str = ""
+    meaning: Meaning = Meaning(tuple(list()), Universe(tuple(list())))
 
     def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
