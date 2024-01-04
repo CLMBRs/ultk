@@ -15,19 +15,20 @@ Example usage:
 import numpy as np
 from ultk.language.semantics import Universe
 from ultk.language.semantics import Meaning, Referent
+from dataclasses import dataclass
 from typing import Callable, Iterable
 
 
+@dataclass
 class Expression:
 
     """Minimally contains a form and a meaning."""
 
-    def __init__(self, form: str | None = None, meaning: Meaning | None = None):
-        # gneric/dummy form and meaning if not specified
-        # useful for hashing in certain cases
-        # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
-        self.form = form or ""
-        self.meaning = meaning or Meaning(tuple([]), Universe(tuple([])))
+    # gneric/dummy form and meaning if not specified
+    # useful for hashing in certain cases
+    # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
+    form: str = ""
+    meaning: Meaning = Meaning(tuple(list()), Universe(tuple(list())))
 
     def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
@@ -40,12 +41,6 @@ class Expression:
         return self.form
         # return f"Expression {self.form}\nMeaning:\n\t{self.meaning}"
 
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, Expression) and (self.form, self.meaning) == (
-            other.form,
-            other.meaning,
-        )
-
     def __lt__(self, other: object) -> bool:
         return isinstance(other, Expression) and (self.form, other.meaning) < (
             other.form,
@@ -54,9 +49,6 @@ class Expression:
 
     def __bool__(self) -> bool:
         return bool(self.form and self.meaning)
-
-    def __hash__(self) -> int:
-        return hash((self.form, self.meaning))
 
 
 class Language:
