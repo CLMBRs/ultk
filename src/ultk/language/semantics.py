@@ -21,6 +21,7 @@ from typing import Any, Iterable, Union
 import numpy as np
 import pandas as pd
 from dataclasses import dataclass
+from functools import cached_property
 
 
 class Referent:
@@ -70,19 +71,19 @@ class Universe:
     referents: Iterable[Referent]
     prior: dict[str, float] = None
 
-    @property
+    @cached_property
     def _referents_by_name(self):
         return {referent.name: referent for referent in self.referents}
 
-    @property
+    @cached_property
+    def size(self):
+        return len(self.referents)
+    
+    @cached_property
     def _prior(self):
         return self.prior or {
             referent.name: 1 / self.size for referent in self.referents
         }
-
-    @property
-    def size(self):
-        return len(self.referents)
 
     def prior_numpy(self) -> np.ndarray:
         return np.array([self._prior[referent.name] for referent in self.referents])
@@ -115,8 +116,7 @@ class Universe:
         if "probability" in df.columns:
             prior = dict(zip(df["name"], df["probability"]))
         records = df.to_dict("records")
-        print(records)
-        referents = tuple([Referent(record["name"], record) for record in records])
+        referents = tuple(Referent(record["name"], record) for record in records)
         return cls(referents, prior)
 
     @classmethod
