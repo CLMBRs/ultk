@@ -78,7 +78,7 @@ class Universe:
     @cached_property
     def size(self):
         return len(self.referents)
-    
+
     @cached_property
     def _prior(self):
         return self.prior or {
