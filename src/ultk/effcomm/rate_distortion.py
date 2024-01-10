@@ -12,7 +12,7 @@ from rdot.information import information_cond, MI
 ##############################################################################
 
 
-def language_to_ib_coordinate(
+def language_to_ib_point(
     language: Language,
     prior: np.ndarray,
     meaning_dists: np.ndarray,
@@ -101,6 +101,9 @@ def ib_encoder_to_point(
     if decoder is None:
         decoder = ib_optimal_decoder(encoder, prior, meaning_dists)
 
+    encoder = rows_zero_to_uniform(encoder)
+    decoder = rows_zero_to_uniform(decoder)
+    # breakpoint()
     complexity = information_cond(prior, encoder)
     accuracy = MI(meaning_dists @ joint(encoder, prior))
     distortion = MI(joint(meaning_dists, prior)) - accuracy

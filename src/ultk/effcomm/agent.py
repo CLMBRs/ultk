@@ -5,7 +5,6 @@ import numpy as np
 from scipy.special import softmax
 from ultk.language.language import Expression, Language
 from ultk.language.semantics import Referent
-from ultk.effcomm.util import bayes
 
 ##############################################################################
 # Base communicative agent class
