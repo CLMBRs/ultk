@@ -44,7 +44,7 @@ The source code is available on github [here](https://github.com/CLMBRs/ultk).
 
 ## Testing
 
-Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and executed via running `pytest` in the `src/tests` folder. 
+Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and executed via running `pytest` in the `src/tests` folder.
 
 ## References
 
