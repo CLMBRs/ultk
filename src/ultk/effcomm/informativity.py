@@ -4,7 +4,7 @@ import numpy as np
 from cmath import isclose
 from typing import Callable
 from ultk.language.language import Language
-from ultk.language.semantics import Referent
+from ultk.language.semantics import Referent, Universe
 from ultk.effcomm.agent import (
     Speaker,
     Listener,
@@ -13,7 +13,18 @@ from ultk.effcomm.agent import (
     PragmaticSpeaker,
     PragmaticListener,
 )
-from ultk.effcomm.util import build_utility_matrix
+
+
+def build_utility_matrix(
+    universe: Universe, utility: Callable[[Referent, Referent], float]
+) -> np.ndarray:
+    """Construct the square matrix specifying the utility function defined for pairs of meanings, used for computing communicative success."""
+    return np.array(
+        [
+            [utility(ref, ref_) for ref_ in universe.referents]
+            for ref in universe.referents
+        ]
+    )
 
 
 def indicator_utility(ref1: Referent, ref2: Referent) -> float:
