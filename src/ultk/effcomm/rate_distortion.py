@@ -35,9 +35,12 @@ def language_to_ib_point(
 
             `distortion`: the distortion E[DKL[ M || M_hat ]] = I[M:U] - I[W:U], in bits
     """
-    args = [language, prior, meaning_dists]
+    args = (language, prior, meaning_dists)
+    result = language_to_ib_encoder_decoder(*args)
     return ib_encoder_to_point(
-        *args[1:], language_to_ib_encoder_decoder(*args).values()
+        *args[1:],
+        result["encoder"],
+        result["decoder"],
     )
 
 
@@ -103,9 +106,14 @@ def ib_encoder_to_point(
 
     encoder = rows_zero_to_uniform(encoder)
     decoder = rows_zero_to_uniform(decoder)
-    # breakpoint()
+
+    # IB complexity = info rate of encoder = I(meanings; words)
     complexity = information_cond(prior, encoder)
+    # IB accuracy/informativity = I(words; world states)
     accuracy = MI(meaning_dists @ joint(encoder, prior))
+
+    # IB comm_cost = distortion = E[DKL[speaker meaning || listener meaning]],
+    # this is also = I(meanings; world states) - I(words; world states)
     distortion = MI(joint(meaning_dists, prior)) - accuracy
 
     return (complexity, accuracy, distortion)
@@ -143,7 +151,7 @@ def get_ib_bound(
     betas: np.ndarray = np.logspace(-2, 5, 30),
     **kwargs,
 ) -> list[IBResult]:
-    """Estimate the IB theoretical bound for a domain, specified by a prior over meanings, (perceptually uncertain) meaning distributions.
+    """Estimate the IB theoretical bound for a domain, specified by a prior over meanings and (perceptually uncertain) meaning distributions.
 
     Args:
         meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
