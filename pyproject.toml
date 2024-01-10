@@ -20,15 +20,15 @@ classifiers = [
 ]
 license = {file = "LICENSE.txt"}
 dependencies = [
+    "mypy",
     "numpy",
     "nltk",
     "pyyaml",
     "pandas",
     "plotnine",
     "pathos",
-    "embo",
     "pytest",
-    "mypy"
+    "rdot",
 ]
 
 [project.urls]

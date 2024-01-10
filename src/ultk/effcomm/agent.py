@@ -5,7 +5,6 @@ import numpy as np
 from scipy.special import softmax
 from ultk.language.language import Expression, Language
 from ultk.language.semantics import Referent
-from ultk.effcomm.util import bayes
 
 ##############################################################################
 # Base communicative agent class
@@ -296,24 +295,3 @@ class PragmaticListener(Listener):
         for i in range(len(self.R)):
             col = speaker.S[:, i]
             self.R[i] = col @ prior / np.sum(col @ prior)
-
-
-class BayesianListener(Listener):
-    """A Bayesian reciever chooses an interpretation according to p(meaning | word), where
-
-    # BUG: This is extremely misleading since we basically only use this function for IB, and IB assumes a DETERMINISTIC bayes-derived listener.
-
-    $P(m | w) = \\frac{P(M | W) \cdot P(M)} { P(W) }$
-
-    Furthermore, we sometimes require that each word w is deterministically interpreted as meaning $\hat{m}$ as follows:
-
-    # BUG: This says nothing about determinism.
-    $\hat{m}_{w}(u) = \sum_m p(m|w) \cdot m(u)$
-
-    See ultk.effcomm.information for more details.
-    """
-
-    def __init__(self, speaker: Speaker, prior: np.ndarray, name: str = None):
-        weights = bayes(speaker.normalized_weights(), prior)
-        # TODO: Change this whole class to DeterministicBayesOptimalListener, and implement the correct weights!
-        super().__init__(speaker.language, weights=weights, name=name)
