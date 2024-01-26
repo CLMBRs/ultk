@@ -16,17 +16,17 @@ class TestLanguage:
     }
     pairs2 = {"shroom": "fungus", "dog": "animal", "tree": "plant", "bird": "bird"}
 
-    uni_refs = [Referent(key, {"phylum": val}) for (key, val) in pairs.items()]
+    uni_refs = (Referent(key, {"phylum": val}) for (key, val) in pairs.items())
     uni = Universe(uni_refs)
 
-    uni2 = Universe([Referent(key, {"phylum": val}) for (key, val) in pairs2.items()])
+    uni2 = Universe((Referent(key, {"phylum": val}) for (key, val) in pairs2.items()))
 
     meaning = Meaning(referents=uni_refs, universe=uni)
 
     dog = Expression(
         form="dog",
         meaning=Meaning(
-            referents=[Referent("dog", {"phylum": "animal"})], universe=uni
+            referents=(Referent("dog", {"phylum": "animal"})), universe=uni
         ),
     )
     cat = Expression(
@@ -60,10 +60,10 @@ class TestLanguage:
     lang_of_different_order = Language(expressions=[dog, cat, shroom, tree])
 
     def test_exp_subset(self):
-        assert TestLanguage.dog.can_express(Referent("dog", {"phylum": "animal"}))
+        assert TestLanguage.dog.can_express((Referent("dog", {"phylum": "animal"})))
 
     def test_exp_subset(self):
-        assert not TestLanguage.dog.can_express(Referent("cat", {"phylum": "animal"}))
+        assert not TestLanguage.dog.can_express((Referent("cat", {"phylum": "animal"})))
 
     def test_language_has_expressions(self):
         with pytest.raises(ValueError):

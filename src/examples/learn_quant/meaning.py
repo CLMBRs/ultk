@@ -1,7 +1,7 @@
 import pandas as pd
 from learn_quant.quantifier import QuantifierModel, QuantifierUniverse
 from itertools import product, combinations_with_replacement, permutations
-from altk.language.sampling import powerset
+from ultk.language.sampling import powerset
 import random
 import argparse
 

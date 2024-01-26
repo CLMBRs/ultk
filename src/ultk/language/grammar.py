@@ -4,6 +4,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from itertools import product
 from typing import Any, Callable, Generator, TypedDict
+from functools import cached_property
 
 from yaml import load
 
@@ -118,6 +119,14 @@ class GrammaticalExpression(Expression):
             self.children = tuple([child])
         else:
             self.children = self.children + (child,)
+
+    @cached_property
+    def antimeaning(self) -> Meaning:
+        """Get the antimeaning of this expression, i.e. the set of all referents for which
+        the expression evaluates to False."""
+
+        return Meaning(set(self.meaning.universe.referents) - set(self.meaning.referents),
+                       self.meaning.universe)
 
     def to_dict(self) -> dict:
         the_dict = super().to_dict()

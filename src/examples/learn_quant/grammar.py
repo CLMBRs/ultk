@@ -1,4 +1,4 @@
-from altk.language.grammar import Grammar, Rule
+from ultk.language.grammar import Grammar, Rule
 
 class QuantifierGrammar(Grammar):
     """This is a grammar class but for experiments involving quantifiers.

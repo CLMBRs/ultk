@@ -12,7 +12,7 @@ try:
 except ImportError:
     from yaml import Dumper
 
-from altk.language.semantics import Universe
+from ultk.language.semantics import Universe
 from learn_quant.quantifier import QuantifierModel
 from learn_quant.scripts.generate_expressions import enumerate_quantifiers, save_quantifiers
 

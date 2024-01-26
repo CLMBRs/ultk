@@ -10,9 +10,9 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
-from altk.language.grammar import GrammaticalExpression
-from altk.language.language import Expression, Language
-from altk.language.semantics import Meaning, Universe
+from ultk.language.grammar import GrammaticalExpression
+from ultk.language.language import Expression, Language
+from ultk.language.semantics import Meaning, Universe
 
 from learn_quant.grammar import quantifiers_grammar
 from learn_quant.meaning import create_universe

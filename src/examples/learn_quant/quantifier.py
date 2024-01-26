@@ -2,7 +2,7 @@
 from typing import Iterable, Union
 import numpy as np
 import pandas as pd
-from altk.language.semantics import Referent, Universe
+from ultk.language.semantics import Referent, Universe
 from dataclasses import dataclass, field
 from concepts.contexts import Context
 
@@ -33,6 +33,10 @@ class QuantifierModel(Referent):
         object.__setattr__(self, 'A', frozenset([i for i, x in enumerate(self.name) if x in ['0','2']]))
         object.__setattr__(self, 'B', frozenset([i for i, x in enumerate(self.name) if x in ['1','2']]))
         object.__setattr__(self, 'M', frozenset([i for i, x in enumerate(self.name) if x in ['0','1','2','3']]))
+
+    @classmethod
+    def from_sets(cls, M: set | frozenset, A: set | frozenset, B: set | frozenset):
+        return cls(name=None, M=frozenset(M), A=frozenset(A), B=frozenset(B))
 
     def get_cardinalities(self) -> dict:
         return {"M": len(self.M), 
