@@ -34,7 +34,7 @@ From the `src/examples` directory:
 2. `python -m indefinites.scripts.generate_expressions`: generates `outputs/generated_expressions.yml`
 
     This script generates the _shortest_ expression (ULTK `GrammaticalExpression`s) for each possible `Meaning` (set of `Referent`s) in the LoT defined in `grammar.py`. In particular, ULTK provides methods for enumerating all grammatical expressions up to a given depth, with user-provided keys for uniqueness and for comparison in the case of a clash.  By setting the former to get the `Meaning` from an expression and the latter to compare along length of the expression, the enumeration method returns a mapping from meanings to shortest expressions which express them.
-3. `python -m indefinites.scripts.esimate_pareto`: consumes `outputs/generated_expressions.yml` and generates `outputs/dominating_languages.yml` and `outputs/explored_languages.yml`
+3. `python -m indefinites.scripts.estimate_pareto`: consumes `outputs/generated_expressions.yml` and generates `outputs/dominating_languages.yml` and `outputs/explored_languages.yml`
 
     This calls `ultk.effcomm.EvolutionaryOptimizer.fit` to use an evolutionary algorithm to esimate the Pareto frontier.  For simplicity, it uses the default mutations of simply adding and removing an expression from a language.  `dominating_languages.yml` contains the Pareto optimal languages, while `explored_languages.yml` contains all languages generated during the optimization process.
 4. `python -m indefinites.scripts.measure_natural_languages`: consumes `data/natural_language_indefinites.csv`, `outputs/generated_expressions.yml` and generates `outputs/natural_languages.yml`

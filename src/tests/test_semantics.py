@@ -50,23 +50,25 @@ class TestSemantics:
         assert Universe.from_dataframe(second_dataframe) == TestSemantics.universe
 
     def test_universe_mismatch(self):
-        ref_list = [TestSemantics.ref1]
-        assert Universe(ref_list) != TestSemantics.universe
+        refs = (TestSemantics.ref1,)
+        assert Universe(refs) != TestSemantics.universe
 
     def test_meaning_subset(self):
-        ref_list = [TestSemantics.ref1]
+        refs = (TestSemantics.ref1,)
         meaning = Meaning(
-            ref_list, TestSemantics.universe
+            refs, TestSemantics.universe
         )  # This meaning should exist within the set of semantics
         assert TestSemantics.ref1 in meaning.referents
 
         with pytest.raises(ValueError):
-            ref_list.append(
-                Referent(
-                    name="neutral+epistemic",
-                    properties={"force": "neutral", "flavor": "epistemic"},
-                )
+            refs_bad = tuple(
+                list(refs) + [
+                    Referent(
+                        name="neutral+epistemic",
+                        properties={"force": "neutral", "flavor": "epistemic"},
+                    )
+                ]
             )
             meaning = Meaning(
-                ref_list, TestSemantics.universe
+                refs_bad, TestSemantics.universe
             )  # This meaning should not
