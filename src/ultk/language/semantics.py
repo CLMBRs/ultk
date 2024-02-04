@@ -87,7 +87,7 @@ class Universe:
 
     def __len__(self) -> int:
         return len(self.referents)
-
+    
     def __hash__(self) -> int:
         return hash(tuple(self.referents))
 
@@ -180,6 +180,9 @@ class Meaning:
     def __str__(self):
         return f"Referents:\n\t{','.join(str(referent) for referent in self.referents)}\
             \nDistribution:\n\t{self.dist}\n"
+    
+    def __contains__(self, referent: Referent) -> bool:
+        return referent in self.referents
 
     def __hash__(self):
         return hash(tuple(self.referents))

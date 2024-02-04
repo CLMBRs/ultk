@@ -42,9 +42,9 @@ def save_quantifiers(expressions_by_meaning,
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Generate expressions')
-    parser.add_argument('--m_size', type=int, default=8, help='maximum size of the universe')
-    parser.add_argument('--x_size', type=int, default=8, help='number of unique referents from which M may be comprised')
-    parser.add_argument('--depth', type=int, default=4, help='maximum depth of the expressions')
+    parser.add_argument('--m_size', type=int, default=6, help='maximum size of the universe')
+    parser.add_argument('--x_size', type=int, default=6, help='number of unique referents from which M may be comprised')
+    parser.add_argument('--depth', type=int, default=3, help='maximum depth of the expressions')
     parser.add_argument('--weight', type=float, default=2.0, help='weight of the index primitives')
     args = parser.parse_args()
 

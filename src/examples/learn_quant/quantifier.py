@@ -47,8 +47,16 @@ class QuantifierModel(Referent):
 
 class QuantifierUniverse(Universe):
 
-    def __init__(self, referents: Iterable[QuantifierModel], m_size: int, x_size: int, prior: dict[str, float] = None):
+    def __init__(self, referents: Iterable[QuantifierModel], m_size: int = None, x_size: int = None, prior: dict[str, float] = None):
         super().__init__(referents, prior)
         self.m_size = m_size
         self.x_size = x_size
+    
+    def __add__(self, other):
+        """Returns the union of two QuantifierUniverses.
+        Largest x_size is used if different."""
+        assert self.x_size == other.x_size
+        x_size = max(self.x_size, other.x_size)
+        return QuantifierUniverse(list(set(self.referents) | set(other.referents)), prior={**self._prior, **other._prior}, x_size=x_size)
+
 
