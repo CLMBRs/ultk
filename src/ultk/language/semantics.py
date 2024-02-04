@@ -68,8 +68,8 @@ class Universe:
 
     """The universe is the set of possible referent objects for a meaning."""
 
-    referents: Iterable[Referent]
-    prior: dict[str, float] = None
+    referents: tuple[Referent]
+    prior: tuple[float] = None
 
     @cached_property
     def _referents_by_name(self):
@@ -81,12 +81,10 @@ class Universe:
 
     @cached_property
     def _prior(self):
-        return self.prior or {
-            referent.name: 1 / self.size for referent in self.referents
-        }
+        return self.prior or tuple([1 / self.size] * self.size)
 
     def prior_numpy(self) -> np.ndarray:
-        return np.array([self._prior[referent.name] for referent in self.referents])
+        return np.array(self.prior)
 
     def __getitem__(self, key: Union[str, int]) -> Referent:
         if type(key) is str:
@@ -114,7 +112,7 @@ class Universe:
         """
         prior = None
         if "probability" in df.columns:
-            prior = dict(zip(df["name"], df["probability"]))
+            prior = tuple(df["probability"])
         records = df.to_dict("records")
         referents = tuple(Referent(record["name"], record) for record in records)
         return cls(referents, prior)
@@ -130,16 +128,14 @@ class Universe:
 
 @dataclass(frozen=True)
 class Meaning:
-    referents: Iterable[Referent]
+    referents: tuple[Referent]
     universe: Universe
     _dist: dict[str, float] = None
     """A meaning picks out a set of objects from the universe.
 
-    On one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
+    Following one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
     Sometimes these different referents are not equally likely,
     in which it can be helpful to define a meaning explicitly as a distribution over the universe.
-
-    The objects of reference are a subset of the universe of discourse. Sometimes it is natural to construe the meaning as as a probability distribution over the universe, instead of just a binary predicate.
 
     Args:
         referents: a list of Referent objects, which must be a subset of the referents in `universe`.
@@ -150,6 +146,10 @@ class Meaning:
     """
 
     def __post_init__(self):
+
+        if not isinstance(self.referents, tuple):
+            raise TypeError(f"The `referents` field of Meaning must be a tuple.")
+
         if not set(self.referents).issubset(set(self.universe.referents)):
             print("referents:")
             print(tuple(str(r) for r in self.referents))
@@ -160,18 +160,20 @@ class Meaning:
             )
 
     @property
-    def dist(self):
+    def dist(self) -> np.ndarray:
         zeros = {
             ref.name: 0.0 for ref in set(self.universe.referents) - set(self.referents)
         }
         if self._dist is not None:
             # normalize weights to distribution
             total_weight = sum(self._dist.values())
-            return {
+            _dist = {
                 ref.name: self._dist[ref.name] / total_weight for ref in self.referents
             } | zeros
+            return np.array(_dist.values())
         else:
-            return {ref.name: 1 / len(self.referents) for ref in self.referents} | zeros
+            _dist = {ref.name: 1 / len(self.referents) for ref in self.referents} | zeros
+            return np.array(_dist.values())
 
     def to_dict(self) -> dict:
         return {"referents": [referent.to_dict() for referent in self.referents]}

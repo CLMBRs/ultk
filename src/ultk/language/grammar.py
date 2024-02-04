@@ -52,7 +52,8 @@ class Rule:
         return out_str
 
 
-@dataclass(eq=True, kw_only=True)
+# We need to use unsafe hash here, because the class needs to be both mutable and hashable (e.g., see https://github.com/CLMBRs/ultk/blob/main/src/ultk/effcomm/agent.py#L30).
+@dataclass(eq=True, kw_only=True, unsafe_hash=True)
 class GrammaticalExpression(Expression):
     """A GrammaticalExpression has been built up from a Grammar by applying a sequence of Rules.
     Crucially, it is _callable_, using the functions corresponding to each rule.
@@ -89,7 +90,7 @@ class GrammaticalExpression(Expression):
         # Expression.__init__ initializes an "empty" meaning if `None` is passed
         if not self.meaning:
             self.meaning = Meaning(
-                [referent for referent in universe.referents if self(referent)],
+                tuple(referent for referent in universe.referents if self(referent)),
                 universe,
             )
         return self.meaning
@@ -430,16 +431,16 @@ class Grammar:
           - bool
           - bool
           name: "and"
-          function: "lambda p1, p2 : p1 and p2"
+          func: "lambda p1, p2 : p1 and p2"
         - lhs: bool
           rhs:
           - bool
           - bool
           name: "or"
-          function: "lambda p1, p2 : p1 or p2"
+          func: "lambda p1, p2 : p1 or p2"
         ```
 
-        Note that for each fule, the value for `function` will be passed to
+        Note that for each fule, the value for `func` will be passed to
         `eval`, so be careful!
 
         Arguments:
@@ -449,9 +450,9 @@ class Grammar:
             grammar_dict = load(f, Loader=Loader)
         grammar = cls(grammar_dict["start"])
         for rule_dict in grammar_dict["rules"]:
-            if "function" in rule_dict:
+            if "func" in rule_dict:
                 # TODO: look-up functions from a registry as well?
-                rule_dict["function"] = eval(rule_dict["function"])
+                rule_dict["func"] = eval(rule_dict["func"])
             if "weight" in rule_dict:
                 rule_dict["weight"] = float(rule_dict["weight"])
             grammar.add_rule(Rule(**rule_dict))
