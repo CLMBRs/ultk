@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from typing import Callable, Iterable
 
 
-@dataclass
+@dataclass(eq=True, unsafe_hash=True)
 class Expression:
 
     """Minimally contains a form and a meaning."""
@@ -28,7 +28,7 @@ class Expression:
     # useful for hashing in certain cases
     # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
     form: str = ""
-    meaning: Meaning = Meaning(tuple(list()), Universe(tuple(list())))
+    meaning: Meaning = Meaning(tuple(), Universe(tuple()))
 
     def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
@@ -55,8 +55,11 @@ class Language:
     """Minimally contains Expression objects."""
 
     def __init__(self, expressions: tuple[Expression, ...], **kwargs):
-        # Check that all expressions have the same universe
 
+        if not expressions:
+            raise ValueError(f"Language cannot be empty.")
+
+        # Check that all expressions have the same universe
         if len(set([e.meaning.universe for e in expressions])) != 1:
             raise ValueError(
                 f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}"

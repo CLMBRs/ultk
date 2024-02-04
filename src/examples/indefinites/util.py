@@ -42,7 +42,7 @@ def read_natural_languages(filename: str) -> list[Language]:
         for item in items.itertuples():
             # generate Meaning from list of flavors
             cur_meaning = Meaning(
-                [indefinites_universe[flavor] for flavor in item.flavors],
+                tuple(indefinites_universe[flavor] for flavor in item.flavors),
                 indefinites_universe,
             )
             # add Expression with form and Meaning
