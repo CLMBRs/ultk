@@ -6,20 +6,20 @@ rules:
     - bool
     - bool
   name: "and"
-  function: |
+  func: |
     lambda p1 , p2 : p1 and p2
 - lhs: bool
   rhs:
     - bool
     - bool
   name: "or"
-  function: |
+  func: |
     lambda p1 , p2 : p1 or p2
 - lhs: bool
   rhs:
     - bool
   name: "not"
-  function: |
+  func: |
     lambda p : not p
 # primitive / feature rules
 # We include "positive" and "negative" features as primitives (instead of definining the latter via negation) for two reasons.
@@ -30,42 +30,42 @@ rules:
 - lhs: bool
   rhs: 
   name: "K+"
-  function: |
+  func: |
     lambda point: point.name == "specific-known"
 - lhs: bool
   rhs: 
   name: "K-"
-  function: |
+  func: |
     lambda point: point.name != "specific-known"
 - lhs: bool
   rhs:
   name: "S+"
-  function: |
+  func: |
     lambda point: point.name in ("specific-known", "specific-unknown")
 - lhs: bool
   rhs:
   name: "S-"
-  function: |
+  func: |
     lambda point: point.name not in ("specific-known", "specific-unknown")
 - lhs: bool
   rhs: 
   name: "SE+"
-  function: |
+  func: |
     lambda point: point.name in ("npi", "freechoice", "negative-indefinite")
 - lhs: bool
   rhs: 
   name: "SE-"
-  function: |
+  func: |
     lambda point: point.name not in ("npi", "freechoice", "negative-indefinite")
 - lhs: bool
   rhs: 
   name: "N+"
-  function: |
+  func: |
     lambda point: point.name == "negative-indefinite"
 - lhs: bool
   rhs: 
   name: "N-"
-  function: |
+  func: |
     lambda point: point.name != "negative-indefinite"
 # NB: the grammar should be modified in such a way that R+ and R- can only occur with SE+
 # easiest would be to just split SE+ into two features
@@ -73,10 +73,10 @@ rules:
 - lhs: bool
   rhs:
   name: "R+"
-  function: |
+  func: |
     lambda point: point.name in ("negative-indefinite", "npi")
 - lhs: bool
   rhs:
   name: "R-"
-  function: |
+  func: |
     lambda point: point.name == "freechoice"

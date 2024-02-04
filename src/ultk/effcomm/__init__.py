@@ -10,11 +10,9 @@ The `altk.effcomm.tradeoff` submodule contains tools for measuring a pool of lan
 
 The `altk.effcomm.analysis` submodule contains tools for performing numerical analyses and producing paradigmatic plots of languages in 2D trade-off space.
 
-The `altk.effcomm.information` submodule contains tools for information theory based analyses of the communicative efficiency of languages. It includes methods for Rate-Distortion style (including the Information Bottleneck) analyses.
+The `altk.effcomm.rate_distortion` submodule contains tools for information theory based analyses of the communicative efficiency of languages. Specificially, it includes methods for Rate-Distortion style (including the Information Bottleneck) analyses.
 
 The `altk.effcomm.agent` submodule implements classes for constructing various speakers and listeners of a language. These are typically used in static analyses of informativity of a language, and are unified abstractions from the Rational Speech Act framework. They can also be used for dynamic analyses, however (see the [signaling game example](https://clmbr.shane.st/altk/src/examples/signaling_game)).
 
 The `altk.effcomm.informativity` submodule implements tools for computing the literal or pragmatic informativity of a language, based on speaker/listener  abstractions described above.
-
-The `altk.effcomm.util` submodule contains various helper functions for working with the probability distributions associated with ALTK abstractions.
 """
