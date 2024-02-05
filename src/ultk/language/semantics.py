@@ -17,15 +17,21 @@
         >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
 """
 
-from typing import Iterable, Union
+from typing import Any, Iterable, Union
 import numpy as np
 import pandas as pd
+from dataclasses import dataclass
+from functools import cached_property
 
 
 class Referent:
-    """A referent is some object in the universe for a language."""
+    """A referent is some object in the universe for a language.
 
-    def __init__(self, name: str, properties: dict = {}, **kwargs) -> None:
+    Conceptually, a Referent can be any kind of object.  This functions like a generic python object that is _immutable_ after initialization.
+    At initialization, properties can be specified either by passing a dictionary or by keyword arguments.
+    """
+
+    def __init__(self, name: str, properties: dict[str, Any] = {}, **kwargs) -> None:
         """Initialize a referent.
 
         Args:
@@ -33,6 +39,13 @@ class Referent:
         """
         self.name = name
         self.__dict__.update(properties, **kwargs)
+        self._frozen = True
+
+    def __setattr__(self, __name: str, __value: Any) -> None:
+        if hasattr(self, "_frozen") and self._frozen:
+            raise AttributeError("Referents are immutable.")
+        else:
+            object.__setattr__(self, __name, __value)
 
     def to_dict(self) -> dict:
         return self.__dict__
@@ -50,23 +63,28 @@ class Referent:
         return hash((self.name, tuple(self.__dict__)))
 
 
+@dataclass(frozen=True)
 class Universe:
 
     """The universe is the set of possible referent objects for a meaning."""
 
-    def __init__(self, referents: Iterable[Referent], prior: dict[str, float] = None):
-        self.referents = referents
-        self._referents_by_name = {referent.name: referent for referent in referents}
-        # set to uniform prior if none specified
-        size = len(referents)
-        prior = prior or {referent.name: 1 / size for referent in referents}
-        self.set_prior(prior)
+    referents: tuple[Referent]
+    prior: tuple[float] = None
 
-    def set_prior(self, prior: dict[str, float]):
-        self._prior = prior
+    @cached_property
+    def _referents_by_name(self):
+        return {referent.name: referent for referent in self.referents}
+
+    @cached_property
+    def size(self):
+        return len(self.referents)
+
+    @cached_property
+    def _prior(self):
+        return self.prior or tuple([1 / self.size] * self.size)
 
     def prior_numpy(self) -> np.ndarray:
-        return np.array([self._prior[referent.name] for referent in self.referents])
+        return np.array(self.prior)
 
     def __getitem__(self, key: Union[str, int]) -> Referent:
         if type(key) is str:
@@ -80,16 +98,8 @@ class Universe:
         referents_str = ",\n\t".join([str(point) for point in self.referents])
         return f"Points:\n\t{referents_str}\nDistribution:\n\t{self._prior}"
 
-    def __eq__(self, __o: object) -> bool:
-        """Returns true if the two universes are the same set."""
-        # TODO: may want to generalize to checking additional structure.  Or just leave that to sub-classes?
-        return set(self.referents) == set(__o.referents)
-
     def __len__(self) -> int:
         return len(self.referents)
-    
-    def __hash__(self) -> int:
-        return hash(tuple(self.referents))
 
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame):
@@ -102,7 +112,7 @@ class Universe:
         """
         prior = None
         if "probability" in df.columns:
-            prior = dict(zip(df["name"], df["probability"]))
+            prior = tuple(df["probability"])
         records = df.to_dict("records")
         referents = tuple(Referent(record["name"], record) for record in records)
         return cls(referents, prior)
@@ -116,57 +126,54 @@ class Universe:
         return cls.from_dataframe(df)
 
 
+@dataclass(frozen=True)
 class Meaning:
+    referents: tuple[Referent]
+    universe: Universe
+    _dist: dict[str, float] = None
     """A meaning picks out a set of objects from the universe.
 
-    On one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
+    Following one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
     Sometimes these different referents are not equally likely,
     in which it can be helpful to define a meaning explicitly as a distribution over the universe.
+
+    Args:
+        referents: a list of Referent objects, which must be a subset of the referents in `universe`.
+
+        universe: a Universe object that defines the probability space for a meaning.
+
+        dist: a dict of with Referent names as keys and weights or probabilities as values, representing the distribution over referents to associate with the meaning. By default is None, and the distribution will be uniform over the passed referents, and any remaining referents are assigned 0 probability.
     """
 
-    def __init__(
-        self,
-        referents: Iterable[Referent],
-        universe: Universe,
-        dist: dict[str, float] = None,
-    ) -> None:
-        """A meaning is the set of things it refers to.
+    def __post_init__(self):
 
-        The objects of reference are a subset of the universe of discourse. Sometimes it is natural to construe the meaning as as a probability distribution over the universe, instead of just a binary predicate.
+        if not isinstance(self.referents, tuple):
+            raise TypeError(f"The `referents` field of Meaning must be a tuple.")
 
-        Args:
-            referents: a list of Referent objects, which must be a subset of the referents in `universe`.
-
-            universe: a Universe object that defines the probability space for a meaning.
-
-            dist: a dict of with Referent names as keys and weights or probabilities as values, representing the distribution over referents to associate with the meaning. By default is None, and the distribution will be uniform over the passed referents, and any remaining referents are assigned 0 probability.
-        """
-        if not set(referents).issubset(set(universe.referents)):
+        if not set(self.referents).issubset(set(self.universe.referents)):
             print("referents:")
-            print([str(r) for r in referents])
+            print(tuple(str(r) for r in self.referents))
             print("universe:")
-            print([str(r) for r in universe.referents])
+            print(tuple(str(r) for r in self.universe.referents))
             raise ValueError(
                 f"The set of referents for a meaning must be a subset of the universe of discourse."
             )
 
-        self.referents = referents
-        self.universe = universe
-
+    @property
+    def dist(self) -> np.ndarray:
         zeros = {
             ref.name: 0.0 for ref in set(self.universe.referents) - set(self.referents)
         }
-        if dist is not None:
+        if self._dist is not None:
             # normalize weights to distribution
-            total_weight = sum(dist.values())
-            self.dist = {
-                ref.name: dist[ref.name] / total_weight for ref in self.referents
+            total_weight = sum(self._dist.values())
+            _dist = {
+                ref.name: self._dist[ref.name] / total_weight for ref in self.referents
             } | zeros
-
+            return np.array(_dist.values())
         else:
-            self.dist = {
-                ref.name: 1 / len(self.referents) for ref in self.referents
-            } | zeros
+            _dist = {ref.name: 1 / len(self.referents) for ref in self.referents} | zeros
+            return np.array(_dist.values())
 
     def to_dict(self) -> dict:
         return {"referents": [referent.to_dict() for referent in self.referents]}
@@ -174,15 +181,6 @@ class Meaning:
     def __bool__(self):
         return bool(self.referents) and bool(self.universe)
 
-    def __eq__(self, other):
-        return (self.referents, self.universe) == (other.referents, other.universe)
-
     def __str__(self):
         return f"Referents:\n\t{','.join(str(referent) for referent in self.referents)}\
             \nDistribution:\n\t{self.dist}\n"
-    
-    def __contains__(self, referent: Referent) -> bool:
-        return referent in self.referents
-
-    def __hash__(self):
-        return hash(tuple(self.referents))

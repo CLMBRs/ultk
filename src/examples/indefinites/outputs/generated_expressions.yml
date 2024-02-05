@@ -4,6 +4,7 @@
   meaning:
     referents:
     - &id001
+      _frozen: true
       name: specific-known
       probability: 0.08125
 - form: ''
@@ -12,18 +13,23 @@
   meaning:
     referents:
     - &id002
+      _frozen: true
       name: specific-unknown
       probability: 0.08125
     - &id003
+      _frozen: true
       name: nonspecific
       probability: 0.2625
     - &id004
+      _frozen: true
       name: freechoice
       probability: 0.0979166666666667
     - &id005
+      _frozen: true
       name: negative-indefinite
       probability: 0.15
     - &id006
+      _frozen: true
       name: npi
       probability: 0.327083333333333
 - form: ''
