@@ -64,10 +64,10 @@ class TestLanguage:
     lang_of_different_order = Language(expressions=tuple([dog, cat, shroom, tree]))
 
     def test_exp_subset(self):
-        assert TestLanguage.dog.can_express((Referent("dog", {"phylum": "animal"})))
+        assert TestLanguage.dog.can_express(Referent("dog", {"phylum": "animal"}))
 
     def test_exp_subset(self):
-        assert not TestLanguage.dog.can_express((Referent("cat", {"phylum": "animal"})))
+        assert not TestLanguage.dog.can_express(Referent("cat", {"phylum": "animal"}))
 
     def test_language_has_expressions(self):
         with pytest.raises(ValueError):
