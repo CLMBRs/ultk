@@ -55,7 +55,6 @@ class Language:
     """Minimally contains Expression objects."""
 
     def __init__(self, expressions: tuple[Expression, ...], **kwargs):
-
         if not expressions:
             raise ValueError(f"Language cannot be empty.")
 
