@@ -66,7 +66,7 @@ class Referent:
 @dataclass(frozen=True)
 class Universe:
 
-    """The universe is the set of possible referent objects for a meaning."""
+    """The universe is the collection of possible referent objects for a meaning."""
 
     referents: tuple[Referent]
     prior: tuple[float] = None
@@ -130,7 +130,7 @@ class Universe:
 class Meaning:
     referents: tuple[Referent]
     universe: Universe
-    _dist: dict[str, float] = None
+    _dist: tuple[float] = None
     """A meaning picks out a set of objects from the universe.
 
     Following one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
@@ -138,15 +138,14 @@ class Meaning:
     in which it can be helpful to define a meaning explicitly as a distribution over the universe.
 
     Args:
-        referents: a list of Referent objects, which must be a subset of the referents in `universe`.
+        referents: a tuple of Referent objects, which must be a subset of the referents in `universe`.
 
         universe: a Universe object that defines the probability space for a meaning.
 
-        dist: a dict of with Referent names as keys and weights or probabilities as values, representing the distribution over referents to associate with the meaning. By default is None, and the distribution will be uniform over the passed referents, and any remaining referents are assigned 0 probability.
+        dist: a tuple representing the distribution over referents to associate with the meaning. By default is None, and the distribution will be uniform over the passed referents, and any remaining referents are assigned 0 probability.
     """
 
     def __post_init__(self):
-
         if not isinstance(self.referents, tuple):
             raise TypeError(f"The `referents` field of Meaning must be a tuple.")
 
@@ -160,20 +159,24 @@ class Meaning:
             )
 
     @property
-    def dist(self) -> np.ndarray:
-        zeros = {
-            ref.name: 0.0 for ref in set(self.universe.referents) - set(self.referents)
-        }
+    def dist(self) -> tuple:
         if self._dist is not None:
             # normalize weights to distribution
-            total_weight = sum(self._dist.values())
-            _dist = {
-                ref.name: self._dist[ref.name] / total_weight for ref in self.referents
-            } | zeros
-            return np.array(_dist.values())
+            total_weight = sum(self._dist)
+            return tuple(
+                self._dist[self.referents.index(self.universe.referents[idx])]
+                / total_weight
+                if self.universe.referents[idx] in self.referents
+                else 0
+                for idx in range(len(self.universe.referents))
+            )
         else:
-            _dist = {ref.name: 1 / len(self.referents) for ref in self.referents} | zeros
-            return np.array(_dist.values())
+            return tuple(
+                1 / len(self.referents)
+                if self.universe.referents[idx] in self.referents
+                else 0
+                for idx in range(len(self.universe.referents))
+            )
 
     def to_dict(self) -> dict:
         return {"referents": [referent.to_dict() for referent in self.referents]}
