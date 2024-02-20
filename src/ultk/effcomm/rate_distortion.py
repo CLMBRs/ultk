@@ -101,11 +101,18 @@ def ib_encoder_to_point(
 
         decoder: array of shape `(|words|, |meanings|)` representing P(M | W).  By default is None, and the Bayesian optimal decoder will be inferred.
     """
+
+
     if decoder is None:
         decoder = ib_optimal_decoder(encoder, prior, meaning_dists)
 
-    encoder = rows_zero_to_uniform(encoder)
-    decoder = rows_zero_to_uniform(decoder)
+    encoder = rows_zero_to_uniform(encoder.normalized_weights())
+    decoder = rows_zero_to_uniform(decoder.normalized_weights())
+
+    print(f"IB Encoder Meaning dists {meaning_dists.shape} | {meaning_dists}")
+    print(f"IB Encoder prior {prior.shape} | {prior}")
+    print(f"IB Encoder encoder {encoder.shape} | {encoder}")
+    print(f"IB Encoder decoder {decoder.shape} | {decoder}")
 
     # IB complexity = info rate of encoder = I(meanings; words)
     complexity = information_cond(prior, encoder)
