@@ -84,7 +84,7 @@ class Universe:
         return self.prior or tuple([1 / self.size] * self.size)
 
     def prior_numpy(self) -> np.ndarray:
-        return np.array(self.prior)
+        return np.array(self._prior)
 
     def __getitem__(self, key: Union[str, int]) -> Referent:
         if type(key) is str:
