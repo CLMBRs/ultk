@@ -71,20 +71,27 @@ class Universe:
     referents: tuple[Referent]
     prior: tuple[float] = None
 
-    @cached_property
-    def _referents_by_name(self):
-        return {referent.name: referent for referent in self.referents}
+    def __post_init__(self):
+        if self.prior is None:
+            if not self.size:
+                # for empty meanings in GrammaticalExpression init, 
+                # assume empty prior
+                # see https://github.com/CLMBRs/ultk/issues/34
+                object.__setattr__(self, "prior",  tuple())
+            else:
+                # Assume uniform prior
+                object.__setattr__(self, "prior",  tuple([1 / self.size] * self.size))
 
     @cached_property
     def size(self):
         return len(self.referents)
 
-    @cached_property
-    def _prior(self):
-        return self.prior or tuple([1 / self.size] * self.size)
-
     def prior_numpy(self) -> np.ndarray:
         return np.array(self.prior)
+    
+    @cached_property
+    def _referents_by_name(self):
+        return {referent.name: referent for referent in self.referents}
 
     def __getitem__(self, key: Union[str, int]) -> Referent:
         if type(key) is str:
@@ -160,7 +167,11 @@ class Meaning:
 
     @property
     def dist(self) -> tuple:
-        if self._dist is not None:
+        # If empty meaning
+        if not self.referents:
+            raise Exception("Cannot return a prior over referents with an empty Meaning.")
+
+        elif self._dist is not None:
             # normalize weights to distribution
             total_weight = sum(self._dist)
             return tuple(
