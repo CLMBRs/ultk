@@ -47,9 +47,6 @@ class Referent:
         else:
             object.__setattr__(self, __name, __value)
 
-    def to_dict(self) -> dict:
-        return self.__dict__
-
     def __str__(self) -> str:
         return str(self.__dict__)
 
@@ -180,9 +177,6 @@ class Meaning:
                 )
                 for idx in range(len(self.universe.referents))
             )
-
-    def to_dict(self) -> dict:
-        return {"referents": [referent.to_dict() for referent in self.referents]}
 
     def __bool__(self):
         return bool(self.referents) and bool(self.universe)
