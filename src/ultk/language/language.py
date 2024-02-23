@@ -21,7 +21,6 @@ from typing import Callable, Iterable
 
 @dataclass(eq=True, unsafe_hash=True)
 class Expression:
-
     """Minimally contains a form and a meaning."""
 
     # gneric/dummy form and meaning if not specified
