@@ -106,7 +106,7 @@ class GrammaticalExpression(Expression):
             self.children = self.children + (child,)
 
     def to_dict(self) -> dict:
-        the_dict = super().__dict__
+        the_dict = super().to_dict()
         the_dict["grammatical_expression"] = str(self)
         the_dict["length"] = len(self)
         return the_dict
