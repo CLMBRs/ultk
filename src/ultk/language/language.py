@@ -33,6 +33,10 @@ class Expression:
         """Return True if the expression can express the input single meaning point and false otherwise."""
         return referent in self.meaning.referents
 
+    def to_dict(self) -> dict:
+        """Return a dictionary representation of the expression."""
+        return {"form": self.form, "meaning": self.meaning.__dict__}
+
     def __str__(self) -> str:
         return self.form
         # return f"Expression {self.form}\nMeaning:\n\t{self.meaning}"
