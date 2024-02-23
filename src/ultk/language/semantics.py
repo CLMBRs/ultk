@@ -65,11 +65,10 @@ class Referent:
 
 @dataclass(frozen=True)
 class Universe:
-
     """The universe is the collection of possible referent objects for a meaning."""
 
-    referents: tuple[Referent]
-    prior: tuple[float] = None
+    referents: tuple[Referent, ...]
+    prior: tuple[float, ...] = tuple()
 
     @cached_property
     def _referents_by_name(self):
@@ -110,7 +109,7 @@ class Universe:
         Args:
             a DataFrame representing the meaning space of interest, assumed to have a column `name`
         """
-        prior = None
+        prior: tuple[float, ...] = tuple()
         if "probability" in df.columns:
             prior = tuple(df["probability"])
         records = df.to_dict("records")
@@ -128,9 +127,9 @@ class Universe:
 
 @dataclass(frozen=True)
 class Meaning:
-    referents: tuple[Referent]
+    referents: tuple[Referent, ...]
     universe: Universe
-    _dist: tuple[float] = None
+    _dist: tuple[float, ...] = tuple()
     """A meaning picks out a set of objects from the universe.
 
     Following one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
@@ -164,17 +163,21 @@ class Meaning:
             # normalize weights to distribution
             total_weight = sum(self._dist)
             return tuple(
-                self._dist[self.referents.index(self.universe.referents[idx])]
-                / total_weight
-                if self.universe.referents[idx] in self.referents
-                else 0
+                (
+                    self._dist[self.referents.index(self.universe.referents[idx])]
+                    / total_weight
+                    if self.universe.referents[idx] in self.referents
+                    else 0
+                )
                 for idx in range(len(self.universe.referents))
             )
         else:
             return tuple(
-                1 / len(self.referents)
-                if self.universe.referents[idx] in self.referents
-                else 0
+                (
+                    1 / len(self.referents)
+                    if self.universe.referents[idx] in self.referents
+                    else 0
+                )
                 for idx in range(len(self.universe.referents))
             )
 
