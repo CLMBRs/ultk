@@ -33,9 +33,6 @@ class Expression:
         """Return True if the expression can express the input single meaning point and false otherwise."""
         return referent in self.meaning.referents
 
-    def to_dict(self) -> dict:
-        return {"form": self.form, "meaning": self.meaning.to_dict()}
-
     def __str__(self) -> str:
         return self.form
         # return f"Expression {self.form}\nMeaning:\n\t{self.meaning}"
@@ -116,7 +113,10 @@ class Language:
     def universe(self, val) -> None:
         self._universe = val
 
-    def to_dict(self, **kwargs) -> dict:
+    def as_dict_with_properties(self, **kwargs) -> dict:
+        """Return a dictionary representation of the language, including additional properties as keyword arguments.
+
+        This is used in some examples to serialize the language to outputs."""
         the_dict = {"expressions": [str(expr) for expr in self.expressions]}
         the_dict.update(kwargs)
         return the_dict
