@@ -61,6 +61,7 @@ class Language:
 
         # Check that all expressions have the same universe
         if len(set([e.meaning.universe for e in expressions])) != 1:
+            breakpoint()
             raise ValueError(
                 f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}"
             )

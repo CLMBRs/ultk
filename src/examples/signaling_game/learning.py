@@ -3,7 +3,7 @@
 import numpy as np
 from ultk.effcomm.agent import CommunicativeAgent
 from ultk.effcomm.informativity import communicative_success
-from ultk.effcomm.information import information_rate
+from ultk.effcomm.rate_distortion import information_cond
 from game import SignalingGame
 from tqdm import tqdm
 from typing import Any
@@ -46,7 +46,7 @@ def simulate_learning(g: SignalingGame, num_rounds: int, learning_rate=1.0) -> N
             )
         )
         g.data["complexity"].append(
-            information_rate(g.prior, g.sender.normalized_weights())
+            information_cond(g.prior, g.sender.normalized_weights())
         )
 
     return g

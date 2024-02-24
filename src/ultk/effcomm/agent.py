@@ -147,7 +147,7 @@ class CommunicativeAgent:
         # loop over agent's vocabulary
         for old_expression in self.language.expressions:
             # get all meanings that the expression can communicate
-            referents = [
+            referents = tuple([
                 referent
                 for referent in self.language.universe.referents
                 if policies[
@@ -156,7 +156,7 @@ class CommunicativeAgent:
                     )
                 ]
                 > threshold  # if probability of referent is high enough
-            ]
+            ])
 
             meaning = meaning_type(referents, self.language.universe)
             # construct the updated expression as a new form-meaning mapping
