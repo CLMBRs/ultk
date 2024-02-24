@@ -1,4 +1,3 @@
-# from . import util
 import util
 import vis
 from agents import Receiver, Sender
@@ -27,7 +26,7 @@ def main(args):
     signal_names = [f"signal_{i+1}" for i in range(num_signals)]
 
     # Construct the universe of states, and language defined over it
-    universe = StateSpace([State(name=name) for name in state_names])
+    universe = StateSpace(tuple([State(name=name) for name in state_names]))
 
     # All meanings are dummy placeholders at this stage, but they can be substantive once agents are given a weight matrix.
     dummy_meaning = SignalMeaning(states=universe.referents, universe=universe)

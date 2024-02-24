@@ -143,9 +143,12 @@ print("Meaning space indices:")
 print(meaning_space_indices)
 
 #result = meaning(munsell_to_cielab[meaning_space_indices[0]], munsell_to_cielab[meaning_space_indices[1]])
-        
-print(rd.language_to_ib_point(language=languages[0], prior=uniform_prior, meaning_dists=meaning_space_indices))
-print(rd.language_to_ib_point(language=languages[100], prior=uniform_prior, meaning_dists=meaning_space_indices))
-print(rd.language_to_ib_point(language=languages[200], prior=uniform_prior, meaning_dists=meaning_space_indices))
+
+# breakpoint()
+meaning_dists = meaning_space_indices / meaning_space_indices.sum(axis=1, keepdims=True)
+
+print(rd.language_to_ib_point(language=languages[0], prior=uniform_prior, meaning_dists=meaning_dists))
+print(rd.language_to_ib_point(language=languages[100], prior=uniform_prior, meaning_dists=meaning_dists))
+print(rd.language_to_ib_point(language=languages[200], prior=uniform_prior, meaning_dists=meaning_dists))
 
 
