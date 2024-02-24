@@ -70,7 +70,7 @@ def language_to_ib_encoder_decoder(
 
         prior: array of shape `|meanings|` representing the communicative need distribution
 
-        meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.                
+        meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
 
     Returns:
         a dict of the form
@@ -92,7 +92,7 @@ def language_to_ib_encoder_decoder(
 
 def ib_encoder_to_point(
     prior: np.ndarray,
-    meaning_dists: np.ndarray,    
+    meaning_dists: np.ndarray,
     encoder: np.ndarray,
     decoder: np.ndarray = None,
 ) -> tuple[float]:
@@ -101,7 +101,7 @@ def ib_encoder_to_point(
     Args:
         prior: array of shape `|meanings|` representing the communicative need distribution
 
-        meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.        
+        meaning_dists: array of shape `(|meanings|, |meanings|)` representing the distribution over world states given meanings.
 
         encoder: array of shape `(|meanings|, |words|)` representing P(W | M)
 
