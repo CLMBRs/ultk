@@ -55,15 +55,13 @@ class Language:
     """Minimally contains Expression objects."""
 
     def __init__(self, expressions: tuple[Expression, ...], **kwargs):
-
         if not expressions:
             raise ValueError(f"Language cannot be empty.")
 
         # Check that all expressions have the same universe
         if len(set([e.meaning.universe for e in expressions])) != 1:
-            breakpoint()
             raise ValueError(
-                f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}"
+                f"All expressions must have the same meaning universe. Received{len(set([e.meaning.universe for e in expressions]))} distinct universes."
             )
 
         self.expressions = tuple(sorted(expressions))
