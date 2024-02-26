@@ -8,7 +8,7 @@ from itertools import chain, combinations
 from tqdm import tqdm
 
 
-def powerset(iterable: Iterable, max_size: int = None) -> Iterable:
+def powerset(iterable: Iterable, max_size: int | None = None) -> Iterable:
     """Enumerate all _non-empty_ subsets of an iterable up to a given maximum size, e.g.:
     powerset([1,2,3]) --> (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)
 
@@ -45,7 +45,7 @@ def all_expressions(meanings: Iterable[Meaning]) -> Generator[Expression, None, 
 def all_languages(
     expressions: Iterable[Expression],
     language_class: Type[Language] = Language,
-    max_size: int = None,
+    max_size: int | None = None,
 ) -> Generator[Language, None, None]:
     """Generate all Languages (sets of Expressions) from a given set of Expressions.
 
@@ -71,9 +71,9 @@ def upto_comb(num: int, max_k: int) -> int:
 def random_languages(
     expressions: Iterable[Expression],
     sampling_strategy: str = "uniform",
-    sample_size: int = None,
+    sample_size: int | None = None,
     language_class: Type[Language] = Language,
-    max_size: int = None,
+    max_size: int | None = None,
 ) -> list[Language]:
     """Generate unique Languages by randomly sampling subsets of Expressions, either in a uniform or stratified way.
     If there are fewer than `sample_size` possible Languages up to size `max_size`,
@@ -122,7 +122,7 @@ def random_languages(
         return list(
             all_languages(expressions, language_class=language_class, max_size=max_size)
         )
-    languages = []
+    languages: list[Language] = []
     subsets = set()
     while len(languages) < sample_size:
         if sampling_strategy == "stratified":
@@ -134,7 +134,9 @@ def random_languages(
             )
         if expr_indices not in subsets:
             subsets.add(expr_indices)
-            languages.append(language_class([expressions[idx] for idx in expr_indices]))
+            languages.append(
+                language_class(tuple(expressions[idx] for idx in expr_indices))
+            )
     return languages
 
 
@@ -212,7 +214,7 @@ def generate_languages(
     word_amt_sample_size = int(sample_size / lang_size)
 
     expressions_indices = list(range(total_word_amount))
-    languages = set()
+    languages: set[Language] = set()
 
     # For each language size
     for word_amount in word_amounts:
@@ -297,7 +299,7 @@ def sample_lang_size(
     id_start: int = 0,
     verbose=False,
     dummy_name="sampled_lang_id",
-) -> list[Language]:
+) -> dict[str, Any]:
     """Get a sample of languages each of exactly lang_size.
 
     Args:
@@ -361,7 +363,7 @@ def sample_quasi_natural(
                 "id_start": (updated length of languages)
             }
     """
-    languages = set()
+    languages: set[Language] = set()
 
     natural_indices = list(range(len(natural_terms)))
     unnatural_indices = list(range(len(unnatural_terms)))
@@ -414,10 +416,12 @@ def sample_quasi_natural(
                 )
 
             # Sample unique languages
-            seen = set()
+            seen: set[Language] = set()
             for _ in range(degree_sample_size):
-                vocabulary = random_combination_vocabulary(
-                    seen, num_natural, natural_terms, num_unnatural, unnatural_terms
+                vocabulary = tuple(
+                    random_combination_vocabulary(
+                        seen, num_natural, natural_terms, num_unnatural, unnatural_terms
+                    )
                 )
                 id_start += 1
                 language = language_class(
@@ -488,9 +492,9 @@ def enumerate_all_languages(
     # Construct the languages
     for natural_subset in natural_subsets:
         for unnatural_subset in unnatural_subsets:
-            vocabulary = [natural_terms[idx] for idx in natural_subset] + [
+            vocabulary = tuple(natural_terms[idx] for idx in natural_subset) + tuple(
                 unnatural_terms[idx] for idx in unnatural_subset
-            ]
+            )
             id_start += 1
             language = language_class(vocabulary, name=rename_id(dummy_name, id_start))
             languages.add(language)
@@ -503,7 +507,7 @@ def random_combination_vocabulary(
     natural_terms: list[Expression],
     num_unnatural: int = 0,
     unnatural_terms: list[Expression] = [],
-) -> list[Language]:
+) -> list[Expression]:
     """Get a single vocabulary for a specific language size by choosing a random combination of natural and unnatural terms.
 
     Args:
@@ -524,7 +528,7 @@ def random_combination_vocabulary(
         nat_sample_indices = tuple(
             sorted(random.sample(range(len(natural_terms)), num_natural))
         )
-        unnat_sample_indices = ()
+        unnat_sample_indices: tuple[int, ...] = tuple()
         if unnatural_terms:
             unnat_sample_indices = tuple(
                 sorted(random.sample(range(len(unnatural_terms)), num_unnatural))
