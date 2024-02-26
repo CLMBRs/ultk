@@ -16,7 +16,7 @@ from .grammar import indefinites_grammar
 from .meaning import universe as indefinites_universe
 
 
-def read_natural_languages(filename: str) -> list[Language]:
+def read_natural_languages(filename: str) -> set[Language]:
     """Read the natural languages from a CSV file.
     Assumes that each row is one expression, with unique strings in "language" column identifying
     which expressions belong to which languages.
@@ -48,12 +48,12 @@ def read_natural_languages(filename: str) -> list[Language]:
             # add Expression with form and Meaning
             cur_expressions.append(Expression(item.expression, cur_meaning))
         # add Language with its Expressions
-        languages.add(Language(cur_expressions, name=lang, natural=True))
+        languages.add(Language(tuple(cur_expressions), name=lang, natural=True))
     return languages
 
 
 def read_expressions(
-    filename: str, universe: Universe = None, return_by_meaning=True
+    filename: str, universe: Universe | None = None, return_by_meaning=True
 ) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
     """Read expressions from a YAML file.
     Assumes that the file is a list, and that each item in the list has a field
@@ -77,10 +77,10 @@ def read_expressions(
 def write_languages(
     languages: list[Language],
     filename: str,
-    properties_to_add: dict[str, Callable[[int, Language], Any]] = None,
+    properties_to_add: dict[str, Callable[[int, Language], Any]] = {},
 ) -> None:
     lang_dicts = [
-        language.to_dict(
+        language.as_dict_with_properties(
             **{key: properties_to_add[key](idx, language) for key in properties_to_add}
         )
         for idx, language in enumerate(languages)
