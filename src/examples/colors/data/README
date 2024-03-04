@@ -1,0 +1,26 @@
+Model from the paper "Efficient compression in color naming and its evolution"
+Zaslavsky et al., PNAS, 2018
+https://doi.org/10.1073/pnas.1800521115
+
+
+Files
+=====
+
+README
+IB_color_naming.pkl
+
+
+Model
+=====
+
+The model .pkl file contains a python dict object with the following fields:
+
+- pM		capacity-achieving prior over color chips
+- pU_M		speaker's mental representations, m(u)
+- betas		the values of beta used for the reverse deterministic annealing schedule
+- IB_curve	the IB curve defined by (I_beta(M;W), I_beta(W;U))
+- qW_M		the optimal IB encoders (color naming systems) for each value of beta
+
+See the paper for more details.
+
+
