@@ -8,7 +8,7 @@ import ultk.effcomm.rate_distortion as rd
 from collections import Counter
 import os 
 import numpy as np
-
+from urllib.request import urlretrieve 
 from rdot.ba import IBResult
 
 import pickle
@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import pandas as pdcombined
 import plotnine as pn
 
+from zipfile import ZipFile
 
 wcs_dialect = csv.Dialect
 wcs_dialect.delimiter = "\t"
@@ -30,8 +31,28 @@ language_terms = dict()
 #Generate all WCS color codes
 current_dir = os.path.dirname(os.path.realpath(__file__))
 
-with open(f"{current_dir}/data/model.pkl", 'rb') as model_file:
-    model_data = pickle.load(model_file)
+#####----TESTING - Grab the Noga model -- remove later
+DEFAULT_MODEL_URL = 'https://www.dropbox.com/s/70w953orv27kz1o/IB_color_naming_model.zip?dl=1'
+def load_model(filename=None, model_dir='./model/'):
+    if not os.path.isdir(model_dir):
+        os.makedirs(model_dir)
+    if filename is None:
+        filename = model_dir + 'IB_color_naming_model/model.pkl'
+    if not os.path.isfile(filename):
+        print('downloading default model from %s  ...' % DEFAULT_MODEL_URL)
+        urlretrieve(DEFAULT_MODEL_URL, model_dir + 'temp.zip')
+        print('extracting model files ...')
+        with ZipFile(model_dir + 'temp.zip', 'r') as zf:
+            zf.extractall(model_dir)
+            #os.remove(model_dir + 'temp.zip')
+            os.rename(model_dir + 'IB_color_naming_model/IB_color_naming.pkl', filename)
+    with open(filename, 'rb') as f:
+        print('loading model from file: %s' % filename)
+        model_data = pickle.load(f)
+        return model_data
+
+model_data = load_model(filename=f"{current_dir}/model/model.pkl", model_dir=f"{current_dir}/model/")
+
 
 munsell_to_cielab = {}
 with open(
