@@ -81,7 +81,9 @@ class Universe:
 
     @cached_property
     def _prior(self):
-        return self.prior or tuple([1 / self.size] * self.size)
+        return (
+            self.prior if self.prior is not None else tuple([1 / self.size] * self.size)
+        )
 
     def prior_numpy(self) -> np.ndarray:
         return np.array(self._prior)
@@ -146,7 +148,6 @@ class Meaning:
     """
 
     def __post_init__(self):
-
         if not isinstance(self.referents, tuple):
             raise TypeError(f"The `referents` field of Meaning must be a tuple.")
 
@@ -172,7 +173,9 @@ class Meaning:
             } | zeros
             return np.array(_dist.values())
         else:
-            _dist = {ref.name: 1 / len(self.referents) for ref in self.referents} | zeros
+            _dist = {
+                ref.name: 1 / len(self.referents) for ref in self.referents
+            } | zeros
             return np.array(_dist.values())
 
     def to_dict(self) -> dict:
