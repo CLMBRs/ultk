@@ -62,7 +62,8 @@ class TestSemantics:
 
         with pytest.raises(ValueError):
             refs_bad = tuple(
-                list(refs) + [
+                list(refs)
+                + [
                     Referent(
                         name="neutral+epistemic",
                         properties={"force": "neutral", "flavor": "epistemic"},
