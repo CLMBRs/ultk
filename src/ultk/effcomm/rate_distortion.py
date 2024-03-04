@@ -85,8 +85,8 @@ def language_to_ib_encoder_decoder(
 
 
 def ib_encoder_to_point(
-    meaning_dists: np.ndarray,
     prior: np.ndarray,
+    meaning_dists: np.ndarray,
     encoder: np.ndarray,
     decoder: np.ndarray = None,
 ) -> tuple[float]:
@@ -108,11 +108,6 @@ def ib_encoder_to_point(
 
     encoder = rows_zero_to_uniform(encoder.normalized_weights())
     decoder = rows_zero_to_uniform(decoder.normalized_weights())
-
-    print(f"IB Encoder Meaning dists {meaning_dists.shape} | {meaning_dists}")
-    print(f"IB Encoder prior {prior.shape} | {prior}")
-    print(f"IB Encoder encoder {encoder.shape} | {encoder}")
-    print(f"IB Encoder decoder {decoder.shape} | {decoder}")
 
     # IB complexity = info rate of encoder = I(meanings; words)
     complexity = information_cond(prior, encoder)
