@@ -34,18 +34,24 @@ with open(f"{current_dir}/data/model.pkl", 'rb') as model_file:
     model_data = pickle.load(model_file)
 
 munsell_to_cielab = {}
-with open(f'{current_dir}/data/cnum-vhcm-lab-new.txt',newline='', encoding="utf-8" ) as csvfile:
-    color_reader = csv.DictReader(csvfile, delimiter='\t')
+with open(
+    f"{current_dir}/data/cnum-vhcm-lab-new.txt", newline="", encoding="utf-8"
+) as csvfile:
+    color_reader = csv.DictReader(csvfile, delimiter="\t")
     for row in color_reader:
-        munsell_to_cielab[row["V"]+row["H"]] = [float(row["L*"]),float(row["a*"]), float(row["b*"])]
-color_codes = [{"name":key} for key in munsell_to_cielab.keys()]
+        munsell_to_cielab[row["V"] + row["H"]] = [
+            float(row["L*"]),
+            float(row["a*"]),
+            float(row["b*"]),
+        ]
+color_codes = [{"name": key} for key in munsell_to_cielab.keys()]
 
-#Generate referents for all color codes
+# Generate referents for all color codes
 referents = pd.DataFrame(color_codes)
 color_universe = Universe.from_dataframe(referents)
 
-with open(f'{current_dir}/data/lang.txt',newline='', encoding="utf-8" ) as csvfile:
-    lang_reader = csv.DictReader(csvfile, delimiter='\t')
+with open(f"{current_dir}/data/lang.txt", newline="", encoding="utf-8") as csvfile:
+    lang_reader = csv.DictReader(csvfile, delimiter="\t")
     for row in lang_reader:
         language_codes[row["LNUM"]] = row["LNAME"]
 
@@ -89,21 +95,21 @@ meaning_dists = meaning_space_indices / meaning_space_indices.sum(axis=1, keepdi
 expressions_by_speaker = {}
 average_language_by_meaning = {}
 speakers_by_language = {}
-with open(f'{current_dir}/data/foci-exp.txt', newline='', encoding="utf-8" ) as csvfile:
-    color_reader = csv.DictReader(csvfile, delimiter='\t')
+with open(f"{current_dir}/data/foci-exp.txt", newline="", encoding="utf-8") as csvfile:
+    color_reader = csv.DictReader(csvfile, delimiter="\t")
     for row in color_reader:
         lang_num = row["LNUM"]
         speaker_num = row["SNUM"]
         transcription = row["WCSC"]
         color = row["COLOR"]
 
-        #Filter AX to A0 and JX to J0 - both of these represent pure white/black respectively
+        # Filter AX to A0 and JX to J0 - both of these represent pure white/black respectively
         if color.startswith("A"):
-            color="A0"
+            color = "A0"
         elif color.startswith("J"):
-            color="J0"
+            color = "J0"
 
-        #Update speaker records
+        # Update speaker records
         if lang_num not in speakers_by_language:
             speakers_by_language[lang_num] = set()
         speakers_by_language[lang_num].add(speaker_num)
@@ -126,8 +132,8 @@ with open(f'{current_dir}/data/foci-exp.txt', newline='', encoding="utf-8" ) as 
 
 #print(expressions_by_language)
 
-#For now, assume that if any speaker refers to a color by a given term, that color can be referred to by that term
-#for language in expressions_by_language:
+# For now, assume that if any speaker refers to a color by a given term, that color can be referred to by that term
+# for language in expressions_by_language:
 #    for expression in expressions_by_language[language]:
 #        expressions_by_language[language][expression] = set(expressions_by_language[language][expression])
 
