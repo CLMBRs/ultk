@@ -43,8 +43,8 @@ def language_to_ib_point(
     return ib_encoder_to_point(
         prior=prior,
         meaning_dists=meaning_dists,
-        encoder=result["encoder"],
-        decoder=result["decoder"],
+        encoder=result["encoder"].normalized_weights(),
+        decoder=result["decoder"].normalized_weights(),
     )
 
 
@@ -92,7 +92,6 @@ def language_to_ib_encoder_decoder(
 
 def ib_encoder_to_point(
     prior: np.ndarray,
-    prior: np.ndarray,
     meaning_dists: np.ndarray,
     encoder: np.ndarray,
     decoder: np.ndarray = None,
@@ -111,9 +110,8 @@ def ib_encoder_to_point(
 
     if decoder is None:
         decoder = ib_optimal_decoder(encoder, prior, meaning_dists)
-
-    encoder = rows_zero_to_uniform(encoder.normalized_weights())
-    decoder = rows_zero_to_uniform(decoder.normalized_weights())
+    encoder = rows_zero_to_uniform(encoder)
+    decoder = rows_zero_to_uniform(decoder)
 
     # IB complexity = info rate of encoder = I(meanings; words)
     complexity = information_cond(prior, encoder)
