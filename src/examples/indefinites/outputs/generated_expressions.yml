@@ -2,524 +2,664 @@
   grammatical_expression: K+
   length: 1
   meaning:
-    referents:
-    - &id001
+    _dist: !!python/tuple []
+    referents: !!python/tuple
+    - &id001 !!python/object:ultk.language.semantics.Referent
       _frozen: true
       name: specific-known
       probability: 0.08125
+    universe: &id007 !!python/object:ultk.language.semantics.Universe
+      prior: !!python/tuple
+      - 0.08125
+      - 0.08125
+      - 0.2625
+      - 0.0979166666666667
+      - 0.15
+      - 0.327083333333333
+      referents: !!python/tuple
+      - *id001
+      - &id002 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: specific-unknown
+        probability: 0.08125
+      - &id003 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: nonspecific
+        probability: 0.2625
+      - &id004 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: freechoice
+        probability: 0.0979166666666667
+      - &id005 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: negative-indefinite
+        probability: 0.15
+      - &id006 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: npi
+        probability: 0.327083333333333
 - form: ''
   grammatical_expression: K-
   length: 1
   meaning:
-    referents:
-    - &id002
-      _frozen: true
-      name: specific-unknown
-      probability: 0.08125
-    - &id003
-      _frozen: true
-      name: nonspecific
-      probability: 0.2625
-    - &id004
-      _frozen: true
-      name: freechoice
-      probability: 0.0979166666666667
-    - &id005
-      _frozen: true
-      name: negative-indefinite
-      probability: 0.15
-    - &id006
-      _frozen: true
-      name: npi
-      probability: 0.327083333333333
+    _dist: !!python/tuple []
+    referents: !!python/tuple
+    - *id002
+    - *id003
+    - *id004
+    - *id005
+    - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: S+
   length: 1
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
+    universe: *id007
 - form: ''
   grammatical_expression: S-
   length: 1
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id003
     - *id004
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: SE+
   length: 1
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id004
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: SE-
   length: 1
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id003
+    universe: *id007
 - form: ''
   grammatical_expression: N+
   length: 1
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: N-
   length: 1
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id003
     - *id004
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: R+
   length: 1
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: R-
   length: 1
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id004
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, S+)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, SE-)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id003
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, N-)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id003
     - *id004
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(S-, SE-)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id003
+    universe: *id007
 - form: ''
   grammatical_expression: and(S-, N-)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id003
     - *id004
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(SE+, N-)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id004
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(N-, R+)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: or(K+, K-)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id003
     - *id004
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: or(K+, S-)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id003
     - *id004
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: or(K+, SE+)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id004
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: or(K+, N+)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: or(K+, R+)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: or(K+, R-)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id004
+    universe: *id007
 - form: ''
   grammatical_expression: or(S+, SE+)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id004
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: or(S+, N+)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: or(S+, R+)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: or(S+, R-)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id004
+    universe: *id007
 - form: ''
   grammatical_expression: or(SE-, N+)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id003
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: not(R-)
   length: 2
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id003
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: not(R+)
   length: 2
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id003
     - *id004
+    universe: *id007
 - form: ''
   grammatical_expression: or(N+, R-)
   length: 3
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id004
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, or(S+, SE+))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id004
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, or(S+, N+))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, or(S+, R+))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, or(S+, R-))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id004
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, or(SE-, N+))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id003
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, not(R-))
   length: 4
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id003
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, not(R+))
   length: 4
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id003
     - *id004
+    universe: *id007
 - form: ''
   grammatical_expression: and(S-, or(SE-, N+))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id003
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: and(S-, not(R-))
   length: 4
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id003
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(S-, not(R+))
   length: 4
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id003
     - *id004
+    universe: *id007
 - form: ''
   grammatical_expression: and(SE-, or(K+, S-))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id003
+    universe: *id007
 - form: ''
   grammatical_expression: and(N-, or(K+, S-))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id003
     - *id004
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(N-, or(K+, SE+))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id004
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(N-, or(K+, R+))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(N-, or(S+, SE+))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id004
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(N-, or(S+, R+))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(N-, not(R-))
   length: 4
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id003
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(and(K-, N-), or(S+, SE+))
   length: 7
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id004
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(and(K-, N-), or(S+, R+))
   length: 7
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(and(K-, N-), not(R-))
   length: 6
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id003
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(and(S-, N-), not(R-))
   length: 6
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id003
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(or(K+, S-), or(SE-, N+))
   length: 7
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id003
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: and(or(K+, S-), not(R-))
   length: 6
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id003
     - *id005
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(or(K+, S-), not(R+))
   length: 6
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id003
     - *id004
+    universe: *id007
 - form: ''
   grammatical_expression: or(K+, or(N+, R-))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id004
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: or(S+, or(N+, R-))
   length: 5
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id004
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: or(N+, not(R+))
   length: 4
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id002
     - *id003
     - *id004
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: or(and(K-, S+), or(N+, R-))
   length: 7
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id004
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: and(K-, or(N+, not(R+)))
   length: 6
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id002
     - *id003
     - *id004
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: and(S-, or(N+, not(R+)))
   length: 6
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id003
     - *id004
     - *id005
+    universe: *id007
 - form: ''
   grammatical_expression: and(N-, and(or(K+, S-), not(R-)))
   length: 8
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id003
     - *id006
+    universe: *id007
 - form: ''
   grammatical_expression: and(or(K+, S-), or(N+, not(R+)))
   length: 8
   meaning:
-    referents:
+    _dist: !!python/tuple []
+    referents: !!python/tuple
     - *id001
     - *id003
     - *id004
     - *id005
+    universe: *id007

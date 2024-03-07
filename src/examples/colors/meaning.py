@@ -186,3 +186,21 @@ print(
         language=languages[200], prior=uniform_prior, meaning_dists=meaning_dists
     )
 )
+
+np.save("prior.npy", uniform_prior)
+np.save("meaning_dists.npy", meaning_dists)
+
+# bound = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists)
+# plot_data = pd.DataFrame(
+#     [(x.rate, x.accuracy) for x in bound if x is not None], 
+#     columns=[
+#         "rate", 
+#         "accuracy",
+#     ]
+# )
+# import plotnine as pn
+# plot = pn.ggplot(
+#     plot_data,
+#     pn.aes(x="rate", y="accuracy"),
+# ) + pn.geom_point() + pn.geom_line()
+# plot.save("plot.png")
