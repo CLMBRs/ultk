@@ -1,54 +1,20 @@
-- comm_cost: 0.2562500000000003
-  complexity: 7
+- comm_cost: 0.4843750000000001
+  complexity: 4
   expressions:
-  - K+
   - N+
+  - R+
   - R-
   - SE-
-  - and(N-, R+)
   name: dominating-0
   type: dominant
-- comm_cost: 2.220446049250313e-16
-  complexity: 12
+- comm_cost: 0.28333333333333366
+  complexity: 6
   expressions:
-  - K+
   - N+
   - R-
-  - and(K-, S+)
+  - SE-
   - and(N-, R+)
-  - and(S-, SE-)
   name: dominating-1
-  type: dominant
-- comm_cost: 0.1625000000000003
-  complexity: 8
-  expressions:
-  - N+
-  - R-
-  - and(N-, R+)
-  - and(S-, SE-)
-  name: dominating-2
-  type: dominant
-- comm_cost: 0.5218750000000001
-  complexity: 3
-  expressions:
-  - R+
-  - R-
-  - SE-
-  name: dominating-3
-  type: dominant
-- comm_cost: 0.7614583333333336
-  complexity: 1
-  expressions:
-  - R+
-  name: dominating-4
-  type: dominant
-- comm_cost: 0.3812500000000003
-  complexity: 5
-  expressions:
-  - N+
-  - SE-
-  - and(N-, R+)
-  name: dominating-5
   type: dominant
 - comm_cost: 0.06093750000000031
   complexity: 10
@@ -59,23 +25,60 @@
   - S+
   - and(N-, R+)
   - and(S-, SE-)
-  name: dominating-6
+  name: dominating-2
   type: dominant
-- comm_cost: 0.08125000000000027
-  complexity: 9
+- comm_cost: 0.7614583333333336
+  complexity: 1
   expressions:
+  - R+
+  name: dominating-3
+  type: dominant
+- comm_cost: 2.220446049250313e-16
+  complexity: 12
+  expressions:
+  - K+
+  - N+
+  - R-
+  - and(K-, S+)
+  - and(N-, R+)
+  - and(S-, SE-)
+  name: dominating-4
+  type: dominant
+- comm_cost: 0.05416666666666692
+  complexity: 11
+  expressions:
+  - K+
+  - K+
   - N+
   - R-
   - S+
   - and(N-, R+)
   - and(S-, SE-)
-  name: dominating-7
+  name: dominating-5
   type: dominant
-- comm_cost: 0.6197916666666669
-  complexity: 2
+- comm_cost: 0.5218750000000001
+  complexity: 3
   expressions:
   - R+
+  - R-
   - SE-
+  name: dominating-6
+  type: dominant
+- comm_cost: 0.1625000000000003
+  complexity: 8
+  expressions:
+  - N+
+  - R-
+  - and(N-, R+)
+  - and(S-, SE-)
+  name: dominating-7
+  type: dominant
+- comm_cost: 0.3812500000000003
+  complexity: 5
+  expressions:
+  - N+
+  - SE-
+  - and(N-, R+)
   name: dominating-8
   type: dominant
 - comm_cost: 0.08125000000000027
@@ -88,33 +91,30 @@
   - and(S-, SE-)
   name: dominating-9
   type: dominant
-- comm_cost: 0.28333333333333366
-  complexity: 6
+- comm_cost: 0.6197916666666669
+  complexity: 2
   expressions:
-  - N+
-  - R-
+  - R+
   - SE-
-  - and(N-, R+)
   name: dominating-10
   type: dominant
-- comm_cost: 0.4843750000000001
-  complexity: 4
+- comm_cost: 0.08125000000000027
+  complexity: 9
   expressions:
-  - N+
-  - R+
-  - R-
-  - SE-
-  name: dominating-11
-  type: dominant
-- comm_cost: 0.05416666666666692
-  complexity: 11
-  expressions:
-  - K+
-  - K+
   - N+
   - R-
   - S+
   - and(N-, R+)
   - and(S-, SE-)
+  name: dominating-11
+  type: dominant
+- comm_cost: 0.2562500000000003
+  complexity: 7
+  expressions:
+  - K+
+  - N+
+  - R-
+  - SE-
+  - and(N-, R+)
   name: dominating-12
   type: dominant
