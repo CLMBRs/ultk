@@ -10,3 +10,8 @@ dist/
 .installed.cfg
 *.egg
 build/
+
+*.zip
+
+model/
+build/
