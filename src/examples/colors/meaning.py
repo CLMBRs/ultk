@@ -5,6 +5,7 @@ from ultk.language.semantics import Meaning, Universe, Referent
 from ultk.language.language import Language, Expression
 import ultk.effcomm.informativity as informativity
 import ultk.effcomm.rate_distortion as rd
+import ultk.effcomm.sampling as sampling
 from collections import Counter
 import os 
 import numpy as np
@@ -53,7 +54,7 @@ def load_model(filename=None, model_dir='./model/'):
 
 model_data = load_model(filename=f"{current_dir}/model/model.pkl", model_dir=f"{current_dir}/model/")
 
-
+#Convert the Munsell hues of the WCS data to CIELab data 
 munsell_to_cielab = {}
 with open(
     f"{current_dir}/data/cnum-vhcm-lab-new.txt", newline="", encoding="utf-8"
@@ -93,13 +94,14 @@ with open(f'{current_dir}/data/dict.txt', newline='', encoding="utf-8" ) as csvf
 uniform_prior = color_universe.prior_numpy()
 #uniform_prior = np.array(color_universe._prior)
 
+#Munsell to Cielab hues
+munsell_to_cielab = np.array(list(munsell_to_cielab.values()))
+#print(f"Munsell to CIELAB hues:{munsell_to_cielab}")
+
 SIGMA_SQUARED_SCALAR = 64
 #Calculate the meaning space as an isotropic Gaussian centered at the first chip C, for all other points
 def meaning(center, point):
     return math.exp((-1/(2*SIGMA_SQUARED_SCALAR) * np.linalg.norm(center-point)))
-
-munsell_to_cielab = np.array(list(munsell_to_cielab.values()))
-print(f"Munsell to CIELAB hues:{munsell_to_cielab}")
 
 #Generate the meaning space
 meaning_space_indices = np.zeros(shape=(len(munsell_to_cielab), len(munsell_to_cielab)))
@@ -124,7 +126,7 @@ with open(f"{current_dir}/data/foci-exp.txt", newline="", encoding="utf-8") as c
         transcription = row["WCSC"]
         color = row["COLOR"]
 
-        # Filter AX to A0 and JX to J0 - both of these represent pure white/black respectively
+        # Filter AX(A1, A2, A3....) to A0 and JX to J0 - both of these represent pure white/black respectively
         if color.startswith("A"):
             color = "A0"
         elif color.startswith("J"):
@@ -197,8 +199,27 @@ for language_code in languages:
     language = languages[language_code]
     #Dereference the lang code to get the actual language associated with it
     language_name = language_codes[language_code] 
-    language_data.append((language_name, "natural") + rd.language_to_ib_point(language=language, prior=noga_prior, meaning_dists=(meaning_dists)))
+
+    #Exclude the languages Amuzgo, Camsa, Candoshi, Chayahuita, Chiquitano, Cree, Garífuna (Black Carib), Ifugao, Micmac, Nahuatl, Papago (O’odham), Slave, Tacana, Tarahumara (Central), Tarahumara (Western).
+    #These langauges have fewer than 5 definitions for major terms
+    excluded_language_codes = [7, 19, 20, 25, 27, 31, 38, 48, 70, 78, 80, 88, 91, 92, 93]
+
+    if language_code not in excluded_language_codes:
+        language_data.append((language_name, "natural") + rd.language_to_ib_point(language=language, prior=noga_prior, meaning_dists=(meaning_dists)))
+
+#Generate some fake languages using the real languages as a baseline via permutation
+artificial_languages = sampling.get_hypothetical_variants(languages=list(languages.values()), total=400)
+#Analyze each of the artificial languages
+artificial_lang_count = 0
+for artificial_language in artificial_languages:
+    artificial_lang_count +=1
+    language_data.append((f"artificial lang {artificial_lang_count}", "artificial") + rd.language_to_ib_point(language=artificial_language, prior=noga_prior, meaning_dists=(meaning_dists)))
+
+print(f"Artificial languages{artificial_languages}")
+
+#Convert the real and artificial languages to DataFrames
 combined_data = pd.DataFrame(language_data, columns =['name','type','complexity', 'informativity', 'comm_cost'])
+
 
 """
 #Generate languages per speaker
@@ -225,11 +246,16 @@ combined_data = pd.DataFrame(language_data, columns =['name','type','speaker_id'
 """
 
 #Get the IB bound for the specified parameters
-ib_boundary = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists, betas=np.logspace(-2, 2, 10))
+#ib_boundary = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists, betas=np.logspace(-2, 2, 10))
+"""
+ib_boundary = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists, betas=np.arange(0, 2, .2))
+
 ib_boundary_points = pd.DataFrame([("ib_bound", "ib_bound", ib_point.rate, ib_point.accuracy, ib_point.distortion ) 
                    for ib_point in ib_boundary if ib_point is not None], columns =['name','type','complexity', 'informativity', 'comm_cost'])
 
 combined_data = pd.concat([ib_boundary_points, combined_data])
+"""
+
 
 #Generate and save plots
 plot = (
