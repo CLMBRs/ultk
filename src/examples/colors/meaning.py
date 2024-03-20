@@ -5,7 +5,8 @@ from ultk.language.semantics import Meaning, Universe, Referent
 from ultk.language.language import Language, Expression
 import ultk.effcomm.informativity as informativity
 import ultk.effcomm.rate_distortion as rd
-import ultk.effcomm.sampling as sampling
+#import ultk.effcomm.sampling as sampling
+import ultk.language.sampling as sampling
 from collections import Counter
 import os 
 import numpy as np
@@ -26,36 +27,42 @@ wcs_dialect.delimiter = "\t"
 language_codes = dict()
 language_terms = dict()
 
+GENERATE_IB_BOUND=False
+USE_RKK = False
+USE_NOGA_ARRAYS = False
+GENERATE_LANG_COLOR_INFO=False
 
-
-
-#Generate all WCS color codes
+#Get current dir for relative paths
 current_dir = os.path.dirname(os.path.realpath(__file__))
 
-#####----TESTING - Grab the Noga model -- remove later
-DEFAULT_MODEL_URL = 'https://www.dropbox.com/s/70w953orv27kz1o/IB_color_naming_model.zip?dl=1'
-def load_model(filename=None, model_dir='./model/'):
-    if not os.path.isdir(model_dir):
-        os.makedirs(model_dir)
-    if filename is None:
-        filename = model_dir + 'IB_color_naming_model/model.pkl'
-    if not os.path.isfile(filename):
-        print('downloading default model from %s  ...' % DEFAULT_MODEL_URL)
-        urlretrieve(DEFAULT_MODEL_URL, model_dir + 'temp.zip')
-        print('extracting model files ...')
-        with ZipFile(model_dir + 'temp.zip', 'r') as zf:
-            zf.extractall(model_dir)
-            #os.remove(model_dir + 'temp.zip')
-            os.rename(model_dir + 'IB_color_naming_model/IB_color_naming.pkl', filename)
-    with open(filename, 'rb') as f:
-        print('loading model from file: %s' % filename)
-        model_data = pickle.load(f)
-        return model_data
+if(USE_NOGA_ARRAYS):
 
-model_data = load_model(filename=f"{current_dir}/model/model.pkl", model_dir=f"{current_dir}/model/")
+    #####----TESTING - Grab the Noga model -- remove later
+    DEFAULT_MODEL_URL = 'https://www.dropbox.com/s/70w953orv27kz1o/IB_color_naming_model.zip?dl=1'
+    def load_model(filename=None, model_dir='./model/'):
+        if not os.path.isdir(model_dir):
+            os.makedirs(model_dir)
+        if filename is None:
+            filename = model_dir + 'IB_color_naming_model/model.pkl'
+        if not os.path.isfile(filename):
+            print('downloading default model from %s  ...' % DEFAULT_MODEL_URL)
+            urlretrieve(DEFAULT_MODEL_URL, model_dir + 'temp.zip')
+            print('extracting model files ...')
+            with ZipFile(model_dir + 'temp.zip', 'r') as zf:
+                zf.extractall(model_dir)
+                #os.remove(model_dir + 'temp.zip')
+                os.rename(model_dir + 'IB_color_naming_model/IB_color_naming.pkl', filename)
+        with open(filename, 'rb') as f:
+            print('loading model from file: %s' % filename)
+            model_data = pickle.load(f)
+            return model_data
 
+    model_data = load_model(filename=f"{current_dir}/model/model.pkl", model_dir=f"{current_dir}/model/")
+
+#Generate all WCS color codes
 #Convert the Munsell hues of the WCS data to CIELab data 
 munsell_to_cielab = {}
+referents_by_color_code = {}
 with open(
     f"{current_dir}/data/cnum-vhcm-lab-new.txt", newline="", encoding="utf-8"
 ) as csvfile:
@@ -66,11 +73,15 @@ with open(
             float(row["a*"]),
             float(row["b*"]),
         ]
-color_codes = [{"name": key} for key in munsell_to_cielab.keys()]
+        referents_by_color_code[row["V"] + row["H"]] = Referent(name=row["V"] + row["H"], properties={"L": float(row["L*"]), "a": float(row["a*"]), "b": float(row["b*"])})
+
+#Generate a list of Meanings
+#color_codes = [{"name": key, "L":munsell_to_cielab[key][0], "a":munsell_to_cielab[key][1], "b":munsell_to_cielab[key][2]} for key in munsell_to_cielab.keys()]
+
+print(f"Color codes:{referents_by_color_code}")
 
 # Generate referents for all color codes
-referents = pd.DataFrame(color_codes)
-color_universe = Universe.from_dataframe(referents)
+color_universe = Universe(referents=referents_by_color_code.values())
 
 with open(f"{current_dir}/data/lang.txt", newline="", encoding="utf-8") as csvfile:
     lang_reader = csv.DictReader(csvfile, delimiter="\t")
@@ -104,11 +115,11 @@ def meaning(center, point):
     return math.exp((-1/(2*SIGMA_SQUARED_SCALAR) * np.linalg.norm(center-point)))
 
 #Generate the meaning space
-meaning_space_indices = np.zeros(shape=(len(munsell_to_cielab), len(munsell_to_cielab)))
+meaning_space_indices = np.zeros(shape=(len(color_universe.referents), len(color_universe.referents)))
 print(meaning_space_indices)
-for center_index, center in enumerate(munsell_to_cielab):
-    for point_index, point in enumerate(munsell_to_cielab):
-        meaning_space_indices[center_index][point_index] = meaning(center, point)
+for c1_index, c1 in enumerate(color_universe.referents):
+    for c2_index, c2 in enumerate(color_universe.referents):
+        meaning_space_indices[c1_index][c2_index] = meaning(np.array((c1.L, c1.a, c1.b)), np.array((c2.L, c2.a, c2.b)))
 
 
 
@@ -162,20 +173,25 @@ with open(f"{current_dir}/data/foci-exp.txt", newline="", encoding="utf-8") as c
 
 languages = {}
 
+#Create a Set of Expressions to pull from later when rrandomly sampling for artificial languages
+expression_set = set()
+
 #Average out the language, in case of disagreements. For each color, find the most common term associated with that color
 for language_code in average_language_by_meaning:
-    expressions = {}
+    color_names = {}
     for color in average_language_by_meaning[language_code]:
-        #Find the most common term associated with each color
-        most_frequent_expression = average_language_by_meaning[language_code][color].most_common(1)[0][0]
-        #print(f"Most frequent expr:{most_frequent_expression}")
-        if most_frequent_expression not in expressions:
-            expressions[most_frequent_expression] = []
-        expressions[most_frequent_expression].append(color)
+        #Find the most common term associated with each color chip
+        most_frequent_color_term = average_language_by_meaning[language_code][color].most_common(1)[0][0]
+        if most_frequent_color_term not in color_names:
+            color_names[most_frequent_color_term] = []
+        color_names[most_frequent_color_term].append(color)
+    #Create list of expressions to add to the Language
     language_expressions = []
-    for expression_form in expressions:
+    for color_name in color_names:
         #language_expressions.append(Expression(form=expression_form, meaning=Meaning(tuple([Referent(name=color) for color in expressions[expression_form]]), universe=color_universe)))
-        language_expressions.append(Expression(form=expression_form, meaning=Meaning(tuple([Referent(name=color) for color in expressions[expression_form]]), universe=color_universe)))
+        expression = Expression(form=color_name, meaning=Meaning(tuple([referents_by_color_code[color] for color in color_names[color_name]]), universe=color_universe))
+        expression_set.add(expression)
+        language_expressions.append(expression)
 
     languages[language_code] = Language(language_expressions, lang_code=language_code)
 
@@ -184,13 +200,15 @@ plt.imshow(meaning_dists,  cmap="hot")
 plt.savefig(f"{current_dir}/outputs/old_meaning_dists.jpg")
 
 #Temporarily use Zaslavsky data to verify information
-meaning_dists = model_data['pU_M']
-noga_prior = np.array([row[0] for row in model_data['pM']])
-noga_bound = model_data['IB_curve']
+if(USE_NOGA_ARRAYS):
+    noga_meaning_dists = model_data['pU_M']
+    noga_prior = np.array([row[0] for row in model_data['pM']])
+    noga_bound = model_data['IB_curve']
 
 #Generate the heatmap for the Zaslavasky meaning function
-plt.imshow(meaning_dists, cmap="hot")
-plt.savefig(f"{current_dir}/outputs/noga_meaning_dists.jpg")
+if(USE_NOGA_ARRAYS):
+    plt.imshow(noga_meaning_dists, cmap="hot")
+    plt.savefig(f"{current_dir}/outputs/noga_meaning_dists.jpg")
 
 #result = meaning(munsell_to_cielab[meaning_space_indices[0]], munsell_to_cielab[meaning_space_indices[1]])
 #Generate the meaning/accuracy/complexity for all languages based on the prior, meaning and Language
@@ -204,16 +222,34 @@ for language_code in languages:
     #These langauges have fewer than 5 definitions for major terms
     excluded_language_codes = [7, 19, 20, 25, 27, 31, 38, 48, 70, 78, 80, 88, 91, 92, 93]
 
-    if language_code not in excluded_language_codes:
-        language_data.append((language_name, "natural") + rd.language_to_ib_point(language=language, prior=noga_prior, meaning_dists=(meaning_dists)))
+    if int(language_code) not in excluded_language_codes:
+        #RKK - complexity is the number of color terms in the language
+        if USE_NOGA_ARRAYS:
+            ib_point =  rd.language_to_ib_point(language=language, prior=noga_prior, meaning_dists=(noga_meaning_dists))
+        else:
+            ib_point =  rd.language_to_ib_point(language=language, prior=uniform_prior, meaning_dists=(meaning_dists))
+
+        if(USE_RKK):
+            language_data.append((language_name, "natural", math.log(len(language.expressions)), ib_point[1], ib_point[2]))
+        else:
+            #Use just the information bound metric
+            language_data.append((language_name, "natural", ib_point[0], ib_point[1], ib_point[2]))
 
 #Generate some fake languages using the real languages as a baseline via permutation
-artificial_languages = sampling.get_hypothetical_variants(languages=list(languages.values()), total=400)
+#artificial_languages = sampling.get_hypothetical_variants(languages=list(languages.values()), total=400)
+artificial_languages = sampling.random_languages(expressions=expression_set, sampling_strategy="stratified", sample_size=20)
 #Analyze each of the artificial languages
 artificial_lang_count = 0
 for artificial_language in artificial_languages:
     artificial_lang_count +=1
-    language_data.append((f"artificial lang {artificial_lang_count}", "artificial") + rd.language_to_ib_point(language=artificial_language, prior=noga_prior, meaning_dists=(meaning_dists)))
+    if USE_NOGA_ARRAYS:
+        artificial_ib_point =  rd.language_to_ib_point(language=artificial_language, prior=noga_prior, meaning_dists=(noga_meaning_dists))
+    else:
+        artificial_ib_point =  rd.language_to_ib_point(language=artificial_language, prior=uniform_prior, meaning_dists=(meaning_dists))
+    if(USE_RKK):
+        language_data.append((f"artificial lang {artificial_lang_count}", "artificial", math.log(len(artificial_language.expressions)), artificial_ib_point[1], artificial_ib_point[2]))
+    else:
+        language_data.append((f"artificial lang {artificial_lang_count}", "artificial", artificial_ib_point[0],  artificial_ib_point[1], artificial_ib_point[2]))
 
 print(f"Artificial languages{artificial_languages}")
 
@@ -247,14 +283,32 @@ combined_data = pd.DataFrame(language_data, columns =['name','type','speaker_id'
 
 #Get the IB bound for the specified parameters
 #ib_boundary = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists, betas=np.logspace(-2, 2, 10))
-"""
-ib_boundary = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists, betas=np.arange(0, 2, .2))
+if(GENERATE_IB_BOUND):
+    ib_boundary = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists, betas=np.arange(0, 2, .2))
 
-ib_boundary_points = pd.DataFrame([("ib_bound", "ib_bound", ib_point.rate, ib_point.accuracy, ib_point.distortion ) 
-                   for ib_point in ib_boundary if ib_point is not None], columns =['name','type','complexity', 'informativity', 'comm_cost'])
+    ib_boundary_points = pd.DataFrame([("ib_bound", "ib_bound", ib_point.rate, ib_point.accuracy, ib_point.distortion ) 
+                    for ib_point in ib_boundary if ib_point is not None], columns =['name','type','complexity', 'informativity', 'comm_cost'])
 
-combined_data = pd.concat([ib_boundary_points, combined_data])
-"""
+    combined_data = pd.concat([ib_boundary_points, combined_data])
+
+
+#Generate plot for color data across languages
+if GENERATE_LANG_COLOR_INFO:
+    for language_code in languages:
+        language:Language = languages[language_code]
+        language_name = language_codes[language_code]
+        language_color_data = []
+        for expression in language.expressions:
+            form = expression.form
+            for referent in expression.meaning.referents:
+                language_color_data.append((form, ord(referent.name[0])-96, int(referent.name[1:])))
+        language_color_data = pd.DataFrame(language_color_data, columns =['form','V','H'])
+        plot = (
+            pn.ggplot(pn.aes(x="H", y="V"))
+            + pn.geom_point(language_color_data, pn.aes(color="form"))
+        )
+        plot.save(f"{current_dir}/outputs/lang-color/color-terms-{language_name}.png", width=8, height=6, dpi=300)
+        
 
 
 #Generate and save plots
