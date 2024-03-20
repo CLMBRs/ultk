@@ -27,7 +27,7 @@ wcs_dialect.delimiter = "\t"
 language_codes = dict()
 language_terms = dict()
 
-GENERATE_IB_BOUND=False
+GENERATE_IB_BOUND=True
 USE_RKK = False
 USE_NOGA_ARRAYS = False
 GENERATE_LANG_COLOR_INFO=False
@@ -284,8 +284,11 @@ combined_data = pd.DataFrame(language_data, columns =['name','type','speaker_id'
 #Get the IB bound for the specified parameters
 #ib_boundary = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists, betas=np.logspace(-2, 2, 10))
 if(GENERATE_IB_BOUND):
-    ib_boundary = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists, betas=np.arange(0, 2, .2))
-
+    betas = np.arange(0, 5, .2)
+    if(USE_NOGA_ARRAYS):
+        ib_boundary = rd.get_ib_bound(prior=noga_prior, meaning_dists=noga_meaning_dists)
+    else:
+        ib_boundary = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists)
     ib_boundary_points = pd.DataFrame([("ib_bound", "ib_bound", ib_point.rate, ib_point.accuracy, ib_point.distortion ) 
                     for ib_point in ib_boundary if ib_point is not None], columns =['name','type','complexity', 'informativity', 'comm_cost'])
 
@@ -329,14 +332,17 @@ plot.save(f"{current_dir}/outputs/complexity-commcost.png", width=8, height=6, d
 plot = (
     pn.ggplot(pn.aes(x="complexity", y="informativity"))
     + pn.geom_point(combined_data, pn.aes(color="type"))
+
+    )
+"""
     + pn.geom_text(
         combined_data[combined_data["type"] == "natural"],
         pn.aes(label="name"),
         ha="left",
         size=5,
         nudge_x=0.1,)
-    )
-
+    """
+    
 plot.save(f"{current_dir}/outputs/complexity-informativity.png", width=8, height=6, dpi=300)
 
 plot = (
