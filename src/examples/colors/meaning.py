@@ -259,11 +259,19 @@ for language_code in languages:
             #Use just the information bound metric
             language_data.append((language_name, "natural", ib_point[0], ib_point[1], ib_point[2]))
 
-
+#Calculate the centroid color of each language
+for language_code in languages:
+    language = languages[language_code]
+    language_name = language_name_from_code[language_code]
+    centroid = np.zeros(3)
+    for expression in language.expressions:
+        for referent in expression.meaning.referents:
+            centroid += np.array((referent.L, referent.a, referent.b))
+        centroid /= len(expression.meaning.referents)
+        expression.centroid = centroid
 
 #Generate some fake languages using the real languages as a baseline via permutation
-#artificial_languages = sampling.get_hypothetical_variants(languages=list(languages.values()), total=400)
-artificial_languages = sampling.random_languages(expressions=expression_set, sampling_strategy="stratified", sample_size=20, max_size=25)
+artificial_languages = sampling.random_languages(expressions=expression_set, sampling_strategy="stratified", sample_size=20, max_size=100)
 #Give enumerated names to each of the artificial languages
 for index, artificial_language in enumerate(artificial_languages):
     artificial_language.name = f"artificial_lang_{index}"
@@ -329,13 +337,13 @@ for language_info in languages:
 combined_data = pd.DataFrame(language_data, columns =['name','type','speaker_id','complexity', 'informativity', 'comm_cost'])
 
 """
-
+ib_boundary_points = pd.DataFrame([], columns =['name','type','complexity', 'informativity', 'comm_cost'])
 #Get the IB bound for the specified parameters
 #ib_boundary = rd.get_ib_bound(prior=uniform_prior, meaning_dists=meaning_dists, betas=np.logspace(-2, 2, 10))
 if(GENERATE_IB_BOUND):
     IB_START = -2
     IB_STOP = 5
-    IB_STEP = 30
+    IB_STEP = 100
     betas = np.logspace(IB_START, IB_STOP, IB_STEP)
 
     #If a cached version of the IB bound already exists, load it
@@ -352,10 +360,10 @@ if(GENERATE_IB_BOUND):
         #Save the IB bound to a file
         with open(ib_bound_filename, "wb") as f:
             pickle.dump(ib_boundary, f)
-            
+
     ib_boundary_points = pd.DataFrame([("ib_bound", "ib_bound", ib_point.rate, ib_point.accuracy, ib_point.distortion)
                     for ib_point in ib_boundary if ib_point is not None], columns =['name','type','complexity', 'informativity', 'comm_cost'])
-    combined_data = pd.concat([ib_boundary_points, combined_data])
+    #combined_data = pd.concat([ib_boundary_points, combined_data])
 
 #Combine artificial and natural languages for processing
 languages = languages | {artificial_language.name:artificial_language for artificial_language in artificial_languages}
@@ -384,6 +392,7 @@ if GENERATE_LANG_COLOR_INFO:
 plot = (
     pn.ggplot(pn.aes(x="complexity", y="comm_cost"))
     + pn.geom_point(combined_data, pn.aes(color="type"))
+    + pn.geom_line(ib_boundary_points, pn.aes(color="type"), linetype="dashed")
     + pn.geom_text(
         combined_data[combined_data["type"] == "natural"],
         pn.aes(label="name"),
@@ -397,6 +406,7 @@ plot.save(f"{current_dir}/outputs/complexity-commcost.png", width=8, height=6, d
 
 plot = (
     pn.ggplot(pn.aes(x="complexity", y="informativity"))
+    + pn.geom_line(ib_boundary_points, pn.aes(color="type"), linetype="dashed")
     + pn.geom_point(combined_data, pn.aes(color="type"))
 
     )
@@ -413,6 +423,8 @@ plot.save(f"{current_dir}/outputs/complexity-informativity.png", width=8, height
 
 plot = (
     pn.ggplot(pn.aes(x="informativity", y="comm_cost"))
+    + pn.geom_line(ib_boundary_points, pn.aes(color="type"), linetype="dashed")
+
     + pn.geom_point(combined_data, pn.aes(color="type"))
 
     )
