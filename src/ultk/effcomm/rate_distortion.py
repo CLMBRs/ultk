@@ -3,7 +3,7 @@
 import numpy as np
 from ultk.language.language import Language
 from ultk.effcomm.agent import LiteralSpeaker, Listener
-from rdot.ba import IBOptimizer, IBResult
+from rdot.optimizers import IBOptimizer, IBResult
 from rdot.probability import joint, bayes
 from rdot.information import information_cond, MI
 
@@ -96,7 +96,7 @@ def ib_encoder_to_point(
     encoder: np.ndarray,
     decoder: np.ndarray = None,
 ) -> tuple[float]:
-    """Return (complexity, accuracy, comm_cost) IB coordinates.
+    """Get (complexity, accuracy, comm_cost) IB coordinates.
 
     Args:
         prior: array of shape `|meanings|` representing the communicative need distribution
@@ -106,18 +106,24 @@ def ib_encoder_to_point(
         encoder: array of shape `(|meanings|, |words|)` representing P(W | M)
 
         decoder: array of shape `(|words|, |meanings|)` representing P(M | W).  By default is None, and the Bayesian optimal decoder will be inferred.
+    
+    Returns:
+        a tuple of floats corresponding to `(complexity, accuracy, comm_cost)`.
     """
 
     if decoder is None:
         decoder = ib_optimal_decoder(encoder, prior, meaning_dists)
-    encoder = rows_zero_to_uniform(encoder)
-    decoder = rows_zero_to_uniform(decoder)
+    # encoder = rows_zero_to_uniform(encoder)
+    # decoder = rows_zero_to_uniform(decoder)
 
     # IB complexity = info rate of encoder = I(meanings; words)
     complexity = information_cond(prior, encoder)
     # IB accuracy/informativity = I(words; world states)
 
-    accuracy = MI(meaning_dists @ joint(encoder, prior))
+    pMW = encoder * prior
+    pWU = pMW.T @ meaning_dists
+    accuracy = MI(pWU)
+    # accuracy = MI(meaning_dists @ joint(encoder, prior))
 
     # IB comm_cost = distortion = E[DKL[speaker meaning || listener meaning]],
     # this is also = I(meanings; world states) - I(words; world states)
