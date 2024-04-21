@@ -1,17 +1,17 @@
-# from . import util
 import util
 import vis
 from agents import Receiver, Sender
 from game import distribution_over_states, SignalingGame, indicator
 from languages import State, StateSpace, Signal, SignalMeaning, SignalingLanguage
 from learning import simulate_learning
+from bounds import generate_hamming_bound
 
 
 def main(args):
     # load game settings
     num_signals = args.num_signals
     num_states = args.num_states
-    num_rounds = args.num_rounds
+    num_rounds = int(float(args.num_rounds))
     learning_rate = args.learning_rate
     prior_type = args.distribution_over_states
     seed = args.seed
@@ -27,7 +27,7 @@ def main(args):
     signal_names = [f"signal_{i+1}" for i in range(num_signals)]
 
     # Construct the universe of states, and language defined over it
-    universe = StateSpace([State(name=name) for name in state_names])
+    universe = StateSpace(tuple([State(name=name) for name in state_names]))
 
     # All meanings are dummy placeholders at this stage, but they can be substantive once agents are given a weight matrix.
     dummy_meaning = SignalMeaning(states=universe.referents, universe=universe)
@@ -76,7 +76,7 @@ def main(args):
     vis.plot_distribution(args.save_distribution, prior_over_states)
     vis.plot_accuracy(args.save_accuracy_plot, accuracies)
     vis.plot_complexity(args.save_complexity_plot, complexities)
-    vis.plot_tradeoff(args.save_tradeoff_plot, complexities, accuracies)
+    vis.plot_tradeoff(args.save_tradeoff_plot, complexities, accuracies, generate_hamming_bound(signaling_game))
 
     print("Done.")
 
