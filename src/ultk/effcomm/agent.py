@@ -147,16 +147,21 @@ class CommunicativeAgent:
         # loop over agent's vocabulary
         for old_expression in self.language.expressions:
             # get all meanings that the expression can communicate
-            referents = [
-                referent
-                for referent in self.language.universe.referents
-                if policies[
-                    self.strategy_to_indices(
-                        strategy={"referent": referent, "expression": old_expression}
-                    )
+            referents = tuple(
+                [
+                    referent
+                    for referent in self.language.universe.referents
+                    if policies[
+                        self.strategy_to_indices(
+                            strategy={
+                                "referent": referent,
+                                "expression": old_expression,
+                            }
+                        )
+                    ]
+                    > threshold  # if probability of referent is high enough
                 ]
-                > threshold  # if probability of referent is high enough
-            ]
+            )
 
             meaning = meaning_type(referents, self.language.universe)
             # construct the updated expression as a new form-meaning mapping
