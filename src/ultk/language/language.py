@@ -21,7 +21,6 @@ from typing import Callable, Iterable
 
 @dataclass(eq=True, unsafe_hash=True)
 class Expression:
-
     """Minimally contains a form and a meaning."""
 
     # gneric/dummy form and meaning if not specified
@@ -35,7 +34,8 @@ class Expression:
         return referent in self.meaning.referents
 
     def to_dict(self) -> dict:
-        return {"form": self.form, "meaning": self.meaning.to_dict()}
+        """Return a dictionary representation of the expression."""
+        return {"form": self.form, "meaning": self.meaning.__dict__}
 
     def __str__(self) -> str:
         return self.form
@@ -61,7 +61,7 @@ class Language:
         # Check that all expressions have the same universe
         if len(set([e.meaning.universe for e in expressions])) != 1:
             raise ValueError(
-                f"All expressions must have the same meaning universe. Received universes: {[e.meaning.universe for e in expressions]}"
+                f"All expressions must have the same meaning universe. Received{len(set([e.meaning.universe for e in expressions]))} distinct universes."
             )
 
         self.expressions = tuple(sorted(expressions))
@@ -117,7 +117,10 @@ class Language:
     def universe(self, val) -> None:
         self._universe = val
 
-    def to_dict(self, **kwargs) -> dict:
+    def as_dict_with_properties(self, **kwargs) -> dict:
+        """Return a dictionary representation of the language, including additional properties as keyword arguments.
+
+        This is used in some examples to serialize the language to outputs."""
         the_dict = {"expressions": [str(expr) for expr in self.expressions]}
         the_dict.update(kwargs)
         return the_dict
