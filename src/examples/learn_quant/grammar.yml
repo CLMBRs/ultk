@@ -6,7 +6,7 @@ rules:
     - bool
     - bool
   name: "and"
-  function: |
+  func: |
     lambda p1, p2 : p1 and p2
   weight: 1.0
 - lhs: bool
@@ -14,14 +14,14 @@ rules:
     - bool
     - bool
   name: "or"
-  function: |
+  func: |
     lambda p1, p2 : p1 or p2
   weight: 1.0
 - lhs: bool
   rhs:
     - bool
   name: "not"
-  function: |
+  func: |
     lambda p : not p
   weight: 1.0
 # set logic rules
@@ -30,7 +30,7 @@ rules:
     - frozenset
     - frozenset
   name: "union"
-  function: |
+  func: |
     lambda s1, s2 : s1 | s2
   weight: 1.0
 - lhs: frozenset
@@ -38,7 +38,7 @@ rules:
     - frozenset
     - frozenset
   name: "intersection"
-  function: |
+  func: |
     lambda s1, s2 : s1 & s2
   weight: 1.0
 - lhs: frozenset
@@ -46,7 +46,7 @@ rules:
     - frozenset
     - frozenset
   name: "difference"
-  function: |
+  func: |
     lambda s1, s2 : s1 - s2
   weight: 1.0
 - lhs: frozenset
@@ -54,14 +54,14 @@ rules:
     - int
     - frozenset
   name: "index"
-  function: |
+  func: |
     lambda i, s: frozenset([sorted(s)[i]]) if i < len(s) else frozenset()
   weight: 1.0
 - lhs: int
   rhs:
     - frozenset
   name: "cardinality"
-  function: |
+  func: |
     lambda s: len(s)
   weight: 1.0
 - lhs: bool
@@ -69,7 +69,7 @@ rules:
     - frozenset
     - frozenset
   name: "subset_eq"
-  function: |
+  func: |
     lambda s1, s2: s1 <= s2
   weight: 1.0
 # integer logical rules
@@ -78,7 +78,7 @@ rules:
     - int
     - int
   name: "equals"
-  function: |
+  func: |
     lambda i1, i2: i1 == i2
   weight: 1.0
 - lhs: bool
@@ -86,19 +86,19 @@ rules:
     - int
     - int
   name: "greater_than"
-  function: |
+  func: |
     lambda i1, i2: i1 > i2
   weight: 1.0
 # primitive
 - lhs: frozenset
   rhs: 
   name: "A"
-  function: |
+  func: |
     lambda q: q.A
   weight: 10.0
 - lhs: frozenset
   rhs: 
   name: "B"
-  function: |
+  func: |
     lambda q: q.B
   weight: 10.0

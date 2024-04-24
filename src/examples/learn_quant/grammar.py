@@ -25,7 +25,7 @@ class QuantifierGrammar(Grammar):
         self.add_rule(Rule(name="{}".format(index),
                            lhs="int",
                            rhs=None,
-                           function=lambda _: index,
+                           func=lambda _: index,
                            weight=weight))
 
     def add_indices_as_primitives(self, indices: Union[int, List[int]], weight: float = 2.0) -> Grammar:
