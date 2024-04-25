@@ -21,6 +21,9 @@ import plotnine as pn
 
 from zipfile import ZipFile
 
+from pathlib import Path
+
+
 wcs_dialect = csv.Dialect
 wcs_dialect.delimiter = "\t"
 
@@ -33,6 +36,7 @@ USE_NOGA_ARRAYS = False #True to use the Zaslavsky data for the IB bound, false 
 GENERATE_LANG_COLOR_INFO=False #True to generate color information for each language
 GENERATE_ADDITIONAL_COLOR_CHIPS = True #If true, will expand color terms based off color distance for both natural and artificial languages
 USE_ONE_LANGUAGE = False #If true, just uses the first language in the list of languages
+COLOR_CHIP_THRESHOLD = 5 #The minimum number of color chips a language must have to be included in the analysis
 
 #Get current dir for relative paths
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -194,15 +198,32 @@ for language_code in average_language_by_meaning:
         most_frequent_color_term = average_language_by_meaning[language_code][color].most_common(1)[0][0]
         if most_frequent_color_term not in color_names:
             color_names[most_frequent_color_term] = []
+
         color_names[most_frequent_color_term].append(color)
 
+    #Filter out colors that have fewer than COLOR_CHIP_THRESHOLD terms associated with them
+    temp_color_terms = {}
+    major_color_terms = []
+    filtered_color_terms = []
+    major_colors = []
+    for color_name in color_names:
+        if len(color_names[color_name]) >= COLOR_CHIP_THRESHOLD:
+            temp_color_terms[color_name] = color_names[color_name]
+            major_color_terms.append(color_name)
+            major_colors += color_names[color_name]
+        else:
+            filtered_color_terms.append(color_name)
+
+    color_names = temp_color_terms 
+
     #Fill in additional color chips
-    for additional_color in color_universe.referents:
-        if additional_color not in average_language_by_meaning[language_code]:
-            #Get the closest color to the current color
-            closest_color_with_term = min([color_term_ref for color_term_ref in color_universe.referents if color_term_ref.name in average_language_by_meaning[language_code].keys()],
-                                            key=lambda x: np.linalg.norm(np.array((x.L, x.a, x.b)) - np.array((additional_color.L, additional_color.a, additional_color.b))))
-            color_names[average_language_by_meaning[language_code][closest_color_with_term.name].most_common(1)[0][0]].append(additional_color.name)
+    if(GENERATE_ADDITIONAL_COLOR_CHIPS):
+        for additional_color in color_universe.referents:
+            if additional_color.name not in major_color_terms and additional_color.name not in filtered_color_terms:
+                #Get the closest color to the current color
+                closest_color_with_term = min([color_term_ref for color_term_ref in color_universe.referents if color_term_ref.name in major_colors],
+                                                key=lambda x: np.linalg.norm(np.array((x.L, x.a, x.b)) - np.array((additional_color.L, additional_color.a, additional_color.b))))
+                color_names[average_language_by_meaning[language_code][closest_color_with_term.name].most_common(1)[0][0]].append(additional_color.name)
 
     #Create list of expressions to add to the Language
     language_expressions = []
@@ -367,6 +388,8 @@ if(GENERATE_IB_BOUND):
 
 #Combine artificial and natural languages for processing
 languages = languages | {artificial_language.name:artificial_language for artificial_language in artificial_languages}
+
+Path(f"{current_dir}/outputs/lang-color/").mkdir(parents=True, exist_ok=True)
 
 #Generate plot for color data across languages
 if GENERATE_LANG_COLOR_INFO:
