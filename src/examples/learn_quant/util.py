@@ -25,6 +25,7 @@ def read_expressions(
     "grammatical_expression" with an expression that can be parsed by the
     indefinites_grammar.
     """
+    print(quantifiers_grammar)
     quantifiers_grammar.add_indices_as_primitives(universe.x_size)
 
     with open(filename, "r") as f:

@@ -18,7 +18,7 @@ def create_universe(M_SIZE, X_SIZE):
     quantifier_models = set()
     for name in possible_quantifiers_name:
         quantifier_models.add(QuantifierModel(name=name))
-    return QuantifierUniverse(quantifier_models, M_SIZE, X_SIZE)
+    return QuantifierUniverse(tuple(quantifier_models), M_SIZE, X_SIZE)
 
 if __name__ == "__main__":
 

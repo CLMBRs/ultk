@@ -58,5 +58,13 @@ class QuantifierUniverse(Universe):
         assert self.x_size == other.x_size
         x_size = max(self.x_size, other.x_size)
         return QuantifierUniverse(list(set(self.referents) | set(other.referents)), prior={**self._prior, **other._prior}, x_size=x_size)
+    
+    def get_names(self) -> list:
+        """Get the names of the referents in the loaded quantifier universe.
+
+        Returns:
+            list: List of names of referents in the quantifier universe.
+        """
+        return [referent.name for referent in self.referents]
 
 
