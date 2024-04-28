@@ -54,7 +54,7 @@ class QuantifierModel(Referent):
         # Use numpy advanced indexing to set the appropriate elements to 1
         one_hot_array[np.arange(len(indices)), indices] = 1
 
-                # If quantifier_index is provided, concatenate it to each vector in one_hot_array
+        # If quantifier_index is provided, concatenate it to each vector in one_hot_array
         if quantifier_index is not None:
             # Ensure quantifier_index is an array
             quantifier_index = np.asarray(quantifier_index)

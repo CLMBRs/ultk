@@ -78,7 +78,8 @@ def generation_time_trial(quantifiers_grammar: QuantifierGrammar,
 
             # Ensure that primitives are added to the grammar up to `m_size`
             quantifiers_grammar_at_depth = deepcopy(quantifiers_grammar)
-            quantifiers_grammar_at_depth.add_indices_as_primitives(cfg.universe.m_size, cfg.universe.weight)
+            quantifiers_grammar_at_depth.add_indices_as_primitives(cfg.m_size, cfg.universe.weight)
+            print(quantifiers_grammar_at_depth)
 
             # Create the universe
             creation_start = time()
@@ -121,7 +122,8 @@ def generate_inclusive_expressions(quantifiers_grammar, cfg, save=True):
 
         # Ensure that primitives are added to the grammar up to `m_size`
         quantifiers_grammar_at_depth = deepcopy(quantifiers_grammar)
-        quantifiers_grammar_at_depth.add_indices_as_primitives(cfg.universe.m_size, cfg.universe.weight)
+        quantifiers_grammar_at_depth.add_indices_as_primitives(m_size, cfg.universe.weight)
+        print(quantifiers_grammar_at_depth)
 
         # Create the universe
         creation_start = time()
@@ -150,8 +152,6 @@ def generate_inclusive_expressions(quantifiers_grammar, cfg, save=True):
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
-
-    from ..grammar import quantifiers_grammar
 
     quantifiers_grammar = QuantifierGrammar.from_yaml(cfg.grammar)
 

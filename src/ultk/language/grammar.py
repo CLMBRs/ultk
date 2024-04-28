@@ -108,17 +108,17 @@ class GrammaticalExpression(Expression):
             self.children = self.children + (child,)
 
     @cached_property
-    def antimeaning(self) -> Meaning:
-        """Get the antimeaning of this expression, i.e. the set of all referents for which
+    def complement(self) -> Meaning:
+        """Get the complement of the meaning of this expression, i.e. the set of all referents for which
         the expression evaluates to False."""
 
-        return Meaning(set(self.meaning.universe.referents) - set(self.meaning.referents),
+        return Meaning(tuple(set(self.meaning.universe.referents) - set(self.meaning.referents)),
                        self.meaning.universe)
     
-    def draw_referent(self, antimeaning=False):
+    def draw_referent(self, complement=False):
         """Get a random referent from the meaning's referents."""
-        if antimeaning:
-            return random.choice(list(self.antimeaning.referents))
+        if complement:
+            return random.choice(list(self.complement.referents))
         return random.choice(list(self.meaning.referents)) 
 
     def to_dict(self) -> dict:
