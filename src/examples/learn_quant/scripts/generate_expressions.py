@@ -52,7 +52,7 @@ def generate_expressions(quantifiers_grammar: QuantifierGrammar,
     quantifiers_universe = create_universe(cfg.universe.m_size, cfg.universe.x_size)
     expressions_by_meaning = enumerate_quantifiers(cfg.universe.depth, quantifiers_universe, quantifiers_grammar)
     
-    outpath = Path().cwd() / Path(cfg.output) / Path("M" + str(cfg.universe.m_size)) / Path("X" + str(cfg.universe.x_size)) / Path("d" + str(cfg.universe.depth)) / Path("generated_expressions.csv")
+    outpath = Path().cwd() / Path(cfg.output) / Path("M" + str(cfg.universe.m_size)) / Path("X" + str(cfg.universe.x_size)) / Path("d" + str(cfg.universe.depth)) / Path("generated_expressions.yml")
     if cfg.save:
         save_quantifiers(expressions_by_meaning, outpath)
 

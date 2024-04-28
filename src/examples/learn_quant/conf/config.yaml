@@ -12,6 +12,6 @@ mode:
 save: true
 
 measures:
-  target: "inclusive/M3_X4_d2/"
+  target: "inclusive/M3_X4_d3/"
   monotonicity:
     - all

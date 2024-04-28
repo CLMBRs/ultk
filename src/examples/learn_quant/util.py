@@ -33,8 +33,8 @@ def read_expressions(
     Returns:
         tuple[list[GrammaticalExpression], dict[Meaning, Expression]]: A tuple containing the parsed expressions and, if return_by_meaning is True, a dictionary of expressions by their meanings.
     """
-    print(quantifiers_grammar)
     quantifiers_grammar.add_indices_as_primitives(universe.x_size)
+    print(quantifiers_grammar)
 
     with open(filename, "r") as f:
         expression_list = load(f, Loader=Loader)
