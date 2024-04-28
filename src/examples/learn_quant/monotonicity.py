@@ -16,6 +16,12 @@ import numpy as np
 from tqdm import tqdm
 from scipy import sparse
 
+from pathlib import Path
+
+import hydra
+from omegaconf import DictConfig, OmegaConf
+
+
 def switch_direction(bools: list[list[bool]], down = False) -> list[list[bool]]:
         """Switches the value of True to False and vice versa.
 
@@ -185,3 +191,25 @@ def calculate_monotonicity(universe, expressions, down = False):
         metrics[str(quantifier_expression)]["monotonicity"] = upward_monotonicity_entropy(submembership, membership[:, expression_id])
 
     return metrics
+
+@hydra.main(version_base=None, config_path="conf", config_name="config")
+def main(cfg: DictConfig) -> None:
+
+    import pickle as pkl
+
+    print(cfg)
+    uni = pkl.load(open(Path.cwd() / Path("learn_quant/outputs") / Path(cfg.measures.target) / Path("master_universe.pkl"), "rb"))
+    expressions, _ = read_expressions(Path.cwd() / Path("learn_quant/outputs") / Path(cfg.measures.target) / "generated_expressions.yml", uni)
+
+    print(len(expressions))
+    mm = calculate_monotonicity(uni, expressions)
+    # mm["greater_than(cardinality(A), cardinality(difference(B, A)))"]["monotonicity"]
+
+    sorted_monotonicity = sorted(mm.items(), key=lambda x: x[1]["monotonicity"], reverse=True)
+
+    print(len(sorted_monotonicity))
+    for x in sorted_monotonicity[0:10]:
+        print(x)
+
+if __name__ == "__main__":
+    main()

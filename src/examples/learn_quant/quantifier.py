@@ -47,7 +47,7 @@ class QuantifierModel(Referent):
 
 class QuantifierUniverse(Universe):
 
-    def __init__(self, referents: Iterable[QuantifierModel], m_size: int = None, x_size: int = None, prior: dict[str, float] = None):
+    def __init__(self, referents: tuple[QuantifierModel], m_size: int = None, x_size: int = None, prior: dict[str, float] = None):
         super().__init__(referents, prior)
         self.m_size = m_size
         self.x_size = x_size
@@ -57,7 +57,7 @@ class QuantifierUniverse(Universe):
         Largest x_size is used if different."""
         assert self.x_size == other.x_size
         x_size = max(self.x_size, other.x_size)
-        return QuantifierUniverse(list(set(self.referents) | set(other.referents)), prior={**self._prior, **other._prior}, x_size=x_size)
+        return QuantifierUniverse(referents = self.referents + other.referents, prior= self._prior + other._prior, x_size=x_size)
     
     def get_names(self) -> list:
         """Get the names of the referents in the loaded quantifier universe.

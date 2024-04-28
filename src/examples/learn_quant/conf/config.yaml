@@ -1,0 +1,17 @@
+defaults:
+  - _self_
+  - universe: base
+
+grammar: "learn_quant/grammar.yml"
+
+output: "learn_quant/outputs/"
+
+mode: 
+  - generate
+
+save: true
+
+measures:
+  target: "inclusive/M3_X4_d2/"
+  monotonicity:
+    - all
