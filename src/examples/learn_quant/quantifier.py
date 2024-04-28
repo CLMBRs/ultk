@@ -43,6 +43,38 @@ class QuantifierModel(Referent):
                 "A": len(self.A), 
                 "B": len(self.B), 
                 }
+    
+    def to_numpy(self, quantifier_index=None, in_meaning=False):
+        # Convert the string to an array of integers
+        indices = np.fromiter(self.name, dtype=int)
+        
+        # Initialize a zero matrix with shape (len(s), 5)
+        one_hot_array = np.zeros((len(indices), 5), dtype=int)
+        
+        # Use numpy advanced indexing to set the appropriate elements to 1
+        one_hot_array[np.arange(len(indices)), indices] = 1
+
+                # If quantifier_index is provided, concatenate it to each vector in one_hot_array
+        if quantifier_index is not None:
+            # Ensure quantifier_index is an array
+            quantifier_index = np.asarray(quantifier_index)
+            if quantifier_index.ndim == 1:
+                # Concatenate quantifier_index to each vector
+                quantifier_index = quantifier_index.reshape(1, -1).repeat(len(indices), axis=0)
+                one_hot_array = np.hstack((one_hot_array, quantifier_index))
+            else:
+                raise ValueError("quantifier_index must be a one-dimensional one-hot vector.")
+        else:
+            appended_value = 0
+            if in_meaning:
+                appended_value = 1
+            new_column = np.full((one_hot_array.shape[0], 1), appended_value)
+
+            # Concatenate the new column to the original array
+            one_hot_array = np.hstack((one_hot_array, new_column))
+
+        return one_hot_array
+
 
 
 class QuantifierUniverse(Universe):
