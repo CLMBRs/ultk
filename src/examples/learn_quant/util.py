@@ -49,6 +49,7 @@ def read_expressions(
         by_meaning = {expr.meaning: expr for expr in parsed_exprs}
     return parsed_exprs, by_meaning
 
+
 def filter_expressions_by_rules(rules: list, expressions):
     """
     Filters a list of expressions based on a set of rules.
@@ -66,7 +67,10 @@ def filter_expressions_by_rules(rules: list, expressions):
 import os
 from pathlib import Path
 
-def read_expressions_from_folder(folder: str, return_by_meaning=True) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
+
+def read_expressions_from_folder(
+    folder: str, return_by_meaning=True
+) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
     """Read expressions from a YAML file in a specified folder.
 
     Args:
@@ -80,10 +84,14 @@ def read_expressions_from_folder(folder: str, return_by_meaning=True) -> tuple[l
         FileNotFoundError: If the expressions file or the universe file is not found.
     """
 
-    expressions_file = os.path.join(folder, 'generated_expressions.yml')  # replace 'filename.yaml' with your actual filename
-    universe_file = os.path.join(folder, 'master_universe.pkl')  # replace 'universe.pkl' with your actual universe filename
+    expressions_file = os.path.join(
+        folder, "generated_expressions.yml"
+    )  # replace 'filename.yaml' with your actual filename
+    universe_file = os.path.join(
+        folder, "master_universe.pkl"
+    )  # replace 'universe.pkl' with your actual universe filename
 
-    with open(universe_file, 'rb') as f:
+    with open(universe_file, "rb") as f:
         universe = pickle.load(f)
 
     quantifiers_grammar.add_indices_as_primitives(universe.x_size)
@@ -101,8 +109,11 @@ def read_expressions_from_folder(folder: str, return_by_meaning=True) -> tuple[l
         by_meaning = {expr.meaning: expr for expr in parsed_exprs}
     return parsed_exprs, by_meaning, universe
 
-def save_quantifiers(expressions_by_meaning: dict[GrammaticalExpression, Any], 
-                     out_path: str = "generated_expressions.yml"):
+
+def save_quantifiers(
+    expressions_by_meaning: dict[GrammaticalExpression, Any],
+    out_path: str = "generated_expressions.yml",
+):
     """
     Save the quantifiers expressions to a YAML file.
 
@@ -123,12 +134,15 @@ def save_quantifiers(expressions_by_meaning: dict[GrammaticalExpression, Any],
             Dumper=Dumper,
         )
 
-def save_inclusive_generation(expressions_by_meaning: dict[GrammaticalExpression, Any], 
-                        master_universe: QuantifierUniverse,
-                        output_dir: str,
-                        m_size: int, 
-                        x_size: int, 
-                        depth: int):
+
+def save_inclusive_generation(
+    expressions_by_meaning: dict[GrammaticalExpression, Any],
+    master_universe: QuantifierUniverse,
+    output_dir: str,
+    m_size: int,
+    x_size: int,
+    depth: int,
+):
     """
     Save the generated expressions and the master universe to files.
 
@@ -144,7 +158,20 @@ def save_inclusive_generation(expressions_by_meaning: dict[GrammaticalExpression
         None
     """
 
-    output_file = Path(output_dir) / Path("inclusive/" + "M"+str(m_size) + "_" + "X"+str(x_size) + "_" + str("d"+str(depth))) / Path("generated_expressions.yml")
+    output_file = (
+        Path(output_dir)
+        / Path(
+            "inclusive/"
+            + "M"
+            + str(m_size)
+            + "_"
+            + "X"
+            + str(x_size)
+            + "_"
+            + str("d" + str(depth))
+        )
+        / Path("generated_expressions.yml")
+    )
     Path(output_file).parent.mkdir(parents=True, exist_ok=True)
 
     print("Saving generated expressions...")
@@ -154,7 +181,7 @@ def save_inclusive_generation(expressions_by_meaning: dict[GrammaticalExpression
     pickle_output_file = Path(output_file).parent / "master_universe.pkl"
 
     # Open the file in write binary mode and dump the object
-    with open(pickle_output_file, 'wb') as f:
+    with open(pickle_output_file, "wb") as f:
         pickle.dump(master_universe, f)
 
     print("Master universe has been pickled and saved to", pickle_output_file)

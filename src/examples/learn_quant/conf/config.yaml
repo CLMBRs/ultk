@@ -1,8 +1,7 @@
 defaults:
   - _self_
   - universe: base
-
-grammar: "learn_quant/grammar.yml"
+  - grammar: base
 
 output: "learn_quant/outputs/"
 
