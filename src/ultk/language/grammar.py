@@ -312,9 +312,6 @@ class Grammar:
                     expr_key = key(expression)
                     # if the current expression has not been generated yet
                     # OR it is "less than" the current entry, add this one
-                    print(expression)
-                    print(expr_key)
-                    print(lhs)
                     if expr_key not in unique_dict[lhs] or uniqueness_args[
                         "compare_func"
                     ](expression, unique_dict[lhs][expr_key]):

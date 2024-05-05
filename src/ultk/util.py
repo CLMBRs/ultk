@@ -1,4 +1,13 @@
-class FrozenDict(dict):
+from collections.abc import Mapping
+from typing import Generic, TypeVar
+
+K = TypeVar("K")
+V = TypeVar("V")
+
+
+# TODO: why is mypy still complaining about type arguments in references to this class?
+class FrozenDict(dict[K, V], Generic[K, V]):
+
     def __hash__(self):
         return hash(frozenset(self.items()))
 
