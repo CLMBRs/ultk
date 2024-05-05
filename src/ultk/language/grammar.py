@@ -3,7 +3,7 @@ import re
 from collections import defaultdict
 from collections.abc import Sequence
 from itertools import product
-from typing import Any, Callable, Generator, TypedDict
+from typing import Any, Callable, Generator, TypedDict, TypeVar
 from dataclasses import dataclass
 from yaml import load
 
@@ -14,6 +14,9 @@ except ImportError:
 
 from ultk.language.language import Expression
 from ultk.language.semantics import Meaning, Universe
+from ultk.util import FrozenDict
+
+T = TypeVar("T")
 
 
 @dataclass(frozen=True)
@@ -54,7 +57,7 @@ class Rule:
 
 # We need to use unsafe hash here, because the class needs to be both mutable and hashable (e.g., see https://github.com/CLMBRs/ultk/blob/main/src/ultk/effcomm/agent.py#L30).
 @dataclass(eq=True, kw_only=True, unsafe_hash=True)
-class GrammaticalExpression(Expression):
+class GrammaticalExpression(Expression[T]):
     """A GrammaticalExpression has been built up from a Grammar by applying a sequence of Rules.
     Crucially, it is _callable_, using the functions corresponding to each rule.
 
@@ -84,20 +87,15 @@ class GrammaticalExpression(Expression):
         return "".join(child.yield_string() for child in self.children)
 
     def evaluate(self, universe: Universe) -> Meaning:
-        # TODO: this presupposes that the expression has type Referent -> bool.  Should we generalize?
-        # and that leaf nodes will take Referents as input...
         # NB: important to use `not self.meaning` and not `self.meaning is None` because of how
         # Expression.__init__ initializes an "empty" meaning if `None` is passed
         if not self.meaning:
             self.meaning = Meaning(
-                tuple(referent for referent in universe.referents if self(referent)),
-                universe,
+                FrozenDict(
+                    {referent: self(referent) for referent in universe.referents}
+                )
             )
         return self.meaning
-
-    def call_on_universe(self, universe: Universe) -> tuple[Any, ...]:
-        """Call this expression on all elements of a universe, and return a tuple of the results."""
-        return tuple(self(referent) for referent in universe.referents)
 
     def add_child(self, child) -> None:
         if self.children is None:
@@ -205,7 +203,7 @@ class Grammar:
         )
 
         # stack to store the tree being built
-        stack = []
+        stack: list[GrammaticalExpression] = []
 
         for match in token_regex.finditer(expression):
             # strip trailing whitespace if needed
@@ -314,6 +312,9 @@ class Grammar:
                     expr_key = key(expression)
                     # if the current expression has not been generated yet
                     # OR it is "less than" the current entry, add this one
+                    print(expression)
+                    print(expr_key)
+                    print(lhs)
                     if expr_key not in unique_dict[lhs] or uniqueness_args[
                         "compare_func"
                     ](expression, unique_dict[lhs][expr_key]):
@@ -325,7 +326,7 @@ class Grammar:
             if depth == 0:
                 for rule in self._rules[lhs]:
                     if rule.is_terminal():
-                        cur_expr = GrammaticalExpression(
+                        cur_expr: GrammaticalExpression = GrammaticalExpression(
                             rule_name=rule.name, func=rule.func, children=None
                         )
                         if not do_unique or add_unique(cur_expr):
