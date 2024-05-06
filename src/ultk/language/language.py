@@ -13,11 +13,10 @@ Example usage:
 """
 
 import numpy as np
-from ultk.language.semantics import Universe
-from ultk.language.semantics import Meaning, Referent
 from dataclasses import dataclass
-from types import MappingProxyType
 from typing import Callable, Generic, Iterable, TypeVar
+from ultk.language.semantics import Meaning, Referent
+from ultk.util import FrozenDict
 
 # TODO: require Python 3.12 and use type parameter syntax instead? https://docs.python.org/3/reference/compound_stmts.html#type-params
 T = TypeVar("T")
@@ -31,7 +30,7 @@ class Expression(Generic[T]):
     # useful for hashing in certain cases
     # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
     form: str = ""
-    meaning: Meaning[T] = Meaning(MappingProxyType({}), MappingProxyType({}))
+    meaning: Meaning[T] = Meaning(FrozenDict(), FrozenDict())
 
     def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
