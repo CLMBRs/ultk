@@ -152,29 +152,14 @@ class Meaning(Generic[T]):
     """
 
     @property
-    def dist(self) -> tuple:
-        # TODO: fix/update this
+    def dist(self) -> FrozenDict[Referent, float]:
         if self._dist is not None:
             # normalize weights to distribution
-            total_weight = sum(self._dist)
-            return tuple(
-                (
-                    self._dist[self.referents.index(self.universe.referents[idx])]
-                    / total_weight
-                    if self.universe.referents[idx] in self.referents
-                    else 0
-                )
-                for idx in range(len(self.universe.referents))
-            )
+            total_weight = sum(self._dist.values())
+            return FrozenDict({referent: weight / total_weight for referent, weight in self._dist.items()})
         else:
-            return tuple(
-                (
-                    1 / len(self.referents)
-                    if self.universe.referents[idx] in self.referents
-                    else 0
-                )
-                for idx in range(len(self.universe.referents))
-            )
+            num_true_like = len(value for value in self.mapping.values() if value)
+            return FrozenDict({referent: (1 / num_true_like if self.mapping[referent] else 0) for referent in self.mapping})
 
     def __getitem__(self, key: Referent) -> T:
         return self.mapping[key]
