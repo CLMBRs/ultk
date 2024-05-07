@@ -176,6 +176,9 @@ class Meaning(Generic[T]):
                 for idx in range(len(self.universe.referents))
             )
 
+    def __getitem__(self, key: Referent) -> T:
+        return self.mapping[key]
+
     def __bool__(self):
         return bool(self.mapping)  # and bool(self.universe)
 
