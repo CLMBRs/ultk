@@ -41,7 +41,7 @@ def enumerate_quantifiers(
     # filter out the trivial meaning, results in NaNs
     # iterate over keys, since we need to change the dict itself
     for meaning in list(expressions_by_meaning.keys()):
-        if len(meaning.referents) == 0:
+        if len(meaning.mapping) == 0:
             del expressions_by_meaning[meaning]
 
     return expressions_by_meaning
