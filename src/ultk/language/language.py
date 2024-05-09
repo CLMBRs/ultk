@@ -34,7 +34,7 @@ class Expression(Generic[T]):
 
     def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
-        return referent in self.meaning.referents
+        return bool(self.meaning[referent])
 
     def to_dict(self) -> dict:
         """Return a dictionary representation of the expression."""
@@ -60,22 +60,23 @@ class Language:
         if not expressions:
             raise ValueError(f"Language cannot be empty.")
 
-        self.expressions = tuple(sorted(expressions))
+        self.expressions = frozenset(expressions)
         self.__dict__.update(**kwargs)
 
+    # TODO: revisit evolutionary algorithm; do we need Languages to be mutable?
     @property
-    def expressions(self) -> tuple[Expression, ...]:
+    def expressions(self) -> frozenset[Expression]:
         return self._expressions
 
     @expressions.setter
-    def expressions(self, val: tuple[Expression, ...]) -> None:
+    def expressions(self, val: frozenset[Expression]) -> None:
         if not val:
             raise ValueError("list of Expressions must not be empty.")
         self._expressions = val
 
     def add_expression(self, e: Expression):
         """Add an expression to the list of expressions in a language."""
-        self.expressions = tuple(sorted(tuple(self.expressions) + (e,)))
+        self.expressions = frozenset(tuple(self.expressions) + (e,))
 
     def pop(self, index: int) -> Expression:
         """Removes an expression at the specified index of the list of expressions, and returns it."""
