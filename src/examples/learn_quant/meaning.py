@@ -6,12 +6,23 @@ import random
 import argparse
 
 
-def create_universe(m_size, x_size):
+def create_universe(m_size: int, x_size: int) -> QuantifierUniverse:
+    """
+    Create a quantifier universe based on the given parameters.
+    All references are quantifier models, which are data classes that represent a relation between sets A, B, and M.
+
+    Args:
+        m_size (int): The size of the m set.
+        x_size (int): The size of the x set.
+
+    Returns:
+        QuantifierUniverse: The created quantifier universe.
+    """
 
     possible_quantifiers = []
 
-    for x in combinations_with_replacement([0, 1, 2, 3], r=m_size):
-        combo = list(x) + [4] * (x_size - m_size)
+    for combination in combinations_with_replacement([0, 1, 2, 3], r=m_size):
+        combo = list(combination) + [4] * (x_size - m_size)
         permutations_for_combo = set(permutations(combo, r=len(combo)))
         possible_quantifiers.extend(permutations_for_combo)
     possible_quantifiers_name = set(

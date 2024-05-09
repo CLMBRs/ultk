@@ -8,6 +8,7 @@ from learn_quant.util import read_expressions
 from learn_quant.quantifier import QuantifierUniverse, QuantifierModel
 from concepts.contexts import Context
 
+from typing import Dict
 from itertools import product
 import math
 from scipy.stats import entropy
@@ -37,9 +38,12 @@ def switch_direction(bools: np.ndarray, down=False) -> np.ndarray:
         return bools
 
 
-def get_truth_matrix(universe: QuantifierUniverse) -> np.ndarray:
+def get_truth_matrix(universe: QuantifierUniverse) -> tuple[np.ndarray, list[str]]:
     """Get a numpy matrix that stores the truth vectors of all models in the quantifier universe
 
+    Args:
+        universe (QuantifierUniverse): Universe of referents
+    
     Returns:
         np.ndarray: A matrix of booleans arrays that track the indices of set items of A intersected by B.
     """
@@ -50,8 +54,7 @@ def get_truth_matrix(universe: QuantifierUniverse) -> np.ndarray:
         truth_array.append(truth_vector)
         names_array.append(quantifier_model.name)
     truth_matrix = np.array(truth_array)
-    names_vector = np.array(names_array)
-    return truth_matrix, names_vector
+    return truth_matrix, names_array
 
 
 def calculate_lattice(universe: QuantifierUniverse, down=False) -> Context:
@@ -67,11 +70,10 @@ def calculate_lattice(universe: QuantifierUniverse, down=False) -> Context:
         See https://github.com/haberchr/ttps://github.com/haberchr/concepts/blob/master/concepts/contexts.py
 
     """
-    truth_df = get_truth_matrix(universe)
-    objects = names_vector.tolist()
-    properties = truth_df.columns
-    bools = switch_direction(truth_df, down)
-    return Context(objects, properties, bools)
+    truth_matrix, names = get_truth_matrix(universe)
+    properties = list(range(0, len(truth_matrix[0,:])))
+    bools = switch_direction(truth_matrix, down)
+    return Context(names, properties, bools)
 
 
 def get_sub_structures(concept_lattice: Context, name: list[str]) -> set[str]:
@@ -126,14 +128,17 @@ def has_sub_structure_in_meaning(
 
 
 def upward_monotonicity_entropy(all_models, quantifier):
-    """Measures degree of upward monotonicity of a quantifiers as
-    1 - H(Q | true_pred) / H(Q) where H is (conditional) entropy, and true_pred is the
-    variable over models saying whether there's a true _predecessor_ in the
-    subset order.
+    """
+    Measures the degree of upward monotonicity of a quantifier as 1 - H(Q | true_pred) / H(Q),
+    where H is the (conditional) entropy, Q is the quantifier, and true_pred is the variable over models
+    indicating whether there's a true predecessor in the subset order.
 
-    :param all_models: calculated matrix MxM, where a given row is an array of bools that correspond to whether a model at that index is a submodel
-    :param quantifier: list of truth values, same len as models
-    :returns scalar
+    Parameters:
+    all_models (numpy.ndarray): A calculated matrix MxM, where each row is an array of booleans that correspond to whether a model at that index is a submodel.
+    quantifier (list): A list of truth values, same length as the models.
+
+    Returns:
+    float: The scalar value representing the degree of upward monotonicity of the quantifier.
     """
 
     submembership = all_models
@@ -145,9 +150,15 @@ def upward_monotonicity_entropy(all_models, quantifier):
     q_ent = -p_q_true * np.log2(p_q_true) - p_q_false * np.log2(p_q_false)
 
     def get_preds(num_arr, num):
-        """Given an array of ints, and an int, get all predecessors of the
-        model corresponding to int.
-        Returns an array of same shape as num_arr, but with bools
+        """
+        Get the predictions for a given number from a 2D array.
+
+        Parameters:
+        num_arr (numpy.ndarray): A 2D array of numbers.
+        num (int): The index of the number to retrieve predictions for.
+
+        Returns:
+        numpy.ndarray: The predictions for the specified number.
         """
         return num_arr[num, :]
 
@@ -178,8 +189,18 @@ def upward_monotonicity_entropy(all_models, quantifier):
     return (1.0 - cond_ent / q_ent)[0, 0]
 
 
-def calculate_monotonicity(universe, expressions, down=False):
+def calculate_monotonicity(universe, expressions, down=False) -> Dict[str, Dict[str, float]]:
+    """
+    Calculates the monotonicity of a set of expressions over a universe of models.
 
+    Args:
+        universe (Universe): The universe of models over which the expressions are evaluated.
+        expressions (list): A list of expressions whose monotonicity is to be calculated.
+        down (bool, optional): If True, calculates downward monotonicity. If False, calculates upward monotonicity. Defaults to False.
+
+    Returns:
+        dict: A dictionary where the keys are the string representations of the expressions and the values are dictionaries containing the monotonicity metrics for each expression.
+    """
     metrics = {}
     concept_lattice = calculate_lattice(universe)
 
