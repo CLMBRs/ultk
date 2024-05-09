@@ -17,11 +17,17 @@
         >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
 """
 
-from typing import Any, Iterable, Union
-import numpy as np
-import pandas as pd
+from collections.abc import Mapping, Set
 from dataclasses import dataclass
 from functools import cached_property
+from types import MappingProxyType
+from typing import Any, Generic, TypeVar, Union
+from ultk.util import FrozenDict
+
+import numpy as np
+import pandas as pd
+
+T = TypeVar("T")
 
 
 class Referent:
@@ -64,8 +70,8 @@ class Referent:
 class Universe:
     """The universe is the collection of possible referent objects for a meaning."""
 
-    referents: tuple[Referent, ...]
-    prior: tuple[float, ...] = tuple()
+    referents: Set[Referent]
+    prior: Mapping[Referent, float]
 
     @cached_property
     def _referents_by_name(self):
@@ -106,11 +112,13 @@ class Universe:
         Args:
             a DataFrame representing the meaning space of interest, assumed to have a column `name`
         """
-        prior: tuple[float, ...] = tuple()
-        if "probability" in df.columns:
-            prior = tuple(df["probability"])
         records = df.to_dict("records")
-        referents = tuple(Referent(record["name"], record) for record in records)
+        referents = frozenset(Referent(record["name"], record) for record in records)
+        default_prob = 1 / len(referents)
+        prior = {
+            referent: getattr(referent, "probability", default_prob)
+            for referent in referents
+        }
         return cls(referents, prior)
 
     @classmethod
@@ -123,10 +131,12 @@ class Universe:
 
 
 @dataclass(frozen=True)
-class Meaning:
-    referents: tuple[Referent, ...]
-    universe: Universe
-    _dist: tuple[float, ...] = tuple()
+class Meaning(Generic[T]):
+    mapping: FrozenDict[Referent, T]
+    # TODO: I think `universe` is no longer needed with the new `mapping` idea, so maybe delete this
+    # universe: Universe
+    _dist: FrozenDict[Referent, float] = FrozenDict({})
+    # TODO: update docstring
     """A meaning picks out a set of objects from the universe.
 
     Following one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
@@ -141,46 +151,21 @@ class Meaning:
         dist: a tuple representing the distribution over referents to associate with the meaning. By default is None, and the distribution will be uniform over the passed referents, and any remaining referents are assigned 0 probability.
     """
 
-    def __post_init__(self):
-        if not isinstance(self.referents, tuple):
-            raise TypeError(f"The `referents` field of Meaning must be a tuple.")
-
-        if not set(self.referents).issubset(set(self.universe.referents)):
-            print("referents:")
-            print(tuple(str(r) for r in self.referents))
-            print("universe:")
-            print(tuple(str(r) for r in self.universe.referents))
-            raise ValueError(
-                f"The set of referents for a meaning must be a subset of the universe of discourse."
-            )
-
     @property
-    def dist(self) -> tuple:
+    def dist(self) -> FrozenDict[Referent, float]:
         if self._dist is not None:
             # normalize weights to distribution
-            total_weight = sum(self._dist)
-            return tuple(
-                (
-                    self._dist[self.referents.index(self.universe.referents[idx])]
-                    / total_weight
-                    if self.universe.referents[idx] in self.referents
-                    else 0
-                )
-                for idx in range(len(self.universe.referents))
-            )
+            total_weight = sum(self._dist.values())
+            return FrozenDict({referent: weight / total_weight for referent, weight in self._dist.items()})
         else:
-            return tuple(
-                (
-                    1 / len(self.referents)
-                    if self.universe.referents[idx] in self.referents
-                    else 0
-                )
-                for idx in range(len(self.universe.referents))
-            )
+            num_true_like = len(value for value in self.mapping.values() if value)
+            return FrozenDict({referent: (1 / num_true_like if self.mapping[referent] else 0) for referent in self.mapping})
+
+    def __getitem__(self, key: Referent) -> T:
+        return self.mapping[key]
 
     def __bool__(self):
-        return bool(self.referents) and bool(self.universe)
+        return bool(self.mapping)  # and bool(self.universe)
 
     def __str__(self):
-        return f"Referents:\n\t{','.join(str(referent) for referent in self.referents)}\
-            \nDistribution:\n\t{self.dist}\n"
+        return f"Mapping:\n\t{'\n'.join(f"{ref}: {self.mapping[ref]}" for ref in self.mapping)}"# \ \nDistribution:\n\t{self.dist}\n"
