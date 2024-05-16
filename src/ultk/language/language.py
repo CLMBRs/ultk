@@ -16,7 +16,7 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Callable, Generic, Iterable, TypeVar
 from ultk.language.semantics import Meaning, Referent
-from ultk.util import FrozenDict
+from ultk.util.frozendict import FrozenDict
 
 # TODO: require Python 3.12 and use type parameter syntax instead? https://docs.python.org/3/reference/compound_stmts.html#type-params
 T = TypeVar("T")
