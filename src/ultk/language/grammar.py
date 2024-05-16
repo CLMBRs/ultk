@@ -111,10 +111,24 @@ class GrammaticalExpression(Expression[T]):
     def to_dict(self) -> dict:
         the_dict = super().to_dict()
         the_dict["term_expression"] = self.term_expression
+        the_dict["rule_name"] = self.rule_name
         the_dict["length"] = len(self)
         if self.children:
             the_dict["children"] = tuple(child.to_dict() for child in self.children)
         return the_dict
+
+    @classmethod
+    def from_dict(cls, the_dict: dict, grammar: "Grammar") -> "GrammaticalExpression":
+        children = the_dict.get("children")
+        if children:
+            children = tuple(cls.from_dict(child, grammar) for child in children)
+        return cls(
+            rule_name=the_dict["rule_name"],
+            func=grammar._rules_by_name[the_dict["rule_name"]].func,
+            children=children,
+            term_expression=the_dict["term_expression"],
+            meaning=the_dict["meaning"],
+        )
 
     def __call__(self, *args):
         if self.children is None:
