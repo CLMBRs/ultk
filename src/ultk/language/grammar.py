@@ -14,7 +14,7 @@ except ImportError:
 
 from ultk.language.language import Expression
 from ultk.language.semantics import Meaning, Universe
-from ultk.util import FrozenDict
+from ultk.util.frozendict import FrozenDict
 
 T = TypeVar("T")
 
