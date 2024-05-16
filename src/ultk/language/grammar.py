@@ -58,6 +58,20 @@ class Rule:
 
     @classmethod
     def from_callable(cls, func: Callable) -> "Rule":
+        """Create a Rule from the type-annotations of a function.
+
+        For example, given the following method definition:
+        ```python
+        def _and(p1: bool, p2: bool) -> bool:
+            return p1 and p2
+        ```
+
+        This method would return a Rule with the following attributes:
+        lhs = bool
+        rhs = (bool, bool)
+        name = "_and"
+        func = _and
+        """
         annotations = inspect.signature(func)
         if annotations.return_annotation is inspect.Signature.empty:
             raise ValueError(
@@ -506,7 +520,11 @@ class Grammar:
     def from_module(cls, module_name: str) -> "Grammar":
         """Read a grammar from a module.
 
-        The module should have a list of type-annotated function definitions, each of which will correspond to one Rule in the new Grammar.
+        The module should have a list of type-annotated method definitions, each of which will correspond to one Rule in the new Grammar.
+        See the docstring for `Rule.from_callable` for more information on how that step works.
+
+        The start symbol of the grammar can either be specified by `start = XXX` somewhere in the module,
+        or will default to the LHS of the first rule in the module (aka the return type annotation of the first method definition).
 
         Arguments:
             module_name: name of the module
