@@ -25,10 +25,19 @@ def read_grammatical_expressions(
     universe: Universe | None = None,
     return_by_meaning=True,
 ) -> tuple[list[GrammaticalExpression], dict[Meaning, GrammaticalExpression]]:
-    """Read expressions from a YAML file.
-    Assumes that the file is a list, and that each item in the list has a field
-    "grammatical_expression" with an expression that can be parsed by the
-    indefinites_grammar.
+    """Read grammatical expressions from a YAML file.
+
+    Optionally re-parse and (re-)evaluate the expressions using the provided grammar and universe.
+
+    Args:
+        filename: the file to read
+        grammar: the grammar to use for parsing (and for re-populating the `.func` attribute of each GrammaticalExpression)
+        re_parse: whether to re-parse the expressions
+        universe: the universe to use for evaluation
+        return_by_meaning: whether to return a dictionary mapping meanings to expressions or not
+
+    Returns:
+        a list of GrammaticalExpressions and a dictionary mapping meanings to expressions (empty if `return_by_meaning` is False)
     """
     if re_parse and (grammar is None or universe is None):
         raise ValueError("Must provide grammar and universe if re-parsing expressions.")
@@ -50,8 +59,6 @@ def read_grammatical_expressions(
             GrammaticalExpression.from_dict(expr_dict, grammar)
             for expr_dict in expression_list
         ]
-    print(final_exprs[0])
-    print(final_exprs[0].meaning)
     if universe is not None:
         [expr.evaluate(universe) for expr in final_exprs]
     by_meaning = {}
