@@ -58,7 +58,7 @@ def read_expressions(
     with open(filename, "r") as f:
         expression_list = load(f, Loader=Loader)
     parsed_exprs = [
-        indefinites_grammar.parse(expr_dict["grammatical_expression"])
+        indefinites_grammar.parse(expr_dict["term_expression"])
         for expr_dict in expression_list
     ]
     if universe is not None:

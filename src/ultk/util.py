@@ -36,7 +36,7 @@ class FrozenDict(dict[K, V], Generic[K, V], YAMLObject):
 
     @classmethod
     def from_yaml(cls, loader, node):
-        return FrozenDict(loader.construct_mapping(node))
+        return FrozenDict(loader.construct_mapping(node, deep=True))
 
     def update(self, *args, **kwargs):
         raise TypeError("FrozenDict is immutable")
