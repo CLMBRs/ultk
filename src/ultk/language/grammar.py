@@ -73,6 +73,11 @@ class GrammaticalExpression(Expression[T]):
     rule_name: str
     func: Callable
     children: tuple | None
+    term_expression: str = ""
+
+    def __post_init__(self):
+        if not self.term_expression:
+            self.term_expression = str(self)
 
     def yield_string(self) -> str:
         """Get the 'yield' string of this term, i.e. the concatenation
@@ -105,7 +110,7 @@ class GrammaticalExpression(Expression[T]):
 
     def to_dict(self) -> dict:
         the_dict = super().to_dict()
-        the_dict["grammatical_expression"] = str(self)
+        the_dict["term_expression"] = self.term_expression
         the_dict["length"] = len(self)
         return the_dict
 
@@ -135,6 +140,9 @@ class GrammaticalExpression(Expression[T]):
         if self.children is not None:
             out_str += f"({', '.join(str(child) for child in self.children)})"
         return out_str
+
+    def __repr__(self):
+        return f"GrammaticalExpression({self.form}, {self.rule_name}, {self.children}, {self.term_expression}, {self.meaning})"
 
 
 class UniquenessArgs(TypedDict):
