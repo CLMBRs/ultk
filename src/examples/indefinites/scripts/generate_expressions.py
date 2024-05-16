@@ -1,4 +1,4 @@
-from yaml import dump, dump_all, Dumper
+from ultk.util.io import write_expressions
 
 from ..grammar import indefinites_grammar
 from ..meaning import universe as indefinites_universe
@@ -19,13 +19,6 @@ if __name__ == "__main__":
     #         del expressions_by_meaning[meaning]
 
     print(f"Generated {len(expressions_by_meaning)} unique expressions.")
-
-    with open("indefinites/outputs/generated_expressions.yml", "w") as outfile:
-        dump(
-            [
-                expressions_by_meaning[meaning].to_dict()
-                for meaning in expressions_by_meaning
-            ],
-            outfile,
-            Dumper=Dumper,
-        )
+    write_expressions(
+        expressions_by_meaning.values(), "indefinites/outputs/generated_expressions.yml"
+    )
