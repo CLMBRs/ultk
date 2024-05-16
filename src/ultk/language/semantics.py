@@ -21,7 +21,7 @@ from collections.abc import Mapping, Set
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Any, Generic, TypeVar, Union
-from ultk.util import FrozenDict
+from ultk.util.frozendict import FrozenDict
 
 import numpy as np
 import pandas as pd
