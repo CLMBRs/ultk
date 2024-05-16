@@ -66,11 +66,10 @@ class Rule:
             return p1 and p2
         ```
 
-        This method would return a Rule with the following attributes:
-        lhs = bool
-        rhs = (bool, bool)
-        name = "_and"
-        func = _and
+        This class method will return the Rule:
+        ```
+        Rule(name="_and", lhs=bool, rhs=(bool, bool), func=_and)
+        ```
         """
         annotations = inspect.signature(func)
         if annotations.return_annotation is inspect.Signature.empty:
