@@ -1,10 +1,12 @@
+import inspect
 import random
 import re
 from collections import defaultdict
 from collections.abc import Sequence
+from dataclasses import dataclass
+from importlib import import_module
 from itertools import product
 from typing import Any, Callable, Generator, TypedDict, TypeVar
-from dataclasses import dataclass
 from yaml import load
 
 try:
@@ -13,7 +15,7 @@ except ImportError:
     from yaml import Loader
 
 from ultk.language.language import Expression
-from ultk.language.semantics import Meaning, Universe
+from ultk.language.semantics import Meaning, Referent, Universe
 from ultk.util.frozendict import FrozenDict
 
 T = TypeVar("T")
@@ -53,6 +55,26 @@ class Rule:
         if self.rhs is not None:
             out_str += f"({', '.join(str(typ) for typ in self.rhs)})"
         return out_str
+
+    @classmethod
+    def from_callable(cls, func: Callable) -> "Rule":
+        annotations = inspect.signature(func)
+        if annotations.return_annotation is inspect.Signature.empty:
+            raise ValueError(
+                f"Function {func} must have a return annotation to be used as a Rule."
+            )
+        # parameters = {'name': Parameter} ordereddict, so we want the values
+        # each value is a Paramter, with .annotation being the actual annotation
+        rhs = tuple(arg.annotation for arg in annotations.parameters.values())
+        # if all type annotations are Referent, treat this as a terminal, no children = None RHS
+        if all(obj == Referent for obj in rhs):
+            rhs = None
+        return cls(
+            name=func.__name__,
+            lhs=annotations.return_annotation,
+            rhs=rhs,
+            func=func,
+        )
 
 
 # We need to use unsafe hash here, because the class needs to be both mutable and hashable (e.g., see https://github.com/CLMBRs/ultk/blob/main/src/ultk/effcomm/agent.py#L30).
@@ -478,4 +500,31 @@ class Grammar:
             if "weight" in rule_dict:
                 rule_dict["weight"] = float(rule_dict["weight"])
             grammar.add_rule(Rule(**rule_dict))
+        return grammar
+
+    @classmethod
+    def from_module(cls, module_name: str) -> "Grammar":
+        """Read a grammar from a module.
+
+        The module should have a list of type-annotated function definitions, each of which will correspond to one Rule in the new Grammar.
+
+        Arguments:
+            module_name: name of the module
+        """
+        module = import_module(module_name)
+        grammar = cls(None)
+        for name, value in inspect.getmembers(module):
+            if inspect.isfunction(value):
+                print(name)
+                print(value)
+                rule = Rule.from_callable(value)
+                grammar.add_rule(rule)
+        print(grammar)
+        # set start symbol if module specifies it
+        if hasattr(module, "start") and module.start in grammar._rules:
+            grammar._start = module.start
+        # otherwise, LHS of the first rule in the module
+        else:
+            first_rule_name = next(iter(grammar._rules_by_name))
+            grammar._start = grammar._rules_by_name[first_rule_name].lhs
         return grammar
