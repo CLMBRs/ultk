@@ -1,7 +1,7 @@
 from typing import Callable, Any
 import pandas as pd
 
-from yaml import load, load_all, dump, Loader, Dumper
+from yaml import load, dump, Loader, Dumper
 
 from ultk.language.grammar import GrammaticalExpression
 from ultk.language.language import Expression, Language

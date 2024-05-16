@@ -112,6 +112,8 @@ class GrammaticalExpression(Expression[T]):
         the_dict = super().to_dict()
         the_dict["term_expression"] = self.term_expression
         the_dict["length"] = len(self)
+        if self.children:
+            the_dict["children"] = tuple(child.to_dict() for child in self.children)
         return the_dict
 
     def __call__(self, *args):
