@@ -38,7 +38,7 @@ class Expression(Generic[T]):
 
     def to_dict(self) -> dict:
         """Return a dictionary representation of the expression."""
-        return {"form": self.form, "meaning": self.meaning.__dict__}
+        return {"form": self.form, "meaning": self.meaning}
 
     def __str__(self) -> str:
         return self.form
