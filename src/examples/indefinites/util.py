@@ -1,13 +1,11 @@
 from typing import Callable, Any
 import pandas as pd
 
-from yaml import load, dump, Loader, Dumper
+from yaml import dump, Dumper
 
-from ultk.language.grammar import GrammaticalExpression
 from ultk.language.language import Expression, Language
-from ultk.language.semantics import Meaning, Universe
+from ultk.language.semantics import Meaning
 
-from .grammar import indefinites_grammar
 from .meaning import universe as indefinites_universe
 
 
