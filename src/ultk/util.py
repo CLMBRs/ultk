@@ -1,12 +1,13 @@
-from collections.abc import Mapping
 from typing import Generic, TypeVar
+from yaml import YAMLObject
 
 K = TypeVar("K")
 V = TypeVar("V")
 
 
-# TODO: why is mypy still complaining about type arguments in references to this class?
-class FrozenDict(dict[K, V], Generic[K, V]):
+class FrozenDict(dict[K, V], Generic[K, V], YAMLObject):
+
+    yaml_tag = "!frozendict"
 
     def __hash__(self):
         return hash(frozenset(self.items()))
@@ -28,6 +29,14 @@ class FrozenDict(dict[K, V], Generic[K, V]):
 
     def setdefault(self, key, default=None):
         raise TypeError("FrozenDict is immutable")
+
+    @classmethod
+    def to_yaml(cls, dumper, data):
+        return dumper.represent_mapping(cls.yaml_tag, dict(data))
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        return FrozenDict(loader.construct_mapping(node))
 
     def update(self, *args, **kwargs):
         raise TypeError("FrozenDict is immutable")

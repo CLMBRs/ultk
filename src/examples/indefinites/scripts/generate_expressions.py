@@ -1,14 +1,7 @@
-from yaml import dump
-
-try:
-    from yaml import CDumper as Dumper
-except ImportError:
-    from yaml import Dumper
+from yaml import dump, dump_all, Dumper
 
 from ..grammar import indefinites_grammar
 from ..meaning import universe as indefinites_universe
-
-import time
 
 if __name__ == "__main__":
     expressions_by_meaning = indefinites_grammar.get_unique_expressions(
@@ -24,6 +17,8 @@ if __name__ == "__main__":
     # for meaning in list(expressions_by_meaning.keys()):
     #     if len(meaning.referents) == 0:
     #         del expressions_by_meaning[meaning]
+
+    print(f"Generated {len(expressions_by_meaning)} unique expressions.")
 
     with open("indefinites/outputs/generated_expressions.yml", "w") as outfile:
         dump(

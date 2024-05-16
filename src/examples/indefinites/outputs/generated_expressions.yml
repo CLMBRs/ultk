@@ -2,855 +2,791 @@
   grammatical_expression: K+
   length: 1
   meaning:
-    _dist: &id001 !!python/object:ultk.util.FrozenDict {}
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        ? &id002 !!python/object:ultk.language.semantics.Referent
-          _frozen: true
-          name: freechoice
-          probability: 0.0979166666666667
-        : false
-        ? &id003 !!python/object:ultk.language.semantics.Referent
-          _frozen: true
-          name: negative-indefinite
-          probability: 0.15
-        : false
-        ? &id004 !!python/object:ultk.language.semantics.Referent
-          _frozen: true
-          name: nonspecific
-          probability: 0.2625
-        : false
-        ? &id005 !!python/object:ultk.language.semantics.Referent
-          _frozen: true
-          name: npi
-          probability: 0.327083333333333
-        : false
-        ? &id006 !!python/object:ultk.language.semantics.Referent
-          _frozen: true
-          name: specific-known
-          probability: 0.08125
-        : true
-        ? &id007 !!python/object:ultk.language.semantics.Referent
-          _frozen: true
-          name: specific-unknown
-          probability: 0.08125
-        : false
+    _dist: &id001 !frozendict {}
+    mapping: !frozendict
+      ? &id002 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: freechoice
+        probability: 0.0979166666666667
+      : false
+      ? &id003 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: negative-indefinite
+        probability: 0.15
+      : false
+      ? &id004 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: nonspecific
+        probability: 0.2625
+      : false
+      ? &id005 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: npi
+        probability: 0.327083333333333
+      : false
+      ? &id006 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: specific-known
+        probability: 0.08125
+      : true
+      ? &id007 !!python/object:ultk.language.semantics.Referent
+        _frozen: true
+        name: specific-unknown
+        probability: 0.08125
+      : false
 - form: ''
   grammatical_expression: K-
   length: 1
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : true
-        *id005 : true
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: true
+      *id005: true
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: S+
   length: 1
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : false
-        *id005 : false
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: false
+      *id005: false
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: S-
   length: 1
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : true
-        *id005 : true
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: true
+      *id005: true
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: SE+
   length: 1
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : false
-        *id005 : true
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: false
+      *id005: true
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: SE-
   length: 1
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : true
-        *id005 : false
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: true
+      *id005: false
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: N+
   length: 1
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : false
-        *id005 : false
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: false
+      *id005: false
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: N-
   length: 1
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : true
-        *id005 : true
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: true
+      *id005: true
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: R+
   length: 1
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : false
-        *id005 : true
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: false
+      *id005: true
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: R-
   length: 1
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : false
-        *id005 : false
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: false
+      *id005: false
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(K+, K-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : false
-        *id005 : false
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: false
+      *id005: false
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(K-, S+)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : false
-        *id005 : false
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: false
+      *id005: false
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(K-, SE-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : true
-        *id005 : false
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: true
+      *id005: false
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(K-, N-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : true
-        *id005 : true
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: true
+      *id005: true
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(S-, SE-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : true
-        *id005 : false
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: true
+      *id005: false
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(S-, N-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : true
-        *id005 : true
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: true
+      *id005: true
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(SE+, N-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : false
-        *id005 : true
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: false
+      *id005: true
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(N-, R+)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : false
-        *id005 : true
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: false
+      *id005: true
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: or(K+, K-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : true
-        *id005 : true
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: true
+      *id005: true
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: or(K+, S-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : true
-        *id005 : true
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: true
+      *id005: true
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: or(K+, SE+)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : false
-        *id005 : true
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: false
+      *id005: true
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: or(K+, N+)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : false
-        *id005 : false
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: false
+      *id005: false
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: or(K+, R+)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : false
-        *id005 : true
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: false
+      *id005: true
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: or(K+, R-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : false
-        *id005 : false
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: false
+      *id005: false
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: or(S+, SE+)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : false
-        *id005 : true
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: false
+      *id005: true
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: or(S+, N+)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : false
-        *id005 : false
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: false
+      *id005: false
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: or(S+, R+)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : false
-        *id005 : true
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: false
+      *id005: true
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: or(S+, R-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : false
-        *id005 : false
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: false
+      *id005: false
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: or(SE-, N+)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : true
-        *id005 : false
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: true
+      *id005: false
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: not(R-)
   length: 2
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : true
-        *id005 : true
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: true
+      *id005: true
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: not(R+)
   length: 2
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : true
-        *id005 : false
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: true
+      *id005: false
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: or(N+, R-)
   length: 3
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : false
-        *id005 : false
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: false
+      *id005: false
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(K-, or(S+, SE+))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : false
-        *id005 : true
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: false
+      *id005: true
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(K-, or(S+, N+))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : false
-        *id005 : false
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: false
+      *id005: false
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(K-, or(S+, R+))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : false
-        *id005 : true
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: false
+      *id005: true
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(K-, or(S+, R-))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : false
-        *id005 : false
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: false
+      *id005: false
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(K-, or(SE-, N+))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : true
-        *id005 : false
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: true
+      *id005: false
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(K-, not(R-))
   length: 4
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : true
-        *id005 : true
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: true
+      *id005: true
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(K-, not(R+))
   length: 4
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : true
-        *id005 : false
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: true
+      *id005: false
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(S-, or(SE-, N+))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : true
-        *id005 : false
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: true
+      *id005: false
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(S-, not(R-))
   length: 4
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : true
-        *id005 : true
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: true
+      *id005: true
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(S-, not(R+))
   length: 4
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : true
-        *id005 : false
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: true
+      *id005: false
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(SE-, or(K+, S-))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : true
-        *id005 : false
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: true
+      *id005: false
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: and(N-, or(K+, S-))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : true
-        *id005 : true
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: true
+      *id005: true
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: and(N-, or(K+, SE+))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : false
-        *id005 : true
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: false
+      *id005: true
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: and(N-, or(K+, R+))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : false
-        *id005 : true
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: false
+      *id005: true
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: and(N-, or(S+, SE+))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : false
-        *id005 : true
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: false
+      *id005: true
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: and(N-, or(S+, R+))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : false
-        *id005 : true
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: false
+      *id005: true
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: and(N-, not(R-))
   length: 4
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : true
-        *id005 : true
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: true
+      *id005: true
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: and(and(K-, N-), or(S+, SE+))
   length: 7
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : false
-        *id005 : true
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: false
+      *id005: true
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(and(K-, N-), or(S+, R+))
   length: 7
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : false
-        *id005 : true
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: false
+      *id005: true
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(and(K-, N-), not(R-))
   length: 6
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : true
-        *id005 : true
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: true
+      *id005: true
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(and(S-, N-), not(R-))
   length: 6
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : true
-        *id005 : true
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: true
+      *id005: true
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(or(K+, S-), or(SE-, N+))
   length: 7
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : true
-        *id005 : false
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: true
+      *id005: false
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: and(or(K+, S-), not(R-))
   length: 6
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : true
-        *id004 : true
-        *id005 : true
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: true
+      *id004: true
+      *id005: true
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: and(or(K+, S-), not(R+))
   length: 6
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : false
-        *id004 : true
-        *id005 : false
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: false
+      *id004: true
+      *id005: false
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: or(K+, or(N+, R-))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : false
-        *id005 : false
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: false
+      *id005: false
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: or(S+, or(N+, R-))
   length: 5
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : false
-        *id005 : false
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: false
+      *id005: false
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: or(N+, not(R+))
   length: 4
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : true
-        *id005 : false
-        *id006 : true
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: true
+      *id005: false
+      *id006: true
+      *id007: true
 - form: ''
   grammatical_expression: or(and(K-, S+), or(N+, R-))
   length: 7
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : false
-        *id005 : false
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: false
+      *id005: false
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(K-, or(N+, not(R+)))
   length: 6
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : true
-        *id005 : false
-        *id006 : false
-        *id007 : true
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: true
+      *id005: false
+      *id006: false
+      *id007: true
 - form: ''
   grammatical_expression: and(S-, or(N+, not(R+)))
   length: 6
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : true
-        *id005 : false
-        *id006 : false
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: true
+      *id005: false
+      *id006: false
+      *id007: false
 - form: ''
   grammatical_expression: and(N-, and(or(K+, S-), not(R-)))
   length: 8
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : false
-        *id003 : false
-        *id004 : true
-        *id005 : true
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: false
+      *id003: false
+      *id004: true
+      *id005: true
+      *id006: true
+      *id007: false
 - form: ''
   grammatical_expression: and(or(K+, S-), or(N+, not(R+)))
   length: 8
   meaning:
     _dist: *id001
-    mapping: !!python/object/new:ultk.util.FrozenDict
-      dictitems:
-        *id002 : true
-        *id003 : true
-        *id004 : true
-        *id005 : false
-        *id006 : true
-        *id007 : false
+    mapping: !frozendict
+      *id002: true
+      *id003: true
+      *id004: true
+      *id005: false
+      *id006: true
+      *id007: false

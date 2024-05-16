@@ -20,7 +20,6 @@
 from collections.abc import Mapping, Set
 from dataclasses import dataclass
 from functools import cached_property
-from types import MappingProxyType
 from typing import Any, Generic, TypeVar, Union
 from ultk.util import FrozenDict
 
@@ -64,6 +63,9 @@ class Referent:
 
     def __hash__(self) -> int:
         return hash((self.name, tuple(self.__dict__)))
+    
+    def __repr__(self) -> str:
+        return f"Referent({self.name}, {self.__dict__})"
 
 
 @dataclass(frozen=True)

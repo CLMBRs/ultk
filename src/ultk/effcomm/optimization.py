@@ -17,14 +17,14 @@ from ultk.language.language import Expression, Language
 
 
 class Mutation:
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def precondition(language: Language, **kwargs) -> bool:
         """Whether a mutation is allowed to apply to a language."""
         raise NotImplementedError
 
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def mutate(language: Language, expressions: list[Expression], **kwargs) -> Language:
         """Mutate the language, possibly using a list of expressions."""
         raise NotImplementedError()
