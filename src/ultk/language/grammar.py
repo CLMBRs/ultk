@@ -531,12 +531,10 @@ class Grammar:
         module = import_module(module_name)
         grammar = cls(None)
         for name, value in inspect.getmembers(module):
+            # functions become rules
             if inspect.isfunction(value):
-                print(name)
-                print(value)
                 rule = Rule.from_callable(value)
                 grammar.add_rule(rule)
-        print(grammar)
         # set start symbol if module specifies it
         if hasattr(module, "start") and module.start in grammar._rules:
             grammar._start = module.start
