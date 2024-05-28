@@ -76,17 +76,26 @@ class Rule:
             raise ValueError(
                 f"Function {func} must have a return annotation to be used as a Rule."
             )
+        # dict so that deletion is possible
+        weight: float = 1.0
+        args = dict(annotations.parameters)
+        if "weight" in args:
+            # assign weight as the default value of weight kwarg
+            weight = float(args["weight"].default)
+            # delete because weight is a special term, not part of RHS like other params
+            del args["weight"]
         # parameters = {'name': Parameter} ordereddict, so we want the values
         # each value is a Paramter, with .annotation being the actual annotation
-        rhs = tuple(arg.annotation for arg in annotations.parameters.values())
+        rhs: tuple[Any, ...] | None = tuple(arg.annotation for arg in args.values())
         # if all type annotations are Referent, treat this as a terminal, no children = None RHS
-        if all(obj == Referent for obj in rhs):
+        if rhs and all(obj == Referent for obj in rhs):
             rhs = None
         return cls(
             name=func.__name__,
             lhs=annotations.return_annotation,
             rhs=rhs,
             func=func,
+            weight=weight,
         )
 
 
