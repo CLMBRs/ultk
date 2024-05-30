@@ -47,9 +47,6 @@ class Referent:
         else:
             object.__setattr__(self, __name, __value)
 
-    def to_dict(self) -> dict:
-        return self.__dict__
-
     def __str__(self) -> str:
         return str(self.__dict__)
 
@@ -65,11 +62,10 @@ class Referent:
 
 @dataclass(frozen=True)
 class Universe:
+    """The universe is the collection of possible referent objects for a meaning."""
 
-    """The universe is the set of possible referent objects for a meaning."""
-
-    referents: tuple[Referent]
-    prior: tuple[float] = None
+    referents: tuple[Referent, ...]
+    prior: tuple[float, ...] = tuple()
 
     @cached_property
     def _referents_by_name(self):
@@ -112,7 +108,7 @@ class Universe:
         Args:
             a DataFrame representing the meaning space of interest, assumed to have a column `name`
         """
-        prior = None
+        prior: tuple[float, ...] = tuple()
         if "probability" in df.columns:
             prior = tuple(df["probability"])
         records = df.to_dict("records")
@@ -130,9 +126,9 @@ class Universe:
 
 @dataclass(frozen=True)
 class Meaning:
-    referents: tuple[Referent]
+    referents: tuple[Referent, ...]
     universe: Universe
-    _dist: dict[str, float] = None
+    _dist: tuple[float, ...] = tuple()
     """A meaning picks out a set of objects from the universe.
 
     Following one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
@@ -140,11 +136,11 @@ class Meaning:
     in which it can be helpful to define a meaning explicitly as a distribution over the universe.
 
     Args:
-        referents: a list of Referent objects, which must be a subset of the referents in `universe`.
+        referents: a tuple of Referent objects, which must be a subset of the referents in `universe`.
 
         universe: a Universe object that defines the probability space for a meaning.
 
-        dist: a dict of with Referent names as keys and weights or probabilities as values, representing the distribution over referents to associate with the meaning. By default is None, and the distribution will be uniform over the passed referents, and any remaining referents are assigned 0 probability.
+        dist: a tuple representing the distribution over referents to associate with the meaning. By default is None, and the distribution will be uniform over the passed referents, and any remaining referents are assigned 0 probability.
     """
 
     def __post_init__(self):
@@ -161,25 +157,28 @@ class Meaning:
             )
 
     @property
-    def dist(self) -> np.ndarray:
-        zeros = {
-            ref.name: 0.0 for ref in set(self.universe.referents) - set(self.referents)
-        }
+    def dist(self) -> tuple:
         if self._dist is not None:
             # normalize weights to distribution
-            total_weight = sum(self._dist.values())
-            _dist = {
-                ref.name: self._dist[ref.name] / total_weight for ref in self.referents
-            } | zeros
-            return np.array(_dist.values())
+            total_weight = sum(self._dist)
+            return tuple(
+                (
+                    self._dist[self.referents.index(self.universe.referents[idx])]
+                    / total_weight
+                    if self.universe.referents[idx] in self.referents
+                    else 0
+                )
+                for idx in range(len(self.universe.referents))
+            )
         else:
-            _dist = {
-                ref.name: 1 / len(self.referents) for ref in self.referents
-            } | zeros
-            return np.array(_dist.values())
-
-    def to_dict(self) -> dict:
-        return {"referents": [referent.to_dict() for referent in self.referents]}
+            return tuple(
+                (
+                    1 / len(self.referents)
+                    if self.universe.referents[idx] in self.referents
+                    else 0
+                )
+                for idx in range(len(self.universe.referents))
+            )
 
     def __bool__(self):
         return bool(self.referents) and bool(self.universe)
