@@ -1,5 +1,6 @@
 """Functions for sampling expressions into languages.
 """
+
 import copy
 from typing import Any
 import numpy as np

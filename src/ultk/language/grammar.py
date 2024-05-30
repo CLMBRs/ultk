@@ -4,7 +4,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from itertools import product
 from typing import Any, Callable, Generator, TypedDict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from yaml import load
 
 try:
