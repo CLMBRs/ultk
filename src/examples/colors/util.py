@@ -24,6 +24,12 @@ def get_args() -> argparse.Namespace:
         help="Set to use the original RKK metric for complexity, false otherwise."
     )
     parser.add_argument(
+        "--generate_graph_language_labels",
+        "-l",
+        action="store_true",
+        help="Set to show per-language labels on the complexity graphs. Can get ugly if multiple languages intersect"
+    )
+    parser.add_argument(
         "--generate_lang_color_info",
         "-c",
         action="store_true",

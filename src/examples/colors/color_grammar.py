@@ -1,5 +1,31 @@
 import numpy as np
-from ultk.language.language import Language, Expression
+from ultk.language.language import Language, Expression, Meaning
+
+class HashableMeaning(Meaning):
+    """Meaning class that can be hashed for use in dictionaries, sets and comparisons."""
+
+    def __getstate__(self):
+        # start with a copy so we don't accidentally modify the object state
+        # or cause other conflicts
+        state = self.__dict__.copy()
+        # Print unpicklable entries
+        if('f' in state):
+            print(f"Unpickled: {state['f']}")
+            # remove unpicklable entries
+            del state['f']
+    def __setstate__(self, state):
+        """Used for deserializing instances"""
+        # restore instance attributes
+        self.__dict__.update(state)
+    def __hash__(self):
+        if(not hasattr(self, '_dist') or self._dist is None):
+            return hash(tuple(self.referents))
+        return hash(tuple(self._dist.values()))
+    def __str__(self):
+        return f"Referents:\n\t{','.join(str(referent.name) for referent in self.referents)}\
+            \nDistribution:\n\t{self.dist}\n"
+
+
 
 class ColorLanguage(Language):
     """Language representing a set of color probabilities. 
@@ -27,6 +53,9 @@ class ColorLanguage(Language):
             # print(f"Unpickled: {state['f']}")
             # remove unpicklable entries
             del state['f']
+
+    def __str__(self):
+        return f"Language: {self.expressions}"
 
        
     

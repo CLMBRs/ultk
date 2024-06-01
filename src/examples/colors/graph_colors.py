@@ -85,7 +85,7 @@ def graph_language_color_distribution(language:ColorLanguage, current_dir:str):
 
 
 
-def graph_complexity(combined_data:DataFrame, ib_boundary_points:None, current_dir:str):
+def graph_complexity(combined_data:DataFrame, ib_boundary_points:None, current_dir:str, show_labels:bool=False):
     """Given a DataFrame of complexities, graph the complexities.
 
     Args:
@@ -96,13 +96,14 @@ def graph_complexity(combined_data:DataFrame, ib_boundary_points:None, current_d
     plot = (
         pn.ggplot(pn.aes(x="complexity", y="comm_cost"))
         + pn.geom_point(combined_data, pn.aes(color="type"))
-        + pn.geom_text(
+    )
+    if show_labels:
+        plot += pn.geom_text(
             combined_data[combined_data["type"] == "natural"],
             pn.aes(label="name"),
             ha="left",
             size=5,
             )
-    )
 
     if ib_boundary_points is not None:
         plot+=pn.geom_line(ib_boundary_points, pn.aes(color="type"), linetype="dashed")
@@ -114,16 +115,15 @@ def graph_complexity(combined_data:DataFrame, ib_boundary_points:None, current_d
         + pn.geom_point(combined_data, pn.aes(color="type"))
 
         )
-    """
-        + pn.geom_line(ib_boundary_points, pn.aes(color="type"), linetype="dashed")
-
-        + pn.geom_text(
+    if ib_boundary_points is not None:
+        plot += pn.geom_line(ib_boundary_points, pn.aes(color="type"), linetype="dashed")
+    if show_labels:
+        plot += pn.geom_text(
             combined_data[combined_data["type"] == "natural"],
             pn.aes(label="name"),
             ha="left",
             size=5,
             nudge_x=0.1,)
-        """
 
     plot.save(f"{current_dir}/outputs/complexity-informativity.png", width=8, height=6, dpi=300)
 

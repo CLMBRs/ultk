@@ -5,10 +5,10 @@
 from pandas import DataFrame
 import os
 from generate_wcs_languages import generate_color_languages
-from complexity import generate_color_complexity
+from complexity import generate_color_complexity, generate_ib_bound
 from graph_colors import graph_complexity, graph_expression,graph_language_color_distribution
 import pandas
-import utils
+import util
 
 GENERATE_IB_BOUND=False #True to generate the IB bound for the specified parameters
 USE_RKK = False #Whether to use the RKK metric for complexity
@@ -30,21 +30,29 @@ def main(args):
 
     #Generate ULTK language structures from the WCS data
     print("Generating color languages...")
-    languages, artificial_languages, meaning_dist = generate_color_languages(num_languages=args.number_of_languages, color_chip_threshold = args.color_chip_threshold)
+    languages, artificial_languages, meaning_dist, prior = generate_color_languages(num_languages=args.number_of_languages, color_chip_threshold = args.color_chip_threshold)
+    
     #Analyze the generated languages using the RKK+ algorithm
     print("Analyzing complexity/informativity of the color languages...")
-    generate_color_complexity(nat_langs=languages, art_langs=artificial_languages, meaning_dist=meaning_dist, use_rkk = args.use_rkk, generate_ib_bound = args.generate_ib_bound)
-    print("Graphing color data...")
+    generate_color_complexity(nat_langs=languages, art_langs=artificial_languages, meaning_dist=meaning_dist, prior=prior, use_rkk = args.use_rkk, generate_ib_bound = args.generate_ib_bound)
+    
+    ib_bound = None
+    if(args.generate_ib_bound):
+        print("Generating IB bound...")
+        ib_bound = generate_ib_bound(meaning=meaning_dist, prior=prior)
+
     #Generate the per-language graphs of color terms
+    print("Graphing color data...")
     if(GENERATE_LANG_COLOR_INFO):
         for nat_lang in languages:
             graph_language_color_distribution(nat_lang, current_dir)
         for art_lang in artificial_languages:
             graph_language_color_distribution(art_lang, current_dir)
+            
     complexity_dataframe:DataFrame = pandas.read_csv(f"{current_dir}/outputs/complexity_data.csv")
-    graph_complexity(complexity_dataframe, None, current_dir)
+    graph_complexity(complexity_dataframe,ib_bound, current_dir, show_labels = args.generate_graph_language_labels)
     print("Color analysis complete.")
 
 if __name__ == "__main__":
-    args = utils.get_args()
+    args = util.get_args()
     main(args)
