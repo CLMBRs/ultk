@@ -23,14 +23,18 @@ This README first explains the contents of this example directory, focusing on w
 
 `graph_colors.py`  contains functions for graphing the distribution of color terms across language expressions and languages themselves.
 
+`util.py` contains utility functions, including the argument parser for running this tool from shell. 
+
 ## Usage
 Run `python analyze_data.py` from the `colors` folder. This calls `generate_wcs_languages` to generate the language data, then `complexity.py` to generate the complexity, then  Several options are available as command-line settings.:
 
 
-##
-
 ## Remaining Tasks
 
 At the moment, the density of the probability function per major color term is not factored into the final graphs generated. 
+
+Additionally, the mutual information when probability is taken into account using an assigned probability to the weight matrix gives a large negative value, which should be impossible given the prior is entirely uniform. 
+
+At the moment 
 
 

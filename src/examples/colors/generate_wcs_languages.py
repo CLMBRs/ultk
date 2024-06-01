@@ -9,12 +9,11 @@ import matplotlib.pyplot as plt
 import dill
 import pandas as pd
 from ultk.language.semantics import Meaning, Universe, Referent
-from color_grammar import ColorLanguage
-from ultk.language.language import Expression
+from color_grammar import ColorLanguage, HashableMeaning
+from ultk.language.language import Expression, Language
 import ultk.language.sampling as sampling 
 import ultk.effcomm.rate_distortion as rd
 from collections import Counter
-
 
 import plotnine as pn
 
@@ -25,6 +24,15 @@ from zipfile import ZipFile
 
 
 def load_noga_model(filename=None, model_dir='./model/'):
+    """Loads the Zaslavasky model and associated emanings. 
+
+    Args:
+        filename (_type_, optional): _description_. Defaults to None.
+        model_dir (str, optional): _description_. Defaults to './model/'.
+
+    Returns:
+        tuple: container for the model data.
+    """
     DEFAULT_MODEL_URL = 'https://www.dropbox.com/s/70w953orv27kz1o/IB_color_naming_model.zip?dl=1'
     if not os.path.isdir(model_dir):
         os.makedirs(model_dir)
@@ -42,25 +50,13 @@ def load_noga_model(filename=None, model_dir='./model/'):
         print('loading model from file: %s' % filename)
         model_data = pickle.load(f)
         return model_data
+    
+def check_noga_model(language:Language):
+    model = load_noga_model()
+    print(model.keys())
+    model_info = rd.language_to_ib_point(language, model['pM'], model['pU_M'])
+    print(model_info)
 
-class HashableMeaning(Meaning):
-    """Used for serializing instances"""
-
-    def __getstate__(self):
-        # start with a copy so we don't accidentally modify the object state
-        # or cause other conflicts
-        state = self.__dict__.copy()
-        # Print unpicklable entries
-        if('f' in state):
-            print(f"Unpickled: {state['f']}")
-            # remove unpicklable entries
-            del state['f']
-    def __setstate__(self, state):
-        """Used for deserializing instances"""
-        # restore instance attributes
-        self.__dict__.update(state)
-    def __hash__(self):
-        return hash(tuple(self._dist.values()))
 
 def generate_color_languages(num_languages = -1, 
                              color_chip_threshold = 5):
@@ -112,7 +108,7 @@ def generate_color_languages(num_languages = -1,
             ]
             referents_by_color_code[row["V"] + row["H"]] = Referent(name=row["V"] + row["H"], properties={"V":row["V"], "H":row["H"], "L": float(row["L*"]), "a": float(row["a*"]), "b": float(row["b*"])})
 
-    print(f"Color codes:{referents_by_color_code.keys()}")
+    #print(f"Color codes:{referents_by_color_code.keys()}")
 
     # Generate referents for all color codes
     color_universe = Universe(referents=referents_by_color_code.values())
@@ -150,7 +146,6 @@ def generate_color_languages(num_languages = -1,
 
     #Generate the meaning space
     meaning_dists = np.zeros(shape=(len(color_universe.referents), len(color_universe.referents)))
-    print(meaning_dists)
     for c1_index, c1 in enumerate(color_universe.referents):
         for c2_index, c2 in enumerate(color_universe.referents):
             meaning_dists[c1_index][c2_index] = meaning_distance(np.array((c1.L, c1.a, c1.b)), np.array((c2.L, c2.a, c2.b)))
@@ -231,14 +226,17 @@ def generate_color_languages(num_languages = -1,
         expression_meanings = np.array([[0.0 for _ in range(len(color_universe.referents))] for _ in range(len(major_color_terms))])
 
         #Print the expression array dimensions
-        print(f"Expression array dimensions: {expression_meanings.shape}")
+        #print(f"Expression array dimensions: {expression_meanings.shape}")
 
         #For each major color chip in the language, add the Gaussian meaning row corresponding to that chip to the row for that color term.
         for color in language_colors:
             color_meaning_dist = meaning_dists[list(color_universe.referents).index(referents_by_color_code[color])]
             for major_term, major_term_count in language_colors_to_expressions[language_code][color].items():
                 if major_term in major_color_terms:
+                    #Option: Take the maximum
                     expression_meanings[major_color_terms.index(major_term)] = np.maximum(expression_meanings[major_color_terms.index(major_term)], color_meaning_dist)
+                    #Option: Add just one value, for the color represented
+                    # expression_meanings[major_color_terms.index(major_term)][list(color_universe.referents).index(referents_by_color_code[color])] = major_term_count
 
 
         #Normalize the expression matrix so that each the column of each color chip sums up to 1
@@ -251,8 +249,23 @@ def generate_color_languages(num_languages = -1,
         #     for row_index in range(expression_meanings.shape[0]):
         #         if row_index != max_index:
         #             expression_meanings[row_index, column_index] = 0
+        
+        most_probable_colors = {}
+        discrete_language_expressions = []
+        prob_language_expressions = []
 
-        language_expressions = []
+        #Find the colors for which the major term is the most probable
+        for color_ref_index, color_ref in enumerate(color_referent_tuple):
+            most_probable_major_term = major_color_terms[np.argmax(expression_meanings[:, color_ref_index])]
+            most_probable_colors.setdefault(most_probable_major_term, [])
+            most_probable_colors[most_probable_major_term].append(color_ref)
+
+        for major_term, major_term_colors in most_probable_colors.items():
+            major_term_meaning = HashableMeaning(referents=tuple(major_term_colors),
+                                        universe=color_universe)
+            major_term_expression = Expression(form=major_term, meaning=major_term_meaning)
+            expression_list.append(major_term_expression)
+            discrete_language_expressions.append(major_term_expression)
 
         for major_term_index, major_term in enumerate(major_color_terms):
             #Create a meaning from the expression row
@@ -268,8 +281,8 @@ def generate_color_languages(num_languages = -1,
             major_term_expression = Expression(form=major_term, meaning=major_term_meaning)
             # graph_expression(major_term_expression, f"expr_{language_name_from_code[language_code]}_{major_term}")
 
-            expression_list.append(major_term_expression)
-            language_expressions.append(major_term_expression)
+            # expression_list.append(major_term_expression)
+            prob_language_expressions.append(major_term_expression)
 
         #Fill in additional color chips
         # if(GENERATE_ADDITIONAL_COLOR_CHIPS):
@@ -286,18 +299,14 @@ def generate_color_languages(num_languages = -1,
         #     major_term = Expression(form=color_name, meaning=Meaning(tuple([referents_by_color_code[color] for color in color_names[color_name]]), universe=color_universe))
         #     expression_set.add(major_term)
         #     language_expressions.append(major_term)
-
-        languages.append(ColorLanguage(language_expressions, lang_code=language_code, name=language_name_from_code[language_code], natural=True))
+        
+        languages.append(ColorLanguage(discrete_language_expressions, lang_code=language_code, name=language_name_from_code[language_code]+" (D)", natural=True))
+        languages.append(ColorLanguage(prob_language_expressions, lang_code=language_code, name=language_name_from_code[language_code], natural=True))
 
     #result = meaning(munsell_to_cielab[meaning_space_indices[0]], munsell_to_cielab[meaning_space_indices[1]])
     if num_languages > 0:
         languages = languages[:num_languages]
-        print(f"Using {num_languages} language(s): {languages}")
-
-
-    #Generate the imshow heatmap for the meaning
-    plt.imshow(meaning_dists,  cmap="hot")
-    plt.savefig(f"{current_dir}/outputs/old_meaning_dists.jpg")
+        print(f"Using {num_languages} language(s) for analysis")
 
     #Temporarily use Zaslavsky data to verify information
     # if USE_NOGA_ARRAYS:
@@ -318,8 +327,24 @@ def generate_color_languages(num_languages = -1,
     # dill.detect.baditems(languages)
 
     #Write out the artificial and natural languages and expressions to file
+    with open(f"{current_dir}/outputs/natural-languages.txt", "w") as f:
+        for language in languages:
+            f.write(f"Name: {language.name} \nLang Code: {language.lang_code}\n")
+            for expression in language.expressions:
+                f.write(f"\tExpression: {expression.form} \n")
+                for referent in expression.meaning.referents:
+                    f.write(f"\t\tReferent: {referent.name} \n")
+                f.write(f"\tDist : {expression.meaning._dist} \n")
+
+
     # pickle.dump(languages, open(f"{current_dir}/outputs/natural-languages.pkl", "wb"))
     # pickle.dump(artificial_languages, open(f"{current_dir}/outputs/artificial-languages.pkl", "wb"))
     # pickle.dump(expression_list, open(f"{current_dir}/outputs/expressions.pkl", "wb"))
 
-    return languages, artificial_languages, meaning_dists
+    prior = color_universe.prior_numpy()
+    pickle.dump(meaning_dists, open(f"{current_dir}/outputs/meaning_dists.pkl", "wb"))
+    pickle.dump(prior, open(f"{current_dir}/outputs/prior.pkl", "wb"))
+
+    return languages, artificial_languages, meaning_dists, prior
+
+
