@@ -1,12 +1,16 @@
 import argparse
 
-GENERATE_IB_BOUND=False #True to generate the IB bound for the specified parameters
-USE_RKK = False #Whether to use the RKK metric for complexity
-USE_NOGA_ARRAYS = False #True to use the Zaslavsky data for the IB bound, false otherwise
-GENERATE_LANG_COLOR_INFO=True #True to generate color information for each language
-GENERATE_ADDITIONAL_COLOR_CHIPS = False #If true, will expand color terms based off color distance for both natural and artificial languages
-USE_ONE_LANGUAGE = False #If true, just uses the first language in the list of languages
-COLOR_CHIP_THRESHOLD = 5 #The minimum number of color chips a language must have to be included in the analysis
+GENERATE_IB_BOUND = False  # True to generate the IB bound for the specified parameters
+USE_RKK = False  # Whether to use the RKK metric for complexity
+USE_NOGA_ARRAYS = (
+    False  # True to use the Zaslavsky data for the IB bound, false otherwise
+)
+GENERATE_LANG_COLOR_INFO = True  # True to generate color information for each language
+GENERATE_ADDITIONAL_COLOR_CHIPS = False  # If true, will expand color terms based off color distance for both natural and artificial languages
+USE_ONE_LANGUAGE = (
+    False  # If true, just uses the first language in the list of languages
+)
+COLOR_CHIP_THRESHOLD = 5  # The minimum number of color chips a language must have to be included in the analysis
 
 
 def get_args() -> argparse.Namespace:
@@ -21,25 +25,25 @@ def get_args() -> argparse.Namespace:
         "--use_rkk",
         "-r",
         action="store_true",
-        help="Set to use the original RKK metric for complexity, false otherwise."
+        help="Set to use the original RKK metric for complexity, false otherwise.",
     )
     parser.add_argument(
         "--generate_graph_language_labels",
         "-l",
         action="store_true",
-        help="Set to show per-language labels on the complexity graphs. Can get ugly if multiple languages intersect"
+        help="Set to show per-language labels on the complexity graphs. Can get ugly if multiple languages intersect",
     )
     parser.add_argument(
         "--generate_lang_color_info",
         "-c",
         action="store_true",
-        help="Set to generate major color term information for each language."
+        help="Set to generate major color term information for each language.",
     )
     parser.add_argument(
         "--number_of_languages",
         type=int,
         default=-1,
-        help="Number of languages to analyze from the WCS data. If -1, all languages will be generated."
+        help="Number of languages to analyze from the WCS data. If -1, all languages will be generated.",
     )
     parser.add_argument(
         "--color_chip_threshold",
