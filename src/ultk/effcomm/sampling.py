@@ -25,7 +25,7 @@ def get_hypothetical_variants(
 
         speakers: a list of speakers of a language, whose weights can be directly permuted. Should be used instead of `languages` if possible, because it can be more finegrained (every language can be associated with multiple speakers).
 
-        total: the total number of hypothetical variants to obtain. Should be greater than the number of languages. 
+        total: the total number of hypothetical variants to obtain. Should be greater than the number of languages.
 
     Returns:
         hypothetical_variants: a list of type either Language or np.ndarray depending on whether `languages` or `speakers` was passed, representing hypothetical variants of the systems passed. If `speakers` was passed, a list of speakers is returned.
@@ -46,7 +46,9 @@ def get_hypothetical_variants(
     variants_per_system = int(total / num_systems)
 
     if variants_per_system == 0:
-        raise Exception("Number of languages exceeds the number of languages to be generated. ")
+        raise Exception(
+            "Number of languages exceeds the number of languages to be generated. "
+        )
 
     hypothetical_variants = []
     for i in range(num_systems):
