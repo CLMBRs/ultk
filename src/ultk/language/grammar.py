@@ -87,8 +87,9 @@ class Rule:
         # parameters = {'name': Parameter} ordereddict, so we want the values
         # each value is a Paramter, with .annotation being the actual annotation
         rhs: tuple[Any, ...] | None = tuple(arg.annotation for arg in args.values())
-        # if all type annotations are Referent, treat this as a terminal, no children = None RHS
-        if rhs and all(obj == Referent for obj in rhs):
+        # if one type annotation, a type of Referent, treat this as a terminal, no children = None RHS
+        # TODO: make this more general?
+        if rhs and len(rhs) == 1 and issubclass(rhs[0], Referent):
             rhs = None
         return cls(
             name=func.__name__,
