@@ -84,6 +84,11 @@ class Rule:
             weight = float(args["weight"].default)
             # delete because weight is a special term, not part of RHS like other params
             del args["weight"]
+        # allow custon names too
+        rule_name = func.__name__
+        if "name" in args:
+            rule_name = args["name"].default
+            del args["name"]
         # parameters = {'name': Parameter} ordereddict, so we want the values
         # each value is a Paramter, with .annotation being the actual annotation
         rhs: tuple[Any, ...] | None = tuple(arg.annotation for arg in args.values())
@@ -92,7 +97,7 @@ class Rule:
         if rhs and len(rhs) == 1 and issubclass(rhs[0], Referent):
             rhs = None
         return cls(
-            name=func.__name__,
+            name=rule_name,
             lhs=annotations.return_annotation,
             rhs=rhs,
             func=func,

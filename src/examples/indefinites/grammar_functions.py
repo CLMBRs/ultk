@@ -13,11 +13,12 @@ def _not(a: bool) -> bool:
     return not a
 
 
-def Kplus(point: Referent) -> bool:
+# these two rules illustrate the use of `name` kwarg to overwrite the default name
+def Kplus(point: Referent, name: str = "K+") -> bool:
     return point.name == "specific-known"
 
 
-def Kminus(point: Referent) -> bool:
+def Kminus(point: Referent, name: str = "K-") -> bool:
     return point.name != "specific-known"
 
 
