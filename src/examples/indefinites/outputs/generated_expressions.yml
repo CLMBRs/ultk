@@ -33,8 +33,8 @@
         name: specific-unknown
         probability: 0.08125
       : true
-  rule_name: Kminus
-  term_expression: Kminus
+  rule_name: K-
+  term_expression: K-
 - form: ''
   length: 1
   meaning: &id009 !!python/object:ultk.language.semantics.Meaning
@@ -46,8 +46,8 @@
       *id005: false
       *id006: true
       *id007: false
-  rule_name: Kplus
-  term_expression: Kplus
+  rule_name: K+
+  term_expression: K+
 - form: ''
   length: 1
   meaning: &id010 !!python/object:ultk.language.semantics.Meaning
@@ -156,13 +156,13 @@
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - form: ''
     length: 1
     meaning: *id009
-    rule_name: Kplus
-    term_expression: Kplus
+    rule_name: K+
+    term_expression: K+
   form: ''
   length: 3
   meaning: !!python/object:ultk.language.semantics.Meaning
@@ -175,13 +175,13 @@
       *id006: false
       *id007: false
   rule_name: _and
-  term_expression: _and(Kminus, Kplus)
+  term_expression: _and(K-, K+)
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - form: ''
     length: 1
     meaning: *id010
@@ -199,13 +199,13 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, Nminus)
+  term_expression: _and(K-, Nminus)
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - form: ''
     length: 1
     meaning: *id011
@@ -223,13 +223,13 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, SEminus)
+  term_expression: _and(K-, SEminus)
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - form: ''
     length: 1
     meaning: *id012
@@ -247,7 +247,7 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, Splus)
+  term_expression: _and(K-, Splus)
 - children: !!python/tuple
   - form: ''
     length: 1
@@ -386,13 +386,13 @@
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - form: ''
     length: 1
     meaning: *id009
-    rule_name: Kplus
-    term_expression: Kplus
+    rule_name: K+
+    term_expression: K+
   form: ''
   length: 3
   meaning: !!python/object:ultk.language.semantics.Meaning
@@ -405,13 +405,13 @@
       *id006: true
       *id007: true
   rule_name: _or
-  term_expression: _or(Kminus, Kplus)
+  term_expression: _or(K-, K+)
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id009
-    rule_name: Kplus
-    term_expression: Kplus
+    rule_name: K+
+    term_expression: K+
   - form: ''
     length: 1
     meaning: *id017
@@ -429,13 +429,13 @@
       *id006: true
       *id007: false
   rule_name: _or
-  term_expression: _or(Kplus, Nplus)
+  term_expression: _or(K+, Nplus)
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id009
-    rule_name: Kplus
-    term_expression: Kplus
+    rule_name: K+
+    term_expression: K+
   - form: ''
     length: 1
     meaning: *id016
@@ -453,13 +453,13 @@
       *id006: true
       *id007: false
   rule_name: _or
-  term_expression: _or(Kplus, Rminus)
+  term_expression: _or(K+, Rminus)
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id009
-    rule_name: Kplus
-    term_expression: Kplus
+    rule_name: K+
+    term_expression: K+
   - form: ''
     length: 1
     meaning: *id013
@@ -477,13 +477,13 @@
       *id006: true
       *id007: false
   rule_name: _or
-  term_expression: _or(Kplus, Rplus)
+  term_expression: _or(K+, Rplus)
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id009
-    rule_name: Kplus
-    term_expression: Kplus
+    rule_name: K+
+    term_expression: K+
   - form: ''
     length: 1
     meaning: *id014
@@ -501,13 +501,13 @@
       *id006: true
       *id007: false
   rule_name: _or
-  term_expression: _or(Kplus, SEplus)
+  term_expression: _or(K+, SEplus)
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id009
-    rule_name: Kplus
-    term_expression: Kplus
+    rule_name: K+
+    term_expression: K+
   - form: ''
     length: 1
     meaning: *id015
@@ -525,7 +525,7 @@
       *id006: true
       *id007: false
   rule_name: _or
-  term_expression: _or(Kplus, Sminus)
+  term_expression: _or(K+, Sminus)
 - children: !!python/tuple
   - form: ''
     length: 1
@@ -674,8 +674,8 @@
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -699,13 +699,13 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, _not(Rminus))
+  term_expression: _and(K-, _not(Rminus))
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -729,13 +729,13 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, _not(Rplus))
+  term_expression: _and(K-, _not(Rplus))
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -764,13 +764,13 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, _or(Nplus, SEminus))
+  term_expression: _and(K-, _or(Nplus, SEminus))
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -799,13 +799,13 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, _or(Nplus, Splus))
+  term_expression: _and(K-, _or(Nplus, Splus))
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -834,13 +834,13 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, _or(Rminus, Splus))
+  term_expression: _and(K-, _or(Rminus, Splus))
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -869,13 +869,13 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, _or(Rplus, Splus))
+  term_expression: _and(K-, _or(Rplus, Splus))
 - children: !!python/tuple
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -904,7 +904,7 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, _or(SEplus, Splus))
+  term_expression: _and(K-, _or(SEplus, Splus))
 - children: !!python/tuple
   - form: ''
     length: 1
@@ -945,8 +945,8 @@
     - form: ''
       length: 1
       meaning: *id009
-      rule_name: Kplus
-      term_expression: Kplus
+      rule_name: K+
+      term_expression: K+
     - form: ''
       length: 1
       meaning: *id013
@@ -956,7 +956,7 @@
     length: 3
     meaning: *id025
     rule_name: _or
-    term_expression: _or(Kplus, Rplus)
+    term_expression: _or(K+, Rplus)
   form: ''
   length: 5
   meaning: !!python/object:ultk.language.semantics.Meaning
@@ -969,7 +969,7 @@
       *id006: true
       *id007: false
   rule_name: _and
-  term_expression: _and(Nminus, _or(Kplus, Rplus))
+  term_expression: _and(Nminus, _or(K+, Rplus))
 - children: !!python/tuple
   - form: ''
     length: 1
@@ -980,8 +980,8 @@
     - form: ''
       length: 1
       meaning: *id009
-      rule_name: Kplus
-      term_expression: Kplus
+      rule_name: K+
+      term_expression: K+
     - form: ''
       length: 1
       meaning: *id014
@@ -991,7 +991,7 @@
     length: 3
     meaning: *id026
     rule_name: _or
-    term_expression: _or(Kplus, SEplus)
+    term_expression: _or(K+, SEplus)
   form: ''
   length: 5
   meaning: !!python/object:ultk.language.semantics.Meaning
@@ -1004,7 +1004,7 @@
       *id006: true
       *id007: false
   rule_name: _and
-  term_expression: _and(Nminus, _or(Kplus, SEplus))
+  term_expression: _and(Nminus, _or(K+, SEplus))
 - children: !!python/tuple
   - form: ''
     length: 1
@@ -1015,8 +1015,8 @@
     - form: ''
       length: 1
       meaning: *id009
-      rule_name: Kplus
-      term_expression: Kplus
+      rule_name: K+
+      term_expression: K+
     - form: ''
       length: 1
       meaning: *id015
@@ -1026,7 +1026,7 @@
     length: 3
     meaning: *id027
     rule_name: _or
-    term_expression: _or(Kplus, Sminus)
+    term_expression: _or(K+, Sminus)
   form: ''
   length: 5
   meaning: !!python/object:ultk.language.semantics.Meaning
@@ -1039,7 +1039,7 @@
       *id006: true
       *id007: false
   rule_name: _and
-  term_expression: _and(Nminus, _or(Kplus, Sminus))
+  term_expression: _and(Nminus, _or(K+, Sminus))
 - children: !!python/tuple
   - form: ''
     length: 1
@@ -1120,8 +1120,8 @@
     - form: ''
       length: 1
       meaning: *id009
-      rule_name: Kplus
-      term_expression: Kplus
+      rule_name: K+
+      term_expression: K+
     - form: ''
       length: 1
       meaning: *id015
@@ -1131,7 +1131,7 @@
     length: 3
     meaning: *id027
     rule_name: _or
-    term_expression: _or(Kplus, Sminus)
+    term_expression: _or(K+, Sminus)
   form: ''
   length: 5
   meaning: !!python/object:ultk.language.semantics.Meaning
@@ -1144,7 +1144,7 @@
       *id006: true
       *id007: false
   rule_name: _and
-  term_expression: _and(SEminus, _or(Kplus, Sminus))
+  term_expression: _and(SEminus, _or(K+, Sminus))
 - children: !!python/tuple
   - form: ''
     length: 1
@@ -1245,8 +1245,8 @@
     - form: ''
       length: 1
       meaning: *id008
-      rule_name: Kminus
-      term_expression: Kminus
+      rule_name: K-
+      term_expression: K-
     - form: ''
       length: 1
       meaning: *id010
@@ -1256,7 +1256,7 @@
     length: 3
     meaning: *id028
     rule_name: _and
-    term_expression: _and(Kminus, Nminus)
+    term_expression: _and(K-, Nminus)
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -1280,14 +1280,14 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(_and(Kminus, Nminus), _not(Rminus))
+  term_expression: _and(_and(K-, Nminus), _not(Rminus))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
       length: 1
       meaning: *id008
-      rule_name: Kminus
-      term_expression: Kminus
+      rule_name: K-
+      term_expression: K-
     - form: ''
       length: 1
       meaning: *id010
@@ -1297,7 +1297,7 @@
     length: 3
     meaning: *id028
     rule_name: _and
-    term_expression: _and(Kminus, Nminus)
+    term_expression: _and(K-, Nminus)
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -1326,14 +1326,14 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(_and(Kminus, Nminus), _or(Rplus, Splus))
+  term_expression: _and(_and(K-, Nminus), _or(Rplus, Splus))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
       length: 1
       meaning: *id008
-      rule_name: Kminus
-      term_expression: Kminus
+      rule_name: K-
+      term_expression: K-
     - form: ''
       length: 1
       meaning: *id010
@@ -1343,7 +1343,7 @@
     length: 3
     meaning: *id028
     rule_name: _and
-    term_expression: _and(Kminus, Nminus)
+    term_expression: _and(K-, Nminus)
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -1372,7 +1372,7 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(_and(Kminus, Nminus), _or(SEplus, Splus))
+  term_expression: _and(_and(K-, Nminus), _or(SEplus, Splus))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
@@ -1430,8 +1430,8 @@
     - form: ''
       length: 1
       meaning: *id009
-      rule_name: Kplus
-      term_expression: Kplus
+      rule_name: K+
+      term_expression: K+
     - form: ''
       length: 1
       meaning: *id015
@@ -1441,7 +1441,7 @@
     length: 3
     meaning: *id027
     rule_name: _or
-    term_expression: _or(Kplus, Sminus)
+    term_expression: _or(K+, Sminus)
   form: ''
   length: 6
   meaning: &id034 !!python/object:ultk.language.semantics.Meaning
@@ -1454,7 +1454,7 @@
       *id006: true
       *id007: false
   rule_name: _and
-  term_expression: _and(_not(Rminus), _or(Kplus, Sminus))
+  term_expression: _and(_not(Rminus), _or(K+, Sminus))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
@@ -1471,8 +1471,8 @@
     - form: ''
       length: 1
       meaning: *id009
-      rule_name: Kplus
-      term_expression: Kplus
+      rule_name: K+
+      term_expression: K+
     - form: ''
       length: 1
       meaning: *id015
@@ -1482,7 +1482,7 @@
     length: 3
     meaning: *id027
     rule_name: _or
-    term_expression: _or(Kplus, Sminus)
+    term_expression: _or(K+, Sminus)
   form: ''
   length: 6
   meaning: !!python/object:ultk.language.semantics.Meaning
@@ -1495,14 +1495,14 @@
       *id006: true
       *id007: false
   rule_name: _and
-  term_expression: _and(_not(Rplus), _or(Kplus, Sminus))
+  term_expression: _and(_not(Rplus), _or(K+, Sminus))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
       length: 1
       meaning: *id009
-      rule_name: Kplus
-      term_expression: Kplus
+      rule_name: K+
+      term_expression: K+
     - form: ''
       length: 1
       meaning: *id015
@@ -1512,7 +1512,7 @@
     length: 3
     meaning: *id027
     rule_name: _or
-    term_expression: _or(Kplus, Sminus)
+    term_expression: _or(K+, Sminus)
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -1541,7 +1541,7 @@
       *id006: true
       *id007: false
   rule_name: _and
-  term_expression: _and(_or(Kplus, Sminus), _or(Nplus, SEminus))
+  term_expression: _and(_or(K+, Sminus), _or(Nplus, SEminus))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
@@ -1576,8 +1576,8 @@
   - form: ''
     length: 1
     meaning: *id009
-    rule_name: Kplus
-    term_expression: Kplus
+    rule_name: K+
+    term_expression: K+
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -1606,7 +1606,7 @@
       *id006: true
       *id007: false
   rule_name: _or
-  term_expression: _or(Kplus, _or(Nplus, Rminus))
+  term_expression: _or(K+, _or(Nplus, Rminus))
 - children: !!python/tuple
   - form: ''
     length: 1
@@ -1646,8 +1646,8 @@
   - form: ''
     length: 1
     meaning: *id008
-    rule_name: Kminus
-    term_expression: Kminus
+    rule_name: K-
+    term_expression: K-
   - children: !!python/tuple
     - children: !!python/tuple
       - form: ''
@@ -1682,14 +1682,14 @@
       *id006: false
       *id007: true
   rule_name: _and
-  term_expression: _and(Kminus, _not(_and(Nminus, Rplus)))
+  term_expression: _and(K-, _not(_and(Nminus, Rplus)))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
       length: 1
       meaning: *id008
-      rule_name: Kminus
-      term_expression: Kminus
+      rule_name: K-
+      term_expression: K-
     - form: ''
       length: 1
       meaning: *id012
@@ -1699,7 +1699,7 @@
     length: 3
     meaning: *id033
     rule_name: _and
-    term_expression: _and(Kminus, Splus)
+    term_expression: _and(K-, Splus)
   - children: !!python/tuple
     - form: ''
       length: 1
@@ -1728,7 +1728,7 @@
       *id006: false
       *id007: true
   rule_name: _or
-  term_expression: _or(_and(Kminus, Splus), _or(Nplus, Rminus))
+  term_expression: _or(_and(K-, Splus), _or(Nplus, Rminus))
 - children: !!python/tuple
   - form: ''
     length: 1
@@ -1792,8 +1792,8 @@
       - form: ''
         length: 1
         meaning: *id009
-        rule_name: Kplus
-        term_expression: Kplus
+        rule_name: K+
+        term_expression: K+
       - form: ''
         length: 1
         meaning: *id015
@@ -1803,12 +1803,12 @@
       length: 3
       meaning: *id027
       rule_name: _or
-      term_expression: _or(Kplus, Sminus)
+      term_expression: _or(K+, Sminus)
     form: ''
     length: 6
     meaning: *id034
     rule_name: _and
-    term_expression: _and(_not(Rminus), _or(Kplus, Sminus))
+    term_expression: _and(_not(Rminus), _or(K+, Sminus))
   form: ''
   length: 8
   meaning: !!python/object:ultk.language.semantics.Meaning
@@ -1821,14 +1821,14 @@
       *id006: true
       *id007: false
   rule_name: _and
-  term_expression: _and(Nminus, _and(_not(Rminus), _or(Kplus, Sminus)))
+  term_expression: _and(Nminus, _and(_not(Rminus), _or(K+, Sminus)))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
       length: 1
       meaning: *id009
-      rule_name: Kplus
-      term_expression: Kplus
+      rule_name: K+
+      term_expression: K+
     - form: ''
       length: 1
       meaning: *id015
@@ -1838,7 +1838,7 @@
     length: 3
     meaning: *id027
     rule_name: _or
-    term_expression: _or(Kplus, Sminus)
+    term_expression: _or(K+, Sminus)
   - children: !!python/tuple
     - children: !!python/tuple
       - form: ''
@@ -1873,4 +1873,4 @@
       *id006: true
       *id007: false
   rule_name: _and
-  term_expression: _and(_or(Kplus, Sminus), _not(_and(Nminus, Rplus)))
+  term_expression: _and(_or(K+, Sminus), _not(_and(Nminus, Rplus)))
