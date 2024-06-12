@@ -548,8 +548,7 @@ class Grammar:
         for name, value in inspect.getmembers(module):
             # functions become rules
             if inspect.isfunction(value):
-                rule = Rule.from_callable(value)
-                grammar.add_rule(rule)
+                grammar.add_rule(Rule.from_callable(value))
         # set start symbol if module specifies it
         if hasattr(module, "start") and module.start in grammar._rules:
             grammar._start = module.start
