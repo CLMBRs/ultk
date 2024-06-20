@@ -70,6 +70,10 @@ class Rule:
         ```
         Rule(name="_and", lhs=bool, rhs=(bool, bool), func=_and)
         ```
+
+        There are two special kwargs that can be used in the function definition:
+        - `weight`: a float, which will be used as the weight of the rule
+        - `name`: a string, which will be used as the name of the rule, if you want it to be different than the name of the method
         """
         annotations = inspect.signature(func)
         if annotations.return_annotation is inspect.Signature.empty:
