@@ -158,6 +158,10 @@ class Meaning(Generic[T]):
         else:
             num_true_like = len(value for value in self.mapping.values() if value)
             return FrozenDict({referent: (1 / num_true_like if self.mapping[referent] else 0) for referent in self.mapping})
+        
+    def is_uniformly_false(self) -> bool:
+        """Return True if all referents in the meaning are mapped to False (or coercible to False).In the case where the meaning type is boolean, this corresponds to the characteristic function of the empty set."""
+        return all(not value for value in self.mapping.values())
 
     def __getitem__(self, key: Referent) -> T:
         return self.mapping[key]

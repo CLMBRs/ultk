@@ -445,7 +445,7 @@ class Grammar:
         compare_func: Callable[[GrammaticalExpression, GrammaticalExpression], bool],
         lhs: Any = None,
         max_size: float = float("inf"),
-    ) -> dict[GrammaticalExpression, Any]:
+    ) -> dict[Any, GrammaticalExpression]:
         """Get all unique GrammaticalExpressions, up to a certain depth, with a user-specified criterion
         of uniqueness, and a specified comparison function for determining which Expression to save when there's a clash.
         This can be used, for instance, to measure the minimum description length of some
