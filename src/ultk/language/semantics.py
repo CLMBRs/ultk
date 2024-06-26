@@ -73,7 +73,7 @@ class Universe:
     """The universe is the collection of possible referent objects for a meaning."""
 
     referents: Set[Referent]
-    prior: Mapping[Referent, float]
+    prior: FrozenDict[Referent, float]
 
     @cached_property
     def _referents_by_name(self):
@@ -117,10 +117,10 @@ class Universe:
         records = df.to_dict("records")
         referents = frozenset(Referent(record["name"], record) for record in records)
         default_prob = 1 / len(referents)
-        prior = {
+        prior = FrozenDict({
             referent: getattr(referent, "probability", default_prob)
             for referent in referents
-        }
+        })
         return cls(referents, prior)
 
     @classmethod
@@ -135,8 +135,9 @@ class Universe:
 @dataclass(frozen=True)
 class Meaning(Generic[T]):
     mapping: FrozenDict[Referent, T]
-    # TODO: I think `universe` is no longer needed with the new `mapping` idea, so maybe delete this
-    # universe: Universe
+    # With the mapping, `universe` is not conceptually needed, but it is very useful to have it lying around.
+    # `universe` should be the keys to `mapping`. 
+    universe: Universe
     _dist: FrozenDict[Referent, float] = FrozenDict({})
     # TODO: update docstring
     """A meaning picks out a set of objects from the universe.
