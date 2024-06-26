@@ -81,7 +81,7 @@ def informativity(
         )
 
     inf = communicative_success(speaker, listener, prior, utility)
-    # print(inf)
+    print(inf)
 
     # Check informativity > 0
     utility_matrix = build_utility_matrix(speaker.language.universe, utility)

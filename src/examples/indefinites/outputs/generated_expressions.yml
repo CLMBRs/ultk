@@ -52,7 +52,7 @@
   term_expression: K-
 - form: ''
   length: 1
-  meaning: &id010 !!python/object:ultk.language.semantics.Meaning
+  meaning: &id017 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
       *id004: false
@@ -66,7 +66,7 @@
   term_expression: K+
 - form: ''
   length: 1
-  meaning: &id011 !!python/object:ultk.language.semantics.Meaning
+  meaning: &id010 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
       *id004: true
@@ -94,7 +94,7 @@
   term_expression: Nplus
 - form: ''
   length: 1
-  meaning: &id017 !!python/object:ultk.language.semantics.Meaning
+  meaning: &id016 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
       *id004: true
@@ -108,7 +108,7 @@
   term_expression: Rminus
 - form: ''
   length: 1
-  meaning: &id014 !!python/object:ultk.language.semantics.Meaning
+  meaning: &id013 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
       *id004: false
@@ -122,7 +122,7 @@
   term_expression: Rplus
 - form: ''
   length: 1
-  meaning: &id012 !!python/object:ultk.language.semantics.Meaning
+  meaning: &id011 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
       *id004: false
@@ -136,7 +136,7 @@
   term_expression: SEminus
 - form: ''
   length: 1
-  meaning: &id015 !!python/object:ultk.language.semantics.Meaning
+  meaning: &id014 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
       *id004: true
@@ -150,7 +150,7 @@
   term_expression: SEplus
 - form: ''
   length: 1
-  meaning: &id016 !!python/object:ultk.language.semantics.Meaning
+  meaning: &id015 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
       *id004: true
@@ -164,7 +164,7 @@
   term_expression: Sminus
 - form: ''
   length: 1
-  meaning: &id013 !!python/object:ultk.language.semantics.Meaning
+  meaning: &id012 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
       *id004: false
@@ -185,31 +185,6 @@
   - form: ''
     length: 1
     meaning: *id010
-    rule_name: K+
-    term_expression: K+
-  form: ''
-  length: 3
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: false
-      *id006: false
-      *id001: false
-      *id002: false
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(K-, K+)
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id009
-    rule_name: K-
-    term_expression: K-
-  - form: ''
-    length: 1
-    meaning: *id011
     rule_name: Nminus
     term_expression: Nminus
   form: ''
@@ -234,7 +209,7 @@
     term_expression: K-
   - form: ''
     length: 1
-    meaning: *id012
+    meaning: *id011
     rule_name: SEminus
     term_expression: SEminus
   form: ''
@@ -259,7 +234,7 @@
     term_expression: K-
   - form: ''
     length: 1
-    meaning: *id013
+    meaning: *id012
     rule_name: Splus
     term_expression: Splus
   form: ''
@@ -279,12 +254,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: Nminus
     term_expression: Nminus
   - form: ''
     length: 1
-    meaning: *id014
+    meaning: *id013
     rule_name: Rplus
     term_expression: Rplus
   form: ''
@@ -304,12 +279,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: Nminus
     term_expression: Nminus
   - form: ''
     length: 1
-    meaning: *id015
+    meaning: *id014
     rule_name: SEplus
     term_expression: SEplus
   form: ''
@@ -329,12 +304,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: Nminus
     term_expression: Nminus
   - form: ''
     length: 1
-    meaning: *id016
+    meaning: *id015
     rule_name: Sminus
     term_expression: Sminus
   form: ''
@@ -354,12 +329,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id012
+    meaning: *id011
     rule_name: SEminus
     term_expression: SEminus
   - form: ''
     length: 1
-    meaning: *id016
+    meaning: *id015
     rule_name: Sminus
     term_expression: Sminus
   form: ''
@@ -379,7 +354,7 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id017
+    meaning: *id016
     rule_name: Rminus
     term_expression: Rminus
   form: ''
@@ -399,7 +374,7 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id014
+    meaning: *id013
     rule_name: Rplus
     term_expression: Rplus
   form: ''
@@ -424,7 +399,7 @@
     term_expression: K-
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id017
     rule_name: K+
     term_expression: K+
   form: ''
@@ -444,7 +419,7 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id017
     rule_name: K+
     term_expression: K+
   - form: ''
@@ -469,12 +444,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id017
     rule_name: K+
     term_expression: K+
   - form: ''
     length: 1
-    meaning: *id017
+    meaning: *id016
     rule_name: Rminus
     term_expression: Rminus
   form: ''
@@ -494,12 +469,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id017
     rule_name: K+
     term_expression: K+
   - form: ''
     length: 1
-    meaning: *id014
+    meaning: *id013
     rule_name: Rplus
     term_expression: Rplus
   form: ''
@@ -519,12 +494,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id017
     rule_name: K+
     term_expression: K+
   - form: ''
     length: 1
-    meaning: *id015
+    meaning: *id014
     rule_name: SEplus
     term_expression: SEplus
   form: ''
@@ -544,12 +519,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id017
     rule_name: K+
     term_expression: K+
   - form: ''
     length: 1
-    meaning: *id016
+    meaning: *id015
     rule_name: Sminus
     term_expression: Sminus
   form: ''
@@ -574,7 +549,7 @@
     term_expression: Nplus
   - form: ''
     length: 1
-    meaning: *id017
+    meaning: *id016
     rule_name: Rminus
     term_expression: Rminus
   form: ''
@@ -599,7 +574,7 @@
     term_expression: Nplus
   - form: ''
     length: 1
-    meaning: *id012
+    meaning: *id011
     rule_name: SEminus
     term_expression: SEminus
   form: ''
@@ -624,7 +599,7 @@
     term_expression: Nplus
   - form: ''
     length: 1
-    meaning: *id013
+    meaning: *id012
     rule_name: Splus
     term_expression: Splus
   form: ''
@@ -644,12 +619,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id017
+    meaning: *id016
     rule_name: Rminus
     term_expression: Rminus
   - form: ''
     length: 1
-    meaning: *id013
+    meaning: *id012
     rule_name: Splus
     term_expression: Splus
   form: ''
@@ -669,12 +644,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id014
+    meaning: *id013
     rule_name: Rplus
     term_expression: Rplus
   - form: ''
     length: 1
-    meaning: *id013
+    meaning: *id012
     rule_name: Splus
     term_expression: Splus
   form: ''
@@ -694,12 +669,12 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id015
+    meaning: *id014
     rule_name: SEplus
     term_expression: SEplus
   - form: ''
     length: 1
-    meaning: *id013
+    meaning: *id012
     rule_name: Splus
     term_expression: Splus
   form: ''
@@ -725,7 +700,7 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     form: ''
@@ -756,7 +731,7 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id014
+      meaning: *id013
       rule_name: Rplus
       term_expression: Rplus
     form: ''
@@ -792,7 +767,7 @@
       term_expression: Nplus
     - form: ''
       length: 1
-      meaning: *id012
+      meaning: *id011
       rule_name: SEminus
       term_expression: SEminus
     form: ''
@@ -828,7 +803,7 @@
       term_expression: Nplus
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
@@ -859,12 +834,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
@@ -895,12 +870,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id014
+      meaning: *id013
       rule_name: Rplus
       term_expression: Rplus
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
@@ -931,12 +906,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id015
+      meaning: *id014
       rule_name: SEplus
       term_expression: SEplus
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
@@ -961,13 +936,13 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: Nminus
     term_expression: Nminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     form: ''
@@ -992,18 +967,18 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: Nminus
     term_expression: Nminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id010
+      meaning: *id017
       rule_name: K+
       term_expression: K+
     - form: ''
       length: 1
-      meaning: *id014
+      meaning: *id013
       rule_name: Rplus
       term_expression: Rplus
     form: ''
@@ -1028,18 +1003,18 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: Nminus
     term_expression: Nminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id010
+      meaning: *id017
       rule_name: K+
       term_expression: K+
     - form: ''
       length: 1
-      meaning: *id015
+      meaning: *id014
       rule_name: SEplus
       term_expression: SEplus
     form: ''
@@ -1064,18 +1039,18 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: Nminus
     term_expression: Nminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id010
+      meaning: *id017
       rule_name: K+
       term_expression: K+
     - form: ''
       length: 1
-      meaning: *id016
+      meaning: *id015
       rule_name: Sminus
       term_expression: Sminus
     form: ''
@@ -1100,18 +1075,18 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: Nminus
     term_expression: Nminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id014
+      meaning: *id013
       rule_name: Rplus
       term_expression: Rplus
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
@@ -1136,18 +1111,18 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: Nminus
     term_expression: Nminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id015
+      meaning: *id014
       rule_name: SEplus
       term_expression: SEplus
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
@@ -1172,18 +1147,18 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id012
+    meaning: *id011
     rule_name: SEminus
     term_expression: SEminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id010
+      meaning: *id017
       rule_name: K+
       term_expression: K+
     - form: ''
       length: 1
-      meaning: *id016
+      meaning: *id015
       rule_name: Sminus
       term_expression: Sminus
     form: ''
@@ -1208,13 +1183,13 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id016
+    meaning: *id015
     rule_name: Sminus
     term_expression: Sminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     form: ''
@@ -1239,13 +1214,13 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id016
+    meaning: *id015
     rule_name: Sminus
     term_expression: Sminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id014
+      meaning: *id013
       rule_name: Rplus
       term_expression: Rplus
     form: ''
@@ -1270,7 +1245,7 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id016
+    meaning: *id015
     rule_name: Sminus
     term_expression: Sminus
   - children: !!python/tuple
@@ -1281,7 +1256,7 @@
       term_expression: Nplus
     - form: ''
       length: 1
-      meaning: *id012
+      meaning: *id011
       rule_name: SEminus
       term_expression: SEminus
     form: ''
@@ -1312,7 +1287,7 @@
       term_expression: K-
     - form: ''
       length: 1
-      meaning: *id011
+      meaning: *id010
       rule_name: Nminus
       term_expression: Nminus
     form: ''
@@ -1323,7 +1298,7 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     form: ''
@@ -1354,7 +1329,7 @@
       term_expression: K-
     - form: ''
       length: 1
-      meaning: *id011
+      meaning: *id010
       rule_name: Nminus
       term_expression: Nminus
     form: ''
@@ -1365,12 +1340,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id014
+      meaning: *id013
       rule_name: Rplus
       term_expression: Rplus
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
@@ -1401,7 +1376,7 @@
       term_expression: K-
     - form: ''
       length: 1
-      meaning: *id011
+      meaning: *id010
       rule_name: Nminus
       term_expression: Nminus
     form: ''
@@ -1412,12 +1387,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id015
+      meaning: *id014
       rule_name: SEplus
       term_expression: SEplus
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
@@ -1443,12 +1418,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id011
+      meaning: *id010
       rule_name: Nminus
       term_expression: Nminus
     - form: ''
       length: 1
-      meaning: *id016
+      meaning: *id015
       rule_name: Sminus
       term_expression: Sminus
     form: ''
@@ -1459,7 +1434,7 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     form: ''
@@ -1485,7 +1460,7 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     form: ''
@@ -1496,12 +1471,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id010
+      meaning: *id017
       rule_name: K+
       term_expression: K+
     - form: ''
       length: 1
-      meaning: *id016
+      meaning: *id015
       rule_name: Sminus
       term_expression: Sminus
     form: ''
@@ -1527,7 +1502,7 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id014
+      meaning: *id013
       rule_name: Rplus
       term_expression: Rplus
     form: ''
@@ -1538,12 +1513,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id010
+      meaning: *id017
       rule_name: K+
       term_expression: K+
     - form: ''
       length: 1
-      meaning: *id016
+      meaning: *id015
       rule_name: Sminus
       term_expression: Sminus
     form: ''
@@ -1569,12 +1544,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id010
+      meaning: *id017
       rule_name: K+
       term_expression: K+
     - form: ''
       length: 1
-      meaning: *id016
+      meaning: *id015
       rule_name: Sminus
       term_expression: Sminus
     form: ''
@@ -1590,7 +1565,7 @@
       term_expression: Nplus
     - form: ''
       length: 1
-      meaning: *id012
+      meaning: *id011
       rule_name: SEminus
       term_expression: SEminus
     form: ''
@@ -1616,12 +1591,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id011
+      meaning: *id010
       rule_name: Nminus
       term_expression: Nminus
     - form: ''
       length: 1
-      meaning: *id014
+      meaning: *id013
       rule_name: Rplus
       term_expression: Rplus
     form: ''
@@ -1646,7 +1621,7 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id017
     rule_name: K+
     term_expression: K+
   - children: !!python/tuple
@@ -1657,7 +1632,7 @@
       term_expression: Nplus
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     form: ''
@@ -1688,12 +1663,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
@@ -1725,12 +1700,12 @@
     - children: !!python/tuple
       - form: ''
         length: 1
-        meaning: *id011
+        meaning: *id010
         rule_name: Nminus
         term_expression: Nminus
       - form: ''
         length: 1
-        meaning: *id014
+        meaning: *id013
         rule_name: Rplus
         term_expression: Rplus
       form: ''
@@ -1766,7 +1741,7 @@
       term_expression: K-
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
@@ -1782,7 +1757,7 @@
       term_expression: Nplus
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     form: ''
@@ -1807,19 +1782,19 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id016
+    meaning: *id015
     rule_name: Sminus
     term_expression: Sminus
   - children: !!python/tuple
     - children: !!python/tuple
       - form: ''
         length: 1
-        meaning: *id011
+        meaning: *id010
         rule_name: Nminus
         term_expression: Nminus
       - form: ''
         length: 1
-        meaning: *id014
+        meaning: *id013
         rule_name: Rplus
         term_expression: Rplus
       form: ''
@@ -1849,14 +1824,14 @@
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: Nminus
     term_expression: Nminus
   - children: !!python/tuple
     - children: !!python/tuple
       - form: ''
         length: 1
-        meaning: *id017
+        meaning: *id016
         rule_name: Rminus
         term_expression: Rminus
       form: ''
@@ -1867,12 +1842,12 @@
     - children: !!python/tuple
       - form: ''
         length: 1
-        meaning: *id010
+        meaning: *id017
         rule_name: K+
         term_expression: K+
       - form: ''
         length: 1
-        meaning: *id016
+        meaning: *id015
         rule_name: Sminus
         term_expression: Sminus
       form: ''
@@ -1903,12 +1878,12 @@
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id010
+      meaning: *id017
       rule_name: K+
       term_expression: K+
     - form: ''
       length: 1
-      meaning: *id016
+      meaning: *id015
       rule_name: Sminus
       term_expression: Sminus
     form: ''
@@ -1920,12 +1895,12 @@
     - children: !!python/tuple
       - form: ''
         length: 1
-        meaning: *id011
+        meaning: *id010
         rule_name: Nminus
         term_expression: Nminus
       - form: ''
         length: 1
-        meaning: *id014
+        meaning: *id013
         rule_name: Rplus
         term_expression: Rplus
       form: ''
