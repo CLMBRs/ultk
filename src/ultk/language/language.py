@@ -15,7 +15,7 @@ Example usage:
 import numpy as np
 from dataclasses import dataclass
 from typing import Callable, Generic, Iterable, TypeVar
-from ultk.language.semantics import Meaning, Referent
+from ultk.language.semantics import Meaning, Referent, Universe
 from ultk.util.frozendict import FrozenDict
 
 # TODO: require Python 3.12 and use type parameter syntax instead? https://docs.python.org/3/reference/compound_stmts.html#type-params
@@ -60,6 +60,13 @@ class Language:
         if not expressions:
             raise ValueError(f"Language cannot be empty.")
 
+        universe: Universe = expressions[0].meaning.universe
+        if not all(expr.meaning.universe == universe for expr in expressions):
+            raise ValueError(
+                "All expressions in a language must have the same universe."
+            )
+
+        self.universe = universe
         self.expressions = frozenset(expressions)
         self.__dict__.update(**kwargs)
 

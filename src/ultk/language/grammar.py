@@ -152,7 +152,8 @@ class GrammaticalExpression(Expression[T]):
             self.meaning = Meaning(
                 FrozenDict(
                     {referent: self(referent) for referent in universe.referents}
-                )
+                ),
+                universe
             )
         return self.meaning
 
