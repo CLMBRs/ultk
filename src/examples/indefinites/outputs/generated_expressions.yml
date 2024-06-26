@@ -3,12 +3,12 @@
   meaning: &id009 !!python/object:ultk.language.semantics.Meaning
     _dist: &id007 !frozendict {}
     mapping: !frozendict
-      ? &id001 !!python/object:ultk.language.semantics.Referent
+      ? &id004 !!python/object:ultk.language.semantics.Referent
         _frozen: true
         name: freechoice
         probability: 0.0979166666666667
       : true
-      ? &id002 !!python/object:ultk.language.semantics.Referent
+      ? &id005 !!python/object:ultk.language.semantics.Referent
         _frozen: true
         name: negative-indefinite
         probability: 0.15
@@ -18,36 +18,36 @@
         name: nonspecific
         probability: 0.2625
       : true
-      ? &id004 !!python/object:ultk.language.semantics.Referent
+      ? &id006 !!python/object:ultk.language.semantics.Referent
         _frozen: true
         name: npi
         probability: 0.327083333333333
       : true
-      ? &id005 !!python/object:ultk.language.semantics.Referent
+      ? &id001 !!python/object:ultk.language.semantics.Referent
         _frozen: true
         name: specific-known
         probability: 0.08125
       : false
-      ? &id006 !!python/object:ultk.language.semantics.Referent
+      ? &id002 !!python/object:ultk.language.semantics.Referent
         _frozen: true
         name: specific-unknown
         probability: 0.08125
       : true
     universe: &id008 !!python/object:ultk.language.semantics.Universe
-      prior: !frozendict
-        *id001: 0.0979166666666667
-        *id002: 0.15
-        *id003: 0.2625
-        *id004: 0.327083333333333
-        *id005: 0.08125
-        *id006: 0.08125
-      referents: !!python/object/apply:builtins.frozenset
-      - - *id003
-        - *id004
-        - *id005
-        - *id002
-        - *id001
-        - *id006
+      prior: !!python/tuple
+      - 0.08125
+      - 0.08125
+      - 0.2625
+      - 0.0979166666666667
+      - 0.15
+      - 0.327083333333333
+      referents: !!python/tuple
+      - *id001
+      - *id002
+      - *id003
+      - *id004
+      - *id005
+      - *id006
   rule_name: K-
   term_expression: K-
 - form: ''
@@ -55,12 +55,12 @@
   meaning: &id010 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
-      *id003: false
       *id004: false
-      *id005: true
+      *id005: false
+      *id003: false
       *id006: false
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: K+
   term_expression: K+
@@ -69,12 +69,12 @@
   meaning: &id011 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
-      *id003: true
       *id004: true
-      *id005: true
+      *id005: false
+      *id003: true
       *id006: true
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: Nminus
   term_expression: Nminus
@@ -83,12 +83,12 @@
   meaning: &id018 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
-      *id003: false
       *id004: false
-      *id005: false
+      *id005: true
+      *id003: false
       *id006: false
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: Nplus
   term_expression: Nplus
@@ -97,12 +97,12 @@
   meaning: &id017 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
-      *id003: false
-      *id004: false
+      *id004: true
       *id005: false
+      *id003: false
       *id006: false
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: Rminus
   term_expression: Rminus
@@ -111,12 +111,12 @@
   meaning: &id014 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
+      *id004: false
+      *id005: true
       *id003: false
-      *id004: true
-      *id005: false
-      *id006: false
+      *id006: true
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: Rplus
   term_expression: Rplus
@@ -125,12 +125,12 @@
   meaning: &id012 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
-      *id003: true
       *id004: false
-      *id005: true
-      *id006: true
+      *id005: false
+      *id003: true
+      *id006: false
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: SEminus
   term_expression: SEminus
@@ -139,12 +139,12 @@
   meaning: &id015 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
-      *id003: false
       *id004: true
-      *id005: false
-      *id006: false
+      *id005: true
+      *id003: false
+      *id006: true
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: SEplus
   term_expression: SEplus
@@ -153,12 +153,12 @@
   meaning: &id016 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
-      *id003: true
       *id004: true
-      *id005: false
-      *id006: false
+      *id005: true
+      *id003: true
+      *id006: true
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: Sminus
   term_expression: Sminus
@@ -167,12 +167,12 @@
   meaning: &id013 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
-      *id003: false
       *id004: false
-      *id005: true
-      *id006: true
+      *id005: false
+      *id003: false
+      *id006: false
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: Splus
   term_expression: Splus
@@ -192,12 +192,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
-      *id003: false
       *id004: false
       *id005: false
+      *id003: false
       *id006: false
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, K+)
@@ -217,12 +217,12 @@
   meaning: &id029 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
-      *id003: true
       *id004: true
       *id005: false
+      *id003: true
       *id006: true
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, Nminus)
@@ -242,12 +242,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
-      *id003: true
       *id004: false
       *id005: false
-      *id006: true
+      *id003: true
+      *id006: false
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, SEminus)
@@ -267,12 +267,12 @@
   meaning: &id034 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
-      *id003: false
       *id004: false
       *id005: false
-      *id006: true
+      *id003: false
+      *id006: false
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, Splus)
@@ -292,12 +292,12 @@
   meaning: &id031 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: false
+      *id005: false
+      *id003: false
+      *id006: true
       *id001: false
       *id002: false
-      *id003: false
-      *id004: true
-      *id005: false
-      *id006: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Nminus, Rplus)
@@ -317,12 +317,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
-      *id003: false
       *id004: true
       *id005: false
-      *id006: false
+      *id003: false
+      *id006: true
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Nminus, SEplus)
@@ -342,12 +342,12 @@
   meaning: &id030 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
-      *id003: true
       *id004: true
       *id005: false
-      *id006: false
+      *id003: true
+      *id006: true
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Nminus, Sminus)
@@ -367,12 +367,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
-      *id003: true
       *id004: false
       *id005: false
+      *id003: true
       *id006: false
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(SEminus, Sminus)
@@ -387,12 +387,12 @@
   meaning: &id019 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
-      *id003: true
-      *id004: true
+      *id004: false
       *id005: true
+      *id003: true
       *id006: true
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _not
   term_expression: _not(Rminus)
@@ -407,12 +407,12 @@
   meaning: &id020 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
+      *id004: true
+      *id005: false
       *id003: true
-      *id004: false
-      *id005: true
-      *id006: true
+      *id006: false
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _not
   term_expression: _not(Rplus)
@@ -432,12 +432,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
-      *id003: true
       *id004: true
       *id005: true
+      *id003: true
       *id006: true
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _or
   term_expression: _or(K-, K+)
@@ -457,12 +457,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
-      *id003: false
       *id004: false
       *id005: true
+      *id003: false
       *id006: false
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _or
   term_expression: _or(K+, Nplus)
@@ -482,12 +482,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: true
+      *id005: false
+      *id003: false
+      *id006: false
       *id001: true
       *id002: false
-      *id003: false
-      *id004: false
-      *id005: true
-      *id006: false
     universe: *id008
   rule_name: _or
   term_expression: _or(K+, Rminus)
@@ -507,12 +507,12 @@
   meaning: &id026 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
-      *id003: false
-      *id004: true
+      *id004: false
       *id005: true
-      *id006: false
+      *id003: false
+      *id006: true
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _or
   term_expression: _or(K+, Rplus)
@@ -532,12 +532,12 @@
   meaning: &id027 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
-      *id003: false
       *id004: true
       *id005: true
-      *id006: false
+      *id003: false
+      *id006: true
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _or
   term_expression: _or(K+, SEplus)
@@ -557,12 +557,12 @@
   meaning: &id028 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
-      *id003: true
       *id004: true
       *id005: true
-      *id006: false
+      *id003: true
+      *id006: true
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _or
   term_expression: _or(K+, Sminus)
@@ -582,12 +582,12 @@
   meaning: &id032 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
+      *id004: true
+      *id005: true
       *id003: false
-      *id004: false
-      *id005: false
       *id006: false
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: _or
   term_expression: _or(Nplus, Rminus)
@@ -607,12 +607,12 @@
   meaning: &id021 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
-      *id003: true
       *id004: false
       *id005: true
-      *id006: true
+      *id003: true
+      *id006: false
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _or
   term_expression: _or(Nplus, SEminus)
@@ -632,12 +632,12 @@
   meaning: &id022 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
-      *id003: false
       *id004: false
       *id005: true
-      *id006: true
+      *id003: false
+      *id006: false
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _or
   term_expression: _or(Nplus, Splus)
@@ -657,12 +657,12 @@
   meaning: &id023 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
+      *id004: true
+      *id005: false
       *id003: false
-      *id004: false
-      *id005: true
-      *id006: true
+      *id006: false
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _or
   term_expression: _or(Rminus, Splus)
@@ -682,12 +682,12 @@
   meaning: &id024 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
-      *id003: false
-      *id004: true
+      *id004: false
       *id005: true
+      *id003: false
       *id006: true
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _or
   term_expression: _or(Rplus, Splus)
@@ -707,12 +707,12 @@
   meaning: &id025 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
-      *id003: false
       *id004: true
       *id005: true
+      *id003: false
       *id006: true
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _or
   term_expression: _or(SEplus, Splus)
@@ -738,12 +738,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: false
+      *id005: true
+      *id003: true
+      *id006: true
       *id001: false
       *id002: true
-      *id003: true
-      *id004: true
-      *id005: false
-      *id006: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, _not(Rminus))
@@ -769,12 +769,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
-      *id003: true
-      *id004: false
+      *id004: true
       *id005: false
-      *id006: true
+      *id003: true
+      *id006: false
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, _not(Rplus))
@@ -805,12 +805,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: false
+      *id005: true
+      *id003: true
+      *id006: false
       *id001: false
       *id002: true
-      *id003: true
-      *id004: false
-      *id005: false
-      *id006: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, _or(Nplus, SEminus))
@@ -841,12 +841,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: false
+      *id005: true
+      *id003: false
+      *id006: false
       *id001: false
       *id002: true
-      *id003: false
-      *id004: false
-      *id005: false
-      *id006: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, _or(Nplus, Splus))
@@ -877,12 +877,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
-      *id003: false
-      *id004: false
+      *id004: true
       *id005: false
-      *id006: true
+      *id003: false
+      *id006: false
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, _or(Rminus, Splus))
@@ -913,12 +913,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: false
+      *id005: true
+      *id003: false
+      *id006: true
       *id001: false
       *id002: true
-      *id003: false
-      *id004: true
-      *id005: false
-      *id006: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, _or(Rplus, Splus))
@@ -949,12 +949,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
-      *id003: false
       *id004: true
-      *id005: false
+      *id005: true
+      *id003: false
       *id006: true
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, _or(SEplus, Splus))
@@ -980,12 +980,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
+      *id004: false
+      *id005: false
       *id003: true
-      *id004: true
-      *id005: true
       *id006: true
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(Nminus, _not(Rminus))
@@ -1016,12 +1016,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
+      *id004: false
+      *id005: false
       *id003: false
-      *id004: true
-      *id005: true
-      *id006: false
+      *id006: true
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Nminus, _or(K+, Rplus))
@@ -1052,12 +1052,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: true
+      *id005: false
+      *id003: false
+      *id006: true
       *id001: true
       *id002: false
-      *id003: false
-      *id004: true
-      *id005: true
-      *id006: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Nminus, _or(K+, SEplus))
@@ -1088,12 +1088,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: true
+      *id005: false
+      *id003: true
+      *id006: true
       *id001: true
       *id002: false
-      *id003: true
-      *id004: true
-      *id005: true
-      *id006: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Nminus, _or(K+, Sminus))
@@ -1124,12 +1124,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
+      *id004: false
+      *id005: false
       *id003: false
-      *id004: true
-      *id005: true
       *id006: true
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(Nminus, _or(Rplus, Splus))
@@ -1160,12 +1160,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
-      *id003: false
       *id004: true
-      *id005: true
+      *id005: false
+      *id003: false
       *id006: true
+      *id001: true
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(Nminus, _or(SEplus, Splus))
@@ -1196,12 +1196,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
-      *id003: true
       *id004: false
-      *id005: true
+      *id005: false
+      *id003: true
       *id006: false
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(SEminus, _or(K+, Sminus))
@@ -1227,12 +1227,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
+      *id004: false
+      *id005: true
       *id003: true
-      *id004: true
-      *id005: false
-      *id006: false
+      *id006: true
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Sminus, _not(Rminus))
@@ -1258,12 +1258,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
-      *id003: true
-      *id004: false
+      *id004: true
       *id005: false
+      *id003: true
       *id006: false
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Sminus, _not(Rplus))
@@ -1294,12 +1294,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
-      *id003: true
       *id004: false
-      *id005: false
+      *id005: true
+      *id003: true
       *id006: false
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Sminus, _or(Nplus, SEminus))
@@ -1336,12 +1336,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
-      *id003: true
-      *id004: true
+      *id004: false
       *id005: false
+      *id003: true
       *id006: true
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(_and(K-, Nminus), _not(Rminus))
@@ -1383,12 +1383,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
-      *id003: false
-      *id004: true
+      *id004: false
       *id005: false
+      *id003: false
       *id006: true
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(_and(K-, Nminus), _or(Rplus, Splus))
@@ -1430,12 +1430,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: false
-      *id003: false
       *id004: true
       *id005: false
+      *id003: false
       *id006: true
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(_and(K-, Nminus), _or(SEplus, Splus))
@@ -1472,12 +1472,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: false
+      *id005: false
+      *id003: true
+      *id006: true
       *id001: false
       *id002: false
-      *id003: true
-      *id004: true
-      *id005: false
-      *id006: false
     universe: *id008
   rule_name: _and
   term_expression: _and(_and(Nminus, Sminus), _not(Rminus))
@@ -1514,12 +1514,12 @@
   meaning: &id035 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
-      *id003: true
-      *id004: true
+      *id004: false
       *id005: true
-      *id006: false
+      *id003: true
+      *id006: true
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(_not(Rminus), _or(K+, Sminus))
@@ -1556,12 +1556,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: true
+      *id005: false
+      *id003: true
+      *id006: false
       *id001: true
       *id002: false
-      *id003: true
-      *id004: false
-      *id005: true
-      *id006: false
     universe: *id008
   rule_name: _and
   term_expression: _and(_not(Rplus), _or(K+, Sminus))
@@ -1603,12 +1603,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: true
-      *id003: true
       *id004: false
       *id005: true
+      *id003: true
       *id006: false
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(_or(K+, Sminus), _or(Nplus, SEminus))
@@ -1634,12 +1634,12 @@
   meaning: &id033 !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: true
+      *id005: true
+      *id003: true
+      *id006: false
       *id001: true
       *id002: true
-      *id003: true
-      *id004: false
-      *id005: true
-      *id006: true
     universe: *id008
   rule_name: _not
   term_expression: _not(_and(Nminus, Rplus))
@@ -1670,12 +1670,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
-      *id003: false
-      *id004: false
+      *id004: true
       *id005: true
+      *id003: false
       *id006: false
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _or
   term_expression: _or(K+, _or(Nplus, Rminus))
@@ -1706,12 +1706,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
+      *id004: true
+      *id005: true
+      *id003: false
+      *id006: false
       *id001: true
       *id002: true
-      *id003: false
-      *id004: false
-      *id005: true
-      *id006: true
     universe: *id008
   rule_name: _or
   term_expression: _or(Nplus, _or(Rminus, Splus))
@@ -1748,12 +1748,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
+      *id004: true
+      *id005: true
       *id003: true
-      *id004: false
-      *id005: false
-      *id006: true
+      *id006: false
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _and
   term_expression: _and(K-, _not(_and(Nminus, Rplus)))
@@ -1795,12 +1795,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
+      *id004: true
+      *id005: true
       *id003: false
-      *id004: false
-      *id005: false
-      *id006: true
+      *id006: false
+      *id001: false
+      *id002: true
     universe: *id008
   rule_name: _or
   term_expression: _or(_and(K-, Splus), _or(Nplus, Rminus))
@@ -1837,12 +1837,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
+      *id004: true
+      *id005: true
       *id003: true
-      *id004: false
-      *id005: false
       *id006: false
+      *id001: false
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Sminus, _not(_and(Nminus, Rplus)))
@@ -1890,12 +1890,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: false
-      *id002: false
+      *id004: false
+      *id005: false
       *id003: true
-      *id004: true
-      *id005: true
-      *id006: false
+      *id006: true
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(Nminus, _and(_not(Rminus), _or(K+, Sminus)))
@@ -1943,12 +1943,12 @@
   meaning: !!python/object:ultk.language.semantics.Meaning
     _dist: *id007
     mapping: !frozendict
-      *id001: true
-      *id002: true
-      *id003: true
-      *id004: false
+      *id004: true
       *id005: true
+      *id003: true
       *id006: false
+      *id001: true
+      *id002: false
     universe: *id008
   rule_name: _and
   term_expression: _and(_or(K+, Sminus), _not(_and(Nminus, Rplus)))

@@ -23,7 +23,8 @@ def complexity(
     )
 
 
-prior = indefinites_universe.prior_numpy()
+prior = indefinites_universe.prior_numpy
+print(prior)
 
 
 def comm_cost(language: Language) -> float:

@@ -72,8 +72,8 @@ class Referent:
 class Universe:
     """The universe is the collection of possible referent objects for a meaning."""
 
-    referents: Set[Referent]
-    prior: FrozenDict[Referent, float]
+    referents: tuple[Referent, ...]
+    prior: tuple[float, ...]
 
     @cached_property
     def _referents_by_name(self):
@@ -84,9 +84,6 @@ class Universe:
         return len(self.referents)
 
     @cached_property
-    def _prior(self):
-        return self.prior or tuple([1 / self.size] * self.size)
-
     def prior_numpy(self) -> np.ndarray:
         return np.array(self.prior)
 
@@ -115,12 +112,10 @@ class Universe:
             a DataFrame representing the meaning space of interest, assumed to have a column `name`
         """
         records = df.to_dict("records")
-        referents = frozenset(Referent(record["name"], record) for record in records)
+        referents = tuple(Referent(record["name"], record) for record in records)
         default_prob = 1 / len(referents)
-        prior = FrozenDict({
-            referent: getattr(referent, "probability", default_prob)
-            for referent in referents
-        })
+        # prior = FrozenDict({ referent: getattr(referent, "probability", default_prob) for referent in referents })
+        prior = tuple(getattr(referent, "probability", default_prob) for referent in referents)
         return cls(referents, prior)
 
     @classmethod
