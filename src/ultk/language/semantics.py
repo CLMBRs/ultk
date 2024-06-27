@@ -62,7 +62,7 @@ class Referent:
         return self.name == other.name and self.__dict__ == other.__dict__
 
     def __hash__(self) -> int:
-        return hash((self.name, tuple(self.__dict__)))
+        return hash((self.name, frozenset(self.__dict__.items())))
     
     def __repr__(self) -> str:
         return f"Referent({self.name}, {self.__dict__})"

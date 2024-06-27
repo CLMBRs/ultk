@@ -5,6 +5,7 @@ from yaml import dump, Dumper
 
 from ultk.language.language import Expression, Language
 from ultk.language.semantics import Meaning
+from ultk.util.frozendict import FrozenDict
 
 from .meaning import universe as indefinites_universe
 
@@ -35,7 +36,7 @@ def read_natural_languages(filename: str) -> set[Language]:
         for item in items.itertuples():
             # generate Meaning from list of flavors
             cur_meaning = Meaning(
-                tuple(indefinites_universe[flavor] for flavor in item.flavors),
+                FrozenDict({referent: referent.name in item.flavors for referent in indefinites_universe}),
                 indefinites_universe,
             )
             # add Expression with form and Meaning
