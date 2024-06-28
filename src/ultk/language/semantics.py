@@ -157,6 +157,8 @@ class Meaning(Generic[T]):
             return FrozenDict({referent: weight / total_weight for referent, weight in self._dist.items()})
         else:
             num_true_like = len(value for value in self.mapping.values() if value)
+            if num_true_like == 0:
+                raise ValueError("Meaning must have at least one true-like referent.")
             return FrozenDict({referent: (1 / num_true_like if self.mapping[referent] else 0) for referent in self.mapping})
         
     def is_uniformly_false(self) -> bool:
