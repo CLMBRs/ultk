@@ -13,33 +13,35 @@ Example usage:
 """
 
 import numpy as np
-from ultk.language.semantics import Universe
-from ultk.language.semantics import Meaning, Referent
 from dataclasses import dataclass
-from typing import Callable, Iterable
+from typing import Callable, Generic, Iterable, TypeVar
+from ultk.language.semantics import Meaning, Referent, Universe
+from ultk.util.frozendict import FrozenDict
+
+# TODO: require Python 3.12 and use type parameter syntax instead? https://docs.python.org/3/reference/compound_stmts.html#type-params
+T = TypeVar("T")
 
 
 @dataclass(eq=True, unsafe_hash=True)
-class Expression:
+class Expression(Generic[T]):
     """Minimally contains a form and a meaning."""
 
     # gneric/dummy form and meaning if not specified
     # useful for hashing in certain cases
     # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
     form: str = ""
-    meaning: Meaning = Meaning(tuple(), Universe(tuple()))
+    meaning: Meaning[T] = Meaning(FrozenDict(), FrozenDict())
 
     def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
-        return referent in self.meaning.referents
+        return bool(self.meaning[referent])
 
     def to_dict(self) -> dict:
         """Return a dictionary representation of the expression."""
-        return {"form": self.form, "meaning": self.meaning.__dict__}
+        return {"form": self.form, "meaning": self.meaning}
 
     def __str__(self) -> str:
         return self.form
-        # return f"Expression {self.form}\nMeaning:\n\t{self.meaning}"
 
     def __lt__(self, other: object) -> bool:
         return isinstance(other, Expression) and (self.form, other.meaning) < (
@@ -58,30 +60,30 @@ class Language:
         if not expressions:
             raise ValueError(f"Language cannot be empty.")
 
-        # Check that all expressions have the same universe
-        if len(set([e.meaning.universe for e in expressions])) != 1:
+        universe: Universe = expressions[0].meaning.universe
+        if not all(expr.meaning.universe == universe for expr in expressions):
             raise ValueError(
-                f"All expressions must have the same meaning universe. Received{len(set([e.meaning.universe for e in expressions]))} distinct universes."
+                "All expressions in a language must have the same universe."
             )
 
-        self.expressions = tuple(sorted(expressions))
-        self.universe = expressions[0].meaning.universe
-
+        self.universe = universe
+        self.expressions = frozenset(expressions)
         self.__dict__.update(**kwargs)
 
+    # TODO: revisit evolutionary algorithm; do we need Languages to be mutable?
     @property
-    def expressions(self) -> tuple[Expression, ...]:
+    def expressions(self) -> frozenset[Expression]:
         return self._expressions
 
     @expressions.setter
-    def expressions(self, val: tuple[Expression]) -> None:
+    def expressions(self, val: frozenset[Expression]) -> None:
         if not val:
             raise ValueError("list of Expressions must not be empty.")
         self._expressions = val
 
     def add_expression(self, e: Expression):
         """Add an expression to the list of expressions in a language."""
-        self.expressions = tuple(sorted(tuple(self.expressions) + (e,)))
+        self.expressions = frozenset(tuple(self.expressions) + (e,))
 
     def pop(self, index: int) -> Expression:
         """Removes an expression at the specified index of the list of expressions, and returns it."""
@@ -108,14 +110,6 @@ class Language:
                 for m in self.universe.referents
             ]
         )
-
-    @property
-    def universe(self) -> Universe:
-        return self._universe
-
-    @universe.setter
-    def universe(self, val) -> None:
-        self._universe = val
 
     def as_dict_with_properties(self, **kwargs) -> dict:
         """Return a dictionary representation of the language, including additional properties as keyword arguments.
@@ -149,6 +143,7 @@ class Language:
         )
 
 
+# TODO: move this to effcomm?
 def aggregate_expression_complexity(
     language: Language,
     expression_complexity_func: Callable[[Expression], float],
