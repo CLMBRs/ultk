@@ -1,35 +1,27 @@
-from yaml import dump
+from ultk.util.io import write_expressions
 
-try:
-    from yaml import CDumper as Dumper
-except ImportError:
-    from yaml import Dumper
-
+from ultk.language.semantics import Meaning
+from ultk.language.grammar import GrammaticalExpression
 from ..grammar import indefinites_grammar
 from ..meaning import universe as indefinites_universe
 
-import time
-
 if __name__ == "__main__":
-    expressions_by_meaning = indefinites_grammar.get_unique_expressions(
-        5,
-        max_size=2 ** len(indefinites_universe),
-        unique_key=lambda expr: expr.evaluate(indefinites_universe),
-        compare_func=lambda e1, e2: len(e1) < len(e2),
+    expressions_by_meaning: dict[Meaning, GrammaticalExpression] = (
+        indefinites_grammar.get_unique_expressions(
+            5,
+            max_size=2 ** len(indefinites_universe),
+            unique_key=lambda expr: expr.evaluate(indefinites_universe),
+            compare_func=lambda e1, e2: len(e1) < len(e2),
+        )
     )
 
     # filter out the trivial meaning, results in NaNs
     # iterate over keys, since we need to change the dict itself
     for meaning in list(expressions_by_meaning.keys()):
-        if len(meaning.referents) == 0:
+        if meaning.is_uniformly_false():
             del expressions_by_meaning[meaning]
 
-    with open("indefinites/outputs/generated_expressions.yml", "w") as outfile:
-        dump(
-            [
-                expressions_by_meaning[meaning].to_dict()
-                for meaning in expressions_by_meaning
-            ],
-            outfile,
-            Dumper=Dumper,
-        )
+    print(f"Generated {len(expressions_by_meaning)} unique expressions.")
+    write_expressions(
+        expressions_by_meaning.values(), "indefinites/outputs/generated_expressions.yml"
+    )
