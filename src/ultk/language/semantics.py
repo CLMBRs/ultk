@@ -75,9 +75,16 @@ class Universe:
     referents: tuple[Referent, ...]
     prior: tuple[float, ...]
 
-    @cached_property
-    def _referents_by_name(self):
-        return {referent.name: referent for referent in self.referents}
+    def __post_init__(self):
+        if self.prior is None:
+            if not self.size:
+                # for empty meanings in GrammaticalExpression init, 
+                # assume empty prior
+                # see https://github.com/CLMBRs/ultk/issues/34
+                object.__setattr__(self, "prior",  tuple())
+            else:
+                # Assume uniform prior
+                object.__setattr__(self, "prior",  tuple([1 / self.size] * self.size))
 
     @cached_property
     def size(self):
@@ -86,6 +93,10 @@ class Universe:
     @cached_property
     def prior_numpy(self) -> np.ndarray:
         return np.array(self.prior)
+    
+    @cached_property
+    def _referents_by_name(self):
+        return {referent.name: referent for referent in self.referents}
 
     def __getitem__(self, key: Union[str, int]) -> Referent:
         if type(key) is str:
