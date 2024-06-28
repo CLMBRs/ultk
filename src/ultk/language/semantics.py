@@ -129,11 +129,6 @@ class Universe:
 
 @dataclass(frozen=True)
 class Meaning(Generic[T]):
-    mapping: FrozenDict[Referent, T]
-    # With the mapping, `universe` is not conceptually needed, but it is very useful to have it lying around.
-    # `universe` should be the keys to `mapping`. 
-    universe: Universe
-    _dist: FrozenDict[Referent, float] = FrozenDict({})
     """A meaning maps Referents to any type of object.
 
     For instance, sentence meanings are often modeled as sets of points (e.g. possible worlds).
@@ -147,6 +142,11 @@ class Meaning(Generic[T]):
 
         _dist: a mapping representing a probability distribution over referents to associate with the meaning. By default, will be assumed to be uniform over the "true-like" `Referent`s in `mapping` (see `.dist`).
     """
+    mapping: FrozenDict[Referent, T]
+    # With the mapping, `universe` is not conceptually needed, but it is very useful to have it lying around.
+    # `universe` should be the keys to `mapping`. 
+    universe: Universe
+    _dist: FrozenDict[Referent, float] = FrozenDict({})
 
     @property
     def dist(self) -> FrozenDict[Referent, float]:
