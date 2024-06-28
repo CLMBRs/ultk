@@ -134,19 +134,18 @@ class Meaning(Generic[T]):
     # `universe` should be the keys to `mapping`. 
     universe: Universe
     _dist: FrozenDict[Referent, float] = FrozenDict({})
-    # TODO: update docstring
-    """A meaning picks out a set of objects from the universe.
+    """A meaning maps Referents to any type of object.
 
-    Following one tradition (from formal semantics), we might model an underspecified meaning as a subset of the universe.
-    Sometimes these different referents are not equally likely,
-    in which it can be helpful to define a meaning explicitly as a distribution over the universe.
+    For instance, sentence meanings are often modeled as sets of points (e.g. possible worlds).
+    These correspond to mappings from points (i.e. Referents) to truth values, corresponding to the characteristic function of a set.
+    But, in general, meanings can have a different output type for, e.g. sub-sentential meanings..
 
-    Args:
-        referents: a tuple of Referent objects, which must be a subset of the referents in `universe`.
+    Properties:
+        mapping: a `FrozenDict` with `Referent` keys, but arbitrary type `T` as values. 
 
-        universe: a Universe object that defines the probability space for a meaning.
+        universe: a Universe object.  The `Referent`s in the keys of `mapping` are expected to be exactly those in `universe`.
 
-        dist: a tuple representing the distribution over referents to associate with the meaning. By default is None, and the distribution will be uniform over the passed referents, and any remaining referents are assigned 0 probability.
+        _dist: a mapping representing a probability distribution over referents to associate with the meaning. By default, will be assumed to be uniform over the "true-like" `Referent`s in `mapping` (see `.dist`).
     """
 
     @property
