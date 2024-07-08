@@ -3,7 +3,7 @@
 import numpy as np
 
 from ultk.language.language import Language
-from typing import Callable, Any
+from typing import Any, Callable, Sequence
 from tqdm import tqdm
 
 from scipy import interpolate
@@ -17,7 +17,7 @@ from scipy.spatial.distance import cdist
 # TODO: convert non_dominated methods to operate on numpy arrays by default?
 
 
-def dominates(p1: list[float], p2: list[float]) -> bool:
+def dominates(p1: tuple[float, ...], p2: tuple[float, ...]) -> bool:
     """Determine whether p1 dominates p2,
     i.e. whether for every i p1[i] <= p2[i]
     and for some i p1[i] < p2[i].
@@ -35,7 +35,7 @@ def dominates(p1: list[float], p2: list[float]) -> bool:
     )
 
 
-def non_dominated_2d(points: list[tuple[float, float]]) -> list[int]:
+def non_dominated_2d(points: Sequence[tuple[float, float]]) -> list[int]:
     """Return the non-dominated (Pareto) front of a list of 2-D points, using Kung's algorithm.
 
     Args:
@@ -55,7 +55,7 @@ def non_dominated_2d(points: list[tuple[float, float]]) -> list[int]:
     indices = list(range(len(points)))
     indices.sort(key=lambda x: points[x])
 
-    front = []
+    front: list[int] = []
     for idx in indices:
         dominated = False
         for bot_idx in front:
@@ -76,10 +76,10 @@ def pareto_optimal_languages(
     """Use non_dominated_2d to compute the Pareto languages."""
     assert len(objectives) == 2, "Can only do pareto optimization in two dimensions."
     dominating_indices = non_dominated_2d(
-        list(
+        tuple(
             zip(
-                [objectives[0](lang) for lang in languages],
-                [objectives[1](lang) for lang in languages],
+                (objectives[0](lang) for lang in languages),
+                (objectives[1](lang) for lang in languages),
             )
         )
     )
