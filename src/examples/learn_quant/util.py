@@ -3,7 +3,7 @@ import pandas as pd
 
 from yaml import load, dump
 from typing import Iterable, Union
-import pickle
+import dill as pkl
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -20,10 +20,10 @@ from learn_quant.quantifier import QuantifierUniverse
 
 
 def read_expressions(
-    filename: str, universe: Universe = None, return_by_meaning=True
+    filename: str, universe: Universe = None, return_by_meaning=True, pickle=False
 ) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
     """
-    Read expressions from a YAML file.
+    Read expressions from a PKL or YAML file.
 
     Args:
         filename (str): The path to the YAML file containing the expressions.
@@ -33,11 +33,14 @@ def read_expressions(
     Returns:
         tuple[list[GrammaticalExpression], dict[Meaning, Expression]]: A tuple containing the parsed expressions and, if return_by_meaning is True, a dictionary of expressions by their meanings.
     """
-    quantifiers_grammar.add_indices_as_primitives(universe.x_size)
-    print(quantifiers_grammar)
+    if pickle:
+        expression_list = pkl.load(open(filename, "rb"))
+    else:
+        quantifiers_grammar.add_indices_as_primitives(universe.x_size)
+        print(quantifiers_grammar)
 
-    with open(filename, "r") as f:
-        expression_list = load(f, Loader=Loader)
+        with open(filename, "r") as f:
+            expression_list = load(f, Loader=Loader)
     parsed_exprs = [
         quantifiers_grammar.parse(expr_dict["grammatical_expression"])
         for expr_dict in expression_list
@@ -92,7 +95,7 @@ def read_expressions_from_folder(
     )  # replace 'universe.pkl' with your actual universe filename
 
     with open(universe_file, "rb") as f:
-        universe = pickle.load(f)
+        universe = pkl.load(f)
 
     quantifiers_grammar.add_indices_as_primitives(universe.x_size)
 
@@ -133,6 +136,15 @@ def save_quantifiers(
             outfile,
             Dumper=Dumper,
         )
+    
+    pickle_output_file = Path(out_path).parent / "generated_expressions.pkl"
+
+    # Open the file in write binary mode and dump the object
+    with open(pickle_output_file, "wb") as f:
+        pkl.dump(expressions_by_meaning, f)
+
+    print("Expressions have been YAML'ed to {} and PKL'ed to {}".format(out_path, pickle_output_file))
+    
 
 
 def save_inclusive_generation(
@@ -182,6 +194,6 @@ def save_inclusive_generation(
 
     # Open the file in write binary mode and dump the object
     with open(pickle_output_file, "wb") as f:
-        pickle.dump(master_universe, f)
+        pkl.dump(master_universe, f)
 
     print("Master universe has been pickled and saved to", pickle_output_file)

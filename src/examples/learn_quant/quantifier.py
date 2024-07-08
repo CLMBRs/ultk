@@ -58,6 +58,16 @@ class QuantifierModel(Referent):
             "A": len(self.A),
             "B": len(self.B),
         }
+    
+    def binarize(self) -> np.ndarray:
+        """
+        Binarizes the sequence of characters in the name attribute.
+
+        Returns:
+            np.ndarray: An array of binary values, where 1 represents characters '1' or '2', and 0 represents other characters.
+        """
+        return np.array([1 if char in {'1', '2'} else 0 for char in self.name])
+        
 
     def to_numpy(
         self, quantifier_index: np.ndarray | None = None, in_meaning: bool = False
@@ -145,3 +155,7 @@ class QuantifierUniverse(Universe):
             list: List of names of referents in the quantifier universe.
         """
         return [referent.name for referent in self.referents]
+    
+    def binarize_referents(self):
+        return np.array([referent.binarize() for referent in self.referents])
+
