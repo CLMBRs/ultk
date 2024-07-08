@@ -15,8 +15,8 @@ Example usage:
 import numpy as np
 from dataclasses import dataclass
 from typing import Callable, Generic, Iterable, TypeVar
-from ultk.language.semantics import Meaning, Referent
-from ultk.util import FrozenDict
+from ultk.language.semantics import Meaning, Referent, Universe
+from ultk.util.frozendict import FrozenDict
 
 # TODO: require Python 3.12 and use type parameter syntax instead? https://docs.python.org/3/reference/compound_stmts.html#type-params
 T = TypeVar("T")
@@ -34,11 +34,11 @@ class Expression(Generic[T]):
 
     def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
-        return referent in self.meaning.referents
+        return bool(self.meaning[referent])
 
     def to_dict(self) -> dict:
         """Return a dictionary representation of the expression."""
-        return {"form": self.form, "meaning": self.meaning.__dict__}
+        return {"form": self.form, "meaning": self.meaning}
 
     def __str__(self) -> str:
         return self.form
@@ -60,22 +60,30 @@ class Language:
         if not expressions:
             raise ValueError(f"Language cannot be empty.")
 
-        self.expressions = tuple(sorted(expressions))
+        universe: Universe = expressions[0].meaning.universe
+        if not all(expr.meaning.universe == universe for expr in expressions):
+            raise ValueError(
+                "All expressions in a language must have the same universe."
+            )
+
+        self.universe = universe
+        self.expressions = frozenset(expressions)
         self.__dict__.update(**kwargs)
 
+    # TODO: revisit evolutionary algorithm; do we need Languages to be mutable?
     @property
-    def expressions(self) -> tuple[Expression, ...]:
+    def expressions(self) -> frozenset[Expression]:
         return self._expressions
 
     @expressions.setter
-    def expressions(self, val: tuple[Expression, ...]) -> None:
+    def expressions(self, val: frozenset[Expression]) -> None:
         if not val:
             raise ValueError("list of Expressions must not be empty.")
         self._expressions = val
 
     def add_expression(self, e: Expression):
         """Add an expression to the list of expressions in a language."""
-        self.expressions = tuple(sorted(tuple(self.expressions) + (e,)))
+        self.expressions = frozenset(tuple(self.expressions) + (e,))
 
     def pop(self, index: int) -> Expression:
         """Removes an expression at the specified index of the list of expressions, and returns it."""

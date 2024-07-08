@@ -4,10 +4,8 @@ from abc import abstractmethod
 import copy
 import random
 import math
-from typing import Callable
+from typing import Any, Callable, Type
 from tqdm import tqdm
-from typing import Any
-from ultk.language.sampling import rename_id
 from ultk.effcomm.tradeoff import pareto_optimal_languages
 from ultk.language.language import Expression, Language
 
@@ -19,11 +17,13 @@ from ultk.language.language import Expression, Language
 
 
 class Mutation:
+    @staticmethod
     @abstractmethod
     def precondition(language: Language, **kwargs) -> bool:
         """Whether a mutation is allowed to apply to a language."""
         raise NotImplementedError
 
+    @staticmethod
     @abstractmethod
     def mutate(language: Language, expressions: list[Expression], **kwargs) -> Language:
         """Mutate the language, possibly using a list of expressions."""
@@ -69,8 +69,8 @@ class EvolutionaryOptimizer:
         sample_size: int,
         max_mutations: int,
         generations: int,
-        lang_size: int = None,
-        mutations: list[Mutation] = [AddExpression, RemoveExpression],
+        lang_size: int | None = None,
+        mutations: tuple[Type[Mutation], ...] = (AddExpression, RemoveExpression),
     ):
         """Initialize the evolutionary algorithm configurations.
 
@@ -104,7 +104,7 @@ class EvolutionaryOptimizer:
         self.max_mutations = max_mutations
         self.generations = generations
         # set max lang size to # expressions if none provided
-        self.lang_size = lang_size or len(expressions)
+        self.lang_size: int = lang_size or len(expressions)
 
         self.dominating_languages = None
         self.explored_languages = None
