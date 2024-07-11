@@ -4,6 +4,7 @@ import pandas as pd
 from ultk.language.semantics import Referent, Universe
 from dataclasses import dataclass, field
 from concepts.contexts import Context
+from functools import cached_property
 
 
 @dataclass(eq=True, frozen=True)
@@ -123,19 +124,17 @@ class QuantifierModel(Referent):
 
         return one_hot_array
 
-
+@dataclass(frozen=True)
 class QuantifierUniverse(Universe):
 
-    def __init__(
-        self,
-        referents: tuple[QuantifierModel],
-        m_size: int = None,
-        x_size: int = None,
-        prior: dict[str, float] = None,
-    ):
+    m_size: int
+    x_size: int
+
+    def __init__(self, referents, m_size, x_size):
+        prior = Universe._calculate_prior(referents)
         super().__init__(referents, prior)
-        self.m_size = m_size
-        self.x_size = x_size
+        object.__setattr__(self, 'm_size', m_size)
+        object.__setattr__(self, 'x_size', x_size)
 
     def __add__(self, other):
         """Returns the union of two QuantifierUniverses.
@@ -144,8 +143,8 @@ class QuantifierUniverse(Universe):
         x_size = max(self.x_size, other.x_size)
         return QuantifierUniverse(
             referents=self.referents + other.referents,
-            prior=self._prior + other._prior,
-            x_size=x_size,
+            m_size=self.m_size,
+            x_size=x_size
         )
 
     def get_names(self) -> list[str]:

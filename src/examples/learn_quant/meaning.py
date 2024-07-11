@@ -32,7 +32,8 @@ def create_universe(m_size: int, x_size: int) -> QuantifierUniverse:
     quantifier_models = set()
     for name in possible_quantifiers_name:
         quantifier_models.add(QuantifierModel(name=name))
-    return QuantifierUniverse(tuple(quantifier_models), m_size, x_size)
+
+    return QuantifierUniverse(referents=tuple(quantifier_models), m_size=m_size, x_size=x_size)
 
 
 if __name__ == "__main__":

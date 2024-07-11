@@ -17,6 +17,7 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 
 from ultk.language.grammar import GrammaticalExpression
+from ultk.language.semantics import Meaning
 from typing import Any
 
 from ..quantifier import QuantifierUniverse
@@ -31,28 +32,33 @@ def enumerate_quantifiers(
     quantifiers_grammar: QuantifierGrammar,
 ) -> dict[GrammaticalExpression, Any]:
 
-    expressions_by_meaning = quantifiers_grammar.get_unique_expressions(
+    expressions_by_meaning: dict[Meaning, GrammaticalExpression] = (
+        quantifiers_grammar.get_unique_expressions(
         depth,
         max_size=2 ** len(quantifiers_universe),
         unique_key=lambda expr: expr.evaluate(quantifiers_universe),
         compare_func=lambda e1, e2: len(e1) < len(e2),
+        )
     )
 
     # filter out the trivial meaning, results in NaNs
     # iterate over keys, since we need to change the dict itself
     for meaning in list(expressions_by_meaning.keys()):
-        if len(meaning.mapping) == 0:
+        if meaning.is_uniformly_false():
             del expressions_by_meaning[meaning]
 
     return expressions_by_meaning
 
 
-def generate_expressions(quantifiers_grammar: QuantifierGrammar, cfg: DictConfig):
+def generate_expressions(quantifiers_grammar: QuantifierGrammar, cfg: DictConfig, universe: QuantifierUniverse = None):
 
     quantifiers_grammar.add_indices_as_primitives(
         cfg.universe.m_size, cfg.universe.weight
     )
-    quantifiers_universe = create_universe(cfg.universe.m_size, cfg.universe.x_size)
+    if not universe:
+        quantifiers_universe = create_universe(cfg.universe.m_size, cfg.universe.x_size)
+    else:
+        quantifiers_universe = universe
     expressions_by_meaning = enumerate_quantifiers(
         cfg.grammar.depth, quantifiers_universe, quantifiers_grammar
     )
@@ -67,6 +73,8 @@ def generate_expressions(quantifiers_grammar: QuantifierGrammar, cfg: DictConfig
     )
     if cfg.save:
         save_quantifiers(expressions_by_meaning, outpath)
+    else:
+        return expressions_by_meaning
 
 
 def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfig):

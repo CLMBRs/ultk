@@ -163,7 +163,6 @@ class GrammaticalExpression(Expression[T]):
         else:
             self.children = self.children + (child,)
 
-    @cached_property
     def complement(self) -> Meaning:
         """Get the complement of the meaning of this expression, i.e. the set of all referents for which
         the expression evaluates to False."""
@@ -174,7 +173,7 @@ class GrammaticalExpression(Expression[T]):
     def draw_referent(self, complement=False):
         """Get a random referent from the meaning's referents."""
         if complement:
-            return random.choice(list(self.complement.referents))
+            return random.choice(list(self.complement().referents))
         return random.choice(list(self.meaning.referents)) 
 
     def to_dict(self) -> dict:
