@@ -8,7 +8,7 @@ This example creates a "conceptual" / miniature replication of the above paper u
 This README first explains the contents of this example directory, focusing on what the user has to provide that's specific to the color case study, before then explaining the concrete steps taken to produce the above plot.  After that, there is some discussion of what's missing from the above paper and other next steps for this example.
 
 ## Contents
-`data` consists of language and color data provided by the [World Color Survey](https://www1.icsi.berkeley.edu/wcs/data/readme/foci-exp-readme.html). Certain files have been slightly edited in order for simplicity of parsing, such as providing a header row.
+`data` consists of language and color data provided by the [World Color Survey](https://linguistics.berkeley.edu/wcs/data.html). Certain files have been slightly edited in order for simplicity of parsing, such as providing a header row.
 
 `outputs` contains intermediate data calculations, graphed color data, and complexity/informativity outputs. 
     `lang_colors` consists of per-language color distributions. Major color terms are graphed per language.
