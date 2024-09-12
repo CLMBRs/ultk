@@ -3,9 +3,10 @@
 import numpy as np
 from ultk.language.language import Language
 from ultk.effcomm.agent import LiteralSpeaker, Listener
-from rdot.ba import IBOptimizer, IBResult
+from rdot.optimizers import IBOptimizer, IBResult
 from rdot.probability import joint, bayes
-from rdot.information import information_cond, MI
+from rdot.information import information_cond, mutual_info
+from rdot.distortions import ib_kl
 
 ##############################################################################
 # Measuring Languages
@@ -96,7 +97,7 @@ def ib_encoder_to_point(
     encoder: np.ndarray,
     decoder: np.ndarray = None,
 ) -> tuple[float]:
-    """Return (complexity, accuracy, comm_cost) IB coordinates.
+    """Get (complexity, accuracy, comm_cost) IB coordinates.
 
     Args:
         prior: array of shape `|meanings|` representing the communicative need distribution
@@ -106,22 +107,44 @@ def ib_encoder_to_point(
         encoder: array of shape `(|meanings|, |words|)` representing P(W | M)
 
         decoder: array of shape `(|words|, |meanings|)` representing P(M | W).  By default is None, and the Bayesian optimal decoder will be inferred.
+    
+    Returns:
+        a tuple of floats corresponding to `(complexity, accuracy, comm_cost)`.
     """
 
     if decoder is None:
         decoder = ib_optimal_decoder(encoder, prior, meaning_dists)
-    encoder = rows_zero_to_uniform(encoder)
-    decoder = rows_zero_to_uniform(decoder)
+    
+    # Unclear that the below is correct
+    # encoder = rows_zero_to_uniform(encoder)
+    # decoder = rows_zero_to_uniform(decoder)
 
     # IB complexity = info rate of encoder = I(meanings; words)
     complexity = information_cond(prior, encoder)
+
     # IB accuracy/informativity = I(words; world states)
+    pMW = encoder * prior
+    pWU = pMW.T @ meaning_dists
+    accuracy = mutual_info(pWU)
 
-    accuracy = MI(meaning_dists @ joint(encoder, prior))
+    # expected distortion
+    I_mu = information_cond(prior, meaning_dists)
+    distortion = I_mu - accuracy
 
-    # IB comm_cost = distortion = E[DKL[speaker meaning || listener meaning]],
-    # this is also = I(meanings; world states) - I(words; world states)
-    distortion = MI(joint(meaning_dists, prior)) - accuracy
+    # TODO: the above is only IB optimal; should we look at the emergent listener accuracy? To do that we'll need to compute kl divergence
+    # and then do I(M;U) - distortion to get the accuracy.
+
+    # pu_w = decoder @ meaning_dists
+    # dist_mat = ib_kl(meaning_dists, pu_w,) # getting infs; I confirmed that this because there exists an x s.t. p(x) > 0 but q(x) = 0. Ask Noga what to do here. Add a little epsilon?
+    # distortion = np.sum( prior * ( encoder @ decoder ) * dist_mat )    
+
+    decoder_smoothed = decoder + 1e-20
+    decoder_smoothed /= decoder_smoothed.sum(axis=1, keepdims=True)
+    pu_w = decoder_smoothed @ meaning_dists
+    dist_mat = ib_kl(meaning_dists, pu_w,)
+    distortion = np.sum( prior * ( encoder @ decoder ) * dist_mat )
+    # but this measure of distortion is almost an order magnitude higher than bayesian decoder
+    # breakpoint()
 
     return (complexity, accuracy, distortion)
 

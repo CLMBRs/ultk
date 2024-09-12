@@ -1,258 +1,34 @@
-- comm_cost: 0.5218750000000001
-  complexity: 3
+- comm_cost: 0.2509259259259262
+  complexity: 11
   expressions:
-  - 38d
-  - 38k
-  - 38m
+  - 06v
+  - 06q
+  - 06n
+  - 06a
+  - 06l
+  - 06d
   lot_expressions:
-  - R-
-  - SE-
-  - R+
-  name: japanese
-  type: natural
-- comm_cost: 0.3354166666666668
-  complexity: 12
-  expressions:
-  - 17b
-  - 17kai
-  - 17kaz
-  - 17ni
-  - 17no
-  lot_expressions:
-  - R-
+  - Rminus
+  - _and(Nminus, Rplus)
+  - Nplus
+  - _and(K-, _not(Rplus))
+  - Rminus
   - K+
-  - and(K-, SE-)
-  - N+
-  - and(and(S-, N-), not(R-))
-  name: lithuanian
-  type: natural
-- comm_cost: 0.6162500000000001
-  complexity: 5
-  expressions:
-  - 26a
-  - 26s
-  - 26v
-  lot_expressions:
-  - and(SE+, N-)
-  - N+
-  - N-
-  name: hungarian
-  type: natural
-- comm_cost: 0.7166666666666668
-  complexity: 4
-  expressions:
-  - 22b
-  - 22k
-  lot_expressions:
-  - and(S-, N-)
-  - SE-
-  name: hindi
-  type: natural
-- comm_cost: 0.20989583333333361
-  complexity: 18
-  expressions:
-  - 16b
-  - 16k
-  - 16l
-  - 16n
-  - 16ni
-  - 16t
-  - 16u
-  lot_expressions:
-  - and(N-, R+)
-  - K+
-  - and(and(S-, N-), not(R-))
-  - N+
-  - and(S-, SE-)
-  - and(K-, SE-)
-  - R-
-  name: russian
+  name: latin
   type: natural
 - comm_cost: 0.4822916666666668
   complexity: 6
   expressions:
-  - 24a
-  - 24b
-  - 24bd
   - 24e
+  - 24a
+  - 24bd
+  - 24b
   lot_expressions:
-  - S+
-  - SE-
-  - and(SE+, N-)
-  - N+
+  - Nplus
+  - Splus
+  - _and(Nminus, SEplus)
+  - SEminus
   name: kazakh
-  type: natural
-- comm_cost: 0.6895833333333334
-  complexity: 4
-  expressions:
-  - 37b
-  - 37p
-  lot_expressions:
-  - S+
-  - and(S-, N-)
-  name: quechua
-  type: natural
-- comm_cost: 0.43194444444444446
-  complexity: 6
-  expressions:
-  - 25b
-  - 25d
-  - 25em
-  - 25er
-  lot_expressions:
-  - R-
-  - SE+
-  - and(S-, SE-)
-  - S+
-  name: yakut
-  type: natural
-- comm_cost: 0.5489583333333334
-  complexity: 12
-  expressions:
-  - 34a
-  - 34m
-  - 34y
-  lot_expressions:
-  - and(S-, or(SE-, N+))
-  - and(and(S-, N-), not(R-))
-  - S+
-  name: georgian
-  type: natural
-- comm_cost: 0.5666666666666668
-  complexity: 5
-  expressions:
-  - 02d
-  - 02i
-  - 02n
-  lot_expressions:
-  - and(S-, N-)
-  - SE-
-  - N+
-  name: dutch
-  type: natural
-- comm_cost: 0.4437500000000002
-  complexity: 9
-  expressions:
-  - 35a
-  - 35o
-  - 35u
-  lot_expressions:
-  - and(S-, SE-)
-  - and(K-, S+)
-  - and(SE+, N-)
-  name: kannada
-  type: natural
-- comm_cost: 0.4083333333333333
-  complexity: 6
-  expressions:
-  - 20d
-  - 20dd
-  - 20i
-  - 20m
-  lot_expressions:
-  - S+
-  - R-
-  - and(S-, SE-)
-  - N+
-  name: ossetic
-  type: natural
-- comm_cost: 0.28333333333333366
-  complexity: 9
-  expressions:
-  - 05ei
-  - 05en
-  - 05n
-  - 05no
-  - 05s
-  lot_expressions:
-  - SE-
-  - N+
-  - and(N-, R+)
-  - and(N-, R+)
-  - R-
-  name: iceland
-  type: natural
-- comm_cost: 0.6505208333333334
-  complexity: 5
-  expressions:
-  - 07a
-  - 07n
-  - 07q
-  lot_expressions:
-  - SE-
-  - R+
-  - and(K-, N-)
-  name: portug
-  type: natural
-- comm_cost: 0.6458333333333335
-  complexity: 4
-  expressions:
-  - 33CL
-  - 33GN
-  lot_expressions:
-  - and(SE+, N-)
-  - SE-
-  name: swahili
-  type: natural
-- comm_cost: 0.5218750000000001
-  complexity: 3
-  expressions:
-  - 39b
-  - 39n
-  - 39t
-  lot_expressions:
-  - SE-
-  - R-
-  - R+
-  name: korean
-  type: natural
-- comm_cost: 0.49583333333333346
-  complexity: 5
-  expressions:
-  - 15k
-  - 15n
-  - 15s
-  lot_expressions:
-  - and(SE+, N-)
-  - N+
-  - SE-
-  name: polish
-  type: natural
-- comm_cost: 0.5218750000000001
-  complexity: 3
-  expressions:
-  - 11n
-  - 11o
-  - 11v
-  lot_expressions:
-  - R+
-  - R-
-  - SE-
-  name: romanian
-  type: natural
-- comm_cost: 0.5463541666666668
-  complexity: 6
-  expressions:
-  - 09n
-  - 09p
-  - 09que
-  - 09quel
-  lot_expressions:
-  - R-
-  - R+
-  - and(SE+, N-)
-  - SE-
-  name: french
-  type: natural
-- comm_cost: 0.6458333333333335
-  complexity: 4
-  expressions:
-  - 32k
-  - 32w
-  lot_expressions:
-  - and(SE+, N-)
-  - SE-
-  name: hausa
   type: natural
 - comm_cost: 0.49583333333333346
   complexity: 5
@@ -261,222 +37,52 @@
   - 18k
   - 18n
   lot_expressions:
-  - and(SE+, N-)
-  - SE-
-  - N+
+  - _and(Nminus, SEplus)
+  - SEminus
+  - Nplus
   name: latvian
   type: natural
-- comm_cost: 0.5218750000000001
-  complexity: 3
-  expressions:
-  - 08a
-  - 08c
-  - 08q
-  lot_expressions:
-  - SE-
-  - R+
-  - R-
-  name: catalan
-  type: natural
-- comm_cost: 0.6144097222222223
-  complexity: 5
-  expressions:
-  - 23b
-  - 23he
-  - 23hi
-  lot_expressions:
-  - SE-
-  - and(S-, N-)
-  - R+
-  name: turkish
-  type: natural
-- comm_cost: 0.41041666666666676
-  complexity: 6
-  expressions:
-  - 40ba
-  - 40bi
-  - 40e
-  - 40i
-  lot_expressions:
-  - K+
-  - and(K-, SE-)
-  - R-
-  - R+
-  name: basque
-  type: natural
-- comm_cost: 0.4031250000000003
-  complexity: 7
-  expressions:
-  - 27h
-  - 27ka
-  - 27ki
-  lot_expressions:
-  - R-
-  - and(N-, R+)
-  - and(K-, SE-)
-  name: finnish
-  type: natural
-- comm_cost: 0.61640625
-  complexity: 5
-  expressions:
-  - 01e
-  - 01i
-  - 01n
-  lot_expressions:
-  - SE-
-  - and(K-, N-)
-  - N+
-  name: german
-  type: natural
-- comm_cost: 0.5380208333333336
-  complexity: 5
-  expressions:
-  - 31a
-  - 31i
-  - 31s
-  lot_expressions:
-  - R+
-  - and(N-, R+)
-  - SE-
-  name: hebrew
-  type: natural
-- comm_cost: 0.5708333333333335
-  complexity: 5
-  expressions:
-  - 13n
-  - 13nj
-  - 13t
-  lot_expressions:
-  - R+
-  - SE-
-  - and(SE+, N-)
-  name: bulgarian
-  type: natural
-- comm_cost: 0.5743055555555556
-  complexity: 6
-  expressions:
-  - 28d
-  - 28dx
-  - 28n
-  lot_expressions:
-  - and(S-, not(R-))
-  - R-
-  - S+
-  name: nanay
-  type: natural
-- comm_cost: 0.6197916666666669
-  complexity: 2
-  expressions:
-  - 21h
-  - 21i
-  lot_expressions:
-  - R+
-  - SE-
-  name: persian
-  type: natural
-- comm_cost: 0.6552083333333333
+- comm_cost: 0.28333333333333366
   complexity: 9
   expressions:
-  - 12d
-  - 12k
-  - 12t
+  - 05s
+  - 05en
+  - 05n
+  - 05no
+  - 05ei
   lot_expressions:
-  - R-
-  - and(K-, SE-)
-  - and(S-, or(SE-, N+))
-  name: greek
+  - Rminus
+  - Nplus
+  - _and(Nminus, Rplus)
+  - _and(Nminus, Rplus)
+  - SEminus
+  name: iceland
   type: natural
 - comm_cost: 0.49583333333333346
   complexity: 5
   expressions:
-  - 03a
-  - 03n
-  - 03s
+  - 15k
+  - 15n
+  - 15s
   lot_expressions:
-  - and(SE+, N-)
-  - N+
-  - SE-
-  name: english
+  - _and(Nminus, SEplus)
+  - Nplus
+  - SEminus
+  name: polish
   type: natural
-- comm_cost: 0.5218750000000001
-  complexity: 3
-  expressions:
-  - 10n
-  - 10q
-  - 10u
-  lot_expressions:
-  - R+
-  - SE-
-  - R-
-  name: italian
-  type: natural
-- comm_cost: 0.5218750000000001
-  complexity: 3
-  expressions:
-  - 29WH
-  - 29X
-  - 29xa
-  lot_expressions:
-  - SE-
-  - R+
-  - R-
-  name: lezgian
-  type: natural
-- comm_cost: 0.2509259259259262
-  complexity: 11
-  expressions:
-  - 06a
-  - 06d
-  - 06l
-  - 06n
-  - 06q
-  - 06v
-  lot_expressions:
-  - and(K-, not(R+))
-  - K+
-  - R-
-  - N+
-  - and(N-, R+)
-  - R-
-  name: latin
-  type: natural
-- comm_cost: 0.4140625000000002
-  complexity: 8
-  expressions:
-  - 14b
-  - 14i
-  - 14ne
-  - 14ni
-  lot_expressions:
-  - and(SE+, N-)
-  - and(N-, R+)
-  - SE-
-  - N+
-  name: serbian
-  type: natural
-- comm_cost: 0.32916666666666694
-  complexity: 7
-  expressions:
-  - 36GN
-  - 36b
-  - 36y
-  lot_expressions:
-  - S+
-  - and(S-, SE-)
-  - and(N-, R+)
-  name: chinese
-  type: natural
-- comm_cost: 0.5640625000000001
+- comm_cost: 0.41041666666666676
   complexity: 6
   expressions:
-  - 04i
-  - 04n
-  - 04s
+  - 40bi
+  - 40ba
+  - 40e
+  - 40i
   lot_expressions:
-  - N+
-  - and(N-, not(R-))
-  - R-
-  name: swedish
+  - _and(K-, SEminus)
+  - K+
+  - Rminus
+  - Rplus
+  name: basque
   type: natural
 - comm_cost: 0.6312500000000001
   complexity: 5
@@ -485,18 +91,403 @@
   - 19ar
   - 19e
   lot_expressions:
-  - SE+
-  - and(SE+, N-)
-  - SE-
+  - SEplus
+  - _and(Nminus, SEplus)
+  - SEminus
   name: irish
+  type: natural
+- comm_cost: 0.61640625
+  complexity: 5
+  expressions:
+  - 01e
+  - 01i
+  - 01n
+  lot_expressions:
+  - SEminus
+  - _and(K-, Nminus)
+  - Nplus
+  name: german
+  type: natural
+- comm_cost: 0.5489583333333334
+  complexity: 12
+  expressions:
+  - 34y
+  - 34a
+  - 34m
+  lot_expressions:
+  - Splus
+  - _and(Sminus, _or(Nplus, SEminus))
+  - _and(_and(Nminus, Sminus), _not(Rminus))
+  name: georgian
+  type: natural
+- comm_cost: 0.6505208333333334
+  complexity: 5
+  expressions:
+  - 07a
+  - 07q
+  - 07n
+  lot_expressions:
+  - SEminus
+  - _and(K-, Nminus)
+  - Rplus
+  name: portug
+  type: natural
+- comm_cost: 0.5218750000000001
+  complexity: 3
+  expressions:
+  - 10q
+  - 10u
+  - 10n
+  lot_expressions:
+  - SEminus
+  - Rminus
+  - Rplus
+  name: italian
+  type: natural
+- comm_cost: 0.6458333333333335
+  complexity: 4
+  expressions:
+  - 33GN
+  - 33CL
+  lot_expressions:
+  - SEminus
+  - _and(Nminus, SEplus)
+  name: swahili
+  type: natural
+- comm_cost: 0.49583333333333346
+  complexity: 5
+  expressions:
+  - 03a
+  - 03n
+  - 03s
+  lot_expressions:
+  - _and(Nminus, SEplus)
+  - Nplus
+  - SEminus
+  name: english
+  type: natural
+- comm_cost: 0.5218750000000001
+  complexity: 3
+  expressions:
+  - 29X
+  - 29xa
+  - 29WH
+  lot_expressions:
+  - Rplus
+  - Rminus
+  - SEminus
+  name: lezgian
+  type: natural
+- comm_cost: 0.4437500000000002
+  complexity: 9
+  expressions:
+  - 35u
+  - 35o
+  - 35a
+  lot_expressions:
+  - _and(Nminus, SEplus)
+  - _and(K-, Splus)
+  - _and(SEminus, Sminus)
+  name: kannada
+  type: natural
+- comm_cost: 0.5708333333333335
+  complexity: 5
+  expressions:
+  - 13nj
+  - 13t
+  - 13n
+  lot_expressions:
+  - SEminus
+  - _and(Nminus, SEplus)
+  - Rplus
+  name: bulgarian
+  type: natural
+- comm_cost: 0.5218750000000001
+  complexity: 3
+  expressions:
+  - 11o
+  - 11n
+  - 11v
+  lot_expressions:
+  - Rminus
+  - Rplus
+  - SEminus
+  name: romanian
+  type: natural
+- comm_cost: 0.5743055555555556
+  complexity: 6
+  expressions:
+  - 28d
+  - 28dx
+  - 28n
+  lot_expressions:
+  - _and(Sminus, _not(Rminus))
+  - Rminus
+  - Splus
+  name: nanay
+  type: natural
+- comm_cost: 0.6552083333333333
+  complexity: 9
+  expressions:
+  - 12t
+  - 12d
+  - 12k
+  lot_expressions:
+  - _and(Sminus, _or(Nplus, SEminus))
+  - Rminus
+  - _and(K-, SEminus)
+  name: greek
+  type: natural
+- comm_cost: 0.5463541666666668
+  complexity: 6
+  expressions:
+  - 09quel
+  - 09que
+  - 09p
+  - 09n
+  lot_expressions:
+  - SEminus
+  - _and(Nminus, SEplus)
+  - Rplus
+  - Rminus
+  name: french
+  type: natural
+- comm_cost: 0.7166666666666668
+  complexity: 4
+  expressions:
+  - 32k
+  - 32w
+  lot_expressions:
+  - _and(Nminus, SEplus)
+  - SEminus
+  name: hausa
   type: natural
 - comm_cost: 0.6197916666666669
   complexity: 2
   expressions:
-  - 30e
   - 30x
+  - 30e
   lot_expressions:
-  - R+
-  - SE-
+  - SEminus
+  - Rplus
   name: maltese
+  type: natural
+- comm_cost: 0.4083333333333333
+  complexity: 6
+  expressions:
+  - 20i
+  - 20m
+  - 20d
+  - 20dd
+  lot_expressions:
+  - _and(SEminus, Sminus)
+  - Nplus
+  - Splus
+  - Rminus
+  name: ossetic
+  type: natural
+- comm_cost: 0.20989583333333361
+  complexity: 18
+  expressions:
+  - 16u
+  - 16l
+  - 16t
+  - 16b
+  - 16k
+  - 16ni
+  - 16n
+  lot_expressions:
+  - Rminus
+  - _and(_and(Nminus, Sminus), _not(Rminus))
+  - _and(K-, SEminus)
+  - _and(Nminus, Rplus)
+  - K+
+  - _and(SEminus, Sminus)
+  - Nplus
+  name: russian
+  type: natural
+- comm_cost: 0.6162500000000001
+  complexity: 5
+  expressions:
+  - 26v
+  - 26s
+  - 26a
+  lot_expressions:
+  - Nminus
+  - Nplus
+  - _and(Nminus, SEplus)
+  name: hungarian
+  type: natural
+- comm_cost: 0.6144097222222223
+  complexity: 5
+  expressions:
+  - 24a
+  - 24b
+  - 24bd
+  - 24e
+  lot_expressions:
+  - SEminus
+  - _and(Nminus, Sminus)
+  - Rplus
+  name: turkish
+  type: natural
+- comm_cost: 0.43194444444444446
+  complexity: 6
+  expressions:
+  - 25em
+  - 25b
+  - 25er
+  - 25d
+  lot_expressions:
+  - _and(SEminus, Sminus)
+  - Rminus
+  - Splus
+  - SEplus
+  name: yakut
+  type: natural
+- comm_cost: 0.4031250000000003
+  complexity: 7
+  expressions:
+  - 27ka
+  - 27ki
+  - 27h
+  lot_expressions:
+  - _and(Nminus, Rplus)
+  - _and(K-, SEminus)
+  - Rminus
+  name: finnish
+  type: natural
+- comm_cost: 0.32916666666666694
+  complexity: 7
+  expressions:
+  - 36b
+  - 36GN
+  - 36y
+  lot_expressions:
+  - _and(SEminus, Sminus)
+  - Splus
+  - _and(Nminus, Rplus)
+  name: chinese
+  type: natural
+- comm_cost: 0.7166666666666668
+  complexity: 4
+  expressions:
+  - 22k
+  - 22b
+  lot_expressions:
+  - SEminus
+  - _and(Nminus, Sminus)
+  name: hindi
+  type: natural
+- comm_cost: 0.5380208333333336
+  complexity: 5
+  expressions:
+  - 31a
+  - 31s
+  - 31i
+  lot_expressions:
+  - Rplus
+  - SEminus
+  - _and(Nminus, Rplus)
+  name: hebrew
+  type: natural
+- comm_cost: 0.3354166666666668
+  complexity: 12
+  expressions:
+  - 17kaz
+  - 17no
+  - 17b
+  - 17kai
+  - 17ni
+  lot_expressions:
+  - _and(K-, SEminus)
+  - _and(_and(Nminus, Sminus), _not(Rminus))
+  - Rminus
+  - K+
+  - Nplus
+  name: lithuanian
+  type: natural
+- comm_cost: 0.6197916666666669
+  complexity: 2
+  expressions:
+  - 21i
+  - 21h
+  lot_expressions:
+  - SEminus
+  - Rplus
+  name: persian
+  type: natural
+- comm_cost: 0.5218750000000001
+  complexity: 3
+  expressions:
+  - 39t
+  - 39b
+  - 39n
+  lot_expressions:
+  - Rplus
+  - SEminus
+  - Rminus
+  name: korean
+  type: natural
+- comm_cost: 0.5218750000000001
+  complexity: 3
+  expressions:
+  - 38d
+  - 38m
+  - 38k
+  lot_expressions:
+  - Rminus
+  - Rplus
+  - SEminus
+  name: japanese
+  type: natural
+- comm_cost: 0.5640625000000001
+  complexity: 6
+  expressions:
+  - 04i
+  - 04s
+  - 04n
+  lot_expressions:
+  - Nplus
+  - Rminus
+  - _and(Nminus, _not(Rminus))
+  name: swedish
+  type: natural
+- comm_cost: 0.4140625000000002
+  complexity: 8
+  expressions:
+  - 14i
+  - 14b
+  - 14ni
+  - 14ne
+  lot_expressions:
+  - _and(Nminus, Rplus)
+  - _and(Nminus, SEplus)
+  - Nplus
+  - SEminus
+  name: serbian
+  type: natural
+- comm_cost: 0.5666666666666668
+  complexity: 5
+  expressions:
+  - 02d
+  - 02i
+  - 02n
+  lot_expressions:
+  - _and(Nminus, Sminus)
+  - SEminus
+  - Nplus
+  name: dutch
+  type: natural
+- comm_cost: 0.5218750000000001
+  complexity: 3
+  expressions:
+  - 08a
+  - 08q
+  - 08c
+  lot_expressions:
+  - SEminus
+  - Rminus
+  - Rplus
+  name: catalan
   type: natural

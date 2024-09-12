@@ -65,7 +65,7 @@ def get_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--num_rounds",
-        type=int,
+        type=float,
         default=100,
         help="How many rounds of the signaling game to run.",
     )
