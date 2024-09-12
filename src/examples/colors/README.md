@@ -10,7 +10,9 @@ This README first explains the contents of this example directory, focusing on w
 ## Contents
 `data` consists of language and color data provided by the [World Color Survey](https://linguistics.berkeley.edu/wcs/data.html). Certain files have been slightly edited in order for simplicity of parsing, such as providing a header row.
 
-`outputs` contains intermediate data calculations, graphed color data, and complexity/informativity outputs. 
+`outputs` contains outputs of various scripts, as outlined below. 
+
+
     `lang_colors` consists of per-language color distributions. Major color terms are graphed per language.
 
 `analyze_data.py` contains functions for graphing the distribution of color terms across language expressions and languages themselves.
@@ -33,8 +35,9 @@ From `ultk/examples` base directory:
     - Produces: `outputs/color_universe.pkl`
 2. Run `python -m colors.scripts.read_natural_languages`: this reads the natural language WCS data and produces ULTK `Language` objects.  (NOTE: still a work-in-progress)
     - Consumes: `data/data/term.txt`, `outputs/color_universe.pkl`
-    - Produces: 
+    - Produces: `outputs/natural_languages.pkl`
 
+NOTE: below this is 
 Run `python analyze_data.py` from the `colors` folder. This calls `generate_wcs_languages` to generate the language data, then `complexity.py` to generate the complexity, then  Several options are available as command-line settings.:
 
 
