@@ -1,10 +1,12 @@
+import inspect
 import random
 import re
 from collections import defaultdict
 from collections.abc import Sequence
-from itertools import product
-from typing import Any, Callable, Generator, TypedDict
 from dataclasses import dataclass
+from importlib import import_module
+from itertools import product
+from typing import Any, Callable, Generator, TypedDict, TypeVar
 from yaml import load
 
 try:
@@ -13,7 +15,10 @@ except ImportError:
     from yaml import Loader
 
 from ultk.language.language import Expression
-from ultk.language.semantics import Meaning, Universe
+from ultk.language.semantics import Meaning, Referent, Universe
+from ultk.util.frozendict import FrozenDict
+
+T = TypeVar("T")
 
 
 @dataclass(frozen=True)
@@ -51,10 +56,62 @@ class Rule:
             out_str += f"({', '.join(str(typ) for typ in self.rhs)})"
         return out_str
 
+    @classmethod
+    def from_callable(cls, func: Callable) -> "Rule":
+        """Create a Rule from the type-annotations of a function.
+
+        For example, given the following method definition:
+        ```python
+        def _and(p1: bool, p2: bool) -> bool:
+            return p1 and p2
+        ```
+
+        This class method will return the Rule:
+        ```
+        Rule(name="_and", lhs=bool, rhs=(bool, bool), func=_and)
+        ```
+
+        There are two special kwargs that can be used in the function definition:
+        - `weight`: a float, which will be used as the weight of the rule
+        - `name`: a string, which will be used as the name of the rule, if you want it to be different than the name of the method
+        """
+        annotations = inspect.signature(func)
+        if annotations.return_annotation is inspect.Signature.empty:
+            raise ValueError(
+                f"Function {func} must have a return annotation to be used as a Rule."
+            )
+        # dict so that deletion is possible
+        weight: float = 1.0
+        args = dict(annotations.parameters)
+        if "weight" in args:
+            # assign weight as the default value of weight kwarg
+            weight = float(args["weight"].default)
+            # delete because weight is a special term, not part of RHS like other params
+            del args["weight"]
+        # allow custon names too
+        rule_name = func.__name__
+        if "name" in args:
+            rule_name = args["name"].default
+            del args["name"]
+        # parameters = {'name': Parameter} ordereddict, so we want the values
+        # each value is a Paramter, with .annotation being the actual annotation
+        rhs: tuple[Any, ...] | None = tuple(arg.annotation for arg in args.values())
+        # if one type annotation, a type of Referent, treat this as a terminal, no children = None RHS
+        # TODO: make this more general?
+        if rhs and len(rhs) == 1 and issubclass(rhs[0], Referent):
+            rhs = None
+        return cls(
+            name=rule_name,
+            lhs=annotations.return_annotation,
+            rhs=rhs,
+            func=func,
+            weight=weight,
+        )
+
 
 # We need to use unsafe hash here, because the class needs to be both mutable and hashable (e.g., see https://github.com/CLMBRs/ultk/blob/main/src/ultk/effcomm/agent.py#L30).
 @dataclass(eq=True, kw_only=True, unsafe_hash=True)
-class GrammaticalExpression(Expression):
+class GrammaticalExpression(Expression[T]):
     """A GrammaticalExpression has been built up from a Grammar by applying a sequence of Rules.
     Crucially, it is _callable_, using the functions corresponding to each rule.
 
@@ -70,6 +127,11 @@ class GrammaticalExpression(Expression):
     rule_name: str
     func: Callable
     children: tuple | None
+    term_expression: str = ""
+
+    def __post_init__(self):
+        if not self.term_expression:
+            self.term_expression = str(self)
 
     def yield_string(self) -> str:
         """Get the 'yield' string of this term, i.e. the concatenation
@@ -84,20 +146,16 @@ class GrammaticalExpression(Expression):
         return "".join(child.yield_string() for child in self.children)
 
     def evaluate(self, universe: Universe) -> Meaning:
-        # TODO: this presupposes that the expression has type Referent -> bool.  Should we generalize?
-        # and that leaf nodes will take Referents as input...
         # NB: important to use `not self.meaning` and not `self.meaning is None` because of how
         # Expression.__init__ initializes an "empty" meaning if `None` is passed
         if not self.meaning:
             self.meaning = Meaning(
-                tuple(referent for referent in universe.referents if self(referent)),
+                FrozenDict(
+                    {referent: self(referent) for referent in universe.referents}
+                ),
                 universe,
             )
         return self.meaning
-
-    def call_on_universe(self, universe: Universe) -> tuple[Any, ...]:
-        """Call this expression on all elements of a universe, and return a tuple of the results."""
-        return tuple(self(referent) for referent in universe.referents)
 
     def add_child(self, child) -> None:
         if self.children is None:
@@ -107,9 +165,25 @@ class GrammaticalExpression(Expression):
 
     def to_dict(self) -> dict:
         the_dict = super().to_dict()
-        the_dict["grammatical_expression"] = str(self)
+        the_dict["term_expression"] = self.term_expression
+        the_dict["rule_name"] = self.rule_name
         the_dict["length"] = len(self)
+        if self.children:
+            the_dict["children"] = tuple(child.to_dict() for child in self.children)
         return the_dict
+
+    @classmethod
+    def from_dict(cls, the_dict: dict, grammar: "Grammar") -> "GrammaticalExpression":
+        children = the_dict.get("children")
+        if children:
+            children = tuple(cls.from_dict(child, grammar) for child in children)
+        return cls(
+            rule_name=the_dict["rule_name"],
+            func=grammar._rules_by_name[the_dict["rule_name"]].func,
+            children=children,
+            term_expression=the_dict["term_expression"],
+            meaning=the_dict["meaning"],
+        )
 
     def __call__(self, *args):
         if self.children is None:
@@ -123,6 +197,8 @@ class GrammaticalExpression(Expression):
         return length
 
     def __lt__(self, other) -> bool:
+        if not isinstance(other, GrammaticalExpression):
+            raise TypeError(f"Cannot compare GrammaticalExpression with {type(other)}.")
         children = self.children or tuple([])
         other_children = other.children or tuple([])
         return (self.rule_name, self.form, self.func, children) < (
@@ -137,6 +213,9 @@ class GrammaticalExpression(Expression):
         if self.children is not None:
             out_str += f"({', '.join(str(child) for child in self.children)})"
         return out_str
+
+    def __repr__(self):
+        return f"GrammaticalExpression({self.form}, {self.rule_name}, {self.children}, {self.term_expression}, {self.meaning})"
 
 
 class UniquenessArgs(TypedDict):
@@ -205,7 +284,7 @@ class Grammar:
         )
 
         # stack to store the tree being built
-        stack = []
+        stack: list[GrammaticalExpression] = []
 
         for match in token_regex.finditer(expression):
             # strip trailing whitespace if needed
@@ -304,7 +383,7 @@ class Grammar:
             yield from cache[args_tuple]
         else:
             do_unique = uniqueness_args is not None
-            if uniqueness_args is not None:
+            if do_unique:
                 unique_dict = uniqueness_args["unique_expressions"]
                 key = uniqueness_args["key"]
 
@@ -325,7 +404,7 @@ class Grammar:
             if depth == 0:
                 for rule in self._rules[lhs]:
                     if rule.is_terminal():
-                        cur_expr = GrammaticalExpression(
+                        cur_expr: GrammaticalExpression = GrammaticalExpression(
                             rule_name=rule.name, func=rule.func, children=None
                         )
                         if not do_unique or add_unique(cur_expr):
@@ -368,7 +447,7 @@ class Grammar:
         compare_func: Callable[[GrammaticalExpression, GrammaticalExpression], bool],
         lhs: Any = None,
         max_size: float = float("inf"),
-    ) -> dict[GrammaticalExpression, Any]:
+    ) -> dict[Any, GrammaticalExpression]:
         """Get all unique GrammaticalExpressions, up to a certain depth, with a user-specified criterion
         of uniqueness, and a specified comparison function for determining which Expression to save when there's a clash.
         This can be used, for instance, to measure the minimum description length of some
@@ -456,4 +535,32 @@ class Grammar:
             if "weight" in rule_dict:
                 rule_dict["weight"] = float(rule_dict["weight"])
             grammar.add_rule(Rule(**rule_dict))
+        return grammar
+
+    @classmethod
+    def from_module(cls, module_name: str) -> "Grammar":
+        """Read a grammar from a module.
+
+        The module should have a list of type-annotated method definitions, each of which will correspond to one Rule in the new Grammar.
+        See the docstring for `Rule.from_callable` for more information on how that step works.
+
+        The start symbol of the grammar can either be specified by `start = XXX` somewhere in the module,
+        or will default to the LHS of the first rule in the module (aka the return type annotation of the first method definition).
+
+        Arguments:
+            module_name: name of the module
+        """
+        module = import_module(module_name)
+        grammar = cls(None)
+        for name, value in inspect.getmembers(module):
+            # functions become rules
+            if inspect.isfunction(value):
+                grammar.add_rule(Rule.from_callable(value))
+        # set start symbol if module specifies it
+        if hasattr(module, "start") and module.start in grammar._rules:
+            grammar._start = module.start
+        # otherwise, LHS of the first rule in the module
+        else:
+            first_rule_name = next(iter(grammar._rules_by_name))
+            grammar._start = grammar._rules_by_name[first_rule_name].lhs
         return grammar

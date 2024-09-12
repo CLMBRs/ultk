@@ -1,18 +1,12 @@
 from typing import Callable, Any
 import pandas as pd
 
-from yaml import load, dump
+from yaml import dump, Dumper
 
-try:
-    from yaml import CLoader as Loader, CDumper as Dumper
-except ImportError:
-    from yaml import Loader, Dumper
-
-from ultk.language.grammar import GrammaticalExpression
 from ultk.language.language import Expression, Language
-from ultk.language.semantics import Meaning, Universe
+from ultk.language.semantics import Meaning
+from ultk.util.frozendict import FrozenDict
 
-from .grammar import indefinites_grammar
 from .meaning import universe as indefinites_universe
 
 
@@ -42,7 +36,12 @@ def read_natural_languages(filename: str) -> set[Language]:
         for item in items.itertuples():
             # generate Meaning from list of flavors
             cur_meaning = Meaning(
-                tuple(indefinites_universe[flavor] for flavor in item.flavors),
+                FrozenDict(
+                    {
+                        referent: referent.name in item.flavors
+                        for referent in indefinites_universe
+                    }
+                ),
                 indefinites_universe,
             )
             # add Expression with form and Meaning
@@ -50,28 +49,6 @@ def read_natural_languages(filename: str) -> set[Language]:
         # add Language with its Expressions
         languages.add(Language(tuple(cur_expressions), name=lang, natural=True))
     return languages
-
-
-def read_expressions(
-    filename: str, universe: Universe | None = None, return_by_meaning=True
-) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
-    """Read expressions from a YAML file.
-    Assumes that the file is a list, and that each item in the list has a field
-    "grammatical_expression" with an expression that can be parsed by the
-    indefinites_grammar.
-    """
-    with open(filename, "r") as f:
-        expression_list = load(f, Loader=Loader)
-    parsed_exprs = [
-        indefinites_grammar.parse(expr_dict["grammatical_expression"])
-        for expr_dict in expression_list
-    ]
-    if universe is not None:
-        [expr.evaluate(universe) for expr in parsed_exprs]
-    by_meaning = {}
-    if return_by_meaning:
-        by_meaning = {expr.meaning: expr for expr in parsed_exprs}
-    return parsed_exprs, by_meaning
 
 
 def write_languages(

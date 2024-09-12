@@ -36,8 +36,8 @@ def plot_complexity(fn: str, complexities: list[float]) -> pn.ggplot:
     save_plot(fn, plot)
 
 
-def plot_tradeoff(fn: str, complexities: list, accuracies: list) -> pn.ggplot:
-    """Get a basic plotnine point plot of languages in a complexity vs comm_cost 2D plot."""
+def plot_tradeoff(fn: str, complexities: list, accuracies: list, hamming_rd_bound: list[tuple[float]]) -> pn.ggplot:
+    """Get a basic plotnine point plot of languages in a complexity vs comm_cost 2D plot against the hamming rate distortion bound."""
     rounds = range(len(complexities))
     data = pd.DataFrame(
         data={
@@ -46,12 +46,20 @@ def plot_tradeoff(fn: str, complexities: list, accuracies: list) -> pn.ggplot:
             "round": rounds,
         }
     )
+
+    bound_data = pd.DataFrame(
+        hamming_rd_bound,
+        columns=["complexity", "comm_cost"],
+    )
     plot = (
         # Set data and the axes
         pn.ggplot(data=data, mapping=pn.aes(x="complexity", y="comm_cost"))
         + pn.scale_y_continuous(limits=[0, 1])
         + pn.geom_point(  # langs
             stroke=0, alpha=1, mapping=pn.aes(color="round")  # might be too faint
+        )
+        + pn.geom_line( # bound
+            data=bound_data,
         )
         + pn.xlab("Cognitive cost")
         + pn.ylab("Communicative cost")
