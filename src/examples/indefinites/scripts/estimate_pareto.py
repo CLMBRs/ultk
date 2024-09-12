@@ -1,14 +1,17 @@
 from ultk.effcomm.optimization import EvolutionaryOptimizer
 from ultk.language.sampling import random_languages
+from ultk.util.io import read_grammatical_expressions
 
 
+from ..grammar import indefinites_grammar
 from ..meaning import universe as indefinites_universe
 from ..measures import comm_cost, complexity
-from ..util import read_expressions, write_languages
+from ..util import write_languages
 
 if __name__ == "__main__":
-    expressions, expressions_by_meaning = read_expressions(
+    expressions, expressions_by_meaning = read_grammatical_expressions(
         "indefinites/outputs/generated_expressions.yml",
+        indefinites_grammar,
         universe=indefinites_universe,
         return_by_meaning=True,
     )

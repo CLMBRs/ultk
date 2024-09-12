@@ -85,7 +85,7 @@ def informativity(
     # Check informativity > 0
     utility_matrix = build_utility_matrix(speaker.language.universe, utility)
     m, _ = utility_matrix.shape  # square matrix
-    if np.array_equal(utility, np.eye(m)):
+    if np.array_equal(utility_matrix, np.eye(m)):
         if isclose(inf, 0.0):
             raise ValueError(
                 f"Informativity must be nonzero for indicator utility reward function, but was: {inf}"
