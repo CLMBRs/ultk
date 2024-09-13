@@ -58,11 +58,11 @@ def language_to_ib_encoder_decoder(
 
     A Bayesian decoder chooses an interpretation according to p(meaning | word), where
 
-    $P(m | w) = \\frac{P(M | W) \cdot P(M)} { P(W) }$
+    $P(m | w) = \\frac{P(M | W) \\cdot P(M)} { P(W) }$
 
-    Furthermore, we will require that each word w is deterministically interpreted as meaning $\hat{m}$ as follows:
+    Furthermore, we will require that each word w is deterministically interpreted as meaning $\\hat{m}$ as follows:
 
-    $\hat{m}_{w}(u) = \sum_m p(m|w) \cdot m(u)$
+    $\\hat{m}_{w}(u) = \\sum_m p(m|w) \\cdot m(u)$
 
     See https://github.com/nogazs/ib-color-naming/blob/master/src/ib_naming_model.py#L40.
 
@@ -95,8 +95,8 @@ def ib_encoder_to_point(
     prior: np.ndarray,
     meaning_dists: np.ndarray,
     encoder: np.ndarray,
-    decoder: np.ndarray = None,
-) -> tuple[float]:
+    decoder: np.ndarray | None = None,
+) -> tuple[float, float, float]:
     """Get (complexity, accuracy, comm_cost) IB coordinates.
 
     Args:
@@ -123,13 +123,15 @@ def ib_encoder_to_point(
     complexity = information_cond(prior, encoder)
 
     # IB accuracy/informativity = I(words; world states)
-    pMW = encoder * prior
+    pMW = encoder * prior[:, None]
     pWU = pMW.T @ meaning_dists
     accuracy = mutual_info(pWU)
 
     # expected distortion
     I_mu = information_cond(prior, meaning_dists)
     distortion = I_mu - accuracy
+
+    # TODO: debug the below!
 
     # TODO: the above is only IB optimal; should we look at the emergent listener accuracy? To do that we'll need to compute kl divergence
     # and then do I(M;U) - distortion to get the accuracy.
@@ -138,16 +140,21 @@ def ib_encoder_to_point(
     # dist_mat = ib_kl(meaning_dists, pu_w,) # getting infs; I confirmed that this because there exists an x s.t. p(x) > 0 but q(x) = 0. Ask Noga what to do here. Add a little epsilon?
     # distortion = np.sum( prior * ( encoder @ decoder ) * dist_mat )
 
+    """
     decoder_smoothed = decoder + 1e-20
     decoder_smoothed /= decoder_smoothed.sum(axis=1, keepdims=True)
+    print(decoder_smoothed.shape)
     pu_w = decoder_smoothed @ meaning_dists
+    print(pu_w.shape)
     dist_mat = ib_kl(
         meaning_dists,
         pu_w,
     )
+    print(dist_mat.shape) # NOTE: this is the wrong shape
     distortion = np.sum(prior * (encoder @ decoder) * dist_mat)
     # but this measure of distortion is almost an order magnitude higher than bayesian decoder
     # breakpoint()
+    """
 
     return (complexity, accuracy, distortion)
 
