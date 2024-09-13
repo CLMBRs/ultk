@@ -9,6 +9,7 @@ if __name__ == "__main__":
     referents.sort_values(by="#cnum", inplace=True)
     # add a name column, as required by ULTK
     referents["name"] = referents["#cnum"]
+    referents.rename(columns={"L*": "L", "a*": "a", "b*": "b"}, inplace=True)
     referents.to_csv("colors/outputs/color_universe.csv", index=False)
     """
     color_universe = Universe.from_dataframe(referents)
