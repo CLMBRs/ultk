@@ -4,8 +4,7 @@ from ultk.language.semantics import Universe
 
 color_universe = Universe.from_csv("colors/outputs/color_universe.csv")
 
-# TODO: do this once and serialize?
-SIGMA_SQUARED = 64
+# TODO: generate meaning dists once and serialize?
 # shape (330, 3): L*a*b* values for each Munsell chip
 cielab_points = np.array([(ref.L, ref.a, ref.b) for ref in color_universe.referents])
 
