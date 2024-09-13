@@ -30,11 +30,11 @@ This README first explains the contents of this example directory, focusing on w
 ## Usage
 
 From `ultk/examples` base directory:
-1. Run `python -m colors.scripts.read_color_universe`: this generates the color universe (the 330 Munsell chips) to be re-used throughout.
+1. Run `python -m colors.scripts.read_color_universe`: this generates the color universe (the 330 Munsell chips) to be re-used throughout.  It does very light processing of the WCS data to generate a CSV file that can be easily read by ULTK.
     - Consumes: `data/cnum-vhcm-lab-new.txt`
-    - Produces: `outputs/color_universe.pkl`
+    - Produces: `outputs/color_universe.csv`
 2. Run `python -m colors.scripts.read_natural_languages`: this reads the natural language WCS data and produces ULTK `Language` objects.  (NOTE: still a work-in-progress)
-    - Consumes: `data/data/term.txt`, `outputs/color_universe.yaml`
+    - Consumes: `data/data/term.txt`, `outputs/color_universe.csv`
     - Produces: `outputs/natural_languages.yaml`
 
 NOTE: below this is 

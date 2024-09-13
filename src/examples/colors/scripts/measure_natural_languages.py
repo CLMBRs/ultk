@@ -1,5 +1,4 @@
-import pickle
-from yaml import load, Loader, dump, Dumper
+from yaml import load, Loader
 
 from ..ib import language_to_encoder
 

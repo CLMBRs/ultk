@@ -1,4 +1,3 @@
-import pickle
+from ultk.language.semantics import Universe
 
-with open("colors/outputs/color_universe.pkl", "rb") as f:
-    color_universe = pickle.load(f)
+color_universe = Universe.from_csv("colors/outputs/color_universe.csv")
