@@ -55,7 +55,9 @@ def bayes(pY_X: np.ndarray, pX: np.ndarray) -> np.ndarray:
     """
     # (|X|, |Y|)
     pXY = joint(pY_X, pX)
+    print(pXY.shape)
     # (|Y|,)
     pY = marginalize(pY_X, pX)
+    print(pY.shape)
     # (|Y|, |X|)
-    return np.where(pY > PRECISION, pXY.T / pY, 1 / pXY.shape[0])
+    return np.where(pY > PRECISION, pXY / pY, 1 / pXY.shape[0]).T
