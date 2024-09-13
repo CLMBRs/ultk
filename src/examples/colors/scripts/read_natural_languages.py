@@ -2,6 +2,7 @@ import pickle
 from typing import Any
 
 import pandas as pd
+from yaml import dump, Dumper
 
 from ultk.language.language import Expression, Language
 from ultk.language.semantics import Meaning
@@ -34,7 +35,7 @@ if __name__ == "__main__":
             # convert counts to probabilities
             total_count = term_df["spkr"].sum()
             chip_probabilities = term_df["spkr"] / total_count
-            # Referent: probability mapping, for all Referents = Munsell chips
+            # Referent -> probability (a float) mapping, for all Referents = Munsell chips
             referent_dict = {
                 color_universe.referents[chip_num]: safe_loc(
                     chip_probabilities, (lang, term, chip_num)
@@ -55,5 +56,7 @@ if __name__ == "__main__":
 
     # write languages to pickle
     # TODO: serialize in better format (e.g. YAML)
-    with open("colors/outputs/natural_languages.pkl", "wb") as f:
-        pickle.dump(languages, f)
+    # with open("colors/outputs/natural_languages.pkl", "wb") as f:
+    # pickle.dump(languages, f)
+    with open("colors/outputs/natural_languages.yaml", "w") as f:
+        dump(languages, f, Dumper=Dumper)
