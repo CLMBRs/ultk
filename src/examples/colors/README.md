@@ -36,6 +36,10 @@ From `ultk/examples` base directory:
 2. Run `python -m colors.scripts.read_natural_languages`: this reads the natural language WCS data and produces ULTK `Language` objects.  (NOTE: still a work-in-progress)
     - Consumes: `data/data/term.txt`, `outputs/color_universe.csv`
     - Produces: `outputs/natural_languages.yaml`
+3. Run `python -m colors.scripts.measure_natural_languages`: this reads the ULTK natural languages and calculates the complexity and informativity of each language.
+    - Consumes: `outputs/natural_languages.yaml`
+    - Produces: `outputs/natural_language_information_plane.csv`
+
 
 NOTE: below this is 
 Run `python analyze_data.py` from the `colors` folder. This calls `generate_wcs_languages` to generate the language data, then `complexity.py` to generate the complexity, then  Several options are available as command-line settings.:
