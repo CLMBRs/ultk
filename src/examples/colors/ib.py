@@ -17,11 +17,16 @@ def language_to_encoder(language: Language) -> np.ndarray:
         where element (r, w) is the probability of word w given referent r
     """
     universe = language.universe
-    encoder = np.array(
+    # (|referents|, |words|): p(r | w)
+    prob_chip_given_expression = np.array(
         [
             [expression.meaning[referent] for expression in language.expressions]
             for referent in universe.referents
         ]
     )
+    # (|referents|, 1): p(r)
+    # prior = np.array(universe.prior)[:, None]
+    # TODO: get encoder from prob_chip_given_expression (i.e. prob_expression_given_chip)
+    encoder = prob_chip_given_expression
     print(encoder)
     return encoder
