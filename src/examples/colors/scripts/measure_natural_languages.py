@@ -9,6 +9,7 @@ from ..meaning import color_universe, meaning_distributions
 
 if __name__ == "__main__":
 
+    """
     with open("colors/outputs/natural_languages.yaml", "r") as f:
         languages = load(f, Loader=Loader)
 
@@ -21,14 +22,15 @@ if __name__ == "__main__":
     encoder = language_to_encoder(language)
     print(encoder)
     print(encoder.sum(axis=0))
+    print(encoder.sum(axis=1))
 
     print(
         ib_encoder_to_point(
             np.array(color_universe.prior), meaning_distributions, encoder
         )
     )
-    """
 
+    """
     prior = np.array(color_universe.prior)
     information_plane = pd.DataFrame.from_records(
         [
@@ -43,3 +45,4 @@ if __name__ == "__main__":
     information_plane.to_csv(
         "colors/outputs/natural_language_information_plane.csv", index=False
     )
+    """

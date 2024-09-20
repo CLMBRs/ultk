@@ -122,16 +122,17 @@ def ib_encoder_to_point(
     # IB complexity = info rate of encoder = I(meanings; words)
     complexity = information_cond(prior, encoder)
 
+    # (|meanings|, 1)
+    prior = prior[:, None]
+
     # IB accuracy/informativity = I(words; world states)
-    pMW = encoder * prior[:, None]
+    pMW = encoder * prior
     pWU = pMW.T @ meaning_dists
     accuracy = mutual_info(pWU)
 
     # expected distortion
     I_mu = information_cond(prior, meaning_dists)
     distortion = I_mu - accuracy
-
-    # TODO: debug the below!
 
     # TODO: the above is only IB optimal; should we look at the emergent listener accuracy? To do that we'll need to compute kl divergence
     # and then do I(M;U) - distortion to get the accuracy.
@@ -140,21 +141,16 @@ def ib_encoder_to_point(
     # dist_mat = ib_kl(meaning_dists, pu_w,) # getting infs; I confirmed that this because there exists an x s.t. p(x) > 0 but q(x) = 0. Ask Noga what to do here. Add a little epsilon?
     # distortion = np.sum( prior * ( encoder @ decoder ) * dist_mat )
 
-    """
     decoder_smoothed = decoder + 1e-20
     decoder_smoothed /= decoder_smoothed.sum(axis=1, keepdims=True)
-    print(decoder_smoothed.shape)
     pu_w = decoder_smoothed @ meaning_dists
-    print(pu_w.shape)
     dist_mat = ib_kl(
         meaning_dists,
         pu_w,
     )
-    print(dist_mat.shape) # NOTE: this is the wrong shape
-    distortion = np.sum(prior * (encoder @ decoder) * dist_mat)
+    distortion = np.sum(prior * encoder * dist_mat)
     # but this measure of distortion is almost an order magnitude higher than bayesian decoder
     # breakpoint()
-    """
 
     return (complexity, accuracy, distortion)
 
