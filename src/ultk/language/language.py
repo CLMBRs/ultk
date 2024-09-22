@@ -30,7 +30,7 @@ class Expression(Generic[T]):
     # useful for hashing in certain cases
     # (e.g. a GrammaticalExpression which has not yet been evaluate()'d and so does not yet have a Meaning)
     form: str = ""
-    meaning: Meaning[T] = Meaning(FrozenDict(), FrozenDict())
+    meaning: Meaning[T] = Meaning(FrozenDict(), Universe(tuple(), tuple()))
 
     def can_express(self, referent: Referent) -> bool:
         """Return True if the expression can express the input single meaning point and false otherwise."""
@@ -58,7 +58,7 @@ class Language:
 
     def __init__(self, expressions: tuple[Expression, ...], **kwargs):
         if not expressions:
-            raise ValueError(f"Language cannot be empty.")
+            raise ValueError("Language cannot be empty.")
 
         universe: Universe = expressions[0].meaning.universe
         if not all(expr.meaning.universe == universe for expr in expressions):
@@ -84,14 +84,6 @@ class Language:
     def add_expression(self, e: Expression):
         """Add an expression to the list of expressions in a language."""
         self.expressions = frozenset(tuple(self.expressions) + (e,))
-
-    def pop(self, index: int) -> Expression:
-        """Removes an expression at the specified index of the list of expressions, and returns it."""
-        if not len(self):
-            raise Exception("Cannot pop expressions from an empty language.")
-        popped = self.expressions[index]
-        self.expressions = self.expressions[:index] + self.expressions[index + 1 :]
-        return popped
 
     def is_natural(self) -> bool:
         """Whether a language represents a human natural language."""
