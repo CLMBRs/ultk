@@ -153,7 +153,7 @@ class GrammaticalExpression(Expression[T]):
                 FrozenDict(
                     {referent: self(referent) for referent in universe.referents}
                 ),
-                universe
+                universe,
             )
         return self.meaning
 
@@ -210,6 +210,8 @@ class GrammaticalExpression(Expression[T]):
         return length
 
     def __lt__(self, other) -> bool:
+        if not isinstance(other, GrammaticalExpression):
+            raise TypeError(f"Cannot compare GrammaticalExpression with {type(other)}.")
         children = self.children or tuple([])
         other_children = other.children or tuple([])
         return (self.rule_name, self.form, self.func, children) < (
@@ -403,7 +405,7 @@ class Grammar:
             yield from cache[args_tuple]
         else:
             do_unique = uniqueness_args is not None
-            if uniqueness_args is not None:
+            if do_unique:
                 unique_dict = uniqueness_args["unique_expressions"]
                 key = uniqueness_args["key"]
 

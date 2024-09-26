@@ -118,7 +118,7 @@ def random_languages(
         max_size = num_expr
     num_subsets = upto_comb(num_expr, max_size)
     if sample_size is None or num_subsets < sample_size:
-        print(f"Due to argument combination, returning all languages.")
+        print("Due to argument combination, returning all languages.")
         return list(
             all_languages(expressions, language_class=language_class, max_size=max_size)
         )
@@ -278,7 +278,7 @@ def generate_languages(
                 id_start,
                 dummy_name=dummy_name,
                 verbose=verbose,
-            )
+            )["languages"]
             languages = languages.union(rlangs)
             additional_sample = sample_size - len(languages)
             print(additional_sample)

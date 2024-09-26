@@ -17,7 +17,6 @@
         >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
 """
 
-from collections.abc import Mapping, Set
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Any, Generic, TypeVar, Union
@@ -159,7 +158,7 @@ class Meaning(Generic[T]):
             total_weight = sum(self._dist.values())
             return FrozenDict({referent: weight / total_weight for referent, weight in self._dist.items()})
         else:
-            num_true_like = len(value for value in self.mapping.values() if value)
+            num_true_like = sum(1 for value in self.mapping.values() if value)
             if num_true_like == 0:
                 raise ValueError("Meaning must have at least one true-like referent.")
             return FrozenDict({referent: (1 / num_true_like if self.mapping[referent] else 0) for referent in self.mapping})
