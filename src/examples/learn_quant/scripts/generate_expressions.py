@@ -1,17 +1,9 @@
-from yaml import dump
 from time import time
-import argparse
 from copy import deepcopy
-import pickle
 import os
 import csv
 import pathlib
 from pathlib import Path
-
-try:
-    from yaml import CDumper as Dumper
-except ImportError:
-    from yaml import Dumper
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -113,7 +105,7 @@ def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfi
             # Ensure that primitives are added to the grammar up to `m_size`
             quantifiers_grammar_at_depth = deepcopy(quantifiers_grammar)
             quantifiers_grammar_at_depth.add_indices_as_primitives(
-                cfg.m_size, cfg.universe.weight
+                m_size, cfg.universe.weight
             )
             print(quantifiers_grammar_at_depth)
 
@@ -142,8 +134,8 @@ def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfi
 
                 outpath = (
                     Path(cfg.output)
-                    / Path("M" + str(m_size))
                     / Path("X" + str(cfg.universe.x_size))
+                    / Path("M" + str(m_size))
                     / Path(str("d" + str(depth)))
                     / Path("generated_expressions.yml")
                 )

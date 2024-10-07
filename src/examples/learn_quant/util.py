@@ -13,6 +13,7 @@ except ImportError:
 from ultk.language.grammar import GrammaticalExpression
 from ultk.language.language import Expression, Language
 from ultk.language.semantics import Meaning, Universe
+from ultk.util.io import write_expressions
 
 from learn_quant.grammar import quantifiers_grammar
 from learn_quant.meaning import create_universe
@@ -127,15 +128,7 @@ def save_quantifiers(
 
     print("Saving generated expressions to file...")
     print("Output path:", os.getcwd() / Path(out_path))
-    with open(out_path, "w+") as outfile:
-        dump(
-            [
-                expressions_by_meaning[meaning].to_dict()
-                for meaning in expressions_by_meaning
-            ],
-            outfile,
-            Dumper=Dumper,
-        )
+    write_expressions(expressions_by_meaning.values(), out_path)
     
     pickle_output_file = Path(out_path).parent / "generated_expressions.pkl"
 

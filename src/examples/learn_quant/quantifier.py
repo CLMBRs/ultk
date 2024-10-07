@@ -5,7 +5,17 @@ from ultk.language.semantics import Referent, Universe
 from dataclasses import dataclass, field
 from concepts.contexts import Context
 from functools import cached_property
+import numpy as np
 
+# Define the mapping from characters to indices
+char_to_index = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4}
+# Convert characters to indices
+one_hot_matrix = np.eye(len(char_to_index))
+compositional_matrix = np.array([[1, 0, 1],
+                                [0, 1, 1],
+                                [1, 1, 1],
+                                [0, 0, 1],
+                                [0, 0, 0]])
 
 @dataclass(eq=True, frozen=True)
 class QuantifierModel(Referent):
@@ -60,18 +70,29 @@ class QuantifierModel(Referent):
             "B": len(self.B),
         }
     
-    def binarize(self) -> np.ndarray:
+    def binarize(self, mode='B_only') -> np.ndarray:
         """
         Binarizes the sequence of characters in the name attribute.
 
         Returns:
             np.ndarray: An array of binary values, where 1 represents characters '1' or '2', and 0 represents other characters.
         """
-        return np.array([1 if char in {'1', '2'} else 0 for char in self.name])
+        if mode=='B_only':
+            return np.array([1 if char in {'1', '2'} else 0 for char in self.name])
+        elif mode=='one_hot':
+            # Create an identity matrix and select rows corresponding to indices
+            indices = [char_to_index[char] for char in self.name]
+            one_hot_encoded = one_hot_matrix[indices]
+            return one_hot_encoded
+        elif mode=='composition':
+            indices = [char_to_index[char] for char in self.name]
+            one_hot_encoded = compositional_matrix[indices]
+            return one_hot_encoded
+
         
 
     def to_numpy(
-        self, quantifier_index: np.ndarray | None = None, in_meaning: bool = False
+        self, mode="one_hot", quantifier_index: np.ndarray | None = None, in_meaning: bool = False
     ):
         """
         Converts the quantifier to a numpy array.
@@ -90,14 +111,7 @@ class QuantifierModel(Referent):
             np.ndarray: The quantifier converted to a numpy array.
         """
 
-        # Convert the string to an array of integers
-        indices = np.fromiter(self.name, dtype=int)
-
-        # Initialize a zero matrix with shape (len(s), 5)
-        one_hot_array = np.zeros((len(indices), 5), dtype=int)
-
-        # Use numpy advanced indexing to set the appropriate elements to 1
-        one_hot_array[np.arange(len(indices)), indices] = 1
+        one_hot_array = self.binarize(mode=mode)
 
         # If quantifier_index is provided, concatenate it to each vector in one_hot_array
         if quantifier_index is not None:
@@ -106,7 +120,7 @@ class QuantifierModel(Referent):
             if quantifier_index.ndim == 1:
                 # Concatenate quantifier_index to each vector
                 quantifier_index = quantifier_index.reshape(1, -1).repeat(
-                    len(indices), axis=0
+                    len(one_hot_array), axis=0
                 )
                 one_hot_array = np.hstack((one_hot_array, quantifier_index))
             else:

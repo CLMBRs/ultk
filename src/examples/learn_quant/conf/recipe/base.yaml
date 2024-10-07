@@ -1,0 +1,15 @@
+# @package _global_
+defaults:
+  - _self_
+
+name: base
+
+grammar: 
+  depth: ${grammar.depth}
+
+universe:
+  m_size: ${universe.m_size}
+  x_size: ${universe.x_size}
+  weight: ${universe.weight}
+  inclusive_universes: ${universe.inclusive_universes}
+

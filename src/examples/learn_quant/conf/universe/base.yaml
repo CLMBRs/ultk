@@ -1,4 +1,4 @@
-m_size: 3
-x_size: 4
+m_size: 8
+x_size: 8
 weight: 2.0
-inclusive_universes: true
+inclusive_universes: false

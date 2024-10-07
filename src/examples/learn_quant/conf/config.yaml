@@ -1,7 +1,6 @@
 defaults:
   - _self_
-  - universe: base
-  - grammar: base
+  - recipe: ???
 
 output: "learn_quant/outputs/"
 
