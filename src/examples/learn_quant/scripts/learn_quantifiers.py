@@ -9,6 +9,7 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from tqdm import tqdm
 import time
+import mlflow
 
 from ultk.util.io import read_grammatical_expressions
 
@@ -23,10 +24,16 @@ from ..training import QuantifierDataset, train_loop, MV_LSTM
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 
+    mlflow.set_tracking_uri("http://localhost:5000")
+    mlflow.set_experiment("learn_quantifiers")
+
     quantifiers_grammar.add_indices_as_primitives(4)
     expressions_path = cfg.expressions.output_dir + "X" + str(cfg.expressions.x_size) + "/M" + str(cfg.expressions.m_size) + "/d" + str(cfg.expressions.depth) + "/" + "generated_expressions.yml"
     print("Reading expressions from: ", expressions_path)
     expressions, _ = read_grammatical_expressions(expressions_path, quantifiers_grammar)
+
+    mlflow.log_params(cfg)
+    mlflow.set_tag("Notes", cfg.notes)
 
     if cfg.training.device == "mps":
         if torch.backends.mps.is_available():
