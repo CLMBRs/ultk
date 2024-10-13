@@ -14,12 +14,10 @@ expressions:
   split: 0.8
 
 training:
+  lightning: true
   device: cpu
   epochs: 10
-  early_stopping:
-    patience: 100
-    monitor: val_loss
-    mode: min
+  conditions: false
 
 model:
   _partial_: true

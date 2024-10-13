@@ -6,6 +6,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
+import lightning as L
+from lightning.pytorch.callbacks import EarlyStopping, Timer
+
+
 import numpy as np
 from tqdm import tqdm
 import time
@@ -18,22 +22,23 @@ from ultk.language.grammar import GrammaticalExpression
 from ..util import read_expressions
 from ..grammar import quantifiers_grammar
 from ..training import QuantifierDataset, train_loop, MV_LSTM
+from ..training_lightning import LightningModel
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="learn")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 
-    mlflow.set_tracking_uri("http://localhost:5000")
-    mlflow.set_experiment("learn_quantifiers")
+    #mlflow.set_tracking_uri("http://localhost:5000")
+    #mlflow.set_experiment("learn_quantifiers")
 
     quantifiers_grammar.add_indices_as_primitives(4)
     expressions_path = cfg.expressions.output_dir + "X" + str(cfg.expressions.x_size) + "/M" + str(cfg.expressions.m_size) + "/d" + str(cfg.expressions.depth) + "/" + "generated_expressions.yml"
     print("Reading expressions from: ", expressions_path)
     expressions, _ = read_grammatical_expressions(expressions_path, quantifiers_grammar)
 
-    mlflow.log_params(cfg)
-    mlflow.set_tag("Notes", cfg.notes)
+    #mlflow.log_params(cfg)
+    #mlflow.set_tag("Notes", cfg.notes)
 
     if cfg.training.device == "mps":
         if torch.backends.mps.is_available():
@@ -68,27 +73,36 @@ def main(cfg: DictConfig) -> None:
             validation_dataloader = DataLoader(validation_data, batch_size=cfg.expressions.batch_size, shuffle=True)
 
             # create NN
-            model = MV_LSTM(n_features, n_timesteps, device=cfg.training.device)
-            criterion = torch.nn.BCEWithLogitsLoss()
-            optimizer = torch.optim.Adam(model.parameters(), lr=cfg.optimizer.lr)
-            model.to(device)
+            if cfg.training.lightning:
+                model = MV_LSTM(n_features, n_timesteps, device=cfg.training.device)
+                optimizer = torch.optim.Adam(model.parameters(), lr=cfg.optimizer.lr)
+                lightning = LightningModel(model, criterion=nn.BCEWithLogitsLoss(), optimizer=optimizer)
+                timer_callback = Timer()
+                trainer = L.Trainer(max_epochs=cfg.training.epochs, accelerator=cfg.training.device, callbacks=[timer_callback, EarlyStopping(monitor="val_loss", mode="min")])
+                trainer.fit(lightning, train_dataloader, validation_dataloader)
+                total_time = timer_callback.time_elapsed("train")
+                print(f"Total training time: {total_time:.2f} seconds")
+            else:
+                model = MV_LSTM(n_features, n_timesteps, device=cfg.training.device)
+                criterion = torch.nn.BCEWithLogitsLoss()
+                optimizer = torch.optim.Adam(model.parameters(), lr=cfg.optimizer.lr)
 
-            start = time.time()
-            train_loop(train_dataloader, model, criterion, optimizer, cfg.training.epochs)
-            end = time.time()
-            print("Training time: ", end-start)
-            model.eval()
+                start = time.time()
+                train_loop(train_dataloader, model, criterion, optimizer, cfg.training.epochs, conditions=cfg.training.conditions)
+                end = time.time()
+                print("Training time: ", end-start)
+                model.eval()
 
-            # Disable gradient computation and reduce memory consumption.
-            with torch.no_grad():
-                running_vloss = 0.0
-                for i, vdata in enumerate(validation_dataloader):
-                    v_inputs, v_targets = vdata
-                    model.init_hidden(v_inputs.size(0))
-                    v_outputs = model(v_inputs)
-                    vloss = criterion(v_outputs, v_targets)
-                    running_vloss += vloss
-            print("Validation loss: ", running_vloss.item())
+                # Disable gradient computation and reduce memory consumption.
+                with torch.no_grad():
+                    running_vloss = 0.0
+                    for i, vdata in enumerate(validation_dataloader):
+                        v_inputs, v_targets = vdata
+                        model.init_hidden(v_inputs.size(0))
+                        v_outputs = model(v_inputs)
+                        vloss = criterion(v_outputs, v_targets)
+                        running_vloss += vloss
+                print("Validation loss: ", running_vloss.item())
 
 if __name__ == "__main__":
     main()

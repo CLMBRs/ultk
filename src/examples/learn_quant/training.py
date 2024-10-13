@@ -175,7 +175,7 @@ def compute_accuracy(outputs, targets):
 
     return accuracy
     
-def train_loop(dataloader, model, criterion, optimizer, epochs):
+def train_loop(dataloader, model, criterion, optimizer, epochs, conditions=None):
 
     def check_conditions(ledger, metrics):
         if metrics["accuracy"] > 0.99:
@@ -190,47 +190,48 @@ def train_loop(dataloader, model, criterion, optimizer, epochs):
     # Loop over epochs
     ledger = {"loss_tally": 0, "accuracy_tally": 0}
     terminate = False
-    while not terminate:
-        for epoch in range(epochs):
-            metrics = {"loss": 0, "accuracy": 0, "batch": 0, "epoch": 0}
-            running_loss = 0.0
-            running_accuracy = 0.0
-            print(f"Epoch {epoch+1}/{epochs}")
-            # Set the model to training mode
-            model.train()
-            for batch, (X, y) in enumerate(dataloader):
+    for epoch in range(epochs):
+        metrics = {"loss": 0, "accuracy": 0, "batch": 0, "epoch": 0}
+        running_loss = 0.0
+        running_accuracy = 0.0
+        print(f"Epoch {epoch+1}/{epochs}")
+        # Set the model to training mode
+        model.train()
+        for batch, (X, y) in enumerate(dataloader):
 
+            if conditions:
                 if check_conditions(ledger, metrics):
                     print("Conditions met. Stopping training.")
                     return
 
-                # Initialize the hidden state (assuming this is an RNN-based model)
-                model.init_hidden(X.size(0))
-                
-                # Zero out gradients before the backward pass
-                optimizer.zero_grad()
+            # Initialize the hidden state (assuming this is an RNN-based model)
+            model.init_hidden(X.size(0))
+            
+            # Zero out gradients before the backward pass
+            optimizer.zero_grad()
 
-                # Compute prediction and loss
-                pred = model(X)
-                loss = criterion(pred, y)
+            # Compute prediction and loss
+            pred = model(X)
+            loss = criterion(pred, y)
 
-                # Backpropagation
-                loss.backward()
-                optimizer.step()
+            # Backpropagation
+            loss.backward()
+            optimizer.step()
 
-                running_loss += loss.item()
+            running_loss += loss.item()
 
-                # Compute minibatch accuracy
-                accuracy = compute_accuracy(pred, y)
-                running_accuracy += accuracy.item()
+            # Compute minibatch accuracy
+            accuracy = compute_accuracy(pred, y)
+            running_accuracy += accuracy.item()
 
-                # Print progress
+            # Print progress
+            if batch % 10 == 0 or batch == len(dataloader)-1:
                 print(f"Epoch {epoch+1}, Batch {batch}, Cumulative Batch {epoch*len(dataloader)+batch}, Accuracy: {accuracy.item()}, Loss: {loss.item():.4f}")
-                metrics = {"loss": loss.item(), "accuracy": accuracy.item(), "batch": batch, "epoch": epoch}
+            metrics = {"loss": loss.item(), "accuracy": accuracy.item(), "batch": batch, "epoch": epoch}
 
-            # Average training loss and accuracy per epoch
-            avg_train_loss = running_loss / len(dataloader)
-            avg_train_accuracy = running_accuracy / len(dataloader)
+        # Average training loss and accuracy per epoch
+        avg_train_loss = running_loss / len(dataloader)
+        avg_train_accuracy = running_accuracy / len(dataloader)
 
-            # Optional: print overall progress at the end of the epoch
-            print(f"Epoch {epoch+1} completed\n")
+        # Optional: print overall progress at the end of the epoch
+        print(f"Epoch {epoch+1} completed\n")
