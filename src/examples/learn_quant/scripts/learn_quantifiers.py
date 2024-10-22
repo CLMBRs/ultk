@@ -28,6 +28,20 @@ from ..grammar import quantifiers_grammar
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
 from ..training_lightning import LightningModel
 import torch.nn as nn
+import random
+
+def set_and_log_seeds(mainrun=False):
+    # Set the seeds
+    seed = random.randint(0,999999)
+    
+    # Log the seed in MLFlow
+    if mainrun:
+        mlflow.log_param("mainrun_seed", seed)
+    else:
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        mlflow.log_param("childrun_seed", seed)
 
 # Weight initialization function (Xavier initialization)
 def init_weights(m):
@@ -125,6 +139,9 @@ def main(cfg: DictConfig) -> None:
         print("Running experiment: ", run_name)
 
         with mlflow.start_run(log_system_metrics=True, run_name=run_name) as mainrun:
+            
+            set_and_log_seeds(mainrun=True)
+
             mlflow.log_params(cfg)
             mlflow.set_tag("Notes", cfg.notes)
             mlf_logger = MLFlowLogger(experiment_name="learn_quantifiers", 
@@ -149,6 +166,7 @@ def main(cfg: DictConfig) -> None:
                 for fold, (train_ids, valid_ids) in enumerate(kfold.split(dataset)):
                     
                     with mlflow.start_run(run_name=f"{fold}", nested=True) as childrun:
+                        set_and_log_seeds()
 
                         print(f'FOLD {fold}')
                         print('--------------------------------')
@@ -168,6 +186,7 @@ def main(cfg: DictConfig) -> None:
                 for i in range(cfg.training.n_runs):
 
                     with mlflow.start_run(run_name=f"{i}", nested=True) as childrun:
+                        set_and_log_seeds()
 
                         print(f'RUN {i}')
                         print('--------------------------------')
