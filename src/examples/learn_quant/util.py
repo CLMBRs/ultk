@@ -4,6 +4,7 @@ import pandas as pd
 from yaml import load, dump
 from typing import Iterable, Union
 import dill as pkl
+import random 
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -18,6 +19,13 @@ from ultk.util.io import write_expressions
 from learn_quant.grammar import quantifiers_grammar
 from learn_quant.meaning import create_universe
 from learn_quant.quantifier import QuantifierUniverse
+
+
+def summarize_expression(expression: GrammaticalExpression):
+    print(str(expression))
+    sample = random.sample(list(expression.meaning.mapping), 10)
+    for model in sample:
+        print(model, expression.meaning.mapping[model])
 
 
 def read_expressions(

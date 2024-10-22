@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from concepts.contexts import Context
 from functools import cached_property
 import numpy as np
+from ultk.language.grammar import GrammaticalExpression
 
 # Define the mapping from characters to indices
 char_to_index = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4}
@@ -41,6 +42,14 @@ class QuantifierModel(Referent):
     B: frozenset = field(init=False)
 
     def __post_init__(self):
+        match self.name:
+            case str():
+                pass
+            case np.ndarray():
+                new_name = ''.join([str(x) for x in self.name])
+                object.__setattr__(self, 'name', new_name)
+            case _:
+                raise ValueError("The name must be a string or a numpy array")
         object.__setattr__(
             self,
             "A",
@@ -172,3 +181,9 @@ class QuantifierUniverse(Universe):
     def binarize_referents(self):
         return np.array([referent.binarize() for referent in self.referents])
 
+import random
+def summarize_expression(expression: GrammaticalExpression):
+    print(str(expression))
+    sample = random.sample(list(expression.meaning.mapping), 10)
+    for model in sample:
+        print(model, expression.meaning.mapping[model])
