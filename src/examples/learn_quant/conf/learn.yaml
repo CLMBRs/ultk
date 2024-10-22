@@ -16,8 +16,8 @@ expressions:
   generation_args:
     batch_size: 1000
     n_limit: 5000 # Minimum number of sample rows in dataset for a single class. Full dataset length is 2 * n_limit.
-    M_size: 4
-    X_size: 8
+    M_size: 12
+    X_size: 20
     entropy_threshold: 0.02
     inclusive: False
   batch_size: 64
@@ -29,12 +29,13 @@ training:
   n_runs: 1
   lightning: true
   device: cpu
-  epochs: 10
+  epochs: 5
   conditions: false
   early_stopping:
+    threshold: 0.01
     monitor: val_loss
     min_delta: 0.001
-    patience: 30
+    patience: 20
     mode: min
     check_on_train_epoch_end: false
 

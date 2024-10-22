@@ -13,7 +13,6 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 from sklearn.model_selection import KFold
 from lightning.pytorch.loggers import MLFlowLogger
 
-
 import numpy as np
 from tqdm import tqdm
 import time
@@ -26,7 +25,7 @@ from ultk.language.grammar import GrammaticalExpression
 from ..util import read_expressions
 from ..grammar import quantifiers_grammar
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
-from ..training_lightning import LightningModel
+from ..training_lightning import LightningModel, ThresholdEarlyStopping
 import torch.nn as nn
 import random
 
@@ -75,7 +74,9 @@ def train_lightning(cfg: DictConfig, expression: GrammaticalExpression, dataset:
                         val_check_interval=1,
                         logger=mlf_logger,
                         callbacks=[timer_callback, 
-                        EarlyStopping(monitor=cfg.training.early_stopping.monitor, 
+                        ThresholdEarlyStopping(
+                                    threshold=cfg.training.early_stopping.threshold,
+                                    monitor=cfg.training.early_stopping.monitor, 
                                     patience=cfg.training.early_stopping.patience, 
                                     min_delta=cfg.training.early_stopping.min_delta, 
                                     mode=cfg.training.early_stopping.mode, 
@@ -139,7 +140,7 @@ def main(cfg: DictConfig) -> None:
         print("Running experiment: ", run_name)
 
         with mlflow.start_run(log_system_metrics=True, run_name=run_name) as mainrun:
-            
+
             set_and_log_seeds(mainrun=True)
 
             mlflow.log_params(cfg)
