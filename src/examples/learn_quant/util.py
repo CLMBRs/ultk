@@ -125,6 +125,7 @@ def read_expressions_from_folder(
 def save_quantifiers(
     expressions_by_meaning: dict[GrammaticalExpression, Any],
     out_path: str = "generated_expressions.yml",
+    pickle: bool = True
 ):
     """
     Save the quantifiers expressions to a YAML file.
@@ -141,8 +142,9 @@ def save_quantifiers(
     pickle_output_file = Path(out_path).parent / "generated_expressions.pkl"
 
     # Open the file in write binary mode and dump the object
-    with open(pickle_output_file, "wb") as f:
-        pkl.dump(expressions_by_meaning, f)
+    if pickle:
+        with open(pickle_output_file, "wb") as f:
+            pkl.dump(expressions_by_meaning, f)
 
     print("Expressions have been YAML'ed to {} and PKL'ed to {}".format(out_path, pickle_output_file))
     
