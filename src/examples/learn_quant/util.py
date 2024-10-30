@@ -14,7 +14,7 @@ except ImportError:
 from ultk.language.grammar import GrammaticalExpression
 from ultk.language.language import Expression, Language
 from ultk.language.semantics import Meaning, Universe
-from ultk.util.io import write_expressions
+from ultk.util.io import write_expressions, read_grammatical_expressions
 
 from learn_quant.grammar import quantifiers_grammar
 from learn_quant.meaning import create_universe
@@ -48,17 +48,7 @@ def read_expressions(
         quantifiers_grammar.add_indices_as_primitives(universe.x_size)
         print(quantifiers_grammar)
 
-        with open(filename, "r") as f:
-            expression_list = load(f, Loader=Loader)
-    parsed_exprs = [
-        quantifiers_grammar.parse(expr_dict["grammatical_expression"])
-        for expr_dict in expression_list
-    ]
-    if universe is not None:
-        [expr.evaluate(universe) for expr in parsed_exprs]
-    by_meaning = {}
-    if return_by_meaning:
-        by_meaning = {expr.meaning: expr for expr in parsed_exprs}
+        parsed_exprs, by_meaning = read_grammatical_expressions(filename, quantifiers_grammar)
     return parsed_exprs, by_meaning
 
 
@@ -108,17 +98,7 @@ def read_expressions_from_folder(
 
     quantifiers_grammar.add_indices_as_primitives(universe.x_size)
 
-    with open(expressions_file, "r") as f:
-        expression_list = load(f, Loader=Loader)
-    parsed_exprs = [
-        quantifiers_grammar.parse(expr_dict["grammatical_expression"])
-        for expr_dict in expression_list
-    ]
-    if universe is not None:
-        [expr.evaluate(universe) for expr in parsed_exprs]
-    by_meaning = {}
-    if return_by_meaning:
-        by_meaning = {expr.meaning: expr for expr in parsed_exprs}
+    parsed_exprs, by_meaning = read_grammatical_expressions(expressions_file, quantifiers_grammar)
     return parsed_exprs, by_meaning, universe
 
 

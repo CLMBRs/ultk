@@ -141,8 +141,9 @@ def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfi
                 )
                 Path(outpath).parent.mkdir(parents=True, exist_ok=True)
 
-                print("Saving generated expressions...")
-                save_quantifiers(expressions_by_meaning, outpath)
+                if cfg.save:
+                    print("Saving generated expressions...")
+                    save_quantifiers(expressions_by_meaning, outpath)
 
                 writer.writerow(
                     [

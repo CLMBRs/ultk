@@ -88,6 +88,8 @@ class QuantifierModel(Referent):
         """
         if mode=='B_only':
             return np.array([1 if char in {'1', '2'} else 0 for char in self.name])
+        if mode=='both':
+            return np.array([1 if char in {'2'} else 0 for char in self.name])
         elif mode=='one_hot':
             # Create an identity matrix and select rows corresponding to indices
             indices = [char_to_index[char] for char in self.name]
@@ -178,8 +180,8 @@ class QuantifierUniverse(Universe):
         """
         return [referent.name for referent in self.referents]
     
-    def binarize_referents(self):
-        return np.array([referent.binarize() for referent in self.referents])
+    def binarize_referents(self, mode='B_only') -> np.ndarray:
+        return np.array([referent.binarize(mode=mode) for referent in self.referents])
 
 import random
 def summarize_expression(expression: GrammaticalExpression):

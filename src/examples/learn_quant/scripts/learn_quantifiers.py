@@ -22,7 +22,6 @@ from ultk.util.io import read_grammatical_expressions
 
 from ..quantifier import QuantifierModel
 from ultk.language.grammar import GrammaticalExpression
-from ..util import read_expressions
 from ..grammar import quantifiers_grammar
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
 from ..training_lightning import LightningModel, ThresholdEarlyStopping

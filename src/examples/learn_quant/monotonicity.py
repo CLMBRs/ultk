@@ -6,7 +6,6 @@ from ultk.language.semantics import Meaning
 from learn_quant.meaning import create_universe
 from learn_quant.util import read_expressions
 from learn_quant.quantifier import QuantifierUniverse, QuantifierModel
-from concepts.contexts import Context
 
 from typing import Dict
 from itertools import product
@@ -22,160 +21,90 @@ from pathlib import Path
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
+def binary_to_int(arr):
+    """ Converts a 2-D numpy array of 1s and 0s into integers, assuming each
+    row is a binary number.  By convention, left-most column is 1, then 2, and
+    so on, up until 2^(arr.shape[1]).
 
-def switch_direction(bools: np.ndarray, down=False) -> np.ndarray:
-    """Switches the value of True to False and vice versa.
-
-    Args:
-        bool (np.ndarray): Accepts a list of lists of bools
-
-    Returns:
-        np.ndarray: A list of lists of bools, flipped unless down == True.
+    :param arr: 2D numpy array
+    :returns: 1D numpy array, length arr.shape[0], containing integers
     """
-    if down:
-        return bools
-    else:
-        return bools
-
-
-def get_truth_matrix(universe: QuantifierUniverse) -> tuple[np.ndarray, list[str]]:
-    """Get a numpy matrix that stores the truth vectors of all models in the quantifier universe
-
-    Args:
-        universe (QuantifierUniverse): Universe of referents
-    
-    Returns:
-        np.ndarray: A matrix of booleans arrays that track the indices of set items of A intersected by B.
-    """
-    truth_array = []
-    names_array = []
-    for quantifier_model in universe.referents:
-        truth_vector = tuple(True if x == "2" else False for x in quantifier_model.name)
-        truth_array.append(truth_vector)
-        names_array.append(quantifier_model.name)
-    truth_matrix = np.array(truth_array)
-    return truth_matrix, names_array
-
-
-def calculate_lattice(universe: QuantifierUniverse, down=False) -> Context:
-    """
-
-    Returns:
-        Context: Created from ``objects``, ``properties``, and ``bools`` correspondence.
-
-        objects: Iterable of object label strings.
-        properties: Iterable of property label strings.
-        bools: Iterable of ``len(objects)`` tuples of ``len(properties)`` booleans.
-
-        See https://github.com/haberchr/ttps://github.com/haberchr/concepts/blob/master/concepts/contexts.py
-
-    """
-    truth_matrix, names = get_truth_matrix(universe)
-    properties = list(range(0, len(truth_matrix[0,:])))
-    bools = switch_direction(truth_matrix, down)
-    return Context(names, properties, bools)
-
-
-def get_sub_structures(concept_lattice: Context, name: list[str]) -> set[str]:
-    """Accepts a list of a singleton name to get a set of substructures of the indexed model, excluding the indexing model name.
-
-    Returns:
-        set(str): Tuple of substructures of the model indexed that exist in the universe.
-
-    """
-
-    return set(concept_lattice[name][0]) - set(name)
-
-
-def has_sub_structure(concept_lattice: Context, name: list[str]) -> bool:
-    """Identity function for a model having a substructure in the universe.
-
-    Returns:
-        bool: ``True`` if there is one or more substructures in the universe, otherwise ``False``.
-    """
-
-    return True if len(set(concept_lattice[name][0]) - set(name)) > 0 else False
-
-
-def get_sub_structure_in_meaning(
-    concept_lattice, name: list[str], meaning: Meaning
-) -> set[str]:
-    """Identity function for a model having a substructure in a defined Meaning.
-
-    Returns:
-        set(str): Tuple of substructures of the model indexed that exist in the selected Meaning.
-    """
-
-    names = set(referent.name for referent in meaning.referents)
-
-    return get_sub_structures(concept_lattice, name) & names
-
-
-def has_sub_structure_in_meaning(
-    concept_lattice, name: list[str], meaning: Meaning
-) -> bool:
-    """Identity function for a model having a substructure in a defined Meaning.
-
-    Returns:
-        bool: ``True`` if there is one or more substructures in the universe, otherwise ``False``.
-    """
-
-    return (
-        True
-        if len(get_sub_structure_in_meaning(concept_lattice, name, meaning)) > 0
-        else False
-    )
-
+    return arr.dot(1 << np.arange(arr.shape[-1]))
 
 def upward_monotonicity_entropy(all_models, quantifier):
-    """
-    Measures the degree of upward monotonicity of a quantifier as 1 - H(Q | true_pred) / H(Q),
-    where H is the (conditional) entropy, Q is the quantifier, and true_pred is the variable over models
-    indicating whether there's a true predecessor in the subset order.
+    """Measures degree of upward monotonicity of a quantifiers as
+    1 - H(Q | true_pred) / H(Q) where H is (conditional) entropy, and true_pred is the
+    variable over models saying whether there's a true _predecessor_ in the
+    subset order.
 
-    Parameters:
-    all_models (numpy.ndarray): A calculated matrix MxM, where each row is an array of booleans that correspond to whether a model at that index is a submodel.
-    quantifier (list): A list of truth values, same length as the models.
-
-    Returns:
-    float: The scalar value representing the degree of upward monotonicity of the quantifier.
+    :param all_models: list of models
+    :param quantifier: list of truth values, same len as models
+    :returns scalar
     """
 
-    submembership = all_models
+    quantifier = quantifier.flatten()
 
     if np.all(quantifier) or not np.any(quantifier):
         return 1
+    # uniform distributions
     p_q_true = sum(quantifier) / len(quantifier)
     p_q_false = 1 - p_q_true
-    q_ent = -p_q_true * np.log2(p_q_true) - p_q_false * np.log2(p_q_false)
+    q_ent = -p_q_true*np.log2(p_q_true) - p_q_false*np.log2(p_q_false)
+
+    # get integers corresponding to each model
+    model_ints = binary_to_int(all_models)
 
     def get_preds(num_arr, num):
+        """Given an array of ints, and an int, get all predecessors of the
+        model corresponding to int.
+        Returns an array of same shape as num_arr, but with bools
         """
-        Get the predictions for a given number from a 2D array.
+        return num_arr & num == num_arr
 
-        Parameters:
-        num_arr (numpy.ndarray): A 2D array of numbers.
-        num (int): The index of the number to retrieve predictions for.
+    def num_preds(num_arr, num):
+        preds = get_preds(num_arr, num).astype(int)
+        return sum(preds)
 
-        Returns:
-        numpy.ndarray: The predictions for the specified number.
-        """
-        return num_arr[num, :]
+    def has_true_pred(num_arr, quantifier, num):
+        preds = get_preds(num_arr, num)
+        return np.any(quantifier * preds)
 
-    def has_true_pred(num_arr, y):
-        return np.any(y * num_arr)
+    # vector of length quantifier, has a 1 if that model has a true
+    # predecessor, 0 otherwise
+    true_preds = np.vectorize(
+        lambda num: has_true_pred(model_ints, quantifier, num)
+    )(model_ints).astype(int)
 
-    # where necessary?
-    true_preds = np.where(np.dot(submembership, quantifier) >= 1, 1, 0)
+    # TODO: how to handle cases where true_preds is all 0s or all 1s, i.e.
+    # where every model does have a true predecessor?  In that case, we have
+    # H(Q | pred) = H(Q), so currently would get degree 0
+    """
+    if np.all(true_preds) or not np.any(true_preds):
+        # to avoid divide by zeros / conditioning on zero-prob
+        # TODO: does this make sense???
+        return q_ent
+    """
 
+    pred_weights =  np.vectorize(
+        lambda num: num_preds(model_ints, num)
+    )(model_ints)
+
+
+    # print('q:')
+    # print(quantifier)
+    # print(true_preds)
+    pred_prob = pred_weights / sum(pred_weights)
+    # print(pred_weights)
+    # print(pred_prob)
+    # TODO: should these be weighted by pred_weights, i.e. pred_prob?
     p_pred = sum(true_preds) / len(true_preds)
     p_nopred = 1 - p_pred
 
     # TODO: make this elegant! solve nan problems
-    q_pred = sum(quantifier.T * true_preds) / len(quantifier)
-    q_nopred = sum(quantifier.T * (1.0 - true_preds)) / len(quantifier)
-    noq_pred = sum((1.0 - quantifier.T) * true_preds) / len(quantifier)
-    noq_nopred = sum((1.0 - quantifier.T) * (1.0 - true_preds)) / len(quantifier)
+    q_pred = sum(quantifier * true_preds) / len(quantifier)
+    q_nopred = sum(quantifier * (1 - true_preds)) / len(quantifier)
+    noq_pred = sum((1 - quantifier) * true_preds) / len(quantifier)
+    noq_nopred = sum((1 - quantifier) * (1 - true_preds)) / len(quantifier)
 
     pred_logs = np.log2([noq_pred, q_pred] / p_pred)
     pred_logs[pred_logs == -np.inf] = 0
@@ -184,72 +113,75 @@ def upward_monotonicity_entropy(all_models, quantifier):
     ent_pred = -np.nansum(np.array([noq_pred, q_pred]) * pred_logs)
     ent_nopred = -np.nansum(np.array([noq_nopred, q_nopred]) * nopred_logs)
     cond_ent = ent_pred + ent_nopred
+    # print(cond_ent)
+    # print(q_ent)
 
     # return 0 if q_ent == 0 else 1 - (cond_ent / q_ent)
-    return (1.0 - cond_ent / q_ent)[0, 0]
+    return 1 - cond_ent / q_ent
 
 
-def calculate_monotonicity(universe, expressions, down=False) -> Dict[str, Dict[str, float]]:
+def measure_monotonicity(all_models, quantifier,
+                         measure=upward_monotonicity_entropy):
+    """ Measures degree of monotonicty, as max of the degree of
+    positive/negative monotonicty, for a given quantifier _and its negation_
+    (since truth values are symmetric for us).
+
+    :param all_models: list of models
+    :param quantifier: list of truth values
+    :param measure: method for computing degree of upward monotonicity of a Q
+    :return: max of measure applied to all_models and quantifier, plus 1- each
+    of those
     """
-    Calculates the monotonicity of a set of expressions over a universe of models.
+    interpretations = [
+        measure(all_models, quantifier),
+        measure(all_models, 1 - quantifier),
+        # downward monotonicity
+        measure(1 - all_models, 1 - quantifier),
+        measure(1 - all_models, quantifier)]
+    return np.max(interpretations)
 
-    Args:
-        universe (Universe): The universe of models over which the expressions are evaluated.
-        expressions (list): A list of expressions whose monotonicity is to be calculated.
-        down (bool, optional): If True, calculates downward monotonicity. If False, calculates upward monotonicity. Defaults to False.
 
-    Returns:
-        dict: A dictionary where the keys are the string representations of the expressions and the values are dictionaries containing the monotonicity metrics for each expression.
+def upward_monotonicity_extensions(all_models, quantifier):
     """
-    metrics = {}
-    concept_lattice = calculate_lattice(universe)
-
-    membership = sparse.lil_matrix((len(universe), len(expressions)), dtype=int)
-    submembership = sparse.lil_matrix((len(universe), len(universe)), dtype=int)
-    model_dictionary = {}
-    for model_id, model in enumerate(universe.referents):
-        model_dictionary[model.name] = model_id
-    for model_id, model in enumerate(universe.referents):
-        for expression_id, quantifier_expression in enumerate(expressions):
-            metrics[str(quantifier_expression)] = {}
-            if model in quantifier_expression.meaning.referents:
-                membership[model_id, expression_id] = 1
-        sub_ids = list(
-            map(
-                model_dictionary.__getitem__,
-                get_sub_structures(concept_lattice, [model.name]),
-            )
-        )
-        for sub_id in sub_ids:
-            submembership[sub_id, model_id] = 1
-
-    membership = membership.todense()
-    submembership = submembership.todense()
-
-    for expression_id, quantifier_expression in enumerate(expressions):
-        print("Calculating monotonicity for: ", quantifier_expression)
-        metrics[str(quantifier_expression)]["monotonicity"] = (
-            upward_monotonicity_entropy(submembership, membership[:, expression_id])
-        )
-
-    return metrics
+    Measures degree of upward monotonocity of a quantifier as % of extensions of each true model that are also true.
+    :param all_models: list of models
+    :param quantifier: list of truth values, same len as all_models
+    :return: scalar measure
+    """
+    if np.all(quantifier) or not np.any(quantifier):
+        return 1
+    props = []
+    #only consider those models for which the quantifier is true (non zero returns indices)
+    for i in np.nonzero(quantifier.flatten() == 1)[0]:
+        model = all_models[i, :]
+        tiled_model = np.tile(model, (len(all_models), 1))
+        extends = np.all(tiled_model * all_models == tiled_model, axis=1).flatten()
+        #proportion of true extensions of that model for the quantifier
+        props.append(np.sum(quantifier[extends])/np.sum(extends))
+    return np.mean(props)
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(cfg: DictConfig) -> None:
 
-    import pickle as pkl
-
+    import dill as pkl
     print(cfg)
-    uni = pkl.load(
-        open(
-            Path.cwd()
-            / Path("learn_quant/outputs")
-            / Path(cfg.measures.target)
-            / Path("master_universe.pkl"),
-            "rb",
-        )
-    )
+
+    try:
+        uni = pkl.load(
+            open(
+                Path.cwd()
+                / Path("learn_quant/outputs")
+                / Path(cfg.measures.target)
+                / Path("master_universe.pkl"),
+                "rb",
+            )
+        ) 
+    except FileNotFoundError:
+        print("Creating universe")
+        uni = create_universe(cfg.universe.m_size, cfg.universe.x_size)
+
+    print("Reading expressions")
     expressions, _ = read_expressions(
         Path.cwd()
         / Path("learn_quant/outputs")
@@ -258,18 +190,28 @@ def main(cfg: DictConfig) -> None:
         uni,
     )
 
-    print(len(expressions))
-    mm = calculate_monotonicity(uni, expressions)
-    # mm["greater_than(cardinality(A), cardinality(difference(B, A)))"]["monotonicity"]
-
-    sorted_monotonicity = sorted(
-        mm.items(), key=lambda x: x[1]["monotonicity"], reverse=True
-    )
-
-    print(len(sorted_monotonicity))
-    for x in sorted_monotonicity[0:10]:
-        print(x)
-
+    # All models should not use binarize referents, but "get_truth_matrix"
+    # Use b only and both? 
+    print("Binarizing referents")
+    all_models = uni.binarize_referents(mode="both")
+    # Create quantifiers like in original code
+    print("Creating quantifiers")
+    quantifiers = np.array([[expression.meaning.mapping[uni.referents[x]] for x in range(len(uni.referents))] for expression in expressions], dtype=int)
+    expression_names = np.array([expression.term_expression for expression in expressions])
+    
+    print("Measuring monotonicity")
+    mon_values = np.empty(shape=(len(quantifiers), 1))
+    for i in range(len(quantifiers)):
+        mon_values[i] = measure_monotonicity(all_models, quantifiers[i], upward_monotonicity_entropy)
+    order_indices = np.argsort(mon_values, axis=0)
+    print("Monotonicity values len:", len(mon_values))
+    print("expression_names len:", len(expression_names))
+    print("quantifiers len:", len(quantifiers))
+    outputs = [(expression_name, quantifier, mon_value)
+                for expression_name, quantifier, mon_value
+                in zip(expression_names[order_indices].tolist(), quantifiers[order_indices].tolist(), mon_values[order_indices].tolist())]
+    for x in outputs:
+        print(x[0], " : ", x[2])
 
 if __name__ == "__main__":
     main()
