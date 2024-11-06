@@ -32,7 +32,7 @@ training:
   k_splits: 5
   n_runs: 1
   lightning: true
-  device: cpu
+  device: cuda
   epochs: 5
   conditions: false
   early_stopping:
