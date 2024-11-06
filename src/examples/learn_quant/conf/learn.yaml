@@ -5,12 +5,16 @@ defaults:
 notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
+grammar:
+  indices: true
+  index_weight: 2.0
+
 expressions:
   n_limit: 2
-  x_size: 8
+  x_size: 4
   m_size: 4
   depth: 3
-  output_dir: src/examples/learn_quant/outputs/
+  output_dir: learn_quant/outputs/
   representation: one_hot
   downsampling: true
   generation_args:

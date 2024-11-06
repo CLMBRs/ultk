@@ -104,7 +104,9 @@ def read_expressions_from_folder(
 
 def save_quantifiers(
     expressions_by_meaning: dict[GrammaticalExpression, Any],
-    out_path: str = "generated_expressions.yml",
+    parent_dir: str,
+    universe: QuantifierUniverse = None,
+    indices_tag: str = "",
     pickle: bool = True
 ):
     """
@@ -115,16 +117,33 @@ def save_quantifiers(
         out_path (str, optional): The output file path. Defaults to "generated_expressions.yml".
     """
 
+    out_path = f"generated_expressions{indices_tag}.yml"
     print("Saving generated expressions to file...")
-    print("Output path:", os.getcwd() / Path(out_path))
-    write_expressions(expressions_by_meaning.values(), out_path)
+    print("Output path:", Path(parent_dir) / Path(out_path))
     
-    pickle_output_file = Path(out_path).parent / "generated_expressions.pkl"
+    # Create all necessary parent directories if there's a directory path
+    if parent_dir:
+        os.makedirs(parent_dir, exist_ok=True)
+
+    write_expressions(expressions_by_meaning.values(), Path(parent_dir) / Path(out_path))
+    
+    pickle_output_file = parent_dir / f"generated_expressions{indices_tag}.pkl"
 
     # Open the file in write binary mode and dump the object
     if pickle:
         with open(pickle_output_file, "wb") as f:
             pkl.dump(expressions_by_meaning, f)
+    
+    if universe:
+        # Create a new path for the pickle file
+        universe_path = f"master_universe.pkl"
+        universe_output_file = parent_dir / universe_path
+
+        # Open the file in write binary mode and dump the object
+        with open(universe_output_file, "wb") as f:
+            pkl.dump(universe, f)
+
+        print("Master universe has been pickled and saved to", pickle_output_file)
 
     print("Expressions have been YAML'ed to {} and PKL'ed to {}".format(out_path, pickle_output_file))
     
@@ -137,6 +156,7 @@ def save_inclusive_generation(
     m_size: int,
     x_size: int,
     depth: int,
+    indices_tag: str,
 ):
     """
     Save the generated expressions and the master universe to files.
@@ -165,18 +185,8 @@ def save_inclusive_generation(
             + "_"
             + str("d" + str(depth))
         )
-        / Path("generated_expressions.yml")
     )
-    Path(output_file).parent.mkdir(parents=True, exist_ok=True)
+    Path(output_file).mkdir(parents=True, exist_ok=True)
 
     print("Saving generated expressions...")
-    save_quantifiers(expressions_by_meaning, output_file)
-
-    # Create a new path for the pickle file
-    pickle_output_file = Path(output_file).parent / "master_universe.pkl"
-
-    # Open the file in write binary mode and dump the object
-    with open(pickle_output_file, "wb") as f:
-        pkl.dump(master_universe, f)
-
-    print("Master universe has been pickled and saved to", pickle_output_file)
+    save_quantifiers(expressions_by_meaning, output_file, universe=master_universe, indices_tag=indices_tag)

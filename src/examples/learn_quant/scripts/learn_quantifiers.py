@@ -22,7 +22,8 @@ from ultk.util.io import read_grammatical_expressions
 
 from ..quantifier import QuantifierModel
 from ultk.language.grammar import GrammaticalExpression
-from ..grammar import quantifiers_grammar
+from ..grammar import quantifiers_grammar, add_indices
+from ..sampling import DatasetInitializationError
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
 from ..training_lightning import LightningModel, ThresholdEarlyStopping
 import torch.nn as nn
@@ -42,11 +43,13 @@ def set_and_log_seeds(mainrun=False):
         mlflow.log_param("childrun_seed", seed)
 
 # Weight initialization function (Xavier initialization)
+"""
 def init_weights(m):
     if isinstance(m, nn.Linear):
         nn.init.xavier_uniform_(m.weight)
         if m.bias is not None:
             nn.init.zeros_(m.bias)
+"""
 
 def train(cfg: DictConfig, expression: GrammaticalExpression, dataset: Dataset, train_dataloader: DataLoader, validation_dataloader: DataLoader, mlf_logger: MLFlowLogger):
     if cfg.training.lightning:
@@ -125,15 +128,26 @@ def main(cfg: DictConfig) -> None:
 
     print(OmegaConf.to_yaml(cfg))
 
-    quantifiers_grammar.add_indices_as_primitives(4)
-    expressions_path = cfg.expressions.output_dir + "X" + str(cfg.expressions.x_size) + "/M" + str(cfg.expressions.m_size) + "/d" + str(cfg.expressions.depth) + "/" + "generated_expressions.yml"
+    from ..grammar import quantifiers_grammar
+    quantifiers_grammar, indices_tag = add_indices(grammar=quantifiers_grammar, 
+                indices=cfg.grammar.indices, 
+                m_size=cfg.expressions.m_size, 
+                weight=cfg.grammar.index_weight,
+                )
+    print(cfg.grammar.indices)
+    print(cfg.expressions.m_size)
+    print(cfg.grammar.index_weight)
+    print(indices_tag)
+    import os
+    print(os.getcwd())
+    expressions_path = cfg.expressions.output_dir + "M" + str(cfg.expressions.m_size) + "/X" + str(cfg.expressions.x_size) + "/d" + str(cfg.expressions.depth) + "/" + f"generated_expressions{indices_tag}.yml"
     print("Reading expressions from: ", expressions_path)
     expressions, _ = read_grammatical_expressions(expressions_path, quantifiers_grammar)
 
 
     device = set_device(cfg.training.device)
 
-    for expression in tqdm(expressions[1:1+cfg.expressions.n_limit]):
+    for expression in tqdm(expressions[0:1+cfg.expressions.n_limit]):
 
         run_name = f'{expression.rule_name}'
         print("Running experiment: ", run_name)
@@ -149,13 +163,18 @@ def main(cfg: DictConfig) -> None:
                                     tracking_uri="http://127.0.0.1:5000",
                                     run_id=mainrun.info.run_id)
 
-            print("Expression: ", expression.rule_name)
-            if cfg.expressions.generation_args:
-                print("Using generation args: ", cfg.expressions.generation_args)
-                dataset = QuantifierDataset(expression, representation=cfg.expressions.representation, downsampling=cfg.expressions.downsampling, generation_args=cfg.expressions.generation_args)
-            else:
-                print("No generation args provided")
-                dataset = QuantifierDataset(expression, representation=cfg.expressions.representation, downsampling=cfg.expressions.downsampling)
+            print("Expression: ", expression.term_expression)
+            try:
+                if cfg.expressions.generation_args:
+                    print("Using generation args: ", cfg.expressions.generation_args)
+                    dataset = QuantifierDataset(expression, representation=cfg.expressions.representation, downsampling=cfg.expressions.downsampling, generation_args=cfg.expressions.generation_args)
+                else:
+                    print("No generation args provided")
+                    dataset = QuantifierDataset(expression, representation=cfg.expressions.representation, downsampling=cfg.expressions.downsampling)
+            except DatasetInitializationError as e:
+                print(f"Skipping the expression due to error: {e}")
+                continue
+
             dataset.inputs = dataset.inputs.to(device)
             dataset.targets = dataset.targets.to(device)
 

@@ -13,10 +13,10 @@ from ultk.language.semantics import Meaning
 from typing import Any
 
 from ..quantifier import QuantifierUniverse
-from ..grammar import QuantifierGrammar
+from ..grammar import QuantifierGrammar, add_indices
 from ..meaning import create_universe
 from ..util import save_quantifiers, save_inclusive_generation
-
+from typing import Iterable
 
 def enumerate_quantifiers(
     depth: int,
@@ -44,9 +44,12 @@ def enumerate_quantifiers(
 
 def generate_expressions(quantifiers_grammar: QuantifierGrammar, cfg: DictConfig, universe: QuantifierUniverse = None):
 
-    quantifiers_grammar.add_indices_as_primitives(
-        cfg.universe.m_size, cfg.universe.weight
-    )
+    quantifiers_grammar, indices_tag = add_indices(quantifiers_grammar, 
+                indices=cfg.grammar.indices, 
+                m_size=cfg.universe.m_size, 
+                weight=cfg.universe.weight,
+                )
+
     if not universe:
         quantifiers_universe = create_universe(cfg.universe.m_size, cfg.universe.x_size)
     else:
@@ -55,25 +58,27 @@ def generate_expressions(quantifiers_grammar: QuantifierGrammar, cfg: DictConfig
         cfg.grammar.depth, quantifiers_universe, quantifiers_grammar
     )
 
-    outpath = (
+    parent_dir = (
         Path().cwd()
         / Path(cfg.output)
         / Path("M" + str(cfg.universe.m_size))
         / Path("X" + str(cfg.universe.x_size))
         / Path("d" + str(cfg.grammar.depth))
-        / Path("generated_expressions.yml")
     )
     if cfg.save:
-        save_quantifiers(expressions_by_meaning, outpath)
+        save_quantifiers(expressions_by_meaning, parent_dir, universe=quantifiers_universe, indices_tag=indices_tag)
     else:
         return expressions_by_meaning
 
 
 def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfig):
 
-    time_log = pathlib.Path(cfg.output) / pathlib.Path(
-        "generated_expressions_time_log.csv"
-    )
+    if cfg.time_trial_log:
+        time_log = pathlib.Path(cfg.output) / pathlib.Path(cfg.time_trial_log)
+    else:
+        time_log = pathlib.Path(cfg.output) / pathlib.Path(
+            "generated_expressions_time_log.csv"
+        )
 
     # Remove old time log
     if os.path.exists(time_log):
@@ -104,9 +109,11 @@ def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfi
 
             # Ensure that primitives are added to the grammar up to `m_size`
             quantifiers_grammar_at_depth = deepcopy(quantifiers_grammar)
-            quantifiers_grammar_at_depth.add_indices_as_primitives(
-                m_size, cfg.universe.weight
-            )
+            quantifiers_grammar_at_depth, indices_tag = add_indices(quantifiers_grammar_at_depth, 
+                indices=cfg.grammar.indices, 
+                m_size=m_size, 
+                weight=cfg.universe.weight,
+                )
             print(quantifiers_grammar_at_depth)
 
             # Create the universe
@@ -132,18 +139,17 @@ def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfi
 
                 from pathlib import Path
 
-                outpath = (
+                parent_dir = (
                     Path(cfg.output)
                     / Path("X" + str(cfg.universe.x_size))
                     / Path("M" + str(m_size))
                     / Path(str("d" + str(depth)))
-                    / Path("generated_expressions.yml")
                 )
-                Path(outpath).parent.mkdir(parents=True, exist_ok=True)
+                Path(parent_dir).mkdir(parents=True, exist_ok=True)
 
                 if cfg.save:
                     print("Saving generated expressions...")
-                    save_quantifiers(expressions_by_meaning, outpath)
+                    save_quantifiers(expressions_by_meaning, parent_dir, universe=quantifier_universe, indices_tag=indices_tag)
 
                 writer.writerow(
                     [
@@ -173,9 +179,11 @@ def generate_inclusive_expressions(quantifiers_grammar, cfg, save=True):
 
         # Ensure that primitives are added to the grammar up to `m_size`
         quantifiers_grammar_at_depth = deepcopy(quantifiers_grammar)
-        quantifiers_grammar_at_depth.add_indices_as_primitives(
-            m_size, cfg.universe.weight
-        )
+        quantifiers_grammar_at_depth, indices_tag = add_indices(quantifiers_grammar_at_depth, 
+                indices=cfg.grammar.indices, 
+                m_size=m_size, 
+                weight=cfg.universe.weight,
+                )
         print(quantifiers_grammar_at_depth)
 
         # Create the universe
@@ -208,6 +216,7 @@ def generate_inclusive_expressions(quantifiers_grammar, cfg, save=True):
                 m_size,
                 cfg.universe.x_size,
                 cfg.grammar.depth,
+                indices_tag=indices_tag,
             )
 
 

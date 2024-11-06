@@ -78,12 +78,10 @@ def upward_monotonicity_entropy(all_models, quantifier):
     # TODO: how to handle cases where true_preds is all 0s or all 1s, i.e.
     # where every model does have a true predecessor?  In that case, we have
     # H(Q | pred) = H(Q), so currently would get degree 0
-    """
     if np.all(true_preds) or not np.any(true_preds):
         # to avoid divide by zeros / conditioning on zero-prob
         # TODO: does this make sense???
         return q_ent
-    """
 
     pred_weights =  np.vectorize(
         lambda num: num_preds(model_ints, num)
@@ -193,7 +191,7 @@ def main(cfg: DictConfig) -> None:
     # All models should not use binarize referents, but "get_truth_matrix"
     # Use b only and both? 
     print("Binarizing referents")
-    all_models = uni.binarize_referents(mode="both")
+    all_models = uni.binarize_referents(mode="B_only")
     # Create quantifiers like in original code
     print("Creating quantifiers")
     quantifiers = np.array([[expression.meaning.mapping[uni.referents[x]] for x in range(len(uni.referents))] for expression in expressions], dtype=int)

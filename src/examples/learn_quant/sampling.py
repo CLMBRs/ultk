@@ -4,6 +4,9 @@ import random
 import numpy as np
 from scipy.stats import entropy
 
+class DatasetInitializationError(Exception):
+    """Custom exception to indicate dataset initialization failure."""
+    pass
 
 def get_random_n_items(dictionary, n):
     if n > len(dictionary):
@@ -102,10 +105,10 @@ def sample_by_expression(expression: GrammaticalExpression,
         if len(true_mapping) > n_limit and len(false_mapping) > n_limit:
             conditions_met = True
         if entropy(list(mapping.values()), entropy_threshold) < 0.02:
-            raise ValueError(f"Entropy is too low with expression '{expression}'")
+            raise DatasetInitializationError(f"Entropy is too low with expression '{expression}'")
         counter += 1
         if counter > 1000:
-            raise ValueError("Could not find a suitable sample in 1000 iterations")
+            raise DatasetInitializationError("Could not find a suitable sample in 1000 iterations")
     sample = get_random_n_items(true_mapping, n_limit) | get_random_n_items(false_mapping, n_limit)
     sample_shuffled = shuffle_dictionary(sample)
     return sample_shuffled

@@ -8,8 +8,9 @@ mode:
   - generate
 
 save: true
+time_trial_log: M${universe.m_size}_X${universe.x_size}_D${grammar.depth}_idx-${grammar.indices}.csv
 
 measures:
-  target: "inclusive/M3_X4_d3/"
+  target: "M4/X4/d3"
   monotonicity:
     - all

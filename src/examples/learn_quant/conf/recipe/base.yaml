@@ -6,6 +6,7 @@ name: base
 
 grammar: 
   depth: ${grammar.depth}
+  indices: ${grammar.indices}
 
 universe:
   m_size: ${universe.m_size}
