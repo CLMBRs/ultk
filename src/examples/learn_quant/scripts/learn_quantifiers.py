@@ -167,13 +167,11 @@ def main(cfg: DictConfig) -> None:
 
             set_and_log_seeds(mainrun=True)
 
-            artifact_location = "file:///mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/mlartifacts"
             mlflow.log_params(cfg)
             mlflow.set_tag("Notes", cfg.notes)
             mlf_logger = MLFlowLogger(experiment_name="learn_quantifiers", 
                                     log_model=True,
                                     tracking_uri= mlflow.get_tracking_uri(),
-                                    artifact_location=artifact_location,
                                     run_id=mainrun.info.run_id)
 
             print("Expression: ", expression.term_expression)
@@ -233,8 +231,8 @@ def main(cfg: DictConfig) -> None:
                         train(cfg, expression, dataset, train_dataloader, validation_dataloader)
 
 if __name__ == "__main__":
-    #mlflow.set_tracking_uri("http://127.0.0.1:5000")
+    mlflow.set_tracking_uri("http://127.0.0.1:5000")
     #mlflow. disable_system_metrics_logging()
-    mlflow.set_tracking_uri("file:///mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/mlruns")
+    #mlflow.set_tracking_uri("file:///mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/mlruns")
     mlflow.set_experiment(f"learn_quantifiers")
     main()
