@@ -124,6 +124,11 @@ def train_base_pytorch(cfg: DictConfig, expression: GrammaticalExpression, datas
 @hydra.main(version_base=None, config_path="../conf", config_name="learn")
 def main(cfg: DictConfig) -> None:
 
+    mlflow.set_tracking_uri(f"http://{cfg.tracking.host}:{cfg.tracking.port}")
+    #mlflow. disable_system_metrics_logging()
+    #mlflow.set_tracking_uri("file:///mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/mlruns")
+    mlflow.set_experiment(f"learn_quantifiers")
+
     mlflow.pytorch.autolog()
 
     import os
@@ -231,8 +236,4 @@ def main(cfg: DictConfig) -> None:
                         train(cfg, expression, dataset, train_dataloader, validation_dataloader)
 
 if __name__ == "__main__":
-    mlflow.set_tracking_uri("http://127.0.0.1:5000")
-    #mlflow. disable_system_metrics_logging()
-    #mlflow.set_tracking_uri("file:///mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/mlruns")
-    mlflow.set_experiment(f"learn_quantifiers")
     main()

@@ -5,6 +5,10 @@ defaults:
 notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
+tracking:
+  host: g3115
+  port: 5000
+
 grammar:
   indices: true
   index_weight: 2.0
