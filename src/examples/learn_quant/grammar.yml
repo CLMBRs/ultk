@@ -51,9 +51,17 @@ rules:
   weight: 1.0
 - lhs: frozenset
   rhs:
+    - frozenset
+    - frozenset
+  name: "difference_sw"
+  func: |
+    lambda s1, s2 : s2 - s1
+  weight: 1.0
+- lhs: frozenset
+  rhs:
     - int
     - frozenset
-  name: "index"
+  name: "index" # can't tell if switching the order of the arguments will make a difference for monotonicity
   func: |
     lambda i, s: frozenset([sorted(s)[i]]) if i < len(s) else frozenset()
   weight: 1.0
@@ -71,6 +79,14 @@ rules:
   name: "subset_eq"
   func: |
     lambda s1, s2: s1 <= s2
+  weight: 1.0
+- lhs: bool
+  rhs:
+    - frozenset
+    - frozenset
+  name: "subset_eq_sw"
+  func: |
+    lambda s1, s2: s2 <= s1
   weight: 1.0
 # integer logical rules
 - lhs: bool

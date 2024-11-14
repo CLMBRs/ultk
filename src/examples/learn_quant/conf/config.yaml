@@ -11,6 +11,9 @@ save: true
 time_trial_log: M${universe.m_size}_X${universe.x_size}_D${grammar.depth}_idx-${grammar.indices}.csv
 
 measures:
-  target: "M4/X4/d3"
+  target: "M${universe.m_size}/X${universe.x_size}/d${grammar.depth}"
   monotonicity:
-    - all
+    direction:
+      - right_upward
+
+

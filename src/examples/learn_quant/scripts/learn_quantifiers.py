@@ -21,8 +21,8 @@ import mlflow
 from ultk.util.io import read_grammatical_expressions
 
 from ..quantifier import QuantifierModel
-from ultk.language.grammar import GrammaticalExpression
-from ..grammar import quantifiers_grammar, add_indices
+from ultk.language.grammar import GrammaticalExpression, Grammar
+from ..grammar import add_indices, QuantifierGrammar
 from ..sampling import DatasetInitializationError
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
 from ..training_lightning import LightningModel, ThresholdEarlyStopping
@@ -128,8 +128,14 @@ def main(cfg: DictConfig) -> None:
 
     print(OmegaConf.to_yaml(cfg))
 
-    from ..grammar import quantifiers_grammar
-    quantifiers_grammar, indices_tag = add_indices(grammar=quantifiers_grammar, 
+    if hasattr(cfg.grammar, "typed_rules"):
+        primitives_grammar = QuantifierGrammar.from_module(cfg.grammar.typed_rules.module_path)
+        quantifiers_grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
+        grammar = quantifiers_grammar | primitives_grammar
+    else:
+        grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
+    
+    grammar, indices_tag = add_indices(grammar=grammar, 
                 indices=cfg.grammar.indices, 
                 m_size=cfg.expressions.m_size, 
                 weight=cfg.grammar.index_weight,
@@ -142,9 +148,11 @@ def main(cfg: DictConfig) -> None:
     print(os.getcwd())
     expressions_path = cfg.expressions.output_dir + "M" + str(cfg.expressions.m_size) + "/X" + str(cfg.expressions.x_size) + "/d" + str(cfg.expressions.depth) + "/" + f"generated_expressions{indices_tag}.yml"
     print("Reading expressions from: ", expressions_path)
-    expressions, _ = read_grammatical_expressions(expressions_path, quantifiers_grammar)
+    expressions, _ = read_grammatical_expressions(expressions_path, grammar)
 
-
+    print("Number of expressions: ", len(expressions))
+    import time
+    time.sleep(15)
     device = set_device(cfg.training.device)
 
     for expression in tqdm(expressions[0:1+cfg.expressions.n_limit]):

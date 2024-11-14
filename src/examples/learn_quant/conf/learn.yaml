@@ -6,14 +6,15 @@ notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
 grammar:
-  indices: true
+  path: learn_quant/grammar.yml
+  indices: false
   index_weight: 2.0
 
 expressions:
   n_limit: 2
   x_size: 4
   m_size: 4
-  depth: 3
+  depth: 5
   output_dir: learn_quant/outputs/
   representation: one_hot
   downsampling: true

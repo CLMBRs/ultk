@@ -6,6 +6,7 @@ from ultk.language.semantics import Meaning
 from learn_quant.meaning import create_universe
 from learn_quant.util import read_expressions
 from learn_quant.quantifier import QuantifierUniverse, QuantifierModel
+from learn_quant.grammar import add_indices, get_indices_tag, QuantifierGrammar
 
 from typing import Dict
 from itertools import product
@@ -15,11 +16,15 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from scipy import sparse
+from copy import deepcopy
 
 from pathlib import Path
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
+
+# e.g.:
+# python -m learn_quant.monotonicity recipe=test_monotonicity
 
 def binary_to_int(arr):
     """ Converts a 2-D numpy array of 1s and 0s into integers, assuming each
@@ -31,7 +36,7 @@ def binary_to_int(arr):
     """
     return arr.dot(1 << np.arange(arr.shape[-1]))
 
-def upward_monotonicity_entropy(all_models, quantifier):
+def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
     """Measures degree of upward monotonicity of a quantifiers as
     1 - H(Q | true_pred) / H(Q) where H is (conditional) entropy, and true_pred is the
     variable over models saying whether there's a true _predecessor_ in the
@@ -54,39 +59,54 @@ def upward_monotonicity_entropy(all_models, quantifier):
     # get integers corresponding to each model
     model_ints = binary_to_int(all_models)
 
-    def get_preds(num_arr, num):
+    def get_preds(num_arr, num, flip=False):
         """Given an array of ints, and an int, get all predecessors of the
         model corresponding to int.
         Returns an array of same shape as num_arr, but with bools
         """
-        return num_arr & num == num_arr
+        if not flip:
+            return num_arr & num == num_arr
+        else:
+            return num_arr & num == num
 
-    def num_preds(num_arr, num):
-        preds = get_preds(num_arr, num).astype(int)
+    def num_preds(num_arr, num, flip=False):
+        preds = get_preds(num_arr, num, flip).astype(int)
         return sum(preds)
 
-    def has_true_pred(num_arr, quantifier, num):
-        preds = get_preds(num_arr, num)
+    def has_true_pred(num_arr, quantifier, num, flip=False):
+        preds = get_preds(num_arr, num, flip)
         return np.any(quantifier * preds)
 
     # vector of length quantifier, has a 1 if that model has a true
     # predecessor, 0 otherwise
     true_preds = np.vectorize(
-        lambda num: has_true_pred(model_ints, quantifier, num)
+        lambda num: has_true_pred(model_ints, quantifier, num, flip)
     )(model_ints).astype(int)
 
     # TODO: how to handle cases where true_preds is all 0s or all 1s, i.e.
     # where every model does have a true predecessor?  In that case, we have
     # H(Q | pred) = H(Q), so currently would get degree 0
+    """
     if np.all(true_preds) or not np.any(true_preds):
         # to avoid divide by zeros / conditioning on zero-prob
         # TODO: does this make sense???
+        print("All true_preds are the same")
         return q_ent
+    """
 
     pred_weights =  np.vectorize(
-        lambda num: num_preds(model_ints, num)
+        lambda num: num_preds(model_ints, num, flip)
     )(model_ints)
 
+    #if cfg.measures.monotonicity.debug:
+    
+    """
+        predecessor_prob_library = {}
+        for i in range(len(model_ints)):
+            predecessor_prob_library.setdefault(model_ints[i], num_preds(model_ints, i) / len(model_ints))
+            print(f"Model {model_ints[i]}: {true_preds[i]}")
+            print(f"Preds {model_ints[i]}: {pred_weights[i]}")
+    """
 
     # print('q:')
     # print(quantifier)
@@ -104,9 +124,9 @@ def upward_monotonicity_entropy(all_models, quantifier):
     noq_pred = sum((1 - quantifier) * true_preds) / len(quantifier)
     noq_nopred = sum((1 - quantifier) * (1 - true_preds)) / len(quantifier)
 
-    pred_logs = np.log2([noq_pred, q_pred] / p_pred)
+    pred_logs = np.log2([noq_pred, q_pred] / p_pred, where=np.array([noq_pred, q_pred] / p_pred) > 0)
     pred_logs[pred_logs == -np.inf] = 0
-    nopred_logs = np.log2([noq_nopred, q_nopred] / p_nopred)
+    nopred_logs = np.log2([noq_nopred, q_nopred] / p_nopred, where=np.array([noq_nopred, q_nopred] / p_nopred) > 0)
     nopred_logs[nopred_logs == -np.inf] = 0
     ent_pred = -np.nansum(np.array([noq_pred, q_pred]) * pred_logs)
     ent_nopred = -np.nansum(np.array([noq_nopred, q_nopred]) * nopred_logs)
@@ -115,12 +135,27 @@ def upward_monotonicity_entropy(all_models, quantifier):
     # print(q_ent)
 
     # return 0 if q_ent == 0 else 1 - (cond_ent / q_ent)
+    if cfg.measures.monotonicity.debug:
+        #print("true pred", true_preds)
+        print("q_ent", q_ent)
+        #print("pred_prob", pred_prob)
+        #print("pred_weights", pred_weights)
+        print("p_pred", p_pred)
+        print("p_nopred", p_nopred)
+        print("q_pred", q_pred)
+        print("q_nopred", q_nopred)
+        print("noq_pred", noq_pred)
+        print("noq_nopred", noq_nopred)
+        print("pred_logs", pred_logs)
+        print("nopred_logs", nopred_logs)
+        print("ent_pred", ent_pred)
+        print("ent_nopred", ent_nopred)
+        print("cond_ent", cond_ent)
     return 1 - cond_ent / q_ent
 
-
-def measure_monotonicity(all_models, quantifier,
-                         measure=upward_monotonicity_entropy):
-    """ Measures degree of monotonicty, as max of the degree of
+def measure_monotonicity(all_models, flipped_models, both_models, quantifier,
+                         measure=upward_monotonicity_entropy, cfg=None, name=None):
+    """ Measures degree of monotonicity, as max of the degree of
     positive/negative monotonicty, for a given quantifier _and its negation_
     (since truth values are symmetric for us).
 
@@ -130,40 +165,60 @@ def measure_monotonicity(all_models, quantifier,
     :return: max of measure applied to all_models and quantifier, plus 1- each
     of those
     """
+    only_all = all_models - both_models
+    only_flipped = flipped_models- both_models
+
     interpretations = [
-        measure(all_models, quantifier),
-        measure(all_models, 1 - quantifier),
+        measure(all_models, quantifier, cfg,), # right upward monotonicity
+        measure(flipped_models, quantifier, cfg,), # left upward monotonicity
         # downward monotonicity
-        measure(1 - all_models, 1 - quantifier),
-        measure(1 - all_models, quantifier)]
-    return np.max(interpretations)
+        measure(all_models, quantifier, cfg, flip=True), # right downward monotonicity 
+        measure(flipped_models, quantifier, cfg, flip=True)] # left downward monotonicity
+    
+    # assert measure(all_models, quantifier, cfg,) == measure(1- all_models, quantifier, cfg, flip=True) == measure(flipped_models - both_models, quantifier, cfg, flip=True)
+    
+    print(name)
+    print("\t", interpretations)
 
+    return np.max(np.clip(interpretations, 0.0, 1.0))
 
-def upward_monotonicity_extensions(all_models, quantifier):
-    """
-    Measures degree of upward monotonocity of a quantifier as % of extensions of each true model that are also true.
-    :param all_models: list of models
-    :param quantifier: list of truth values, same len as all_models
-    :return: scalar measure
-    """
-    if np.all(quantifier) or not np.any(quantifier):
-        return 1
-    props = []
-    #only consider those models for which the quantifier is true (non zero returns indices)
-    for i in np.nonzero(quantifier.flatten() == 1)[0]:
-        model = all_models[i, :]
-        tiled_model = np.tile(model, (len(all_models), 1))
-        extends = np.all(tiled_model * all_models == tiled_model, axis=1).flatten()
-        #proportion of true extensions of that model for the quantifier
-        props.append(np.sum(quantifier[extends])/np.sum(extends))
-    return np.mean(props)
+def get_true_predecessors(all_models, quantifier, flip=False):
 
+    quantifier = quantifier.flatten()
+
+    # get integers corresponding to each model
+    model_ints = binary_to_int(all_models)
+
+    def get_preds(num_arr, num, flip):
+        """Given an array of ints, and an int, get all predecessors of the
+        model corresponding to int.
+        Returns an array of same shape as num_arr, but with bools
+        """
+        if not flip:
+            return num_arr & num == num_arr
+        elif flip:
+            return num_arr & num == num
+
+    def num_preds(num_arr, num, flip):
+        preds = get_preds(num_arr, num, flip).astype(int)
+        return sum(preds)
+
+    def has_true_pred(num_arr, quantifier, num, flip):
+        preds = get_preds(num_arr, num, flip)
+        return np.any(quantifier * preds)
+
+    # vector of length quantifier, has a 1 if that model has a true
+    # predecessor, 0 otherwise
+    true_preds = np.vectorize(
+        lambda num: has_true_pred(model_ints, quantifier, num, flip=flip)
+    )(model_ints).astype(int)
+
+    return true_preds
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(cfg: DictConfig) -> None:
 
     import dill as pkl
-    print(cfg)
 
     try:
         uni = pkl.load(
@@ -179,37 +234,72 @@ def main(cfg: DictConfig) -> None:
         print("Creating universe")
         uni = create_universe(cfg.universe.m_size, cfg.universe.x_size)
 
+    print("Size of universe: ", len(uni.referents))
+    # Filter out referents with certain digits in their names (e.g. 3, 4)
+    if cfg.measures.monotonicity.universe_filter and any(cfg.measures.monotonicity.universe_filter):
+        test_referents = tuple(
+            ref for ref in deepcopy(uni.referents)
+            if not any(str(digit) in ref.name for digit in cfg.measures.monotonicity.universe_filter)
+        )
+        print("Size of filtered universe: ", len(test_referents))
+        uni = QuantifierUniverse(referents=test_referents, m_size=cfg.universe.m_size, x_size=cfg.universe.x_size)
+
     print("Reading expressions")
+
+    if hasattr(cfg.grammar, "typed_rules"):
+        print("Loading rules from module...")
+        primitives_grammar = QuantifierGrammar.from_module(cfg.grammar.typed_rules.module_path)
+        quantifiers_grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
+        grammar = quantifiers_grammar | primitives_grammar
+    else:
+        grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
+    
+    indices_tag = get_indices_tag(indices=cfg.grammar.indices)
     expressions, _ = read_expressions(
         Path.cwd()
         / Path("learn_quant/outputs")
         / Path(cfg.measures.target)
-        / "generated_expressions.yml",
+        / f"generated_expressions{indices_tag}.yml",
         uni,
+        add_indices=cfg.grammar.indices,
+        grammar=grammar,
     )
 
     # All models should not use binarize referents, but "get_truth_matrix"
     # Use b only and both? 
     print("Binarizing referents")
-    all_models = uni.binarize_referents(mode="B_only")
+    all_models = uni.binarize_referents(mode="B")
+    flipped_models = uni.binarize_referents(mode="A")
+    both_models = uni.binarize_referents(mode="both")
+    #print(all_models)
     # Create quantifiers like in original code
     print("Creating quantifiers")
     quantifiers = np.array([[expression.meaning.mapping[uni.referents[x]] for x in range(len(uni.referents))] for expression in expressions], dtype=int)
     expression_names = np.array([expression.term_expression for expression in expressions])
     
+    # Select only quantifiers in the expression list (unless 'all' specified)
+    if "all" not in cfg.measures.expressions:
+        mask = np.isin(expression_names, cfg.measures.expressions)
+        indices = np.where(mask)[0]
+        quantifiers = quantifiers[indices]
+        expression_names = expression_names[indices]
+
     print("Measuring monotonicity")
-    mon_values = np.empty(shape=(len(quantifiers), 1))
-    for i in range(len(quantifiers)):
-        mon_values[i] = measure_monotonicity(all_models, quantifiers[i], upward_monotonicity_entropy)
-    order_indices = np.argsort(mon_values, axis=0)
-    print("Monotonicity values len:", len(mon_values))
-    print("expression_names len:", len(expression_names))
-    print("quantifiers len:", len(quantifiers))
-    outputs = [(expression_name, quantifier, mon_value)
-                for expression_name, quantifier, mon_value
-                in zip(expression_names[order_indices].tolist(), quantifiers[order_indices].tolist(), mon_values[order_indices].tolist())]
-    for x in outputs:
-        print(x[0], " : ", x[2])
+
+    if "all" in cfg.measures.monotonicity.direction:
+        mon_values = np.empty(shape=(len(quantifiers), 1))
+        for i in range(len(quantifiers)):
+            mon_values[i] = measure_monotonicity(all_models, flipped_models, both_models, quantifiers[i], upward_monotonicity_entropy, cfg, name=expression_names[i])
+        order_indices = np.argsort(mon_values, axis=0)[::-1]
+        print("Monotonicity values len:", len(mon_values))
+        print("expression_names len:", len(expression_names))
+        print("quantifiers len:", len(quantifiers))
+        outputs = [(expression_name, quantifier, mon_value)
+                    for expression_name, quantifier, mon_value
+                    in zip(expression_names[order_indices].tolist(), quantifiers[order_indices].tolist(), mon_values[order_indices].tolist())]
+        for x in outputs:
+            print(x[0], " : ", x[2])
+
 
 if __name__ == "__main__":
     main()

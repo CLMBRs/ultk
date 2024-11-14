@@ -10,6 +10,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from ultk.language.grammar import GrammaticalExpression
 from ultk.language.semantics import Meaning
+from ultk.language.grammar import Grammar
 from typing import Any
 
 from ..quantifier import QuantifierUniverse
@@ -17,6 +18,9 @@ from ..grammar import QuantifierGrammar, add_indices
 from ..meaning import create_universe
 from ..util import save_quantifiers, save_inclusive_generation
 from typing import Iterable
+
+# e.g.:
+# python -m learn_quant.scripts.generate_expressions mode=generate universe.inclusive_universes=false universe.m_size=4 universe.x_size=5 grammar.depth=3 recipe=base grammar.indices=true
 
 def enumerate_quantifiers(
     depth: int,
@@ -47,7 +51,7 @@ def generate_expressions(quantifiers_grammar: QuantifierGrammar, cfg: DictConfig
     quantifiers_grammar, indices_tag = add_indices(quantifiers_grammar, 
                 indices=cfg.grammar.indices, 
                 m_size=cfg.universe.m_size, 
-                weight=cfg.universe.weight,
+                weight=cfg.grammar.weight,
                 )
 
     if not universe:
@@ -98,6 +102,7 @@ def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfi
                 "elapsed_time_creation",
             ]
         )
+        f.flush()
 
         for m_size in range(1, cfg.universe.m_size + 1):
 
@@ -112,7 +117,7 @@ def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfi
             quantifiers_grammar_at_depth, indices_tag = add_indices(quantifiers_grammar_at_depth, 
                 indices=cfg.grammar.indices, 
                 m_size=m_size, 
-                weight=cfg.universe.weight,
+                weight=cfg.grammar.weight,
                 )
             print(quantifiers_grammar_at_depth)
 
@@ -141,8 +146,8 @@ def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfi
 
                 parent_dir = (
                     Path(cfg.output)
-                    / Path("X" + str(cfg.universe.x_size))
                     / Path("M" + str(m_size))
+                    / Path("X" + str(cfg.universe.x_size))
                     / Path(str("d" + str(depth)))
                 )
                 Path(parent_dir).mkdir(parents=True, exist_ok=True)
@@ -161,6 +166,7 @@ def generation_time_trial(quantifiers_grammar: QuantifierGrammar, cfg: DictConfi
                         creation_elapsed,
                     ]
                 )
+                f.flush()
 
 
 def generate_inclusive_expressions(quantifiers_grammar, cfg, save=True):
@@ -182,7 +188,7 @@ def generate_inclusive_expressions(quantifiers_grammar, cfg, save=True):
         quantifiers_grammar_at_depth, indices_tag = add_indices(quantifiers_grammar_at_depth, 
                 indices=cfg.grammar.indices, 
                 m_size=m_size, 
-                weight=cfg.universe.weight,
+                weight=cfg.grammar.weight,
                 )
         print(quantifiers_grammar_at_depth)
 
@@ -224,18 +230,26 @@ def generate_inclusive_expressions(quantifiers_grammar, cfg, save=True):
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 
-    quantifiers_grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
+    if hasattr(cfg.grammar, "typed_rules"):
+        primitives_grammar = QuantifierGrammar.from_module(cfg.grammar.typed_rules.module_path)
+        print(cfg.grammar.path)
+        quantifiers_grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
+        grammar = quantifiers_grammar | primitives_grammar
+    else:
+        grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
+
+    from pprint import pprint
+    pprint(grammar._rules)
 
     if cfg.universe.inclusive_universes:
         # Generate expressions for universes up to size M
-        generate_inclusive_expressions(quantifiers_grammar, cfg)
+        generate_inclusive_expressions(grammar, cfg)
     elif "time_trial" in cfg.mode:
         # Time the generation of expressions for universes up to size M and depths up to D at fixed X
-        generation_time_trial(quantifiers_grammar, cfg)
+        generation_time_trial(grammar, cfg)
     elif "generate" in cfg.mode:
         # Generate expressions for a single universe at size M
-        generate_expressions(quantifiers_grammar, cfg)
-
+        generate_expressions(grammar, cfg)
 
 if __name__ == "__main__":
     main()
