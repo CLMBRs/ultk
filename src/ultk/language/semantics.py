@@ -145,7 +145,8 @@ class Meaning(Generic[T]):
     # With the mapping, `universe` is not conceptually needed, but it is very useful to have it lying around.
     # `universe` should be the keys to `mapping`. 
     universe: Universe
-    _dist: FrozenDict[Referent, float] = FrozenDict({})
+    # _dist: FrozenDict[Referent, float] = FrozenDict({})
+    _dist = False #TODO: clean up
 
     @property
     def dist(self) -> FrozenDict[Referent, float]:
