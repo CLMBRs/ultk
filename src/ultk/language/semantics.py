@@ -169,5 +169,6 @@ class Meaning(Generic[T]):
     def __bool__(self):
         return bool(self.mapping)  # and bool(self.universe)
 
-    def __str__(self):
-        return f"Mapping:\n\t{'\n'.join(f"{ref}: {self.mapping[ref]}" for ref in self.mapping)}"# \ \nDistribution:\n\t{self.dist}\n"
+    # def __str__(self):
+        # BUG: this is a syntax error and idk what was trying to be done here
+        # return f"Mapping:\n\t{'\n'.join(f"{ref}: {self.mapping[ref]}" for ref in self.mapping)}"# \ \nDistribution:\n\t{self.dist}\n"
