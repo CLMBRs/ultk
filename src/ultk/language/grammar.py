@@ -176,10 +176,7 @@ class GrammaticalExpression(Expression[T]):
     def count_atoms(self):
         if self.children is None:
             return 1
-        length = 0
-        if self.children is not None:
-            length += sum(child.count_atoms() for child in self.children)
-        return length
+        return sum(child.count_atoms() for child in self.children)
 
     @classmethod
     def from_dict(cls, the_dict: dict, grammar: "Grammar") -> "GrammaticalExpression":
