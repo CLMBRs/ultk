@@ -171,6 +171,15 @@ class GrammaticalExpression(Expression[T]):
         if self.children:
             the_dict["children"] = tuple(child.to_dict() for child in self.children)
         return the_dict
+    
+    # Following function counts the total number of atoms / leaf nodes, as opposed to __len__, which counts all nodes
+    def count_atoms(self):
+        if self.children is None:
+            return 1
+        length = 0
+        if self.children is not None:
+            length += sum(child.count_atoms() for child in self.children)
+        return length
 
     @classmethod
     def from_dict(cls, the_dict: dict, grammar: "Grammar") -> "GrammaticalExpression":
