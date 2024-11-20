@@ -1,6 +1,7 @@
 """Re-implementation of the IBNamingModel at https://github.com/nogazs/ib-color-naming/blob/master/src/ib_naming_model.py."""
 
 import numpy as np
+from ultk.util.io import read_pickle, write_pickle
 from rdot.information import mutual_info, information_cond, gNID
 from rdot.optimizers.ib import IBOptimizer, IBResult
 from rdot.probability import joint
@@ -34,7 +35,7 @@ class IBNamingModel:
         self.pU_M = pU_M
         self.I_MU = mutual_info(pU_M * self.pM)
         self.betas = betas
-        self.IB_curve = IB_curve
+        self.IB_curve = np.array(IB_curve)
         self.qW_M = qW_M
         self.qW_M_orig = None
         self.F = IB_curve[0] - betas * IB_curve[1]
@@ -113,6 +114,14 @@ class IBNamingModel:
         qW_M_fit = self.qW_M[bl_ind]
         gnid = gNID(pW_M, qW_M_fit, self.pM)
         return epsilon, gnid, bl, qW_M_fit
+    
+    def save(self, fn: str = "ib_naming_model.pkl") -> None:
+        """Save as pickle binary."""
+        write_pickle(fn, self)
+
+    @classmethod
+    def from_pickle(cls, fn: str):
+        return read_pickle(fn)
 
 
 ##############################################################################
