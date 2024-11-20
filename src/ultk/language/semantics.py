@@ -157,6 +157,16 @@ class Meaning(Generic[T]):
     universe: Universe
     _dist: FrozenDict[Referent, float] = FrozenDict({})
 
+
+
+    def __init__(self, mapping, universe):
+        # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
+        object.__setattr__(self, "mapping", mapping)
+        object.__setattr__(self, "universe", universe)
+        for v in mapping.keys():
+            if v not in universe.referents:
+                raise ValueError(f"Referent `{v}` not in Universe `{universe}`") 
+
     @property
     def dist(self) -> FrozenDict[Referent, float]:
         if self._dist:
