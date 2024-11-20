@@ -4,6 +4,7 @@ import pytest
 
 from ultk.language.language import Expression, Language
 from ultk.language.semantics import Referent, Universe, Meaning
+from ultk.util.frozendict import FrozenDict
 
 
 class TestLanguage:
@@ -25,36 +26,34 @@ class TestLanguage:
 
     meaning = Meaning(mapping=uni_refs, universe=uni)
 
-    uni.referents
-
     dog = Expression(
         form="dog",
         meaning=Meaning(
-            mapping=tuple([Referent("dog", {"phylum": "animal"})]), universe=uni
+            mapping=FrozenDict({ref: ref.name == "dog" for ref in uni_refs}), universe=uni
         ),
     )
     cat = Expression(
         form="cat",
         meaning=Meaning(
-            mapping=tuple([Referent("cat", {"phylum": "animal"})]), universe=uni
+            mapping=FrozenDict({ref: ref.name == "cat" for ref in uni_refs}), universe=uni
         ),
     )
     tree = Expression(
         form="tree",
         meaning=Meaning(
-            mapping=tuple([Referent("tree", {"phylum": "plant"})]), universe=uni
+            mapping=FrozenDict({ref: ref.name == "tree" for ref in uni_refs}), universe=uni
         ),
     )
     shroom = Expression(
         form="shroom",
         meaning=Meaning(
-            mapping=tuple([Referent("shroom", {"phylum": "fungus"})]), universe=uni
+            mapping=FrozenDict({ref: ref.name == "shroom" for ref in uni_refs}), universe=uni
         ),
     )
     bird = Expression(
         form="bird",
         meaning=Meaning(
-            mapping=tuple([Referent("bird", {"phylum": "animal"})]), universe=uni
+            mapping=FrozenDict({ref: ref.name == "bird" for ref in uni_refs}), universe=uni
         ),
     )
 
@@ -81,7 +80,7 @@ class TestLanguage:
                     Expression(
                         form="dog",
                         meaning=Meaning(
-                            referents=tuple([Referent("dog", {"phylum": "animal"})]),
+                            mapping=FrozenDict({ref: ref.name == "dog" for ref in TestLanguage.uni.referents}),
                             universe=TestLanguage.uni2,
                         ),
                     ),
@@ -90,8 +89,11 @@ class TestLanguage:
 
     def test_language_degree(self):
         def isAnimal(exp: Expression) -> bool:
-            print("checking phylum of " + str(exp.meaning.referents[0]))
-            return exp.meaning.referents[0].phylum == "animal"
+            print("checking phylum of " + str(exp))
+            for k, v in exp.meaning.mapping.items():
+                if v and k.phylum != "animal":
+                    return False
+            return True
 
         assert TestLanguage.lang.degree_property(isAnimal) == 0.5
 
