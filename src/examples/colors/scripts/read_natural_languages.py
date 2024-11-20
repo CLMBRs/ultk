@@ -35,6 +35,9 @@ if __name__ == "__main__":
             # convert counts to probabilities
             total_count = term_df["spkr"].sum()
             chip_probabilities = term_df["spkr"] / total_count
+            # NOTE: the above appears to be obtaining p(m|w)
+            # TODO: look at Mycal's implementation
+
             # Referent -> probability (a float) mapping, for all Referents = Munsell chips
             referent_dict = {
                 color_universe.referents[chip_num]: safe_loc(

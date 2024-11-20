@@ -2,7 +2,7 @@ import numpy as np
 
 from ultk.language.semantics import Universe
 
-color_universe = Universe.from_csv("colors/outputs/color_universe.csv")
+color_universe = Universe.from_csv("src/examples/colors/outputs/color_universe.csv")
 
 # TODO: generate meaning dists once and serialize?
 # shape (330, 3): L*a*b* values for each Munsell chip
@@ -22,7 +22,7 @@ def meaning_distance(
     Returns:
         exp(-||center - other_point||^2 / (2 * sigma_squared))
     """
-    return np.exp(np.linalg.norm(center - other_point) ** 2 / (2 * sigma_squared))
+    return np.exp(-np.linalg.norm(center - other_point) ** 2 / (2 * sigma_squared))
 
 
 # shape: (330, 330)

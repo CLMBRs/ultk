@@ -1,3 +1,4 @@
+import pickle
 from ultk.language.language import Expression
 from ultk.language.semantics import Meaning, Universe
 from ultk.language.grammar import Grammar, GrammaticalExpression
@@ -65,3 +66,14 @@ def read_grammatical_expressions(
     if return_by_meaning:
         by_meaning = {expr.meaning: expr for expr in final_exprs}
     return final_exprs, by_meaning
+
+
+def write_pickle(fn: str, data):
+    with open(fn, "wb") as f:
+        pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+    print(f"Wrote a pickle binary to {fn}.")
+
+def read_pickle(fn: str):
+    with open(fn, "rb") as f:
+        data = pickle.load(f)
+    return data
