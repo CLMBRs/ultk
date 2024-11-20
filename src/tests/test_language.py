@@ -23,38 +23,38 @@ class TestLanguage:
         tuple(Referent(key, {"phylum": val}) for (key, val) in pairs2.items())
     )
 
-    meaning = Meaning(referents=uni_refs, universe=uni)
+    meaning = Meaning(mapping=uni_refs, universe=uni)
 
     uni.referents
 
     dog = Expression(
         form="dog",
         meaning=Meaning(
-            referents=tuple([Referent("dog", {"phylum": "animal"})]), universe=uni
+            mapping=tuple([Referent("dog", {"phylum": "animal"})]), universe=uni
         ),
     )
     cat = Expression(
         form="cat",
         meaning=Meaning(
-            referents=tuple([Referent("cat", {"phylum": "animal"})]), universe=uni
+            mapping=tuple([Referent("cat", {"phylum": "animal"})]), universe=uni
         ),
     )
     tree = Expression(
         form="tree",
         meaning=Meaning(
-            referents=tuple([Referent("tree", {"phylum": "plant"})]), universe=uni
+            mapping=tuple([Referent("tree", {"phylum": "plant"})]), universe=uni
         ),
     )
     shroom = Expression(
         form="shroom",
         meaning=Meaning(
-            referents=tuple([Referent("shroom", {"phylum": "fungus"})]), universe=uni
+            mapping=tuple([Referent("shroom", {"phylum": "fungus"})]), universe=uni
         ),
     )
     bird = Expression(
         form="bird",
         meaning=Meaning(
-            referents=tuple([Referent("bird", {"phylum": "animal"})]), universe=uni
+            mapping=tuple([Referent("bird", {"phylum": "animal"})]), universe=uni
         ),
     )
 
