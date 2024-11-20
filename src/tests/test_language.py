@@ -24,8 +24,6 @@ class TestLanguage:
         tuple(Referent(key, {"phylum": val}) for (key, val) in pairs2.items())
     )
 
-    meaning = Meaning(mapping=uni_refs, universe=uni)
-
     dog = Expression(
         form="dog",
         meaning=Meaning(
