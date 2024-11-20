@@ -25,7 +25,7 @@ class TestGrammar:
         parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
         expr_meaning = parsed_expression.evaluate(TestGrammar.universe)
         goal_meaning = Meaning(
-            tuple(referent for referent in TestGrammar.referents if referent.num > 2),
+            {referent: referent.num > 2 for referent in TestGrammar.referents},
             TestGrammar.universe,
         )
         assert expr_meaning == goal_meaning
