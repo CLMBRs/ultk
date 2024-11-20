@@ -33,6 +33,10 @@ class TestGrammar:
     def test_length(self):
         parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
         assert len(parsed_expression) == 5
+    
+    def test_atom_count(self):
+        parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
+        assert parsed_expression.count_atoms() == 3
 
     def test_yield(self):
         parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
