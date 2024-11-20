@@ -157,8 +157,6 @@ class Meaning(Generic[T]):
     universe: Universe
     _dist: FrozenDict[Referent, float] = FrozenDict({})
 
-
-
     def __init__(self, mapping, universe):
         # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
         object.__setattr__(self, "mapping", mapping)
