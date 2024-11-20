@@ -2,6 +2,7 @@
 
 import numpy as np
 from ultk.util.io import read_pickle, write_pickle
+from ultk.language.language import Language, Expression, Meaning, Referent, FrozenDict, Universe
 from rdot.information import mutual_info, information_cond, gNID
 from rdot.optimizers.ib import IBOptimizer, IBResult
 from rdot.probability import joint
@@ -188,3 +189,58 @@ def get_ib_naming_model(
     )
 
     return naming_model    
+
+
+##############################################################################
+# Integration with ULTK Language
+##############################################################################
+
+def encoder_to_language(
+    qW_M: np.ndarray, 
+    naming_model: IBNamingModel,
+    universe: Universe,
+    words: list[str] = None, 
+    name: str = None, 
+    natural: bool = False,
+    ) -> Language:
+    """Convert a stochastic encoder to a ULTK Language using an IBNamingModel bayesian decoder.
+    
+    Args:
+        qW_M (np.ndarray): A stochastic matrix where rows correspond to meanings
+            and columns correspond to words, defining the encoder.
+        naming_model (IBNamingModel): An instance of the IBNamingModel used to 
+            decode the encoder into a language.
+        universe (Universe): The universe containing referents and the structure 
+            in which the meanings are defined.
+        words (list[str], optional): A list of word forms to use. If None, default 
+            numeric indices are used. Defaults to None.
+        name (str, optional): The name of the resulting Language. Defaults to None.
+        natural (bool, optional): Whether the resulting Language is a natural 
+            language. Defaults to False.
+
+    Returns:
+        Language: The constructed Language object, where each expression maps a 
+        word form to its corresponding meaning.
+    """
+
+    if words is None:
+        words = range(qW_M.shape[1])
+
+    return Language(
+        expressions=tuple([
+            Expression(
+                form=str(words[i]),
+                meaning=Meaning[float](
+                    FrozenDict({
+                        # define each mapping from referent -> probability
+                        universe.referents[chip_num]: qm[chip_num]
+                        for chip_num in range(qW_M.shape[0])
+                    }), 
+                    universe,
+                )
+            )
+        for i, qm in enumerate(naming_model.m_hat(qW_M))
+        ]),
+        name=name,
+        natural=natural,
+    )
