@@ -54,22 +54,20 @@ class TestSemantics:
         assert Universe(refs) != TestSemantics.universe
 
     def test_meaning_subset(self):
-        refs = (TestSemantics.ref1,)
+        refs = {TestSemantics.ref1: True}
         meaning = Meaning(
             refs, TestSemantics.universe
         )  # This meaning should exist within the set of semantics
-        assert TestSemantics.ref1 in meaning.referents
+        assert TestSemantics.ref1 in meaning.mapping
 
         with pytest.raises(ValueError):
-            refs_bad = tuple(
-                list(refs)
-                + [
-                    Referent(
-                        name="neutral+epistemic",
-                        properties={"force": "neutral", "flavor": "epistemic"},
-                    )
-                ]
-            )
+            refs_bad = {
+                TestSemantics.ref1: True,
+                Referent(
+                    name="neutral+epistemic",
+                    properties={"force": "neutral", "flavor": "epistemic"},
+                ): True
+            }
             meaning = Meaning(
                 refs_bad, TestSemantics.universe
             )  # This meaning should not
