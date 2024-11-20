@@ -2,7 +2,7 @@
 .vscode/
 .DS_Store
 src/altk.egg-info
-.pkl
+**/*.pkl
 
 # Distribution/build
 dist/
