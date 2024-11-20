@@ -7,14 +7,6 @@ from examples.colors.meaning import meaning_distributions, cielab_points
 
 if __name__ == "__main__":
 
-
-    # This assumes you've run the script ./scripts/read_color_universe.py
-    # color_universe = Universe.from_csv("src/examples/colors/outputs/color_universe.csv")
-
-    # shape `(330, 3)`: L*a*b* values for each Munsell chip
-    # cielab_points = np.array([(ref.L, ref.a, ref.b) for ref in color_universe.referents])
-
-
     # shape: `(330, 330)`
     pU_M = meaning_distributions
 
@@ -26,7 +18,7 @@ if __name__ == "__main__":
         pU_M,
         pM,
         # add custom beta values here
-        betas=np.logspace(0, 10, 30,)
+        betas=np.logspace(0, 5, 1600,)
     )
 
 
