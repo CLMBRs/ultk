@@ -244,3 +244,66 @@ def encoder_to_language(
         name=name,
         natural=natural,
     )
+
+
+
+
+def pU_M_from_similarity(gamma: float, sim_mat: np.ndarray) -> np.ndarray:
+    """
+    Computes the conditional distribution p(U|M) based on similarity.
+
+    Args:
+        gamma (float): Scaling factor for the similarity matrix.
+        sim_mat (np.ndarray): Similarity matrix representing similarity between meanings (M) and referents (U).
+
+    Returns:
+        np.ndarray: Conditional distribution p(U|M).
+    """
+    pU_M = np.exp(gamma * sim_mat)
+    pU_M /= pU_M.sum(axis=1, keepdims=True)
+    return pU_M
+
+
+def get_imu(gamma: float, sim_mat: np.ndarray, pM: np.ndarray = None) -> np.ndarray:
+    """
+    Calculates the mutual information I(M;U) for a distribution p(U|M) ∝ exp(gamma * sim(u, m)).
+
+    Args:
+        gamma (float): Scaling factor for the similarity matrix.
+        sim_mat (np.ndarray): Similarity matrix representing similarity between meanings (M) and referents (U).
+        pM (np.ndarray, optional): Prior distribution over meanings (M). Defaults to a uniform distribution.
+
+    Returns:
+        np.ndarray: Mutual information I(M;U).
+    """
+    return information_cond(
+        pB_A=pU_M_from_similarity(gamma, sim_mat),
+        pA=pM if pM is not None else np.full(sim_mat.shape[0], 1/sim_mat.shape[0])
+    )
+
+
+def select_gamma(
+    similarity_matrix: np.ndarray,
+    pM: np.ndarray = None,
+    gammas: np.ndarray = np.logspace(-2, 2, 1000)
+) -> tuple[float, float, int, np.ndarray, np.ndarray]:
+    """
+    Selects the gamma value that corresponds to the midpoint of I(M;U) for a distribution p(U|M) ∝ exp(gamma * sim(u, m)).
+
+    Args:
+        similarity_matrix (np.ndarray): Matrix encoding pairwise similarities between meanings (M) and referents (U).
+        pM (np.ndarray, optional): Communicative need distribution over meanings (M). Defaults to None.
+        gammas (np.ndarray, optional): Range of gamma values to sample. Defaults to logspace(-2, 2, 1000).
+
+    Returns:
+        tuple: A tuple containing:
+            - float: Gamma value corresponding to the midpoint of I(M;U).
+            - float: Midpoint of I(M;U).
+            - int: Index of the midpoint in the gamma array.
+            - np.ndarray: Array of gamma values used.
+            - np.ndarray: Array of computed I(M;U) values.
+    """
+    imus = np.array([get_imu(g, similarity_matrix, pM) for g in gammas])
+    mid = (np.max(imus) - np.min(imus)) / 2
+    mid_ind = np.argmin((imus - mid) ** 2)
+    return gammas[mid_ind], mid, mid_ind, gammas, imus
