@@ -1,11 +1,12 @@
 """Re-implementation of the IBNamingModel at https://github.com/nogazs/ib-color-naming/blob/master/src/ib_naming_model.py."""
 
 import numpy as np
+import warnings
 from ultk.util.io import read_pickle, write_pickle
 from ultk.language.language import Language, Expression, Meaning, Referent, FrozenDict, Universe
-from rdot.information import mutual_info, information_cond, gNID
-from rdot.optimizers.ib import IBOptimizer, IBResult
-from rdot.probability import joint
+from .tools import mutual_info, information_cond
+from .ib import IBOptimizer, IBResult
+from ..probability import joint
 
 ##############################################################################
 # Base IBNamingModel class
@@ -123,6 +124,32 @@ class IBNamingModel:
     @classmethod
     def from_pickle(cls, fn: str):
         return read_pickle(fn)
+
+
+# Helper
+def gNID(pW_X: np.ndarray, pV_X: np.ndarray, pX: np.ndarray):
+    """Compute Generalized Normalized Informational Distance (gNID, in Zaslavsky et al. 2018, SI, Section 3.2) between two encoders. Code credit: https://github.com/nogazs/ib-color-naming/blob/master/src/tools.py#L94
+
+    Args:
+        pW_X: first encoder of shape `(|meanings|, |words|)`
+
+        pV_X: second encoder of shape `(|meanings|, |words|)`
+
+        pX: prior over source variables of shape `(|meanings|,)`
+    """
+    if len(pX.shape) == 1:
+        pX = pX[:, None]
+    elif pX.shape[0] == 1 and pX.shape[1] > 1:
+        pX = pX.T
+    pXW = pW_X * pX
+    pWV = pXW.T @ (pV_X)
+    pWW = pXW.T @ (pW_X)
+    pVV = (pV_X * pX).T @ (pV_X)
+    score = 1 - mutual_info(pWV) / (np.max([mutual_info(pWW), mutual_info(pVV)]))
+    if score < 0:
+        # N.B.: gNID is not necessarily non-negative (See SI, Section 3.2, paragraph 2.)
+        warnings.warn(f"Negative gNID: {score}.")    
+    return score
 
 
 ##############################################################################
