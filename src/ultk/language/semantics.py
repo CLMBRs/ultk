@@ -62,7 +62,7 @@ class Referent:
 
     def __hash__(self) -> int:
         return hash((self.name, frozenset(self.__dict__.items())))
-    
+
     def __repr__(self) -> str:
         return f"Referent({self.name}, {self.__dict__})"
 
@@ -114,7 +114,9 @@ class Universe:
         referents = tuple(Referent(record["name"], record) for record in records)
         default_prob = 1 / len(referents)
         # prior = FrozenDict({ referent: getattr(referent, "probability", default_prob) for referent in referents })
-        prior = tuple(getattr(referent, "probability", default_prob) for referent in referents)
+        prior = tuple(
+            getattr(referent, "probability", default_prob) for referent in referents
+        )
         return cls(referents, prior)
 
     @classmethod
@@ -135,31 +137,42 @@ class Meaning(Generic[T]):
     But, in general, meanings can have a different output type for, e.g. sub-sentential meanings..
 
     Properties:
-        mapping: a `FrozenDict` with `Referent` keys, but arbitrary type `T` as values. 
+        mapping: a `FrozenDict` with `Referent` keys, but arbitrary type `T` as values.
 
         universe: a Universe object.  The `Referent`s in the keys of `mapping` are expected to be exactly those in `universe`.
 
         _dist: a mapping representing a probability distribution over referents to associate with the meaning. By default, will be assumed to be uniform over the "true-like" `Referent`s in `mapping` (see `.dist`).
     """
+
     mapping: FrozenDict[Referent, T]
     # With the mapping, `universe` is not conceptually needed, but it is very useful to have it lying around.
-    # `universe` should be the keys to `mapping`. 
+    # `universe` should be the keys to `mapping`.
     universe: Universe
     # _dist: FrozenDict[Referent, float] = FrozenDict({})
-    _dist = False #TODO: clean up
+    _dist = False  # TODO: clean up
 
     @property
     def dist(self) -> FrozenDict[Referent, float]:
         if self._dist:
             # normalize weights to distribution
             total_weight = sum(self._dist.values())
-            return FrozenDict({referent: weight / total_weight for referent, weight in self._dist.items()})
+            return FrozenDict(
+                {
+                    referent: weight / total_weight
+                    for referent, weight in self._dist.items()
+                }
+            )
         else:
             num_true_like = sum(1 for value in self.mapping.values() if value)
             if num_true_like == 0:
                 raise ValueError("Meaning must have at least one true-like referent.")
-            return FrozenDict({referent: (1 / num_true_like if self.mapping[referent] else 0) for referent in self.mapping})
-        
+            return FrozenDict(
+                {
+                    referent: (1 / num_true_like if self.mapping[referent] else 0)
+                    for referent in self.mapping
+                }
+            )
+
     def is_uniformly_false(self) -> bool:
         """Return True if all referents in the meaning are mapped to False (or coercible to False).In the case where the meaning type is boolean, this corresponds to the characteristic function of the empty set."""
         return all(not value for value in self.mapping.values())
@@ -171,5 +184,5 @@ class Meaning(Generic[T]):
         return bool(self.mapping)  # and bool(self.universe)
 
     # def __str__(self):
-        # BUG: this is a syntax error and idk what was trying to be done here
-        # return f"Mapping:\n\t{'\n'.join(f"{ref}: {self.mapping[ref]}" for ref in self.mapping)}"# \ \nDistribution:\n\t{self.dist}\n"
+    # BUG: this is a syntax error and idk what was trying to be done here
+    # return f"Mapping:\n\t{'\n'.join(f"{ref}: {self.mapping[ref]}" for ref in self.mapping)}"# \ \nDistribution:\n\t{self.dist}\n"
