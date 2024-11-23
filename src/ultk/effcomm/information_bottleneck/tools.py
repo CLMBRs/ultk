@@ -8,9 +8,11 @@ from scipy.stats import entropy
 
 PRECISION = 1e-15
 
+
 def get_gaussian_noise(shape):
     """Small Gaussian noise."""
     return np.random.normal(loc=0.0, scale=1e-15, size=shape)
+
 
 def add_noise_to_stochastic_matrix(q, weight=1e-2):
     """
@@ -24,6 +26,7 @@ def add_noise_to_stochastic_matrix(q, weight=1e-2):
     # Normalize to ensure the rows sum to 1
     noisy_matrix /= noisy_matrix.sum(axis=1, keepdims=True)
     return noisy_matrix
+
 
 def random_stochastic_matrix(shape, gamma=1e-10):
     """
@@ -39,9 +42,11 @@ def random_stochastic_matrix(shape, gamma=1e-10):
     energies = gamma * np.random.randn(*shape)
     return softmax(energies, axis=1)
 
+
 ##############################################################################
 # Probability and Information
 ##############################################################################
+
 
 def entropy_bits(p: np.ndarray, axis=None) -> float:
     """Compute entropy of p, $H(X) = - \sum_x p(x) \log p(x)$, in bits."""
@@ -92,9 +97,11 @@ def information_cond(pA: np.ndarray, pB_A: np.ndarray) -> float:
         raise Exception
     return mi
 
+
 ##############################################################################
 # Postprocessing helper
 ##############################################################################
+
 
 def compute_lower_bound(rd_points):
     """
@@ -119,7 +126,8 @@ def compute_lower_bound(rd_points):
         # Check that each point increases in rate and does not increase in distortion
         if (
             pts[idx, 0] >= pts[selected_indices[-1], 0]  # Monotonically increasing rate
-            and pts[idx, 1] <= pts[selected_indices[-1], 1]  # Monotonically decreasing distortion
+            and pts[idx, 1]
+            <= pts[selected_indices[-1], 1]  # Monotonically decreasing distortion
         ):
             selected_indices.append(idx)
 

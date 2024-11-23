@@ -12,15 +12,16 @@ from ..probability import joint
 # Base IBNamingModel class
 ##############################################################################
 
+
 class IBNamingModel:
     """A model for simulating Information Bottleneck (IB) naming systems."""
 
     def __init__(
-        self, 
-        pM: np.ndarray, 
-        pU_M: np.ndarray, 
-        betas: np.ndarray, 
-        IB_curve: tuple[np.ndarray, np.ndarray], 
+        self,
+        pM: np.ndarray,
+        pU_M: np.ndarray,
+        betas: np.ndarray,
+        IB_curve: tuple[np.ndarray, np.ndarray],
         qW_M: np.ndarray,
     ):
         """
@@ -116,7 +117,7 @@ class IBNamingModel:
         qW_M_fit = self.qW_M[bl_ind]
         gnid = gNID(pW_M, qW_M_fit, self.pM)
         return epsilon, gnid, bl, qW_M_fit
-    
+
     def save(self, fn: str = "ib_naming_model.pkl") -> None:
         """Save as pickle binary."""
         write_pickle(fn, self)
@@ -149,13 +150,14 @@ def gNID(pW_X: np.ndarray, pV_X: np.ndarray, pX: np.ndarray):
     score = 1 - mutual_info(pWV) / (np.max([mutual_info(pWW), mutual_info(pVV)]))
     if score < 0:
         # N.B.: gNID is not necessarily non-negative (See SI, Section 3.2, paragraph 2.)
-        warnings.warn(f"Negative gNID: {score}.")    
+        warnings.warn(f"Negative gNID: {score}.")
     return score
 
 
 ##############################################################################
 # IB Bound computation
 ##############################################################################
+
 
 def compute_bound(
     pU_M: np.ndarray,
@@ -184,10 +186,11 @@ def compute_bound(
     results = optim.get_results()
     return results
 
+
 def get_ib_naming_model(
     pU_M: np.ndarray,
     pM: np.ndarray = None,
-    **bound_kwargs,    
+    **bound_kwargs,
 ) -> IBNamingModel:
     """
     Constructs an IBNamingModel by constructing the IB bound for the domain distribution P(M,U).
@@ -199,15 +202,21 @@ def get_ib_naming_model(
         **bound_kwargs: Additional parameters for IB bound computation. See `compute_bound` kwargs.
 
     Returns:
-        IBNamingModel: An IBNamingModel instance configured with the computed IB bound.    
-    
+        IBNamingModel: An IBNamingModel instance configured with the computed IB bound.
+
     """
     results = compute_bound(pU_M, pM, **bound_kwargs)
 
-    qW_M, complexity, accuracy, beta = zip(*[(res.qxhat_x, res.rate, res.accuracy, res.beta) for res in results if res is not None])
+    qW_M, complexity, accuracy, beta = zip(
+        *[
+            (res.qxhat_x, res.rate, res.accuracy, res.beta)
+            for res in results
+            if res is not None
+        ]
+    )
 
     IB_curve = (np.array(complexity), np.array(accuracy))
-    
+
     naming_model = IBNamingModel(
         pM[:, None],
         pU_M,
@@ -216,38 +225,39 @@ def get_ib_naming_model(
         qW_M,
     )
 
-    return naming_model    
+    return naming_model
 
 
 ##############################################################################
 # Integration with ULTK Language
 ##############################################################################
 
+
 def encoder_to_language(
-    qW_M: np.ndarray, 
+    qW_M: np.ndarray,
     naming_model: IBNamingModel,
     universe: Universe,
-    words: list[str] = None, 
-    name: str = None, 
+    words: list[str] = None,
+    name: str = None,
     natural: bool = False,
-    ) -> Language:
+) -> Language:
     """Convert a stochastic encoder to a ULTK Language using an IBNamingModel bayesian decoder.
-    
+
     Args:
         qW_M (np.ndarray): A stochastic matrix where rows correspond to meanings
             and columns correspond to words, defining the encoder.
-        naming_model (IBNamingModel): An instance of the IBNamingModel used to 
+        naming_model (IBNamingModel): An instance of the IBNamingModel used to
             decode the encoder into a language.
-        universe (Universe): The universe containing referents and the structure 
+        universe (Universe): The universe containing referents and the structure
             in which the meanings are defined.
-        words (list[str], optional): A list of word forms to use. If None, default 
+        words (list[str], optional): A list of word forms to use. If None, default
             numeric indices are used. Defaults to None.
         name (str, optional): The name of the resulting Language. Defaults to None.
-        natural (bool, optional): Whether the resulting Language is a natural 
+        natural (bool, optional): Whether the resulting Language is a natural
             language. Defaults to False.
 
     Returns:
-        Language: The constructed Language object, where each expression maps a 
+        Language: The constructed Language object, where each expression maps a
         word form to its corresponding meaning.
     """
 
@@ -255,25 +265,27 @@ def encoder_to_language(
         words = range(qW_M.shape[1])
 
     return Language(
-        expressions=tuple([
-            Expression(
-                form=str(words[i]),
-                meaning=Meaning[float](
-                    FrozenDict({
-                        # define each mapping from referent -> probability
-                        universe.referents[chip_num]: qm[chip_num]
-                        for chip_num in range(qW_M.shape[0])
-                    }), 
-                    universe,
+        expressions=tuple(
+            [
+                Expression(
+                    form=str(words[i]),
+                    meaning=Meaning[float](
+                        FrozenDict(
+                            {
+                                # define each mapping from referent -> probability
+                                universe.referents[chip_num]: qm[chip_num]
+                                for chip_num in range(qW_M.shape[0])
+                            }
+                        ),
+                        universe,
+                    ),
                 )
-            )
-        for i, qm in enumerate(naming_model.m_hat(qW_M))
-        ]),
+                for i, qm in enumerate(naming_model.m_hat(qW_M))
+            ]
+        ),
         name=name,
         natural=natural,
     )
-
-
 
 
 def pU_M_from_similarity(gamma: float, sim_mat: np.ndarray) -> np.ndarray:
@@ -306,14 +318,14 @@ def get_imu(gamma: float, sim_mat: np.ndarray, pM: np.ndarray = None) -> np.ndar
     """
     return information_cond(
         pB_A=pU_M_from_similarity(gamma, sim_mat),
-        pA=pM if pM is not None else np.full(sim_mat.shape[0], 1/sim_mat.shape[0])
+        pA=pM if pM is not None else np.full(sim_mat.shape[0], 1 / sim_mat.shape[0]),
     )
 
 
 def select_gamma(
     similarity_matrix: np.ndarray,
     pM: np.ndarray = None,
-    gammas: np.ndarray = np.logspace(-2, 2, 1000)
+    gammas: np.ndarray = np.logspace(-2, 2, 1000),
 ) -> tuple[float, float, int, np.ndarray, np.ndarray]:
     """
     Selects the gamma value that corresponds to the midpoint of I(M;U) for a distribution p(U|M) ∝ exp(gamma * sim(u, m)).

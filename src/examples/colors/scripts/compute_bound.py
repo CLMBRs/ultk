@@ -13,18 +13,19 @@ if __name__ == "__main__":
     # pM = np.full(pU_M.shape[0], 1/pU_M.shape[0])
     pM = np.load("src/examples/colors/data/zkrt18_prior.npy").squeeze()
 
-
     model = ib.get_ib_naming_model(
         pU_M,
         pM,
         # add custom beta values here
-        betas=np.logspace(0, 5, 1600,)
+        betas=np.logspace(
+            0,
+            5,
+            1600,
+        ),
     )
-
 
     # write model
     fn = "src/examples/colors/outputs/naming_model.pkl"
     with open(fn, "wb") as f:
         pickle.dump(model, f, protocol=pickle.HIGHEST_PROTOCOL)
     print(f"Wrote a pickle binary to {fn}.")
-
