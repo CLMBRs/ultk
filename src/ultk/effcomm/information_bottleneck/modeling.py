@@ -3,7 +3,7 @@
 import numpy as np
 import warnings
 from ultk.util.io import read_pickle, write_pickle
-from ultk.language.language import Language, Expression, Meaning, Referent, FrozenDict, Universe
+from ultk.language.language import Language, Expression, Meaning, FrozenDict, Universe
 from .tools import mutual_info, information_cond
 from .ib import IBOptimizer, IBResult
 from ..probability import joint
@@ -123,6 +123,7 @@ class IBNamingModel:
 
     @classmethod
     def from_pickle(cls, fn: str):
+        breakpoint()
         return read_pickle(fn)
 
 
