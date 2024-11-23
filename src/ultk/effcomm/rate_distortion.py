@@ -3,8 +3,8 @@
 import numpy as np
 from ultk.language.language import Language
 from ultk.effcomm.agent import LiteralSpeaker, Listener
+from ultk.effcomm.probability import joint, bayes
 from rdot.optimizers import IBOptimizer, IBResult
-from rdot.probability import joint, bayes
 from rdot.information import information_cond, mutual_info
 from rdot.distortions import ib_kl
 
@@ -58,11 +58,11 @@ def language_to_ib_encoder_decoder(
 
     A Bayesian decoder chooses an interpretation according to p(meaning | word), where
 
-    $P(m | w) = \\frac{P(M | W) \cdot P(M)} { P(W) }$
+    $P(m | w) = \\frac{P(M | W) \\cdot P(M)} { P(W) }$
 
-    Furthermore, we will require that each word w is deterministically interpreted as meaning $\hat{m}$ as follows:
+    Furthermore, we will require that each word w is deterministically interpreted as meaning $\\hat{m}$ as follows:
 
-    $\hat{m}_{w}(u) = \sum_m p(m|w) \cdot m(u)$
+    $\\hat{m}_{w}(u) = \\sum_m p(m|w) \\cdot m(u)$
 
     See https://github.com/nogazs/ib-color-naming/blob/master/src/ib_naming_model.py#L40.
 
@@ -95,8 +95,8 @@ def ib_encoder_to_point(
     prior: np.ndarray,
     meaning_dists: np.ndarray,
     encoder: np.ndarray,
-    decoder: np.ndarray = None,
-) -> tuple[float]:
+    decoder: np.ndarray | None = None,
+) -> tuple[float, float, float]:
     """Get (complexity, accuracy, comm_cost) IB coordinates.
 
     Args:
@@ -107,20 +107,23 @@ def ib_encoder_to_point(
         encoder: array of shape `(|meanings|, |words|)` representing P(W | M)
 
         decoder: array of shape `(|words|, |meanings|)` representing P(M | W).  By default is None, and the Bayesian optimal decoder will be inferred.
-    
+
     Returns:
         a tuple of floats corresponding to `(complexity, accuracy, comm_cost)`.
     """
 
     if decoder is None:
         decoder = ib_optimal_decoder(encoder, prior, meaning_dists)
-    
+
     # Unclear that the below is correct
     # encoder = rows_zero_to_uniform(encoder)
     # decoder = rows_zero_to_uniform(decoder)
 
     # IB complexity = info rate of encoder = I(meanings; words)
     complexity = information_cond(prior, encoder)
+
+    # (|meanings|, 1)
+    prior = prior[:, None]
 
     # IB accuracy/informativity = I(words; world states)
     pMW = encoder * prior
@@ -136,13 +139,16 @@ def ib_encoder_to_point(
 
     # pu_w = decoder @ meaning_dists
     # dist_mat = ib_kl(meaning_dists, pu_w,) # getting infs; I confirmed that this because there exists an x s.t. p(x) > 0 but q(x) = 0. Ask Noga what to do here. Add a little epsilon?
-    # distortion = np.sum( prior * ( encoder @ decoder ) * dist_mat )    
+    # distortion = np.sum( prior * ( encoder @ decoder ) * dist_mat )
 
     decoder_smoothed = decoder + 1e-20
     decoder_smoothed /= decoder_smoothed.sum(axis=1, keepdims=True)
     pu_w = decoder_smoothed @ meaning_dists
-    dist_mat = ib_kl(meaning_dists, pu_w,)
-    distortion = np.sum( prior * ( encoder @ decoder ) * dist_mat )
+    dist_mat = ib_kl(
+        meaning_dists,
+        pu_w,
+    )
+    distortion = np.sum(prior * encoder * dist_mat)
     # but this measure of distortion is almost an order magnitude higher than bayesian decoder
     # breakpoint()
 
