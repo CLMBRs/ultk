@@ -84,7 +84,8 @@ class IBNamingModel:
 
     def d_IB(self, pW_M: np.ndarray) -> float:
         """
-        Calculates the deviation from the IB curve, E[D[m||m_hat]] = I(M;U) - I(W;U).
+        Calculates the IB distortion for a given encoder, i.e. the KL divergence between speaker and listener meanings, $
+        \mathbb{E}\left[D[m||\hat{m}]\right] = I(M;U) - I(W;U)$.
 
         Args:
             pW_M (np.ndarray): Encoder (naming system) matrix.

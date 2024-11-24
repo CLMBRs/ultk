@@ -104,7 +104,7 @@ class IBOptimizer(BaseRDOptimizer):
         Args:
             pxy: 2D array of shape `(|X|, |Y|)` representing the joint probability mass function of the source and relevance variables.
 
-            beta: (scalar) the slope of the rate-distoriton function at the point where evaluation is required
+            betas: 1D array of values of beta, where each beta is a float corresponding to the slope of the rate-distoriton function at the point where evaluation is required
         """
         super().__init__(betas, *args, **kwargs)
 
@@ -128,7 +128,7 @@ class IBOptimizer(BaseRDOptimizer):
         *args,
         **kwargs,
     ) -> None:
-        """Vanilla IB distortion matrix."""
+        """IB distortion matrix."""
         self.dist_mat = ib_kl(np.exp(self.ln_py_x), np.exp(self.ln_qy_xhat))
 
     def update_eqs(
@@ -137,7 +137,7 @@ class IBOptimizer(BaseRDOptimizer):
         *args,
         **kwargs,
     ) -> None:
-        """Iterate the vanilla IB update equations."""
+        """Iterate the IB update equations."""
         self.ln_qxhat = next_ln_qxhat(self.ln_px, self.ln_qxhat_x)
         self.ln_qy_xhat = next_ln_qy_xhat(self.ln_pxy, self.ln_qxhat_x)
         self.next_dist_mat(*args, **kwargs)
