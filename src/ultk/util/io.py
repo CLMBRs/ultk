@@ -73,6 +73,7 @@ def write_pickle(fn: str, data):
         pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
     print(f"Wrote a pickle binary to {fn}.")
 
+
 def read_pickle(fn: str):
     with open(fn, "rb") as f:
         data = pickle.load(f)
