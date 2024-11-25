@@ -1,0 +1,7 @@
+name,force,flavor,probability
+weak+epistemic,weak,epistemic,0.1389370306181398
+weak+deontic,weak,deontic,0.0420277296360485
+weak+circumstantial,weak,circumstantial,0.1429809358752166
+strong+epistemic,strong,epistemic,0.1042749855574812
+strong+deontic,strong,deontic,0.2537550548815713
+strong+circumstantial,strong,circumstantial,0.3180242634315424
