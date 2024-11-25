@@ -2,7 +2,12 @@ import numpy as np
 
 from typing import Any
 from tqdm import tqdm
-from .tools import information_cond, random_stochastic_matrix, add_noise_to_stochastic_matrix, compute_lower_bound
+from .tools import (
+    information_cond,
+    random_stochastic_matrix,
+    add_noise_to_stochastic_matrix,
+    compute_lower_bound,
+)
 
 
 ##############################################################################
@@ -18,7 +23,7 @@ class BaseRDOptimizer:
         max_it: int = 1000,
         eps: float = 1e-15,
         ignore_converge: bool = False,
-        xhat_size = None,
+        xhat_size=None,
         **kwargs,
     ) -> None:
         """Base initializer for a Blahut-Arimoto-based optimizer of the Rate Distortion function.
@@ -52,7 +57,7 @@ class BaseRDOptimizer:
 
         self.xhat_size = xhat_size
         # if xhat_size is None:
-            # self.xhat_size = len(self.ln_px)
+        # self.xhat_size = len(self.ln_px)
 
         self.result = None  # namedtuple
         self.results: list[Any] = []  # list of namedtuples
@@ -95,7 +100,9 @@ class BaseRDOptimizer:
 
             reverse_annealing: whether to use reverse annealing or regular annealing. If self.output_size < len(self.ln_px), then this is set to false.
         """
-        if (self.xhat_size is not None and self.xhat_size < len(self.ln_px)) or not reverse_annealing:
+        if (
+            self.xhat_size is not None and self.xhat_size < len(self.ln_px)
+        ) or not reverse_annealing:
             reverse = False
         else:
             reverse = True
@@ -133,9 +140,7 @@ class BaseRDOptimizer:
             # sort betas in decreasing order
             betas = betas[::-1]
             # start with bijective mapping
-            init_q = np.eye(
-                len(self.ln_px)
-            )
+            init_q = np.eye(len(self.ln_px))
         else:
             # Random degenerate initialization
             xhat = random_stochastic_matrix(shape=(1, self.xhat_size), gamma=1e-2)
@@ -149,7 +154,7 @@ class BaseRDOptimizer:
         for beta in pbar:
             pbar.set_description(f"beta={beta:.5f}")
             candidates = []
-            for _ in range(num_restarts+1):
+            for _ in range(num_restarts + 1):
                 self.blahut_arimoto(beta, *args, init_q=init_q, **kwargs)
                 cand = self.results[-1]
                 init_q = cand.qxhat_x
