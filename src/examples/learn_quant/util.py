@@ -5,6 +5,9 @@ from yaml import load, dump
 from typing import Iterable, Union
 import dill as pkl
 import random 
+import os
+from pathlib import Path
+
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -69,9 +72,6 @@ def filter_expressions_by_rules(rules: list, expressions):
     """
     return list(filter(lambda x: str(x) in rules, expressions))
 
-
-import os
-from pathlib import Path
 
 
 def read_expressions_from_folder(
@@ -197,3 +197,15 @@ def save_inclusive_generation(
 
     print("Saving generated expressions...")
     save_quantifiers(expressions_by_meaning, output_file, universe=master_universe, indices_tag=indices_tag)
+
+
+def calculate_term_expression_depth(expression):
+    depth = 0
+    max_depth = 0
+    for char in expression:
+        if char == "(":
+            depth += 1
+            max_depth = max(max_depth, depth)
+        elif char == ")":
+            depth -= 1
+    return max_depth

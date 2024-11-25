@@ -8,10 +8,11 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import lightning as L
-from lightning.pytorch.callbacks import EarlyStopping, Timer
+from lightning.pytorch.callbacks import Timer, EarlyStopping
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from sklearn.model_selection import KFold
 from lightning.pytorch.loggers import MLFlowLogger
+import os
 
 import numpy as np
 from tqdm import tqdm
@@ -23,11 +24,26 @@ from ultk.util.io import read_grammatical_expressions
 from ..quantifier import QuantifierModel
 from ultk.language.grammar import GrammaticalExpression, Grammar
 from ..grammar import add_indices, QuantifierGrammar
+from ..util import calculate_term_expression_depth
 from ..sampling import DatasetInitializationError
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
-from ..training_lightning import LightningModel, ThresholdEarlyStopping
+from ..training_lightning import LightningModel, ThresholdEarlyStopping, StepEarlyStopping
+from ..monotonicity import load_grammar, get_verified_models, load_universe, filter_universe, filter_universe, measure_monotonicity, upward_monotonicity_entropy
 import torch.nn as nn
 import random
+from collections.abc import MutableMapping
+
+# HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.script training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false
+
+def flatten(dictionary, parent_key='', separator='_'):
+    items = []
+    for key, value in dictionary.items():
+        new_key = parent_key + separator + key if parent_key else key
+        if isinstance(value, MutableMapping):
+            items.extend(flatten(value, new_key, separator=separator).items())
+        else:
+            items.append((new_key, value))
+    return dict(items)
 
 def set_and_log_seeds(mainrun=False):
     # Set the seeds
@@ -66,7 +82,6 @@ def train_lightning(cfg: DictConfig, expression: GrammaticalExpression, dataset:
     selected_optimizer = instantiate(cfg.optimizer)
 
     model = selected_model(device=cfg.training.device)
-    print(model)
     
     optimizer = selected_optimizer(model.parameters())
     lightning = LightningModel(model, criterion=instantiate(cfg.criterion), optimizer=optimizer)
@@ -75,7 +90,8 @@ def train_lightning(cfg: DictConfig, expression: GrammaticalExpression, dataset:
                         accelerator=cfg.training.device,
                         val_check_interval=1,
                         logger=mlf_logger,
-                        callbacks=[timer_callback, 
+                        callbacks=[timer_callback,
+                        EarlyStopping(monitor="val_loss_epoch", verbose=True, mode="min", min_delta=.01, patience=3),
                         ThresholdEarlyStopping(
                                     threshold=cfg.training.early_stopping.threshold,
                                     monitor=cfg.training.early_stopping.monitor, 
@@ -124,49 +140,68 @@ def train_base_pytorch(cfg: DictConfig, expression: GrammaticalExpression, datas
 @hydra.main(version_base=None, config_path="../conf", config_name="learn")
 def main(cfg: DictConfig) -> None:
 
+    mlflow.set_experiment(f"{cfg.experiment_name}")
+
     mlflow.pytorch.autolog()
 
     print(OmegaConf.to_yaml(cfg))
 
-    if hasattr(cfg.grammar, "typed_rules"):
-        primitives_grammar = QuantifierGrammar.from_module(cfg.grammar.typed_rules.module_path)
-        quantifiers_grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
-        grammar = quantifiers_grammar | primitives_grammar
-    else:
-        grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
+    grammar = load_grammar(cfg)
     
     grammar, indices_tag = add_indices(grammar=grammar, 
                 indices=cfg.grammar.indices, 
-                m_size=cfg.expressions.m_size, 
+                m_size=cfg.universe.m_size, 
                 weight=cfg.grammar.index_weight,
                 )
     print(cfg.grammar.indices)
-    print(cfg.expressions.m_size)
+    print(cfg.universe.m_size)
     print(cfg.grammar.index_weight)
     print(indices_tag)
-    import os
-    print(os.getcwd())
-    expressions_path = cfg.expressions.output_dir + "M" + str(cfg.expressions.m_size) + "/X" + str(cfg.expressions.x_size) + "/d" + str(cfg.expressions.depth) + "/" + f"generated_expressions{indices_tag}.yml"
+
+    expressions_path = cfg.expressions.output_dir + "M" + str(cfg.universe.m_size) + "/X" + str(cfg.universe.x_size) + "/d" + str(cfg.expressions.depth) + "/" + f"generated_expressions{indices_tag}.yml"
     print("Reading expressions from: ", expressions_path)
     expressions, _ = read_grammatical_expressions(expressions_path, grammar)
 
     print("Number of expressions: ", len(expressions))
     import time
-    time.sleep(15)
+    #time.sleep(5)
     device = set_device(cfg.training.device)
 
-    for expression in tqdm(expressions[0:1+cfg.expressions.n_limit]):
+    print("Loading universe...")
+    universe = load_universe(cfg)
+    universe = filter_universe(cfg, universe)
 
-        run_name = f'{expression.rule_name}'
+    try:
+        if cfg.training.resume.term_expression:
+            for i, expression in enumerate(expressions):
+                if expression.term_expression == cfg.training.resume.term_expression:
+                    print("Resuming training from expression: ", expression.term_expression)
+                    start_index = i
+    except Exception as e:
+        print("Could not resume training from specified expression.")
+        print(e)
+        start_index = 0
+
+    for expression in tqdm(expressions[start_index:1+cfg.expressions.n_limit]):
+
+        print("Calculating montonicity for expression: ", expression.term_expression)
+        all_models, flipped_models, quantifiers, expression_names = get_verified_models(cfg, [expression], universe)
+        monotonicity = measure_monotonicity(all_models, flipped_models, quantifiers[0], upward_monotonicity_entropy, cfg, name=expression_names[0])
+        print("Monotonicity: ", monotonicity)
+
+        run_name = f'{expression.term_expression}'
         print("Running experiment: ", run_name)
 
         with mlflow.start_run(log_system_metrics=True, run_name=run_name) as mainrun:
+            mlflow.log_metric("monotonicity_entropic", float(monotonicity))
 
             set_and_log_seeds(mainrun=True)
 
-            mlflow.log_params(cfg)
+            mlflow.log_params(flatten(OmegaConf.to_container(cfg)))
+            mlflow.log_param("expression", expression.term_expression)
+            mlflow.log_param("expression_depth", calculate_term_expression_depth(expression.term_expression))
             mlflow.set_tag("Notes", cfg.notes)
-            mlf_logger = MLFlowLogger(experiment_name="learn_quantifiers", 
+            mlf_logger = MLFlowLogger(experiment_name=f"{cfg.experiment_name}", 
                                     log_model=True,
                                     tracking_uri="http://127.0.0.1:5000",
                                     run_id=mainrun.info.run_id)
@@ -225,9 +260,8 @@ def main(cfg: DictConfig) -> None:
                         print("Training set size: ", len(train_dataloader))
                         print("Validation set size: ", len(validation_dataloader))
                         
-                        train(cfg, expression, dataset, train_dataloader, validation_dataloader)
+                        train(cfg, expression, dataset, train_dataloader, validation_dataloader, mlf_logger)
 
 if __name__ == "__main__":
     mlflow.set_tracking_uri("http://127.0.0.1:5000")
-    mlflow.set_experiment(f"learn_quantifiers")
     main()
