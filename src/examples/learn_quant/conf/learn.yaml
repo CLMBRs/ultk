@@ -47,7 +47,7 @@ training:
     mode: min
     check_on_train_epoch_end: false
   resume:
-    term_expression: "subset_eq(index(cardinality(A), union(A, B)), difference(B, A))"
+    term_expression: "and(not(subset_eq(B, A)), subset_eq(index(cardinality(B), union(A, B)), index(cardinality(A), difference(B, A))))"
 
 optimizer:
   _partial_: true

@@ -20,7 +20,6 @@ from ultk.language.semantics import Meaning, Universe
 from ultk.util.io import write_expressions, read_grammatical_expressions
 
 from learn_quant.grammar import quantifiers_grammar
-from learn_quant.meaning import create_universe
 from learn_quant.quantifier import QuantifierUniverse
 
 

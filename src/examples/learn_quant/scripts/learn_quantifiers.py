@@ -27,7 +27,7 @@ from ..grammar import add_indices, QuantifierGrammar
 from ..util import calculate_term_expression_depth
 from ..sampling import DatasetInitializationError
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
-from ..training_lightning import LightningModel, ThresholdEarlyStopping, StepEarlyStopping
+from ..training_lightning import LightningModel, ThresholdEarlyStopping
 from ..monotonicity import load_grammar, get_verified_models, load_universe, filter_universe, filter_universe, measure_monotonicity, upward_monotonicity_entropy
 import torch.nn as nn
 import random
