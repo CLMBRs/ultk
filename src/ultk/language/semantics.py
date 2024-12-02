@@ -81,7 +81,7 @@ class Universe:
         object.__setattr__(
             self,
             "prior",
-            prior[:] if prior is not None else (1.0/len(referents) for _ in referents)
+            prior or tuple(1/len(referents) for _ in referents)
         )
 
     @cached_property
@@ -156,14 +156,6 @@ class Meaning(Generic[T]):
     # `universe` should be the keys to `mapping`. 
     universe: Universe
     _dist: FrozenDict[Referent, float] = FrozenDict({})
-
-    def __init__(self, mapping, universe):
-        # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
-        object.__setattr__(self, "mapping", mapping)
-        object.__setattr__(self, "universe", universe)
-        for v in mapping.keys():
-            if v not in universe.referents:
-                raise ValueError(f"Referent `{v}` not in Universe `{universe}`") 
 
     @property
     def dist(self) -> FrozenDict[Referent, float]:
