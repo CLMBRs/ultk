@@ -203,9 +203,6 @@ class GrammaticalExpression(Expression[T]):
         return (new_node, changed_node)
     
     def hm_sample(self, grammar: "Grammar") -> "GrammaticalExpression":
-        # Only one initial symbol, so fine to not modify the root
-        # node = pick_node(self) # linearize the structure and pick one
-        # Note: the new tree will have empty meaning
         linearized_self = []
         stack = [self]
         while stack:
@@ -220,27 +217,23 @@ class GrammaticalExpression(Expression[T]):
         return new_tree
     
     def hm_sample_flat(self, grammar: "Grammar") -> "GrammaticalExpression":
-        # Only one initial symbol, so fine to not modify the root
-        # node = pick_node(self) # linearize the structure and pick one
-        # Note: the new tree will have empty meaning
         linearized_self = []
-        parents = [-1]
-        stack = [self]
-        counter = 0
+        parents = []
+        stack = [(self, -1)]
         while stack:
-            current_node = stack.pop()
-            parent = counter
+            current_node, parent_index = stack.pop()
             linearized_self.append(current_node)
+            parents.append(parent_index)
+            current_index = len(linearized_self) - 1
             children = current_node.children if current_node.children else ()
-            for n in children:
-                stack.append(n)
-                parents.append(parent)
-                counter += 1
+            for child in children:
+                stack.append((child, current_index))
         changing_node = random.choice(range(len(linearized_self)))
         #print(str(linearized_self[changing_node]))
         #print(str(linearized_self[parents[changing_node]]))
         current_node = linearized_self[changing_node]
         parent_node = linearized_self[parents[changing_node]]
+        new_tree = None
         if parents[changing_node] != -1:
             new_children = []
             children = parent_node.children if parent_node.children else ()
@@ -250,9 +243,10 @@ class GrammaticalExpression(Expression[T]):
                 else:
                     new_children.append(child)
             parent_node.replace_children(tuple(new_children))
-            return self
+            new_tree = self
         else:
-            return grammar.generate(grammar._rules_by_name[self.rule_name].lhs)
+            new_tree = grammar.generate(grammar._rules_by_name[self.rule_name].lhs)
+        return(new_tree)
         
    
         

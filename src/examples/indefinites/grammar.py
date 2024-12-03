@@ -1,8 +1,8 @@
 from ultk.language.grammar import Grammar, Rule
 
-# indefinites_grammar = Grammar.from_yaml("indefinites/grammar.yml")
+indefinites_grammar = Grammar.from_yaml("indefinites/grammar.yml")
 indefinites_grammar = Grammar.from_module("indefinites.grammar_functions")
-
+#print(indefinites_grammar.parse("and(not(K+), or(N-, not(SE-)))").hm_sample_flat(indefinites_grammar))
 
 """
 # this defines the grammar "manually" instead of using the YAML text format
