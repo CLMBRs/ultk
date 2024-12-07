@@ -79,17 +79,23 @@ class QuantifierModel(Referent):
             "B": len(self.B),
         }
     
-    def binarize(self, mode='B_only') -> np.ndarray:
+    def binarize(self, mode='B') -> np.ndarray:
         """
         Binarizes the sequence of characters in the name attribute.
 
         Returns:
             np.ndarray: An array of binary values, where 1 represents characters '1' or '2', and 0 represents other characters.
         """
-        if mode=='B_only':
+        if mode=='B':
             return np.array([1 if char in {'1', '2'} else 0 for char in self.name])
+        if mode=='A':
+            return np.array([1 if char in {'0', '2'} else 0 for char in self.name])
         if mode=='both':
             return np.array([1 if char in {'2'} else 0 for char in self.name])
+        if mode=='B_only':
+            return np.array([1 if char in {'1'} else 0 for char in self.name])
+        if mode=='A_only':
+            return np.array([1 if char in {'0'} else 0 for char in self.name])
         elif mode=='one_hot':
             # Create an identity matrix and select rows corresponding to indices
             indices = [char_to_index[char] for char in self.name]
@@ -180,7 +186,7 @@ class QuantifierUniverse(Universe):
         """
         return [referent.name for referent in self.referents]
     
-    def binarize_referents(self, mode='B_only') -> np.ndarray:
+    def binarize_referents(self, mode='B') -> np.ndarray:
         return np.array([referent.binarize(mode=mode) for referent in self.referents])
 
 import random

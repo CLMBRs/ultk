@@ -5,6 +5,9 @@ from yaml import load, dump
 from typing import Iterable, Union
 import dill as pkl
 import random 
+import os
+from pathlib import Path
+
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -17,7 +20,6 @@ from ultk.language.semantics import Meaning, Universe
 from ultk.util.io import write_expressions, read_grammatical_expressions
 
 from learn_quant.grammar import quantifiers_grammar
-from learn_quant.meaning import create_universe
 from learn_quant.quantifier import QuantifierUniverse
 
 
@@ -29,7 +31,7 @@ def summarize_expression(expression: GrammaticalExpression):
 
 
 def read_expressions(
-    filename: str, universe: Universe = None, return_by_meaning=True, pickle=False
+    filename: str, universe: Universe = None, return_by_meaning=True, pickle=False, add_indices=True, grammar=None,
 ) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
     """
     Read expressions from a PKL or YAML file.
@@ -42,13 +44,17 @@ def read_expressions(
     Returns:
         tuple[list[GrammaticalExpression], dict[Meaning, Expression]]: A tuple containing the parsed expressions and, if return_by_meaning is True, a dictionary of expressions by their meanings.
     """
+
     if pickle:
         expression_list = pkl.load(open(filename, "rb"))
     else:
-        quantifiers_grammar.add_indices_as_primitives(universe.x_size)
-        print(quantifiers_grammar)
+        if not grammar:
+            grammar = quantifiers_grammar
+        if add_indices:
+            grammar.add_indices_as_primitives(universe.x_size)
+            print("Indices added as primitives to the grammar.")
 
-        parsed_exprs, by_meaning = read_grammatical_expressions(filename, quantifiers_grammar)
+        parsed_exprs, by_meaning = read_grammatical_expressions(filename, grammar)
     return parsed_exprs, by_meaning
 
 
@@ -66,12 +72,9 @@ def filter_expressions_by_rules(rules: list, expressions):
     return list(filter(lambda x: str(x) in rules, expressions))
 
 
-import os
-from pathlib import Path
-
 
 def read_expressions_from_folder(
-    folder: str, return_by_meaning=True
+    folder: str, return_by_meaning=True, grammar=None,
 ) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
     """Read expressions from a YAML file in a specified folder.
 
@@ -96,9 +99,12 @@ def read_expressions_from_folder(
     with open(universe_file, "rb") as f:
         universe = pkl.load(f)
 
-    quantifiers_grammar.add_indices_as_primitives(universe.x_size)
+    if not grammar:
+        grammar = quantifiers_grammar
 
-    parsed_exprs, by_meaning = read_grammatical_expressions(expressions_file, quantifiers_grammar)
+    grammar.add_indices_as_primitives(universe.x_size)
+
+    parsed_exprs, by_meaning = read_grammatical_expressions(expressions_file, grammar)
     return parsed_exprs, by_meaning, universe
 
 
@@ -190,3 +196,15 @@ def save_inclusive_generation(
 
     print("Saving generated expressions...")
     save_quantifiers(expressions_by_meaning, output_file, universe=master_universe, indices_tag=indices_tag)
+
+
+def calculate_term_expression_depth(expression):
+    depth = 0
+    max_depth = 0
+    for char in expression:
+        if char == "(":
+            depth += 1
+            max_depth = max(max_depth, depth)
+        elif char == ")":
+            depth -= 1
+    return max_depth

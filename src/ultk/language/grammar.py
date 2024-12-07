@@ -18,6 +18,8 @@ from ultk.language.language import Expression
 from ultk.language.semantics import Meaning, Referent, Universe
 from ultk.util.frozendict import FrozenDict
 
+from learn_quant.set_primitives import FrozensetA, FrozensetB
+
 T = TypeVar("T")
 
 
@@ -265,6 +267,15 @@ class Grammar:
         # Return the next rule in the iterator
         # Raise StopIteration if there are no more rules
         raise StopIteration
+    
+    def __or__(self, other: "Grammar") -> "Grammar":
+        #Combine two grammars into one, with the same start symbol.
+        if self._start != other._start:
+            raise ValueError("Grammars must have the same start symbol to be combined.")
+        new_grammar = Grammar(self._start)
+        for rule in self.get_all_rules() + other.get_all_rules():
+            new_grammar.add_rule(rule)
+        return new_grammar
 
     def add_rule(self, rule: Rule):
         self._rules[rule.lhs].append(rule)
@@ -579,7 +590,7 @@ class Grammar:
             if inspect.isfunction(value):
                 grammar.add_rule(Rule.from_callable(value))
         # set start symbol if module specifies it
-        if hasattr(module, "start") and module.start in grammar._rules:
+        if hasattr(module, "start"):
             grammar._start = module.start
         # otherwise, LHS of the first rule in the module
         else:

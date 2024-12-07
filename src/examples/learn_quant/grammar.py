@@ -14,6 +14,15 @@ class QuantifierGrammar(Grammar):
         super().__init__(*args, **kwargs)
         # Add any additional initialization code here
 
+    def __or__(self, other: "QuantifierGrammar") -> "QuantifierGrammar":
+        #Combine two grammars into one, with the same start symbol.
+        if self._start != other._start:
+            raise ValueError("QuantifierGrammar must have the same start symbol to be combined.")
+        new_grammar = QuantifierGrammar(self._start)
+        for rule in self.get_all_rules() + other.get_all_rules():
+            new_grammar.add_rule(rule)
+        return new_grammar
+
     def add_index_primitive(self, index: int, weight: float):
         """Add an index as a primitive to the grammar.
 
@@ -51,42 +60,48 @@ class QuantifierGrammar(Grammar):
             for index in indices:
                 self.add_index_primitive(index, weight)
 
+def get_indices_tag(indices = True) -> str:
+
+    if indices is True:
+        indices_tag = ""
+    elif indices is False:
+        indices_tag = "_xidx"
+    elif isinstance(indices, int):
+        indices_tag = f"_E{indices}"
+    elif isinstance(indices, Iterable):
+        indices_tag = "_" + "-".join([str(x) for x in list(indices)])
+    else:
+        raise ValueError("Invalid type for indices. Must be bool, int, or iterable.")
+
+    return indices_tag
+
+
 def add_indices(grammar: QuantifierGrammar, 
                 m_size: int,
                 weight: int,
                 indices = True) -> QuantifierGrammar:
-    print("Adding indices...")
-    print(indices)
-    print(type(indices))
-    print(type(indices))
+    
+    indices_tag = get_indices_tag(indices)
 
     if indices is True:
         print("Adding all indices up to m_size")
         grammar.add_indices_as_primitives(
             m_size, weight
-        )
-        indices_tag = ""
-        
-    elif indices is False:
-        indices_tag = "_xidx"
-        
+        )        
     elif isinstance(indices, int):
-        indices = list(range(0, m_size, indices))
-        grammar.add_indices_as_primitives(
-            indices, weight
-        )
-        indices_tag = f"_E{indices}"
-        
+        if not isinstance(indices, bool):
+            indices = list(range(0, m_size, indices))
+            grammar.add_indices_as_primitives(
+                indices, weight
+            )        
     elif isinstance(indices, Iterable):
         grammar.add_indices_as_primitives(
             list(indices), weight
         )
-        indices_tag = "_" + "-".join([str(x) for x in list(indices)])
-
     else:
         raise ValueError("Invalid type for indices. Must be bool, int, or iterable.")
 
     return grammar, indices_tag
 
-
 quantifiers_grammar = QuantifierGrammar.from_yaml("learn_quant/grammar.yml")
+quantifiers_grammar_xprimitives = QuantifierGrammar.from_yaml("learn_quant/grammar_xprimitives.yml")
