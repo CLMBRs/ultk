@@ -19,6 +19,8 @@ from copy import deepcopy
 import dill as pkl
 from pathlib import Path
 
+from itertools import product, combinations_with_replacement, permutations
+
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
