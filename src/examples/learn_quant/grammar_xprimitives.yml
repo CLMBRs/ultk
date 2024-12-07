@@ -43,16 +43,16 @@ rules:
   weight: 1.0
 - lhs: frozenset
   rhs:
-    - frozenset
-    - frozenset
+    - FrozensetA
+    - FrozensetB
   name: "difference"
   func: |
     lambda s1, s2 : s1 - s2
   weight: 1.0
 - lhs: frozenset
   rhs:
-    - frozenset
-    - frozenset
+    - FrozensetA
+    - FrozensetB
   name: "difference_sw"
   func: |
     lambda s1, s2 : s2 - s1
@@ -74,16 +74,16 @@ rules:
   weight: 1.0
 - lhs: bool
   rhs:
-    - frozenset
-    - frozenset
+    - FrozensetA
+    - FrozensetB
   name: "subset_eq"
   func: |
     lambda s1, s2: s1 <= s2
   weight: 1.0
 - lhs: bool
   rhs:
-    - frozenset
-    - frozenset
+    - FrozensetA
+    - FrozensetB
   name: "subset_eq_sw"
   func: |
     lambda s1, s2: s2 <= s1
@@ -105,16 +105,3 @@ rules:
   func: |
     lambda i1, i2: i1 > i2
   weight: 1.0
-# primitive
-- lhs: frozenset
-  rhs: 
-  name: "A"
-  func: |
-    lambda q: q.A
-  weight: 10.0
-- lhs: frozenset
-  rhs: 
-  name: "B"
-  func: |
-    lambda q: q.B
-  weight: 10.0
