@@ -21,6 +21,7 @@ from typing import Iterable
 
 # e.g.:
 # python -m learn_quant.scripts.generate_expressions mode=generate universe.inclusive_universes=false universe.m_size=4 universe.x_size=5 grammar.depth=3 recipe=base grammar.indices=true
+# HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.generate_expressions mode=time_trial recipe=base
 
 def enumerate_quantifiers(
     depth: int,

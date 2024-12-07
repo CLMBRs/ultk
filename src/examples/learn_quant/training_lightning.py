@@ -5,7 +5,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 import lightning as L
 from learn_quant.training import MV_LSTM
-from lightning.pytorch.callbacks import EarlyStopping
+from lightning.pytorch.callbacks import EarlyStopping, Callback
+from collections import deque
 
 class LightningModel(L.LightningModule):
     def __init__(self, model, criterion, optimizer):
@@ -13,6 +14,7 @@ class LightningModel(L.LightningModule):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
+        self.validation_losses = deque(maxlen=50)
 
     def training_step(self, batch, batch_idx):
         # training_step defines the train loop.
@@ -34,7 +36,16 @@ class LightningModel(L.LightningModule):
         loss = self.criterion(pred, y)
         self.log("val_loss", loss, prog_bar=True, on_step=True, on_epoch=True)
         self.log('global_step', self.global_step, on_step=True, on_epoch=False, prog_bar=True)
-        return loss
+
+        self.validation_losses.append(loss.detach().cpu().item())
+        # Compute running average over the last 50 losses if deque is full
+        if len(self.validation_losses) == 50:
+            running_avg_loss = sum(self.validation_losses) / len(self.validation_losses)
+            self.log('val_loss_running_avg50', running_avg_loss, prog_bar=True, on_step=True, on_epoch=False)
+            return {'global_step': self.global_step, "val_loss": loss, 'val_loss_running_avg50': running_avg_loss}
+        else:
+            # If deque is not full, do not log 'val_loss_running_avg50' to avoid misleading values
+            return {'global_step': self.global_step, "val_loss": loss, 'val_loss_running_avg50': None}
 
     def configure_optimizers(self):
         return self.optimizer

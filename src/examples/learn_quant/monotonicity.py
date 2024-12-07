@@ -3,7 +3,6 @@ from ultk.language.grammar import GrammaticalExpression
 from ultk.language.language import Language, aggregate_expression_complexity
 from ultk.language.semantics import Meaning
 
-from learn_quant.meaning import create_universe
 from learn_quant.util import read_expressions
 from learn_quant.quantifier import QuantifierUniverse, QuantifierModel
 from learn_quant.grammar import add_indices, get_indices_tag, QuantifierGrammar
@@ -17,14 +16,47 @@ import numpy as np
 from tqdm import tqdm
 from scipy import sparse
 from copy import deepcopy
-
+import dill as pkl
 from pathlib import Path
+
+from itertools import product, combinations_with_replacement, permutations
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
 # e.g.:
 # python -m learn_quant.monotonicity recipe=test_monotonicity
+# python -m learn_quant.monotonicity recipe=4_4_5_xi grammar.indices=false
+
+def create_universe(m_size: int, x_size: int) -> QuantifierUniverse:
+    """
+    Create a quantifier universe based on the given parameters.
+    All references are quantifier models, which are data classes that represent a relation between sets A, B, and M.
+
+    Args:
+        m_size (int): The size of the m set.
+        x_size (int): The size of the x set.
+
+    Returns:
+        QuantifierUniverse: The created quantifier universe.
+    """
+
+    possible_quantifiers = []
+
+    for combination in combinations_with_replacement([0, 1, 2, 3], r=m_size):
+        combo = list(combination) + [4] * (x_size - m_size)
+        permutations_for_combo = set(permutations(combo, r=len(combo)))
+        possible_quantifiers.extend(permutations_for_combo)
+    possible_quantifiers_name = set(
+        ["".join([str(j) for j in i]) for i in possible_quantifiers]
+    )
+
+    quantifier_models = set()
+    for name in possible_quantifiers_name:
+        quantifier_models.add(QuantifierModel(name=name))
+
+    return QuantifierUniverse(referents=tuple(quantifier_models), m_size=m_size, x_size=x_size)
+
 
 def binary_to_int(arr):
     """ Converts a 2-D numpy array of 1s and 0s into integers, assuming each
@@ -153,7 +185,7 @@ def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
         print("cond_ent", cond_ent)
     return 1 - cond_ent / q_ent
 
-def measure_monotonicity(all_models, flipped_models, both_models, quantifier,
+def measure_monotonicity(all_models, flipped_models, quantifier,
                          measure=upward_monotonicity_entropy, cfg=None, name=None):
     """ Measures degree of monotonicity, as max of the degree of
     positive/negative monotonicty, for a given quantifier _and its negation_
@@ -165,8 +197,6 @@ def measure_monotonicity(all_models, flipped_models, both_models, quantifier,
     :return: max of measure applied to all_models and quantifier, plus 1- each
     of those
     """
-    only_all = all_models - both_models
-    only_flipped = flipped_models- both_models
 
     interpretations = [
         measure(all_models, quantifier, cfg,), # right upward monotonicity
@@ -215,11 +245,18 @@ def get_true_predecessors(all_models, quantifier, flip=False):
 
     return true_preds
 
-@hydra.main(version_base=None, config_path="conf", config_name="config")
-def main(cfg: DictConfig) -> None:
 
-    import dill as pkl
+def filter_universe(cfg, uni):
+    if cfg.measures.monotonicity.universe_filter and any(cfg.measures.monotonicity.universe_filter):
+        test_referents = tuple(
+            ref for ref in deepcopy(uni.referents)
+            if not any(str(digit) in ref.name for digit in cfg.measures.monotonicity.universe_filter)
+        )
+        print("Size of filtered universe: ", len(test_referents))
+        uni = QuantifierUniverse(referents=test_referents, m_size=cfg.universe.m_size, x_size=cfg.universe.x_size)
+    return uni
 
+def load_universe(cfg):
     try:
         uni = pkl.load(
             open(
@@ -235,17 +272,9 @@ def main(cfg: DictConfig) -> None:
         uni = create_universe(cfg.universe.m_size, cfg.universe.x_size)
 
     print("Size of universe: ", len(uni.referents))
-    # Filter out referents with certain digits in their names (e.g. 3, 4)
-    if cfg.measures.monotonicity.universe_filter and any(cfg.measures.monotonicity.universe_filter):
-        test_referents = tuple(
-            ref for ref in deepcopy(uni.referents)
-            if not any(str(digit) in ref.name for digit in cfg.measures.monotonicity.universe_filter)
-        )
-        print("Size of filtered universe: ", len(test_referents))
-        uni = QuantifierUniverse(referents=test_referents, m_size=cfg.universe.m_size, x_size=cfg.universe.x_size)
+    return uni
 
-    print("Reading expressions")
-
+def load_grammar(cfg):
     if hasattr(cfg.grammar, "typed_rules"):
         print("Loading rules from module...")
         primitives_grammar = QuantifierGrammar.from_module(cfg.grammar.typed_rules.module_path)
@@ -253,7 +282,31 @@ def main(cfg: DictConfig) -> None:
         grammar = quantifiers_grammar | primitives_grammar
     else:
         grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
-    
+    return grammar
+
+def get_verified_models(cfg, expressions, uni):
+    print("Binarizing referents")
+    all_models = uni.binarize_referents(mode="B")
+    flipped_models = uni.binarize_referents(mode="A")
+
+    # Create quantifiers like in original code
+    print("Creating quantifiers")
+    quantifiers = np.array([[expression.meaning.mapping[uni.referents[x]] for x in range(len(uni.referents))] for expression in expressions], dtype=int)
+    expression_names = np.array([expression.term_expression for expression in expressions])
+    return all_models, flipped_models, quantifiers, expression_names
+
+@hydra.main(version_base=None, config_path="conf", config_name="config")
+def main(cfg: DictConfig) -> None:
+
+    uni = load_universe(cfg)
+    # Filter out referents with certain digits in their names (e.g. 3, 4)
+    uni = filter_universe(cfg, uni)
+
+    grammar = load_grammar(cfg)
+
+    print("Reading expressions")
+
+
     indices_tag = get_indices_tag(indices=cfg.grammar.indices)
     expressions, _ = read_expressions(
         Path.cwd()
@@ -267,16 +320,8 @@ def main(cfg: DictConfig) -> None:
 
     # All models should not use binarize referents, but "get_truth_matrix"
     # Use b only and both? 
-    print("Binarizing referents")
-    all_models = uni.binarize_referents(mode="B")
-    flipped_models = uni.binarize_referents(mode="A")
-    both_models = uni.binarize_referents(mode="both")
-    #print(all_models)
-    # Create quantifiers like in original code
-    print("Creating quantifiers")
-    quantifiers = np.array([[expression.meaning.mapping[uni.referents[x]] for x in range(len(uni.referents))] for expression in expressions], dtype=int)
-    expression_names = np.array([expression.term_expression for expression in expressions])
-    
+    all_models, flipped_models, quantifiers, expression_names = get_verified_models(cfg, expressions, uni)
+
     # Select only quantifiers in the expression list (unless 'all' specified)
     if "all" not in cfg.measures.expressions:
         mask = np.isin(expression_names, cfg.measures.expressions)
@@ -289,7 +334,7 @@ def main(cfg: DictConfig) -> None:
     if "all" in cfg.measures.monotonicity.direction:
         mon_values = np.empty(shape=(len(quantifiers), 1))
         for i in range(len(quantifiers)):
-            mon_values[i] = measure_monotonicity(all_models, flipped_models, both_models, quantifiers[i], upward_monotonicity_entropy, cfg, name=expression_names[i])
+            mon_values[i] = measure_monotonicity(all_models, flipped_models, quantifiers[i], upward_monotonicity_entropy, cfg, name=expression_names[i])
         order_indices = np.argsort(mon_values, axis=0)[::-1]
         print("Monotonicity values len:", len(mon_values))
         print("expression_names len:", len(expression_names))
