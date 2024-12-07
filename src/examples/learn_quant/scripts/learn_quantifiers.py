@@ -140,9 +140,23 @@ def train_base_pytorch(cfg: DictConfig, expression: GrammaticalExpression, datas
 @hydra.main(version_base=None, config_path="../conf", config_name="learn")
 def main(cfg: DictConfig) -> None:
 
+    mlflow.set_tracking_uri(f"http://{cfg.tracking.host}:{cfg.tracking.port}")
+    #mlflow. disable_system_metrics_logging()
+    #mlflow.set_tracking_uri("file:///mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/mlruns")
     mlflow.set_experiment(f"{cfg.experiment_name}")
 
     mlflow.pytorch.autolog()
+
+    import os
+    # Print environment variables for debugging
+    print("MLFLOW_TRACKING_URI environment variable:", os.environ.get('MLFLOW_TRACKING_URI'))
+    print("MLflow version:", mlflow.version.VERSION)
+    # Disable system metrics tracking
+    os.environ['MLFLOW_SYSTEM_METRICS_ENABLED'] = 'true'
+
+    # Verify settings
+    print("MLFLOW_SYSTEM_METRICS_ENABLED:", os.environ.get('MLFLOW_SYSTEM_METRICS_ENABLED'))
+    print("Current MLflow Tracking URI:", mlflow.get_tracking_uri())
 
     print(OmegaConf.to_yaml(cfg))
 
@@ -192,7 +206,7 @@ def main(cfg: DictConfig) -> None:
         run_name = f'{expression.term_expression}'
         print("Running experiment: ", run_name)
 
-        with mlflow.start_run(log_system_metrics=True, run_name=run_name) as mainrun:
+        with mlflow.start_run(log_system_metrics=False, run_name=run_name) as mainrun:
             mlflow.log_metric("monotonicity_entropic", float(monotonicity))
 
             set_and_log_seeds(mainrun=True)
@@ -203,7 +217,7 @@ def main(cfg: DictConfig) -> None:
             mlflow.set_tag("Notes", cfg.notes)
             mlf_logger = MLFlowLogger(experiment_name=f"{cfg.experiment_name}", 
                                     log_model=True,
-                                    tracking_uri="http://127.0.0.1:5000",
+                                    tracking_uri= mlflow.get_tracking_uri(),
                                     run_id=mainrun.info.run_id)
 
             print("Expression: ", expression.term_expression)
@@ -263,5 +277,4 @@ def main(cfg: DictConfig) -> None:
                         train(cfg, expression, dataset, train_dataloader, validation_dataloader, mlf_logger)
 
 if __name__ == "__main__":
-    mlflow.set_tracking_uri("http://127.0.0.1:5000")
     main()

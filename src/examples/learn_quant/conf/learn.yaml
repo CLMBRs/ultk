@@ -6,6 +6,10 @@ experiment_name: learn_quant_e50
 notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
+tracking:
+  host: g3115
+  port: 5000
+
 grammar:
   path: learn_quant/grammar.yml
   indices: false

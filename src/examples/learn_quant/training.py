@@ -24,6 +24,9 @@ def set_device(training_device):
     elif training_device == "cpu":
         print("Using CPU.")
         device = torch.device("cpu")
+    elif training_device in ["gpu", "cuda"]:
+        print("Using GPU.")
+        device = torch.device("cuda")
     return device
 
 class ExpressionDataset(Dataset):
