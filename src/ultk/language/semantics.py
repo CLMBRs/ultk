@@ -74,6 +74,16 @@ class Universe:
     referents: tuple[Referent, ...]
     prior: tuple[float, ...]
 
+    def __init__(self, referents, prior = None):
+        # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
+        object.__setattr__(self, "referents", referents)
+        # When only referents are passed in, make the priors a unifrom distribution
+        object.__setattr__(
+            self,
+            "prior",
+            prior or tuple(1/len(referents) for _ in referents)
+        )
+
     @cached_property
     def _referents_by_name(self):
         return {referent.name: referent for referent in self.referents}
@@ -183,6 +193,5 @@ class Meaning(Generic[T]):
     def __bool__(self):
         return bool(self.mapping)  # and bool(self.universe)
 
-    # def __str__(self):
-    # BUG: this is a syntax error and idk what was trying to be done here
-    # return f"Mapping:\n\t{'\n'.join(f"{ref}: {self.mapping[ref]}" for ref in self.mapping)}"# \ \nDistribution:\n\t{self.dist}\n"
+    def __str__(self):
+        return "Mapping:\n\t{0}".format('\n'.join(f"{ref}: {self.mapping[ref]}" for ref in self.mapping)) # \ \nDistribution:\n\t{self.dist}\n"
