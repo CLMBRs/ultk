@@ -6,7 +6,6 @@ V = TypeVar("V")
 
 
 class FrozenDict(dict[K, V], Generic[K, V], YAMLObject):
-
     yaml_tag = "!frozendict"
 
     def __hash__(self):
