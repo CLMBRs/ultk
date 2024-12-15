@@ -6,7 +6,6 @@ from ultk.language.semantics import Universe
 from examples.colors.meaning import meaning_distributions, cielab_points
 
 if __name__ == "__main__":
-
     # shape: `(330, 330)`
     pU_M = meaning_distributions
 
