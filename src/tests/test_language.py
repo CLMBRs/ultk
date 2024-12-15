@@ -27,31 +27,36 @@ class TestLanguage:
     dog = Expression(
         form="dog",
         meaning=Meaning(
-            mapping=FrozenDict({ref: ref.name == "dog" for ref in uni_refs}), universe=uni
+            mapping=FrozenDict({ref: ref.name == "dog" for ref in uni_refs}),
+            universe=uni,
         ),
     )
     cat = Expression(
         form="cat",
         meaning=Meaning(
-            mapping=FrozenDict({ref: ref.name == "cat" for ref in uni_refs}), universe=uni
+            mapping=FrozenDict({ref: ref.name == "cat" for ref in uni_refs}),
+            universe=uni,
         ),
     )
     tree = Expression(
         form="tree",
         meaning=Meaning(
-            mapping=FrozenDict({ref: ref.name == "tree" for ref in uni_refs}), universe=uni
+            mapping=FrozenDict({ref: ref.name == "tree" for ref in uni_refs}),
+            universe=uni,
         ),
     )
     shroom = Expression(
         form="shroom",
         meaning=Meaning(
-            mapping=FrozenDict({ref: ref.name == "shroom" for ref in uni_refs}), universe=uni
+            mapping=FrozenDict({ref: ref.name == "shroom" for ref in uni_refs}),
+            universe=uni,
         ),
     )
     bird = Expression(
         form="bird",
         meaning=Meaning(
-            mapping=FrozenDict({ref: ref.name == "bird" for ref in uni_refs}), universe=uni
+            mapping=FrozenDict({ref: ref.name == "bird" for ref in uni_refs}),
+            universe=uni,
         ),
     )
 
@@ -78,7 +83,12 @@ class TestLanguage:
                     Expression(
                         form="dog",
                         meaning=Meaning(
-                            mapping=FrozenDict({ref: ref.name == "dog" for ref in TestLanguage.uni.referents}),
+                            mapping=FrozenDict(
+                                {
+                                    ref: ref.name == "dog"
+                                    for ref in TestLanguage.uni.referents
+                                }
+                            ),
                             universe=TestLanguage.uni2,
                         ),
                     ),
