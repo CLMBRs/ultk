@@ -1,14 +1,12 @@
 import numpy as np
-
+from collections import namedtuple
 from typing import Any
 from tqdm import tqdm
-from .tools import (
+from ultk.effcomm.probability import (
     information_cond,
     random_stochastic_matrix,
     add_noise_to_stochastic_matrix,
-    compute_lower_bound,
 )
-
 
 ##############################################################################
 # Base Rate Distortion class
@@ -46,6 +44,7 @@ class BaseRDOptimizer:
         self.betas = betas
         self.max_it = max_it
         self.eps = eps
+        self.ln_eps = np.log1p(eps)
         self.ignore_converge = ignore_converge
 
         self.init_args = args
@@ -59,10 +58,10 @@ class BaseRDOptimizer:
         # if xhat_size is None:
         # self.xhat_size = len(self.ln_px)
 
-        self.result = None  # namedtuple
-        self.results: list[Any] = []  # list of namedtuples
+        self.result: namedtuple = None
+        self.results: list[namedtuple] = []
 
-    def get_results(self) -> list[Any]:
+    def get_results(self) -> list[namedtuple]:
         # Re-initialize results
         self.result = None
         self.results = []
@@ -132,7 +131,6 @@ class BaseRDOptimizer:
         disable_tqdm: bool = False,
         **kwargs,
     ) -> list:
-
         results = []
         betas = np.sort(self.betas)
 
@@ -209,8 +207,7 @@ class BaseRDOptimizer:
             else:
                 converged = (
                     it == self.max_it
-                    or np.sum(np.abs(np.exp(self.ln_qxhat_x) - np.exp(prev_q)))
-                    < self.eps
+                    or np.sum(np.abs(self.ln_qxhat_x - prev_q)) < self.ln_eps
                 )
 
         self.results.append(self.next_result(beta, *args, **kwargs))
@@ -226,3 +223,39 @@ class BaseRDOptimizer:
     ) -> float:
         """Compute the information rate for the current p(x), q(xhat|x)."""
         return information_cond(np.exp(self.ln_px), np.exp(self.ln_qxhat_x))
+
+
+##############################################################################
+# Postprocessing helper
+##############################################################################
+
+
+def compute_lower_bound(rd_points):
+    """
+    Remove all points in a rate-distortion curve that would make it nonmonotonic and
+    return only the resulting monotonic indices.
+
+    This is required to remove the random fluctuations in the result induced by the BA algorithm getting stuck in local minima.
+
+    Acknowledgement: https://github.com/epiasini/embo-github-mirror/blob/master/embo/utils.py#L77.
+
+    Args:
+        rd_points: list of pairs of floats, where each pair represents an estimated (rate, distortion) pair,
+                   and *ordered by increasing rate*.
+
+    Returns:
+        selected_indices: 1D numpy array containing the indices of the points selected to ensure monotonically decreasing values.
+    """
+    pts = np.array(rd_points, dtype=np.float32)
+    selected_indices = [0]
+
+    for idx in range(1, len(pts)):
+        # Check that each point increases in rate and does not increase in distortion
+        if (
+            pts[idx, 0] >= pts[selected_indices[-1], 0]  # Monotonically increasing rate
+            and pts[idx, 1]
+            <= pts[selected_indices[-1], 1]  # Monotonically decreasing distortion
+        ):
+            selected_indices.append(idx)
+
+    return np.array(selected_indices, dtype=np.int32)

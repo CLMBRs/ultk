@@ -4,9 +4,8 @@ import numpy as np
 import warnings
 from ultk.util.io import read_pickle, write_pickle
 from ultk.language.language import Language, Expression, Meaning, FrozenDict, Universe
-from .tools import mutual_info, information_cond
 from .ib import IBOptimizer, IBResult
-from ..probability import joint
+from ultk.effcomm.probability import joint, mutual_info, information_cond
 
 ##############################################################################
 # Base IBNamingModel class
@@ -37,7 +36,7 @@ class IBNamingModel:
         self.pM = pM if len(pM.shape) == 2 else pM[:, None]
         self.pU_M = pU_M
         self.I_MU = mutual_info(pU_M * self.pM)
-        self.betas = betas
+        self.betas = np.array(betas)
         self.IB_curve = np.array(IB_curve)
         self.qW_M = qW_M
         self.qW_M_orig = None
@@ -92,7 +91,7 @@ class IBNamingModel:
             pW_M (np.ndarray): Encoder (naming system) matrix.
 
         Returns:
-            float: Deviation from the optimal IB solution.
+            float: Distortion value.
         """
         return self.I_MU - self.accuracy(pW_M)
 
@@ -267,22 +266,20 @@ def encoder_to_language(
 
     return Language(
         expressions=tuple(
-            [
-                Expression(
-                    form=str(words[i]),
-                    meaning=Meaning[float](
-                        FrozenDict(
-                            {
-                                # define each mapping from referent -> probability
-                                universe.referents[chip_num]: qm[chip_num]
-                                for chip_num in range(qW_M.shape[0])
-                            }
-                        ),
-                        universe,
+            Expression(
+                form=str(words[i]),
+                meaning=Meaning[float](
+                    FrozenDict(
+                        {
+                            # define each mapping from referent -> probability
+                            universe.referents[chip_num]: qm[chip_num]
+                            for chip_num in range(qW_M.shape[0])
+                        }
                     ),
-                )
-                for i, qm in enumerate(naming_model.m_hat(qW_M))
-            ]
+                    universe,
+                ),
+            )
+            for i, qm in enumerate(naming_model.m_hat(qW_M))
         ),
         name=name,
         natural=natural,

@@ -6,7 +6,12 @@ from collections import namedtuple
 from scipy.special import logsumexp, log_softmax
 
 from .ba import BaseRDOptimizer
-from .tools import PRECISION, information_cond, mutual_info, kl_divergence
+from ultk.effcomm.probability import (
+    PRECISION,
+    information_cond,
+    mutual_info,
+    kl_divergence,
+)
 
 
 def ib_kl(py_x: np.ndarray, qy_xhat: np.ndarray) -> np.ndarray:

@@ -1,1 +1,0 @@
-In the original notes, both daiteke and liteke (and other forms in different person number agreement) are all categorized as [V... izan]. I separated izan into daiteke and liteke since they have complementary distribution in the actual data.
