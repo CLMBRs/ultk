@@ -15,7 +15,7 @@ from typing import Any
 
 from ..quantifier import QuantifierUniverse
 from ..grammar import QuantifierGrammar, add_indices
-from ..meaning import create_universe
+from ..monotonicity import create_universe
 from ..util import save_quantifiers, save_inclusive_generation
 from typing import Iterable
 

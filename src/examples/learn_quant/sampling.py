@@ -104,7 +104,7 @@ def sample_by_expression(expression: GrammaticalExpression,
         false_mapping.update({model: val for model, val in mapping.items() if not val})
         if len(true_mapping) > n_limit and len(false_mapping) > n_limit:
             conditions_met = True
-        if entropy(list(mapping.values()), entropy_threshold) < 0.02:
+        if entropy(list(mapping.values()), ) < entropy_threshold:
             raise DatasetInitializationError(f"Entropy is too low with expression '{expression}'")
         counter += 1
         if counter > 1000:
