@@ -5,7 +5,7 @@ import warnings
 from ultk.util.io import read_pickle, write_pickle
 from ultk.language.language import Language, Expression, Meaning, FrozenDict, Universe
 from .ib import IBOptimizer, IBResult
-from ultk.effcomm.probability import joint, mutual_info, information_cond
+from ultk.effcomm.probability import joint, mutual_info, information_cond, entropy_bits
 
 ##############################################################################
 # Base IBNamingModel class
@@ -36,6 +36,7 @@ class IBNamingModel:
         self.pM = pM if len(pM.shape) == 2 else pM[:, None]
         self.pU_M = pU_M
         self.I_MU = mutual_info(pU_M * self.pM)
+        self.H_M = entropy_bits(pM.squeeze())
         self.betas = np.array(betas)
         self.IB_curve = np.array(IB_curve)
         self.qW_M = qW_M
@@ -187,13 +188,13 @@ def compute_bound(
     return results
 
 
-def get_ib_naming_model(
+def construct_ib_naming_model(
     pU_M: np.ndarray,
     pM: np.ndarray = None,
     **bound_kwargs,
 ) -> IBNamingModel:
     """
-    Constructs an IBNamingModel by constructing the IB bound for the domain distribution P(M,U).
+    Constructs an IBNamingModel by computing the IB bound for the domain distribution P(M,U).
 
     Args:
         pU_M (np.ndarray): Conditional distribution of observations given meanings.

@@ -51,7 +51,7 @@ Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and execut
 <details>
 <summary>Figures:</summary>
 
-> Kemp, C. & Regier, T. (2012) Kinship Categories Across Languages Reflect General Communicative Principles. Science. https://www.science.org/doi/10.1126/science.1218811
+> Kemp, C. & Regier, T. (2012). Kinship Categories Across Languages Reflect General Communicative Principles. Science. https://www.science.org/doi/10.1126/science.1218811
 
 > Zaslavsky, N., Kemp, C., Regier, T., & Tishby, N. (2018). Efficient compression in color naming and its evolution. Proceedings of the National Academy of Sciences, 115(31), 7937–7942. https://doi.org/10.1073/pnas.1800521115
 
