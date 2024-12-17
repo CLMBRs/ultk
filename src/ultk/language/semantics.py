@@ -187,7 +187,7 @@ class Meaning(Generic[T]):
 
     def __getitem__(self, key: Referent) -> T:
         return self.mapping[key]
-    
+
     def __iter__(self):
         """Iterate over the referents in the meaning."""
         return iter(self.mapping)
