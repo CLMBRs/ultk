@@ -51,8 +51,8 @@
   - Rminus
   name: explored-4
   type: explored
-- comm_cost: 0.26521990740740764
-  complexity: 19
+- comm_cost: 0.55
+  complexity: 7
   expressions:
   - Nplus
   - _or(K+, Rplus)
@@ -50464,7 +50464,16 @@
   - Rminus
   name: explored-4958
   type: explored
-- comm_cost: 0.3659722222222226
+- comm_cost: 0.5552083333333335
+  complexity: 4
+  expressions:
+  - K+
+  - N+
+  - R+
+  - SE-
+  name: explored-14886
+  type: explored
+- comm_cost: 0.6148437500000001
   complexity: 13
   expressions:
   - Nplus
@@ -54582,7 +54591,57 @@
   - _and(_or(K+, Sminus), _not(_and(Nminus, Rplus)))
   name: explored-5365
   type: explored
-- comm_cost: 0.5536458333333335
+- comm_cost: 0.5868055555555556
+  complexity: 9
+  expressions:
+  - K+
+  - N+
+  - R-
+  - and(S-, SE-)
+  - or(K+, K-)
+  name: explored-15053
+  type: explored
+- comm_cost: 0.5895833333333336
+  complexity: 9
+  expressions:
+  - R+
+  - and(SE-, or(K+, S-))
+  - or(K+, N+)
+  name: explored-15054
+  type: explored
+- comm_cost: 0.5772569444444446
+  complexity: 11
+  expressions:
+  - R+
+  - R-
+  - SE-
+  - and(N-, or(K+, SE+))
+  - or(K+, N+)
+  name: explored-15055
+  type: explored
+- comm_cost: 0.4932291666666667
+  complexity: 9
+  expressions:
+  - R+
+  - R+
+  - R-
+  - SE-
+  - and(SE-, or(K+, S-))
+  name: explored-15056
+  type: explored
+- comm_cost: 0.5522916666666668
+  complexity: 13
+  expressions:
+  - K-
+  - N+
+  - R-
+  - S+
+  - and(N-, R+)
+  - and(S-, SE-)
+  - or(K+, S-)
+  name: explored-15057
+  type: explored
+- comm_cost: 0.4208333333333336
   complexity: 8
   expressions:
   - SEminus
@@ -134426,7 +134485,209 @@
   - Rminus
   name: explored-13245
   type: explored
-- comm_cost: 0.3215277777777781
+- comm_cost: 0.7756944444444445
+  complexity: 12
+  expressions:
+  - SE-
+  - and(K-, not(R+))
+  - and(or(K+, S-), or(SE-, N+))
+  name: explored-15786
+  type: explored
+- comm_cost: 0.5359375000000002
+  complexity: 18
+  expressions:
+  - K+
+  - K+
+  - R-
+  - S+
+  - and(K-, or(S+, SE+))
+  - and(N-, R+)
+  - and(S-, SE-)
+  - or(K+, K-)
+  name: explored-15787
+  type: explored
+- comm_cost: 0.5833333333333333
+  complexity: 9
+  expressions:
+  - N+
+  - R-
+  - S+
+  - and(S-, SE-)
+  - or(SE-, N+)
+  name: explored-15788
+  type: explored
+- comm_cost: 0.3750000000000002
+  complexity: 20
+  expressions:
+  - N+
+  - R-
+  - S+
+  - and(K-, or(S+, N+))
+  - and(N-, R+)
+  - and(S-, SE-)
+  - and(or(K+, S-), not(R-))
+  name: explored-15789
+  type: explored
+- comm_cost: 0.08125000000000027
+  complexity: 13
+  expressions:
+  - N+
+  - N+
+  - R-
+  - S+
+  - and(N-, R+)
+  - and(N-, R+)
+  - and(S-, SE-)
+  name: explored-15790
+  type: explored
+- comm_cost: 0.6884375000000001
+  complexity: 14
+  expressions:
+  - N-
+  - R+
+  - and(K-, or(SE-, N+))
+  - and(or(K+, S-), or(SE-, N+))
+  name: explored-15791
+  type: explored
+- comm_cost: 0.4036458333333336
+  complexity: 13
+  expressions:
+  - K+
+  - N+
+  - S+
+  - and(N-, R+)
+  - and(N-, not(R-))
+  - and(S-, SE-)
+  name: explored-15792
+  type: explored
+- comm_cost: 0.6621875000000002
+  complexity: 6
+  expressions:
+  - N+
+  - R+
+  - SE-
+  - or(K+, S-)
+  name: explored-15793
+  type: explored
+- comm_cost: 0.6614583333333335
+  complexity: 5
+  expressions:
+  - N-
+  - R+
+  - R-
+  - SE+
+  - SE-
+  name: explored-15794
+  type: explored
+- comm_cost: 0.6849907407407408
+  complexity: 38
+  expressions:
+  - K+
+  - and(K-, or(S+, N+))
+  - and(N-, or(K+, R+))
+  - and(N-, or(K+, SE+))
+  - and(S-, N-)
+  - and(or(K+, S-), not(R-))
+  - or(K+, SE+)
+  - or(S+, SE+)
+  - or(and(K-, S+), or(N+, R-))
+  name: explored-15795
+  type: explored
+- comm_cost: 0.6470486111111112
+  complexity: 8
+  expressions:
+  - R+
+  - SE-
+  - and(and(K-, N-), not(R-))
+  name: explored-15796
+  type: explored
+- comm_cost: 0.39333333333333353
+  complexity: 13
+  expressions:
+  - N+
+  - R-
+  - and(K-, S+)
+  - and(N-, R+)
+  - and(S-, SE-)
+  - not(R-)
+  name: explored-15797
+  type: explored
+- comm_cost: 0.4570312500000002
+  complexity: 9
+  expressions:
+  - N+
+  - R-
+  - SE-
+  - and(K-, N-)
+  - and(N-, R+)
+  name: explored-15798
+  type: explored
+- comm_cost: 0.7204166666666667
+  complexity: 6
+  expressions:
+  - K-
+  - K-
+  - R+
+  - or(K+, N+)
+  name: explored-15799
+  type: explored
+- comm_cost: 0.5877430555555557
+  complexity: 14
+  expressions:
+  - N+
+  - R-
+  - SE-
+  - and(N-, R+)
+  - and(N-, or(K+, S-))
+  - or(K+, S-)
+  name: explored-15800
+  type: explored
+- comm_cost: 0.7388680555555557
+  complexity: 17
+  expressions:
+  - N-
+  - and(K-, N-)
+  - and(K-, S+)
+  - and(K-, not(R-))
+  - and(and(K-, N-), not(R-))
+  name: explored-15801
+  type: explored
+- comm_cost: 0.4583912037037039
+  complexity: 16
+  expressions:
+  - N+
+  - R-
+  - S+
+  - and(N-, R+)
+  - and(S-, not(R-))
+  - and(and(K-, N-), not(R-))
+  name: explored-15802
+  type: explored
+- comm_cost: 0.44930555555555574
+  complexity: 16
+  expressions:
+  - K+
+  - N+
+  - N+
+  - R-
+  - SE-
+  - and(K-, N-)
+  - and(K-, or(S+, N+))
+  - and(N-, R+)
+  name: explored-15803
+  type: explored
+- comm_cost: 0.35451388888888924
+  complexity: 18
+  expressions:
+  - K+
+  - R-
+  - SE-
+  - and(N-, R+)
+  - and(S-, or(SE-, N+))
+  - or(and(K-, S+), or(N+, R-))
+  name: explored-15804
+  type: explored
+- comm_cost: 0.5827256944444446
   complexity: 10
   expressions:
   - _and(K-, _not(Rplus))
