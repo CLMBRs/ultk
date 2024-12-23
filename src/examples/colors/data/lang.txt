@@ -19,15 +19,15 @@ LNUM	LNAME	LGEO	LFW
 18	Ucayali Campa	Peru	Allene Heitzman	Jason D. Patent	*	Campa_DAT_new.txt	new
 19	Camsa	*	*	*	*	Camsa_DAT_new.txt	new
 20	Candoshi	*	*	*	*	Candoshi_DAT_new.txt	new
-21	Cavine{\x96}a	*	*	*	*	Cavinena_DAT_new.txt	new
+21	Cavinena	*	*	*	*	Cavinena_DAT_new.txt	new
 22	Cayapa	Ecuador	Neil Wiebe	Scott Merrifield	William R. Merrifield	Cayapa_DAT_new.txt	new
-23	Ch{\x87}cobo	*	*	*	*	Chacobo_DAT_new.txt	new
+23	Chacobo	*	*	*	*	Chacobo_DAT_new.txt	new
 24	Chavacano	*	*	*	*	Chavacano_DAT_new.txt	new
 25	Chayahuita	*	*	*	*	Chayahuita_DAT_new.txt	new
 26	Chinanteco	Mexico	Al & Jeff Anderson	Jason D. Patent	*	Chinantec_DAT_new.txt	new
 27	Chiquitano	Bolivia	M. Kr{\x9F}si, L. Rodriguez, E. Lyn (?)	Jason Patent	*	Chiquitano_DAT_new.txt	new
 28	Chumburu	*	Hansford	Scott Merrifield	William R. Merrifield	Chumburu_DAT_new.txt	new
-29	Cof{\x87}n	*	*	*	*	Cofan_DAT_new.txt	new
+29	Cofan	*	*	*	*	Cofan_DAT_new.txt	new
 30	Colorado	*	*	*	*	Colorado_DAT_new.txt	new
 31	Eastern Cree	Canada	Lieselotte Bartlett	Scott Merrifield	William R. Merrifield	Cree_DAT_new.txt	new
 32	Culina	Peru, Brazil	P. Adams and T. Fern{\x87}ndez	Jason Patent	*	Culina_DAT_new.txt	new
@@ -40,7 +40,7 @@ LNUM	LNAME	LGEO	LFW
 39	Guahibo	Colombia	Riena Kondo	Kenneth J. Merrifield	William R. Merrifield	Guahibo_DAT_new.txt	new
 40	Guambiano	*	*	*	*	Guambiano_DAT_new.txt	new
 41	Guarijio	Mexico	Ron and Sharon Stoltzfus	Kenneth J. Merrifield	William R. Merrifield	Guarijio_DAT_new.txt	new
-42	Ng{\x8A}bere	Panama	Arosemena	Patent, Jason	*	Guaymi_DAT_new.txt	new
+42	Ngbere	Panama	Arosemena	Patent, Jason	*	Guaymi_DAT_new.txt	new
 43	Gunu	Cameroon	D. Heath	Ken Merrifield	Ken Merrifield	Gunu_DAT_new.txt	new
 44	Halbi	India	F. Woods and P. Hopple	Jason Patent	*	Halbi_DAT_new.txt	new
 45	Huasteco	*	*	*	*	Huastec_DAT_new.txt	new
@@ -72,11 +72,11 @@ LNUM	LNAME	LGEO	LFW
 71	Mikasuki	U S A	David West	Scott Merrifield	Scott Merrifield	Mikasuki_DAT_new.txt	new
 72	Mixteco	*	*	*	*	Mixtec_DAT_new.txt	new
 73	Mundu	*	*	*	*	Mundu_DAT_new.txt	new
-74	M{\x9C}ra Pirah{\x8B}	*	*	*	*	Mura-Piraha_DAT_new.txt	new
+74	Mura Piraha	*	*	*	*	Mura-Piraha_DAT_new.txt	new
 75	Murle	*	*	*	*	Murle_DAT_new.txt	new
 76	Murinbata	*	*	*	*	Murrinh-Patha_DAT_new.txt	new
 77	Nafaanra	*	*	*	*	Nafaanra_DAT_new.txt	new
-78	N{\x87}huatl	*	*	*	*	Nahuatl_DAT_new.txt	new
+78	Nahuatl	*	*	*	*	Nahuatl_DAT_new.txt	new
 79	Ocaina	*	*	*	*	Ocaina_DAT_new.txt	new
 80	Papago	*	*	*	*	Oodham_DAT_new.txt	new
 81	Patep	*	*	*	*	Patep_DAT_new.txt	new
@@ -85,7 +85,7 @@ LNUM	LNAME	LGEO	LFW
 84	Saramaccan	*	*	*	*	Saramaccan_DAT_new.txt	new
 85	Seri	*	*	*	*	Seri_DAT_new.txt	new
 86	Shipibo	Peru	Guillermo Ramirez	Ken Merrifield	Ken Merrifield	Shipibo_DAT_new.txt	new
-87	Sirion{\x97}	*	*	*	*	Siriono_DAT_new.txt	new
+87	Siriono	*	*	*	*	Siriono_DAT_new.txt	new
 88	Slave	Canada	Monus	Jason D. Patent	*	Slave_DAT_new.txt	new
 89	Sursurunga	*	*	*	*	Sursurunga_DAT_new.txt	new
 90	Tabla	*	*	*	*	Tabla_DAT_new.txt	new
