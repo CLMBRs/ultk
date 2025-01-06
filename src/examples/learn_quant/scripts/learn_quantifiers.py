@@ -33,7 +33,7 @@ import torch.nn as nn
 import random
 from collections.abc import MutableMapping
 
-# HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.script training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false
+# HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.learn_quantifiers training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false
 
 def flatten(dictionary, parent_key='', separator='_'):
     items = []

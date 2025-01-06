@@ -7,7 +7,7 @@ notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
 tracking:
-  host: g3115
+  host: n3143
   port: 5000
 
 grammar:
@@ -21,7 +21,7 @@ universe:
 
 expressions:
   n_limit: 10000
-  depth: 5
+  depth: 3
   output_dir: learn_quant/outputs/
   representation: one_hot
   downsampling: true
@@ -50,8 +50,6 @@ training:
     patience: 20
     mode: min
     check_on_train_epoch_end: false
-  resume:
-    term_expression: "and(not(equals(cardinality(A), cardinality(B))), subset_eq(index(cardinality(B), union(A, B)), index(cardinality(B), A)))"
 
 optimizer:
   _partial_: true
