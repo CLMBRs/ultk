@@ -1,6 +1,7 @@
 import inspect
 import random
 import re
+import copy
 from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -19,6 +20,15 @@ from ultk.language.semantics import Meaning, Referent, Universe
 from ultk.util.frozendict import FrozenDict
 
 T = TypeVar("T")
+
+def all_or_nothing(data, tree):
+    prob = 1
+    for i in data:
+        if tree(i[0])==i[1]:
+            prob = prob * 1
+        else:
+            return 0
+    return prob
 
 
 @dataclass(frozen=True)
@@ -175,82 +185,77 @@ class GrammaticalExpression(Expression[T]):
             the_dict["children"] = tuple(child.to_dict() for child in self.children)
         return the_dict
     
-    '''
-    def prior()
-    def likelihood()
-    def node_count(self)
-    '''
-    def build_new_tree(self, grammar: "Grammar", current_node: "GrammaticalExpression", changing_node: "GrammaticalExpression") -> ("GrammaticalExpression", "GrammaticalExpression"):
-        new_node = None
-        changed_node = None
-        if current_node is changing_node:
-            new_node = grammar.generate(grammar._rules_by_name[current_node.rule_name].lhs)
-            changed_node = new_node
-        else:
-            new_dict = {}
-            new_dict["rule_name"] = current_node.rule_name
-            new_dict["term_expression"] = current_node.term_expression
-            new_dict["meaning"] = None
-            new_dict["children"] = None
-            new_node = GrammaticalExpression.from_dict(new_dict, grammar)
-            children = current_node.children if current_node.children else ()
-            for child in children:
-                result = self.build_new_tree(grammar, child, changing_node)
-                new_node.add_child(result[0])
-                if result[1]:
-                    changed_node = result[1]
-        return (new_node, changed_node)
+
     
-    # Deprecated
-    def hm_sample_recursion(self, grammar: "Grammar") -> "GrammaticalExpression":
-        linearized_self = []
+    # data: (input, output)
+    def hm_sample(self, grammar: "Grammar", data, likelihood_func=all_or_nothing) -> "GrammaticalExpression":
+        old_tree_prior = self.prior(grammar)
+        old_node_count = self.node_count()
+        while True:
+            old_tree = copy.deepcopy(self)
+            linearized_self = []
+            parents = []
+            stack = [(old_tree, -1)]
+            while stack:
+                current_node, parent_index = stack.pop()
+                linearized_self.append(current_node)
+                parents.append(parent_index)
+                current_index = len(linearized_self) - 1
+                children = current_node.children if current_node.children else ()
+                for child in children:
+                    stack.append((child, current_index))
+            changing_node = random.choice(range(len(linearized_self)))
+            #print(str(linearized_self[changing_node]))
+            #print(str(linearized_self[parents[changing_node]]))
+            current_node = linearized_self[changing_node]
+            parent_node = linearized_self[parents[changing_node]]
+            old_subtree_prior = current_node.prior(grammar)
+            new_tree, new_node = None, None
+            if parents[changing_node] != -1:
+                new_children = []
+                children = parent_node.children if parent_node.children else ()
+                for child in children:
+                    if child is current_node:
+                        new_node = grammar.generate(grammar._rules_by_name[current_node.rule_name].lhs)
+                        new_children.append(new_node)
+                    else:
+                        new_children.append(child)
+                parent_node.replace_children(tuple(new_children))
+                new_tree = old_tree
+            else:
+                new_node = grammar.generate(grammar._rules_by_name[old_tree.rule_name].lhs)
+                new_tree = new_node
+            new_tree_prior = new_tree.prior(grammar)
+            new_node_count = new_tree.node_count()
+            new_subtree_prior = new_node.prior(grammar)
+            # Seems sketchy with the division by zero going on
+            try:
+                mh_accept = min(1, ((new_tree_prior*likelihood_func(data, new_tree))/(old_tree_prior*likelihood_func(data, old_tree)))*((old_subtree_prior/new_node_count)/(new_subtree_prior/old_node_count)))
+            except ZeroDivisionError:
+                mh_accept = 0
+            print(mh_accept)
+            if random.random() < mh_accept:
+                return(new_tree)
+    
+    def prior(self, grammar: "Grammar") -> float:
+        probability = grammar.probability(grammar._rules_by_name[self.rule_name])
+        children = self.children if self.children else ()
+        for child in children:
+            probability = probability * (child.prior(grammar))
+        return probability
+        
+    def node_count(self) -> int:
+        counter = 1
         stack = [self]
         while stack:
             current_node = stack.pop()
-            linearized_self.append(current_node)
             children = current_node.children if current_node.children else ()
-            for n in children:
-                stack.append(n)
-        changing_node = random.choice(linearized_self)
-        #print(str(changing_node))
-        new_tree = self.build_new_tree(grammar, self, changing_node)[0]
-        return new_tree
+            for child in children:
+                stack.append(child)
+                counter += 1
+        return counter
+            
     
-    # TODO: implement the probability
-    def hm_sample(self, grammar: "Grammar") -> "GrammaticalExpression":
-        linearized_self = []
-        parents = []
-        stack = [(self, -1)]
-        while stack:
-            current_node, parent_index = stack.pop()
-            linearized_self.append(current_node)
-            parents.append(parent_index)
-            current_index = len(linearized_self) - 1
-            children = current_node.children if current_node.children else ()
-            for child in children:
-                stack.append((child, current_index))
-        changing_node = random.choice(range(len(linearized_self)))
-        #print(str(linearized_self[changing_node]))
-        #print(str(linearized_self[parents[changing_node]]))
-        current_node = linearized_self[changing_node]
-        parent_node = linearized_self[parents[changing_node]]
-        new_tree, new_node = None, None
-        if parents[changing_node] != -1:
-            new_children = []
-            children = parent_node.children if parent_node.children else ()
-            for child in children:
-                if child is current_node:
-                    new_node = grammar.generate(grammar._rules_by_name[current_node.rule_name].lhs)
-                    new_children.append(new_node)
-                else:
-                    new_children.append(child)
-            parent_node.replace_children(tuple(new_children))
-            new_tree = self
-        else:
-            new_node = grammar.generate(grammar._rules_by_name[self.rule_name].lhs)
-            new_tree = new_node
-        return(new_tree)
-        
     @classmethod
     def from_dict(cls, the_dict: dict, grammar: "Grammar") -> "GrammaticalExpression":
         children = the_dict.get("children")
@@ -330,6 +335,9 @@ class Grammar:
                 f"Rules of a grammar must have unique names. This grammar already has a rule named {rule.name}."
             )
         self._rules_by_name[rule.name] = rule
+
+    def probability(self, rule: Rule) -> float:
+        return float(rule.weight)/sum([r.weight for r in self._rules[rule.lhs]])
 
     def parse(
         self,
