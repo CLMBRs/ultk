@@ -252,7 +252,7 @@
   - Rminus
   name: french
   type: natural
-- comm_cost: 0.6458333333333335
+- comm_cost: 0.7166666666666668
   complexity: 4
   expressions:
   - 32k
@@ -321,9 +321,10 @@
 - comm_cost: 0.6144097222222223
   complexity: 5
   expressions:
-  - 23b
-  - 23he
-  - 23hi
+  - 24a
+  - 24b
+  - 24bd
+  - 24e
   lot_expressions:
   - SEminus
   - _and(Nminus, Sminus)

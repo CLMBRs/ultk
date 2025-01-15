@@ -25,7 +25,7 @@ class TestGrammar:
         parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
         expr_meaning = parsed_expression.evaluate(TestGrammar.universe)
         goal_meaning = Meaning(
-            tuple(referent for referent in TestGrammar.referents if referent.num > 2),
+            {referent: referent.num > 2 for referent in TestGrammar.referents},
             TestGrammar.universe,
         )
         assert expr_meaning == goal_meaning
@@ -33,6 +33,10 @@ class TestGrammar:
     def test_length(self):
         parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
         assert len(parsed_expression) == 5
+
+    def test_atom_count(self):
+        parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
+        assert parsed_expression.count_atoms() == 3
 
     def test_yield(self):
         parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
