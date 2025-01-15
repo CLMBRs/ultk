@@ -175,7 +175,6 @@ class GrammaticalExpression(Expression[T]):
             the_dict["children"] = tuple(child.to_dict() for child in self.children)
         return the_dict
     
-    # TODO: implement the probability, proper pointer to parent
     '''
     def prior()
     def likelihood()
@@ -202,7 +201,8 @@ class GrammaticalExpression(Expression[T]):
                     changed_node = result[1]
         return (new_node, changed_node)
     
-    def hm_sample(self, grammar: "Grammar") -> "GrammaticalExpression":
+    # Deprecated
+    def hm_sample_recursion(self, grammar: "Grammar") -> "GrammaticalExpression":
         linearized_self = []
         stack = [self]
         while stack:
@@ -216,7 +216,8 @@ class GrammaticalExpression(Expression[T]):
         new_tree = self.build_new_tree(grammar, self, changing_node)[0]
         return new_tree
     
-    def hm_sample_flat(self, grammar: "Grammar") -> "GrammaticalExpression":
+    # TODO: implement the probability
+    def hm_sample(self, grammar: "Grammar") -> "GrammaticalExpression":
         linearized_self = []
         parents = []
         stack = [(self, -1)]
@@ -233,22 +234,22 @@ class GrammaticalExpression(Expression[T]):
         #print(str(linearized_self[parents[changing_node]]))
         current_node = linearized_self[changing_node]
         parent_node = linearized_self[parents[changing_node]]
-        new_tree = None
+        new_tree, new_node = None, None
         if parents[changing_node] != -1:
             new_children = []
             children = parent_node.children if parent_node.children else ()
             for child in children:
                 if child is current_node:
-                    new_children.append(grammar.generate(grammar._rules_by_name[current_node.rule_name].lhs))
+                    new_node = grammar.generate(grammar._rules_by_name[current_node.rule_name].lhs)
+                    new_children.append(new_node)
                 else:
                     new_children.append(child)
             parent_node.replace_children(tuple(new_children))
             new_tree = self
         else:
-            new_tree = grammar.generate(grammar._rules_by_name[self.rule_name].lhs)
+            new_node = grammar.generate(grammar._rules_by_name[self.rule_name].lhs)
+            new_tree = new_node
         return(new_tree)
-        
-   
         
     @classmethod
     def from_dict(cls, the_dict: dict, grammar: "Grammar") -> "GrammaticalExpression":
