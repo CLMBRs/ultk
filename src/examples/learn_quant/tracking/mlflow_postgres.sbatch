@@ -2,11 +2,12 @@
 #SBATCH --job-name=mlflow_postgres
 #SBATCH --output=mlflow_postgres.out
 #SBATCH --error=mlflow_postgres.err
-#SBATCH --time=01:00:00 # Adjust as needed
+#SBATCH --time=4-00 # Adjust as needed
 #SBATCH --requeue
 #SBATCH --partition=gpu-l40 # Replace with your partition
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
+#SBATCH --nodelist=g3116
 #SBATCH --cpus-per-task=4 # Adjust based on your needs
 
 source ~/.bashrc
@@ -16,10 +17,10 @@ export NODE_IP=$(hostname -i)
 echo "Node IP Address: $NODE_IP"
 
 # Load environment variables from .env file
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+if [ -f .env_mlflow ]; then
+    export $(grep -v '^#' .env_mlflow | xargs)
 else
-    echo "ERROR: .env file not found. Please create one with the necessary environment variables."
+    echo "ERROR: .env_mlflow file not found. Please create one with the necessary environment variables."
     exit 1
 fi
 
@@ -39,7 +40,8 @@ is_port_in_use() {
 mlflow server \
     --backend-store-uri "$MLFLOW_TRACKING_URI" \
     --host 0.0.0.0 \
-    --port "$MLFLOW_SERVER_PORT"
+    --port "$MLFLOW_SERVER_PORT" \
+    --gunicorn-opts "--worker-class gevent --threads 3 --workers 3 --timeout 300 --keep-alive 300 --log-level INFO"
 
 # Check if the server started successfully by checking if the port is open
 if ! is_port_in_use "$MLFLOW_SERVER_PORT"; then

@@ -13,6 +13,7 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 from sklearn.model_selection import KFold
 from lightning.pytorch.loggers import MLFlowLogger
 import os
+import csv
 
 import numpy as np
 from tqdm import tqdm
@@ -88,18 +89,18 @@ def train_lightning(cfg: DictConfig, expression: GrammaticalExpression, dataset:
     timer_callback = Timer()
     trainer = L.Trainer(max_epochs=cfg.training.epochs, 
                         accelerator=cfg.training.device,
-                        val_check_interval=1,
+                        val_check_interval=.1,
                         logger=mlf_logger,
                         callbacks=[timer_callback,
-                        EarlyStopping(monitor="val_loss_epoch", verbose=True, mode="min", min_delta=.01, patience=3),
-                        ThresholdEarlyStopping(
-                                    threshold=cfg.training.early_stopping.threshold,
-                                    monitor=cfg.training.early_stopping.monitor, 
-                                    patience=cfg.training.early_stopping.patience, 
-                                    min_delta=cfg.training.early_stopping.min_delta, 
-                                    mode=cfg.training.early_stopping.mode, 
-                                    check_on_train_epoch_end=cfg.training.early_stopping.check_on_train_epoch_end, # Check at the step level, not at the epoch level
-                                    ),
+                        #EarlyStopping(monitor="val_loss_epoch", verbose=True, mode="min", min_delta=.01, patience=3),
+                        #ThresholdEarlyStopping(
+                        #            threshold=cfg.training.early_stopping.threshold,
+                        #            monitor=cfg.training.early_stopping.monitor, 
+                        #            patience=cfg.training.early_stopping.patience, 
+                        #            min_delta=cfg.training.early_stopping.min_delta, 
+                        #            mode=cfg.training.early_stopping.mode, 
+                        #            check_on_train_epoch_end=cfg.training.early_stopping.check_on_train_epoch_end, # Check at the step level, not at the epoch level
+                        #            ),
                         MLFlowConnectivityCallback()]) 
     trainer.fit(lightning, train_dataloader, validation_dataloader)
     total_time = timer_callback.time_elapsed("train")
@@ -212,7 +213,18 @@ def main(cfg: DictConfig) -> None:
 
         start, end = define_indices(cfg)
 
-        for expression in tqdm(expressions[start:end]):
+        filename = "/mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/expressions_sample_2k.csv"
+
+        original_index_list = []
+        with open(filename, 'r', newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                # Convert to int if needed
+                original_index_list.append(int(row['original_index']))
+        
+        for original_index in tqdm(original_index_list[start:end]):
+
+            expression = expressions[original_index]
 
             print("Calculating montonicity for expression: ", expression.term_expression)
             all_models, flipped_models, quantifiers, expression_names = get_verified_models(cfg, [expression], universe)

@@ -3,16 +3,16 @@ defaults:
   - model: ???
   - override hydra/launcher: hyak_swarm
 
-experiment_name: learn_quant_e50
+experiment_name: expressions_shuffled_2k
 notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
-expression_indices: 5
+expression_indices: 2000
 
 tracking:
   max_retries: 8
   backoff_factor: 60
-  host: g3115
+  host: g3116
   port: 5000
 
 grammar:
@@ -25,8 +25,8 @@ universe:
   m_size: 4
 
 expressions:
-  n_limit: 10000
-  depth: 3
+  n_limit: 8
+  depth: 5
   output_dir: learn_quant/outputs/
   representation: one_hot
   downsampling: true
@@ -46,7 +46,7 @@ training:
   n_runs: 1
   lightning: true
   device: cpu
-  epochs: 100
+  epochs: 50
   conditions: false
   early_stopping:
     threshold: 0.05
@@ -76,16 +76,16 @@ measures:
 
 hydra:
   launcher:
-    partition: compute-bigmem                   # The partition/queue to submit jobs
+    partition: gpu-l40                   # The partition/queue to submit jobs
     account: clmbr         # Your account (if required by your cluster)
-    time: 2880                        # Time in minutes (12 hours)
-    cpus_per_task: 2
-    mem_gb: 2
+    time: 2880                        # Time in minutes (48 hours)
+    cpus_per_task: 1
+    mem_gb: 8
     # gpus_per_node: 0
     # mem_per_gpu: 32GB
     # If you want to requeue on timeout:
     max_num_timeout: 10               # number of times to re-queue job after timeout
-    array_parallelism: 2           # number of jobs to launch in parallel
+    array_parallelism: 120           # number of jobs to launch in parallel
   sweeper:
     params:
       +expressions.index: range(0, ${expression_indices})

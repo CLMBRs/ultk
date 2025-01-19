@@ -2,14 +2,14 @@
 #SBATCH --job-name=postgres_db
 #SBATCH --output=postgres_db.out
 #SBATCH --error=postgres_db.err
-#SBATCH --time=24:00:00
-#SBATCH --account=clmbr
-#SBATCH --partition=compute-bigmem
+#SBATCH --time=5-00
+#SBATCH --partition=gpu-l40
 #SBATCH --requeue
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --nodelist=n3190
-#SBATCH --cpus-per-task=2
+#SBATCH --mem=10G
+#SBATCH --cpus-per-task=10
+#SBATCH --nodelist=g3115
 
 module load apptainer
 
