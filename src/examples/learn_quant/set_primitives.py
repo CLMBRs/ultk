@@ -3,15 +3,18 @@ from ultk.language.semantics import Referent
 
 
 global start
-start = 'bool'
+start = "bool"
+
 
 class FrozensetA(frozenset):
     def __new__(cls, *args):
         return super().__new__(cls, *args)
-    
+
+
 class FrozensetB(frozenset):
     def __new__(cls, *args):
         return super().__new__(cls, *args)
+
 
 def A(r: Referent, weight=10.0) -> "FrozensetA":
     """

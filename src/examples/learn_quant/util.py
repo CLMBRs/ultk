@@ -1,7 +1,7 @@
 from typing import Any
 
 import dill as pkl
-import random 
+import random
 import os
 from pathlib import Path
 
@@ -22,7 +22,12 @@ def summarize_expression(expression: GrammaticalExpression):
 
 
 def read_expressions(
-    filename: str, universe: Universe = None, return_by_meaning=True, pickle=False, add_indices=True, grammar=None,
+    filename: str,
+    universe: Universe = None,
+    return_by_meaning=True,
+    pickle=False,
+    add_indices=True,
+    grammar=None,
 ) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
     """
     Read expressions from a PKL or YAML file.
@@ -63,9 +68,10 @@ def filter_expressions_by_rules(rules: list, expressions):
     return list(filter(lambda x: str(x) in rules, expressions))
 
 
-
 def read_expressions_from_folder(
-    folder: str, return_by_meaning=True, grammar=None,
+    folder: str,
+    return_by_meaning=True,
+    grammar=None,
 ) -> tuple[list[GrammaticalExpression], dict[Meaning, Expression]]:
     """Read expressions from a YAML file in a specified folder.
 
@@ -104,7 +110,7 @@ def save_quantifiers(
     parent_dir: str,
     universe: QuantifierUniverse = None,
     indices_tag: str = "",
-    pickle: bool = True
+    pickle: bool = True,
 ):
     """
     Save the quantifiers expressions to a YAML file.
@@ -117,20 +123,22 @@ def save_quantifiers(
     out_path = f"generated_expressions{indices_tag}.yml"
     print("Saving generated expressions to file...")
     print("Output path:", Path(parent_dir) / Path(out_path))
-    
+
     # Create all necessary parent directories if there's a directory path
     if parent_dir:
         os.makedirs(parent_dir, exist_ok=True)
 
-    write_expressions(expressions_by_meaning.values(), Path(parent_dir) / Path(out_path))
-    
+    write_expressions(
+        expressions_by_meaning.values(), Path(parent_dir) / Path(out_path)
+    )
+
     pickle_output_file = parent_dir / f"generated_expressions{indices_tag}.pkl"
 
     # Open the file in write binary mode and dump the object
     if pickle:
         with open(pickle_output_file, "wb") as f:
             pkl.dump(expressions_by_meaning, f)
-    
+
     if universe:
         # Create a new path for the pickle file
         universe_path = f"master_universe.pkl"
@@ -142,8 +150,11 @@ def save_quantifiers(
 
         print("Master universe has been pickled and saved to", pickle_output_file)
 
-    print("Expressions have been YAML'ed to {} and PKL'ed to {}".format(out_path, pickle_output_file))
-    
+    print(
+        "Expressions have been YAML'ed to {} and PKL'ed to {}".format(
+            out_path, pickle_output_file
+        )
+    )
 
 
 def save_inclusive_generation(
@@ -170,23 +181,25 @@ def save_inclusive_generation(
         None
     """
 
-    output_file = (
-        Path(output_dir)
-        / Path(
-            "inclusive/"
-            + "M"
-            + str(m_size)
-            + "_"
-            + "X"
-            + str(x_size)
-            + "_"
-            + str("d" + str(depth))
-        )
+    output_file = Path(output_dir) / Path(
+        "inclusive/"
+        + "M"
+        + str(m_size)
+        + "_"
+        + "X"
+        + str(x_size)
+        + "_"
+        + str("d" + str(depth))
     )
     Path(output_file).mkdir(parents=True, exist_ok=True)
 
     print("Saving generated expressions...")
-    save_quantifiers(expressions_by_meaning, output_file, universe=master_universe, indices_tag=indices_tag)
+    save_quantifiers(
+        expressions_by_meaning,
+        output_file,
+        universe=master_universe,
+        indices_tag=indices_tag,
+    )
 
 
 def calculate_term_expression_depth(expression):

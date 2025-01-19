@@ -76,7 +76,12 @@ def main(args):
     vis.plot_distribution(args.save_distribution, prior_over_states)
     vis.plot_accuracy(args.save_accuracy_plot, accuracies)
     vis.plot_complexity(args.save_complexity_plot, complexities)
-    vis.plot_tradeoff(args.save_tradeoff_plot, complexities, accuracies, generate_hamming_bound(signaling_game))
+    vis.plot_tradeoff(
+        args.save_tradeoff_plot,
+        complexities,
+        accuracies,
+        generate_hamming_bound(signaling_game),
+    )
 
     print("Done.")
 

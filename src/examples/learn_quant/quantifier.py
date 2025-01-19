@@ -5,14 +5,11 @@ import numpy as np
 from ultk.language.grammar import GrammaticalExpression
 
 # Define the mapping from characters to indices
-char_to_index = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4}
+char_to_index = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4}
 # Convert characters to indices
 one_hot_matrix = np.eye(len(char_to_index))
-compositional_matrix = np.array([[1, 0, 1],
-                                [0, 1, 1],
-                                [1, 1, 1],
-                                [0, 0, 1],
-                                [0, 0, 0]])
+compositional_matrix = np.array([[1, 0, 1], [0, 1, 1], [1, 1, 1], [0, 0, 1], [0, 0, 0]])
+
 
 @dataclass(eq=True, frozen=True)
 class QuantifierModel(Referent):
@@ -42,8 +39,8 @@ class QuantifierModel(Referent):
             case str():
                 pass
             case np.ndarray():
-                new_name = ''.join([str(x) for x in self.name])
-                object.__setattr__(self, 'name', new_name)
+                new_name = "".join([str(x) for x in self.name])
+                object.__setattr__(self, "name", new_name)
             case _:
                 raise ValueError("The name must be a string or a numpy array")
         object.__setattr__(
@@ -74,38 +71,39 @@ class QuantifierModel(Referent):
             "A": len(self.A),
             "B": len(self.B),
         }
-    
-    def binarize(self, mode='B') -> np.ndarray:
+
+    def binarize(self, mode="B") -> np.ndarray:
         """
         Binarizes the sequence of characters in the name attribute.
 
         Returns:
             np.ndarray: An array of binary values, where 1 represents characters '1' or '2', and 0 represents other characters.
         """
-        if mode=='B':
-            return np.array([1 if char in {'1', '2'} else 0 for char in self.name])
-        if mode=='A':
-            return np.array([1 if char in {'0', '2'} else 0 for char in self.name])
-        if mode=='both':
-            return np.array([1 if char in {'2'} else 0 for char in self.name])
-        if mode=='B_only':
-            return np.array([1 if char in {'1'} else 0 for char in self.name])
-        if mode=='A_only':
-            return np.array([1 if char in {'0'} else 0 for char in self.name])
-        elif mode=='one_hot':
+        if mode == "B":
+            return np.array([1 if char in {"1", "2"} else 0 for char in self.name])
+        if mode == "A":
+            return np.array([1 if char in {"0", "2"} else 0 for char in self.name])
+        if mode == "both":
+            return np.array([1 if char in {"2"} else 0 for char in self.name])
+        if mode == "B_only":
+            return np.array([1 if char in {"1"} else 0 for char in self.name])
+        if mode == "A_only":
+            return np.array([1 if char in {"0"} else 0 for char in self.name])
+        elif mode == "one_hot":
             # Create an identity matrix and select rows corresponding to indices
             indices = [char_to_index[char] for char in self.name]
             one_hot_encoded = one_hot_matrix[indices]
             return one_hot_encoded
-        elif mode=='composition':
+        elif mode == "composition":
             indices = [char_to_index[char] for char in self.name]
             one_hot_encoded = compositional_matrix[indices]
             return one_hot_encoded
 
-        
-
     def to_numpy(
-        self, mode="one_hot", quantifier_index: np.ndarray | None = None, in_meaning: bool = False
+        self,
+        mode="one_hot",
+        quantifier_index: np.ndarray | None = None,
+        in_meaning: bool = False,
     ):
         """
         Converts the quantifier to a numpy array.
@@ -151,6 +149,7 @@ class QuantifierModel(Referent):
 
         return one_hot_array
 
+
 @dataclass(frozen=True)
 class QuantifierUniverse(Universe):
 
@@ -160,8 +159,8 @@ class QuantifierUniverse(Universe):
     def __init__(self, referents, m_size, x_size):
         prior = Universe._calculate_prior(referents)
         super().__init__(referents, prior)
-        object.__setattr__(self, 'm_size', m_size)
-        object.__setattr__(self, 'x_size', x_size)
+        object.__setattr__(self, "m_size", m_size)
+        object.__setattr__(self, "x_size", x_size)
 
     def __add__(self, other):
         """Returns the union of two QuantifierUniverses.
@@ -171,7 +170,7 @@ class QuantifierUniverse(Universe):
         return QuantifierUniverse(
             referents=self.referents + other.referents,
             m_size=self.m_size,
-            x_size=x_size
+            x_size=x_size,
         )
 
     def get_names(self) -> list[str]:
@@ -181,11 +180,14 @@ class QuantifierUniverse(Universe):
             list: List of names of referents in the quantifier universe.
         """
         return [referent.name for referent in self.referents]
-    
-    def binarize_referents(self, mode='B') -> np.ndarray:
+
+    def binarize_referents(self, mode="B") -> np.ndarray:
         return np.array([referent.binarize(mode=mode) for referent in self.referents])
 
+
 import random
+
+
 def summarize_expression(expression: GrammaticalExpression):
     print(str(expression))
     sample = random.sample(list(expression.meaning.mapping), 10)

@@ -169,14 +169,16 @@ class GrammaticalExpression(Expression[T]):
         """Get the complement of the meaning of this expression, i.e. the set of all referents for which
         the expression evaluates to False."""
 
-        return Meaning(tuple(set(self.meaning.universe.referents) - set(self.meaning.referents)),
-                       self.meaning.universe)
-    
+        return Meaning(
+            tuple(set(self.meaning.universe.referents) - set(self.meaning.referents)),
+            self.meaning.universe,
+        )
+
     def draw_referent(self, complement=False):
         """Get a random referent from the meaning's referents."""
         if complement:
             return random.choice(list(self.complement().referents))
-        return random.choice(list(self.meaning.referents)) 
+        return random.choice(list(self.meaning.referents))
 
     def to_dict(self) -> dict:
         the_dict = super().to_dict()
@@ -186,7 +188,7 @@ class GrammaticalExpression(Expression[T]):
         if self.children:
             the_dict["children"] = tuple(child.to_dict() for child in self.children)
         return the_dict
-    
+
     # Following function counts the total number of atoms / leaf nodes, as opposed to __len__, which counts all nodes
     def count_atoms(self):
         if self.children is None:
@@ -273,9 +275,9 @@ class Grammar:
         # Return the next rule in the iterator
         # Raise StopIteration if there are no more rules
         raise StopIteration
-    
+
     def __or__(self, other: "Grammar") -> "Grammar":
-        #Combine two grammars into one, with the same start symbol.
+        # Combine two grammars into one, with the same start symbol.
         if self._start != other._start:
             raise ValueError("Grammars must have the same start symbol to be combined.")
         new_grammar = Grammar(self._start)

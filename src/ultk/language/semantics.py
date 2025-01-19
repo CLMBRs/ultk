@@ -62,7 +62,7 @@ class Referent:
 
     def __hash__(self) -> int:
         return hash((self.name, frozenset(self.__dict__.items())))
-    
+
     def __repr__(self) -> str:
         return f"Referent({self.name}, {self.__dict__})"
 
@@ -74,14 +74,12 @@ class Universe:
     referents: tuple[Referent, ...]
     prior: tuple[float, ...]
 
-    def __init__(self, referents, prior = None):
+    def __init__(self, referents, prior=None):
         # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
         object.__setattr__(self, "referents", referents)
         # When only referents are passed in, make the priors a unifrom distribution
         object.__setattr__(
-            self,
-            "prior",
-            prior or tuple(1/len(referents) for _ in referents)
+            self, "prior", prior or tuple(1 / len(referents) for _ in referents)
         )
 
     @cached_property
@@ -91,7 +89,7 @@ class Universe:
     @cached_property
     def size(self):
         return len(self.referents)
-    
+
     @cached_property
     def prior_numpy(self) -> np.ndarray:
         return np.array(self.prior)
@@ -110,11 +108,13 @@ class Universe:
 
     def __len__(self) -> int:
         return len(self.referents)
-    
+
     @classmethod
     def _calculate_prior(cls, referents: tuple[Referent]):
         default_prob = 1 / len(referents)
-        prior = tuple(getattr(referent, "probability", default_prob) for referent in referents)
+        prior = tuple(
+            getattr(referent, "probability", default_prob) for referent in referents
+        )
         return prior
 
     @classmethod
@@ -149,15 +149,16 @@ class Meaning(Generic[T]):
     But, in general, meanings can have a different output type for, e.g. sub-sentential meanings..
 
     Properties:
-        mapping: a `FrozenDict` with `Referent` keys, but arbitrary type `T` as values. 
+        mapping: a `FrozenDict` with `Referent` keys, but arbitrary type `T` as values.
 
         universe: a Universe object.  The `Referent`s in the keys of `mapping` are expected to be exactly those in `universe`.
 
         _dist: a mapping representing a probability distribution over referents to associate with the meaning. By default, will be assumed to be uniform over the "true-like" `Referent`s in `mapping` (see `.dist`).
     """
+
     mapping: FrozenDict[Referent, T]
     # With the mapping, `universe` is not conceptually needed, but it is very useful to have it lying around.
-    # `universe` should be the keys to `mapping`. 
+    # `universe` should be the keys to `mapping`.
     universe: Universe
     _dist: FrozenDict[Referent, float] = FrozenDict({})
 
@@ -166,17 +167,27 @@ class Meaning(Generic[T]):
         if self._dist:
             # normalize weights to distribution
             total_weight = sum(self._dist.values())
-            return FrozenDict({referent: weight / total_weight for referent, weight in self._dist.items()})
+            return FrozenDict(
+                {
+                    referent: weight / total_weight
+                    for referent, weight in self._dist.items()
+                }
+            )
         else:
             num_true_like = sum(1 for value in self.mapping.values() if value)
             if num_true_like == 0:
                 raise ValueError("Meaning must have at least one true-like referent.")
-            return FrozenDict({referent: (1 / num_true_like if self.mapping[referent] else 0) for referent in self.mapping})
-        
+            return FrozenDict(
+                {
+                    referent: (1 / num_true_like if self.mapping[referent] else 0)
+                    for referent in self.mapping
+                }
+            )
+
     def is_uniformly_false(self) -> bool:
         """Return True if all referents in the meaning are mapped to False (or coercible to False).In the case where the meaning type is boolean, this corresponds to the characteristic function of the empty set."""
         return all(not value for value in self.mapping.values())
-    
+
     def get_binarized_meaning(self):
         return np.array(list(self.mapping.values())).astype(int)
 
@@ -187,4 +198,6 @@ class Meaning(Generic[T]):
         return bool(self.mapping)  # and bool(self.universe)
 
     def __str__(self):
-        return "Mapping:\n\t{0}".format('\n'.join(f"{ref}: {self.mapping[ref]}" for ref in self.mapping)) # \ \nDistribution:\n\t{self.dist}\n"
+        return "Mapping:\n\t{0}".format(
+            "\n".join(f"{ref}: {self.mapping[ref]}" for ref in self.mapping)
+        )  # \ \nDistribution:\n\t{self.dist}\n"

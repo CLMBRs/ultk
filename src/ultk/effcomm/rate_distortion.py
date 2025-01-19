@@ -107,14 +107,14 @@ def ib_encoder_to_point(
         encoder: array of shape `(|meanings|, |words|)` representing P(W | M)
 
         decoder: array of shape `(|words|, |meanings|)` representing P(M | W).  By default is None, and the Bayesian optimal decoder will be inferred.
-    
+
     Returns:
         a tuple of floats corresponding to `(complexity, accuracy, comm_cost)`.
     """
 
     if decoder is None:
         decoder = ib_optimal_decoder(encoder, prior, meaning_dists)
-    
+
     # Unclear that the below is correct
     # encoder = rows_zero_to_uniform(encoder)
     # decoder = rows_zero_to_uniform(decoder)
@@ -136,13 +136,16 @@ def ib_encoder_to_point(
 
     # pu_w = decoder @ meaning_dists
     # dist_mat = ib_kl(meaning_dists, pu_w,) # getting infs; I confirmed that this because there exists an x s.t. p(x) > 0 but q(x) = 0. Ask Noga what to do here. Add a little epsilon?
-    # distortion = np.sum( prior * ( encoder @ decoder ) * dist_mat )    
+    # distortion = np.sum( prior * ( encoder @ decoder ) * dist_mat )
 
     decoder_smoothed = decoder + 1e-20
     decoder_smoothed /= decoder_smoothed.sum(axis=1, keepdims=True)
     pu_w = decoder_smoothed @ meaning_dists
-    dist_mat = ib_kl(meaning_dists, pu_w,)
-    distortion = np.sum( prior * ( encoder @ decoder ) * dist_mat )
+    dist_mat = ib_kl(
+        meaning_dists,
+        pu_w,
+    )
+    distortion = np.sum(prior * (encoder @ decoder) * dist_mat)
     # but this measure of distortion is almost an order magnitude higher than bayesian decoder
     # breakpoint()
 
