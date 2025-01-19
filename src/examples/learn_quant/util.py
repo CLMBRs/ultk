@@ -1,21 +1,12 @@
-from typing import Callable, Any
-import pandas as pd
+from typing import Any
 
-from yaml import load, dump
-from typing import Iterable, Union
 import dill as pkl
 import random 
 import os
 from pathlib import Path
 
-
-try:
-    from yaml import CLoader as Loader, CDumper as Dumper
-except ImportError:
-    from yaml import Loader, Dumper
-
 from ultk.language.grammar import GrammaticalExpression
-from ultk.language.language import Expression, Language
+from ultk.language.language import Expression
 from ultk.language.semantics import Meaning, Universe
 from ultk.util.io import write_expressions, read_grammatical_expressions
 

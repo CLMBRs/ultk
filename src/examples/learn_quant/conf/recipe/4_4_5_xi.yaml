@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
-  - //Users/radmajik/Documents/UWLing/altk/src/examples/learn_quant/conf/grammar/base@grammar
-  - //Users/radmajik/Documents/UWLing/altk/src/examples/learn_quant/conf/universe/base@universe
+  - /grammar/base@grammar
+  - /universe/base@universe
   - _self_
 
 name: base

@@ -1,28 +1,17 @@
-from ultk.effcomm.informativity import informativity
-from ultk.language.grammar import GrammaticalExpression
-from ultk.language.language import Language, aggregate_expression_complexity
-from ultk.language.semantics import Meaning
-
 from learn_quant.util import read_expressions
 from learn_quant.quantifier import QuantifierUniverse, QuantifierModel
-from learn_quant.grammar import add_indices, get_indices_tag, QuantifierGrammar
+from learn_quant.grammar import get_indices_tag, QuantifierGrammar
 
 from typing import Dict
-from itertools import product
-import math
-from scipy.stats import entropy
-import pandas as pd
 import numpy as np
-from tqdm import tqdm
-from scipy import sparse
 from copy import deepcopy
 import dill as pkl
 from pathlib import Path
 
-from itertools import product, combinations_with_replacement, permutations
+from itertools import combinations_with_replacement, permutations
 
 import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
 # e.g.:
 # python -m learn_quant.monotonicity recipe=test_monotonicity
@@ -140,12 +129,7 @@ def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
             print(f"Preds {model_ints[i]}: {pred_weights[i]}")
     """
 
-    # print('q:')
-    # print(quantifier)
-    # print(true_preds)
     pred_prob = pred_weights / sum(pred_weights)
-    # print(pred_weights)
-    # print(pred_prob)
     # TODO: should these be weighted by pred_weights, i.e. pred_prob?
     p_pred = sum(true_preds) / len(true_preds)
     p_nopred = 1 - p_pred
@@ -163,15 +147,10 @@ def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
     ent_pred = -np.nansum(np.array([noq_pred, q_pred]) * pred_logs)
     ent_nopred = -np.nansum(np.array([noq_nopred, q_nopred]) * nopred_logs)
     cond_ent = ent_pred + ent_nopred
-    # print(cond_ent)
-    # print(q_ent)
 
     # return 0 if q_ent == 0 else 1 - (cond_ent / q_ent)
     if cfg.measures.monotonicity.debug:
-        #print("true pred", true_preds)
         print("q_ent", q_ent)
-        #print("pred_prob", pred_prob)
-        #print("pred_weights", pred_weights)
         print("p_pred", p_pred)
         print("p_nopred", p_nopred)
         print("q_pred", q_pred)

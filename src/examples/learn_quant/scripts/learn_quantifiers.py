@@ -3,9 +3,6 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import lightning as L
 from lightning.pytorch.callbacks import Timer, EarlyStopping
@@ -20,16 +17,13 @@ import time
 import mlflow
 
 from ultk.util.io import read_grammatical_expressions
-
-from ..quantifier import QuantifierModel
-from ultk.language.grammar import GrammaticalExpression, Grammar
-from ..grammar import add_indices, QuantifierGrammar
+from ultk.language.grammar import GrammaticalExpression
+from ..grammar import add_indices
 from ..util import calculate_term_expression_depth
 from ..sampling import DatasetInitializationError
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
 from ..training_lightning import LightningModel, ThresholdEarlyStopping
 from ..monotonicity import load_grammar, get_verified_models, load_universe, filter_universe, filter_universe, measure_monotonicity, upward_monotonicity_entropy
-import torch.nn as nn
 import random
 from collections.abc import MutableMapping
 
@@ -147,7 +141,6 @@ def main(cfg: DictConfig) -> None:
 
     mlflow.pytorch.autolog()
 
-    import os
     # Print environment variables for debugging
     print("MLFLOW_TRACKING_URI environment variable:", os.environ.get('MLFLOW_TRACKING_URI'))
     print("MLflow version:", mlflow.version.VERSION)

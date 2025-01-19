@@ -10,14 +10,12 @@ from omegaconf import DictConfig, OmegaConf
 
 from ultk.language.grammar import GrammaticalExpression
 from ultk.language.semantics import Meaning
-from ultk.language.grammar import Grammar
 from typing import Any
 
 from ..quantifier import QuantifierUniverse
 from ..grammar import QuantifierGrammar, add_indices
 from ..monotonicity import create_universe
 from ..util import save_quantifiers, save_inclusive_generation
-from typing import Iterable
 
 # e.g.:
 # python -m learn_quant.scripts.generate_expressions mode=generate universe.inclusive_universes=false universe.m_size=4 universe.x_size=5 grammar.depth=3 recipe=base grammar.indices=true

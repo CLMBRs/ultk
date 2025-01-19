@@ -1,8 +1,6 @@
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
 import numpy as np
 from ultk.language.grammar import GrammaticalExpression
 from typing import Iterable
@@ -10,8 +8,6 @@ from typing import Iterable
 import torch
 from torch.utils.data import Dataset
 from learn_quant.sampling import sample_by_expression, downsample_quantifier_models
-
-import mlflow
 
 def set_device(training_device):
     if training_device == "mps":

@@ -1,10 +1,6 @@
-from typing import Iterable, Union
 import numpy as np
-import pandas as pd
 from ultk.language.semantics import Referent, Universe
 from dataclasses import dataclass, field
-from concepts.contexts import Context
-from functools import cached_property
 import numpy as np
 from ultk.language.grammar import GrammaticalExpression
 

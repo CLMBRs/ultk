@@ -3,7 +3,7 @@ defaults:
   - model: ???
   - override hydra/launcher: hyak_swarm
 
-experiment_name: expressions_shuffled_2k
+experiment_name: repeated_runs
 notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
