@@ -24,16 +24,12 @@ The code in this example provides experimental code to:
 
 ## Usage
 
-From the `src/examples` directory:
-1. `python -m learn_quant.scripts.generate_expressions`: generates `generated_expressions.yml` files that catalog licensed `QuantifierModel`s given a `Grammar` and `QuantifierUniverse`
+1. From the `src/examples` directory:
+`python -m learn_quant.scripts.generate_expressions`: generates `generated_expressions.yml` files that catalog licensed `QuantifierModel`s given a `Grammar` and `QuantifierUniverse` given a config at `conf/config`
 
+### With Slurm
+2. Generate randomized index with `notebooks/randomize_expression_index.ipynb`.
+3. Run `HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.learn_quantifiers_slurm --multirun training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false`. This command will read the config at `conf/learn_slurm` and training data based on the chosen quantifier expressions and run 1 training job per expression with the Hydra submitit plugin.
 
-## Comparison to "Learnability and semantic universals" (Steinert-Threlkeld and Szymanik 2019)
-
-This example attempts to generalize the experiments from Steinert-Threlkeld and Szymanik 2019 to observe learnability properties across a wide range of quantifiers, both hypothetical and evinced in natural expressions. 
-
-## TODOs for this example
-
-1. Add configuration files (ideally yml using [hydra](https://hydra.cc)), to keep track of filenames and allow for easy experimentation with different parameter settings.
-2. Measure monotonicity and run statistical tests in `scripts/monotonicity.py`.
-3. ...
+### Without Slurm
+2. Run `HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.learn_quantifiers training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false`. This command will read the config at `conf/learn` and training data based on the chosen quantifier expressions and run 1 training job for all expressions on your local machine.
