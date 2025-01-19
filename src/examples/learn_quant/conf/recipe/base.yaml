@@ -1,8 +1,8 @@
 # @package _global_
 defaults:
   - _self_
-  - //mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/conf/grammar/base@grammar
-  - //mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/conf/universe/base@universe
+  - /grammar/base@grammar
+  - /universe/base@universe
 
 name: base
 
