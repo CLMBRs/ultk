@@ -128,7 +128,11 @@ class Universe:
         """
         records = df.to_dict("records")
         referents = tuple(Referent(record["name"], record) for record in records)
-        prior = cls._calculate_prior(referents)
+        default_prob = 1 / len(referents)
+        # prior = FrozenDict({ referent: getattr(referent, "probability", default_prob) for referent in referents })
+        prior = tuple(
+            getattr(referent, "probability", default_prob) for referent in referents
+        )
         return cls(referents, prior)
 
     @classmethod
@@ -160,7 +164,8 @@ class Meaning(Generic[T]):
     # With the mapping, `universe` is not conceptually needed, but it is very useful to have it lying around.
     # `universe` should be the keys to `mapping`.
     universe: Universe
-    _dist: FrozenDict[Referent, float] = FrozenDict({})
+    # _dist: FrozenDict[Referent, float] = FrozenDict({})
+    _dist = False  # TODO: clean up
 
     @property
     def dist(self) -> FrozenDict[Referent, float]:
@@ -193,6 +198,10 @@ class Meaning(Generic[T]):
 
     def __getitem__(self, key: Referent) -> T:
         return self.mapping[key]
+
+    def __iter__(self):
+        """Iterate over the referents in the meaning."""
+        return iter(self.mapping)
 
     def __bool__(self):
         return bool(self.mapping)  # and bool(self.universe)

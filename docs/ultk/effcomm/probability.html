@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="pdoc 15.0.0"/>
-    <title>ultk API documentation</title>
+    <title>ultk.effcomm.probability API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
     <style>/*! syntax-highlighting.css */pre{line-height:125%;}span.linenos{color:inherit; background-color:transparent; padding-left:5px; padding-right:20px;}.pdoc-code .hll{background-color:#ffffcc}.pdoc-code{background:#f8f8f8;}.pdoc-code .c{color:#3D7B7B; font-style:italic}.pdoc-code .err{border:1px solid #FF0000}.pdoc-code .k{color:#008000; font-weight:bold}.pdoc-code .o{color:#666666}.pdoc-code .ch{color:#3D7B7B; font-style:italic}.pdoc-code .cm{color:#3D7B7B; font-style:italic}.pdoc-code .cp{color:#9C6500}.pdoc-code .cpf{color:#3D7B7B; font-style:italic}.pdoc-code .c1{color:#3D7B7B; font-style:italic}.pdoc-code .cs{color:#3D7B7B; font-style:italic}.pdoc-code .gd{color:#A00000}.pdoc-code .ge{font-style:italic}.pdoc-code .gr{color:#E40000}.pdoc-code .gh{color:#000080; font-weight:bold}.pdoc-code .gi{color:#008400}.pdoc-code .go{color:#717171}.pdoc-code .gp{color:#000080; font-weight:bold}.pdoc-code .gs{font-weight:bold}.pdoc-code .gu{color:#800080; font-weight:bold}.pdoc-code .gt{color:#0044DD}.pdoc-code .kc{color:#008000; font-weight:bold}.pdoc-code .kd{color:#008000; font-weight:bold}.pdoc-code .kn{color:#008000; font-weight:bold}.pdoc-code .kp{color:#008000}.pdoc-code .kr{color:#008000; font-weight:bold}.pdoc-code .kt{color:#B00040}.pdoc-code .m{color:#666666}.pdoc-code .s{color:#BA2121}.pdoc-code .na{color:#687822}.pdoc-code .nb{color:#008000}.pdoc-code .nc{color:#0000FF; font-weight:bold}.pdoc-code .no{color:#880000}.pdoc-code .nd{color:#AA22FF}.pdoc-code .ni{color:#717171; font-weight:bold}.pdoc-code .ne{color:#CB3F38; font-weight:bold}.pdoc-code .nf{color:#0000FF}.pdoc-code .nl{color:#767600}.pdoc-code .nn{color:#0000FF; font-weight:bold}.pdoc-code .nt{color:#008000; font-weight:bold}.pdoc-code .nv{color:#19177C}.pdoc-code .ow{color:#AA22FF; font-weight:bold}.pdoc-code .w{color:#bbbbbb}.pdoc-code .mb{color:#666666}.pdoc-code .mf{color:#666666}.pdoc-code .mh{color:#666666}.pdoc-code .mi{color:#666666}.pdoc-code .mo{color:#666666}.pdoc-code .sa{color:#BA2121}.pdoc-code .sb{color:#BA2121}.pdoc-code .sc{color:#BA2121}.pdoc-code .dl{color:#BA2121}.pdoc-code .sd{color:#BA2121; font-style:italic}.pdoc-code .s2{color:#BA2121}.pdoc-code .se{color:#AA5D1F; font-weight:bold}.pdoc-code .sh{color:#BA2121}.pdoc-code .si{color:#A45A77; font-weight:bold}.pdoc-code .sx{color:#008000}.pdoc-code .sr{color:#A45A77}.pdoc-code .s1{color:#BA2121}.pdoc-code .ss{color:#19177C}.pdoc-code .bp{color:#008000}.pdoc-code .fm{color:#0000FF}.pdoc-code .vc{color:#19177C}.pdoc-code .vg{color:#19177C}.pdoc-code .vi{color:#19177C}.pdoc-code .vm{color:#19177C}.pdoc-code .il{color:#666666}</style>
@@ -38,34 +38,35 @@
     <nav class="pdoc">
         <label id="navtoggle" for="togglestate" class="pdoc-button"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg></label>
         <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
-        <div>
+        <div>            <a class="pdoc-button module-list-button" href="../effcomm.html">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0v-2z"/>
+  <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+</svg>                &nbsp;ultk.effcomm</a>
+
 
             <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
                    pattern=".+" required>
 
-            <h2>Contents</h2>
-            <ul>
-  <li><a href="#the-unnatural-language-toolkit-ultk">The Unnatural Language ToolKit (ULTK)</a>
-  <ul>
-    <li><a href="#introduction">Introduction</a></li>
-    <li><a href="#installing-ultk">Installing ULTK</a></li>
-    <li><a href="#getting-started">Getting started</a></li>
-    <li><a href="#modules">Modules</a></li>
-    <li><a href="#testing">Testing</a></li>
-    <li><a href="#references">References</a></li>
-  </ul></li>
-</ul>
 
-
-            <h2>Submodules</h2>
-            <ul>
-                    <li><a href="ultk/effcomm.html">effcomm</a></li>
-                    <li><a href="ultk/language.html">language</a></li>
-                    <li><a href="ultk/util.html">util</a></li>
-            </ul>
 
             <h2>API Documentation</h2>
                 <ul class="memberlist">
+            <li>
+                    <a class="variable" href="#PRECISION">PRECISION</a>
+            </li>
+            <li>
+                    <a class="function" href="#marginal">marginal</a>
+            </li>
+            <li>
+                    <a class="function" href="#joint">joint</a>
+            </li>
+            <li>
+                    <a class="function" href="#marginalize">marginalize</a>
+            </li>
+            <li>
+                    <a class="function" href="#bayes">bayes</a>
+            </li>
     </ul>
 
 
@@ -80,111 +81,271 @@
     <main class="pdoc">
             <section class="module-info">
                     <h1 class="modulename">
-ultk    </h1>
+<a href="./../../ultk.html">ultk</a><wbr>.<a href="./../effcomm.html">effcomm</a><wbr>.probability    </h1>
 
-                        <div class="docstring"><h1 id="the-unnatural-language-toolkit-ultk">The Unnatural Language ToolKit (ULTK)</h1>
+                
+                        <input id="mod-probability-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
-<p><img alt="Four examples of many recent results showing that natural languages are optimized for efficient communication." src="https://raw.githubusercontent.com/CLMBRs/ultk/main/images/plots.jpeg" width="100%" /></p>
+                        <label class="view-source-button" for="mod-probability-view-source"><span>View Source</span></label>
 
-<h2 id="introduction">Introduction</h2>
-
-<p>ULTK is a software library that aims to support <a href="https://github.com/CLMBRs/ultk/blob/main/images/mit-altk.pdf">efficient communication analyses</a> of natural language. This is a line of research that aims to explain why natural languages have the structure that they do in terms competing pressures to minimize cognitive complexity and maximize communicative accuracy.</p>
-
-<p>Key features:</p>
-
-<ul>
-<li>Primitives for constructing semantic spaces, expressions, and languages</li>
-<li>Tools for measuring informativity of languages, communicative success of RSA speakers and listeners</li>
-<li>Language population sampling and optimization w.r.t Pareto fronts</li>
-<li>Rate-Distortion and Information Bottleneck style analyses</li>
-</ul>
-
-<p>ULTK is a long term project and it is currently in its early stages. It is intended to help lower the barrier to entry for certain research in computational semantics, and to unify methodologies. If you find something confusing, please open an issue. If you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on, please contact the contributors.</p>
-
-<p>Read the <a href="https://clmbr.shane.st/ultk">documentation</a>.</p>
-
-<h2 id="installing-ultk">Installing ULTK</h2>
-
-<p>First, set up a virtual environment (e.g. via <a href="https://docs.conda.io/en/latest/miniconda.html">miniconda</a>, <code>conda create -n ultk python=3.11</code>, and <code>conda activate ultk</code>).</p>
-
-<ol>
-<li><p>Download or clone this repository and navigate to the root folder.</p></li>
-<li><p>Install ULTK (We recommend doing this inside a virtual environment)</p>
-
-<p><code>pip install -e .</code></p></li>
-</ol>
-
-<h2 id="getting-started">Getting started</h2>
-
-<ul>
-<li>Check out the <a href="https://github.com/CLMBRs/ultk/tree/main/src/examples">examples</a>, starting with a simiple efficient communication analysis of <a href="https://github.com/CLMBRs/ultk/tree/main/src/examples/indefinites">indefinites</a> and a comparison of two approaches to efficient communication, with modals as a test case.</li>
-<li>To see more scaled up usage examples, visit the codebase for an efficient communication analysis of <a href="https://github.com/nathimel/modals-effcomm">modals</a> or <a href="https://github.com/nathimel/rdsg">sim-max games</a>.</li>
-<li>For an introduction to efficient communication research, here is a <a href="https://www.annualreviews.org/doi/abs/10.1146/annurev-linguistics-011817-045406">survey paper</a> of the field.</li>
-<li>For an introduction to the RSA framework, see <a href="http://www.problang.org/">this online textbook</a>.</li>
-</ul>
-
-<h2 id="modules">Modules</h2>
-
-<p>There are two modules. The first is <a href="https://clmbr.shane.st/ultk/ultk/effcomm.html">ultk.effcomm</a>, which includes methods for measuring informativity of languages and/or communicative success of Rational Speech Act agents, and for language population sampling and optimization w.r.t Pareto fronts.</p>
-
-<p>The second module is <a href="https://clmbr.shane.st/ultk/ultk/language.html">ultk.language</a>, which contains primitives for constructing semantic spaces, expressions, and languages.  It also has a <code>grammar</code> module which can be used for building expressions in a Language of Thought and measuring complexity in terms of minimum description length, as well as for natural language syntax.</p>
-
-<p>The source code is available on github <a href="https://github.com/CLMBRs/ultk">here</a>.</p>
-
-<h2 id="testing">Testing</h2>
-
-<p>Unit tests are written in <a href="https://docs.pytest.org/en/7.3.x/">pytest</a> and executed via running <code>pytest</code> in the <code>src/tests</code> folder.</p>
-
-<h2 id="references">References</h2>
-
-<p><details>
-<summary>Figures:</summary></p>
-
-<blockquote>
-  <p>Kemp, C. &amp; Regier, T. (2012) Kinship Categories Across Languages Reflect General Communicative Principles. Science. <a href="https://www.science.org/doi/10.1126/science.1218811">https://www.science.org/doi/10.1126/science.1218811</a></p>
-</blockquote>
-
-<blockquote>
-  <p>Zaslavsky, N., Kemp, C., Regier, T., &amp; Tishby, N. (2018). Efficient compression in color naming and its evolution. Proceedings of the National Academy of Sciences, 115(31), 7937–7942. <a href="https://doi.org/10.1073/pnas.1800521115">https://doi.org/10.1073/pnas.1800521115</a></p>
-</blockquote>
-
-<blockquote>
-  <p>Denić, M., Steinert-Threlkeld, S., &amp; Szymanik, J. (2022). Indefinite Pronouns Optimize the Simplicity/Informativeness Trade-Off. Cognitive Science, 46(5), e13142. <a href="https://doi.org/10.1111/cogs.13142">https://doi.org/10.1111/cogs.13142</a></p>
-</blockquote>
-
-<blockquote>
-  <p>Steinert-Threlkeld, S. (2021). Quantifiers in Natural Language: Efficient Communication and Degrees of Semantic Universals. Entropy, 23(10), Article 10. <a href="https://doi.org/10.3390/e23101335">https://doi.org/10.3390/e23101335</a></p>
-</blockquote>
-
-<p></details></p>
-
-<p><details>
-<summary>Links:</summary></p>
-
-<blockquote>
-  <p>Imel, N., &amp; Steinert-Threlkeld, S. (2022). Modal semantic universals optimize the simplicity/informativeness trade-off. Semantics and Linguistic Theory, 1(0), Article 0. <a href="https://doi.org/10.3765/salt.v1i0.5346">https://doi.org/10.3765/salt.v1i0.5346</a></p>
-</blockquote>
-
-<blockquote>
-  <p>Kemp, C., Xu, Y., &amp; Regier, T. (2018). Semantic Typology and Efficient Communication. Annual Review of Linguistics, 4(1), 109–128. <a href="https://doi.org/10.1146/annurev-linguistics-011817-045406">https://doi.org/10.1146/annurev-linguistics-011817-045406</a></p>
-</blockquote>
-
-<p></details></p>
-</div>
-
-                        <input id="mod-ultk-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-
-                        <label class="view-source-button" for="mod-ultk-view-source"><span>View Source</span></label>
-
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="sd">.. include:: ../../README.md</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">3</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">5</span></a><span class="n">__docformat__</span> <span class="o">=</span> <span class="s2">&quot;google&quot;</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="c1"># see the utilities in https://github.com/nogazs/ib-color-naming/blob/master/src/tools.py</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="n">PRECISION</span> <span class="o">=</span> <span class="mf">1e-12</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="k">def</span> <span class="nf">marginal</span><span class="p">(</span><span class="n">pXY</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Computer marginals of a joint distribution.</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">    Args:</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">        pXY: a joint distribution of shape (|X|, |Y|), corresponding to p(x, y)</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">        axis: the axis along which to compute the marginal</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">    Returns:</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">        either pY (axis = 0) or pX (default, axis = 1)</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="k">return</span> <span class="n">pXY</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="k">def</span> <span class="nf">joint</span><span class="p">(</span><span class="n">pY_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pX</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a joint distribution from a conditional and a prior.</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="sd">    Args:</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="sd">        pY_X: a conditional distribution of shape (|X|, |Y|), corresponding to p(y|x)</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="sd">        pX: a prior distribution of shape (|X|,), corresponding to p(x)</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="sd">    Returns:</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="sd">        a joint distribution of shape (|X|, |Y|), corresponding to p(x, y)</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="k">return</span> <span class="n">pY_X</span> <span class="o">*</span> <span class="n">pX</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="k">def</span> <span class="nf">marginalize</span><span class="p">(</span><span class="n">pY_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pX</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Marginalize a conditional distribution (without a detour through the joint).</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">    Args:</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">        pY_X: a conditional distribution of shape (|X|, |Y|), corresponding to p(y|x)</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">        pX: a prior distribution of shape (|X|,), corresponding to p(x)</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">    Returns:</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">        a marginal distribution of shape (|Y|,), corresponding to p(y)</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="k">return</span> <span class="n">pY_X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">pX</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="k">def</span> <span class="nf">bayes</span><span class="p">(</span><span class="n">pY_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pX</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform Bayesian inference, computing p(x|y) from p(y|x) and p(x).</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="sd">    Args:</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="sd">        pY_X: a conditional distribution of shape (|X|, |Y|), corresponding to p(y|x)</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a><span class="sd">        pX: a prior distribution of shape (|X|,), corresponding to p(x)</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a><span class="sd">    Returns:</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a><span class="sd">        a posterior distribution of shape (|Y|, |X|), corresponding to p(x|y)</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="c1"># (|X|, |Y|)</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>    <span class="n">pXY</span> <span class="o">=</span> <span class="n">joint</span><span class="p">(</span><span class="n">pY_X</span><span class="p">,</span> <span class="n">pX</span><span class="p">)</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>    <span class="nb">print</span><span class="p">(</span><span class="n">pXY</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>    <span class="c1"># (|Y|,)</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="n">pY</span> <span class="o">=</span> <span class="n">marginalize</span><span class="p">(</span><span class="n">pY_X</span><span class="p">,</span> <span class="n">pX</span><span class="p">)</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>    <span class="nb">print</span><span class="p">(</span><span class="n">pY</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>    <span class="c1"># (|Y|, |X|)</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pY</span> <span class="o">&gt;</span> <span class="n">PRECISION</span><span class="p">,</span> <span class="n">pXY</span> <span class="o">/</span> <span class="n">pY</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">pXY</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
 </span></pre></div>
 
 
             </section>
+                <section id="PRECISION">
+                    <div class="attr variable">
+            <span class="name">PRECISION</span>        =
+<span class="default_value">1e-12</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PRECISION"></a>
+    
+    
+
+                </section>
+                <section id="marginal">
+                            <input id="marginal-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">marginal</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">pXY</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>, </span><span class="param"><span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>:</span></span>
+
+                <label class="view-source-button" for="marginal-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#marginal"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="marginal-8"><a href="#marginal-8"><span class="linenos"> 8</span></a><span class="k">def</span> <span class="nf">marginal</span><span class="p">(</span><span class="n">pXY</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="marginal-9"><a href="#marginal-9"><span class="linenos"> 9</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Computer marginals of a joint distribution.</span>
+</span><span id="marginal-10"><a href="#marginal-10"><span class="linenos">10</span></a>
+</span><span id="marginal-11"><a href="#marginal-11"><span class="linenos">11</span></a><span class="sd">    Args:</span>
+</span><span id="marginal-12"><a href="#marginal-12"><span class="linenos">12</span></a><span class="sd">        pXY: a joint distribution of shape (|X|, |Y|), corresponding to p(x, y)</span>
+</span><span id="marginal-13"><a href="#marginal-13"><span class="linenos">13</span></a><span class="sd">        axis: the axis along which to compute the marginal</span>
+</span><span id="marginal-14"><a href="#marginal-14"><span class="linenos">14</span></a>
+</span><span id="marginal-15"><a href="#marginal-15"><span class="linenos">15</span></a><span class="sd">    Returns:</span>
+</span><span id="marginal-16"><a href="#marginal-16"><span class="linenos">16</span></a><span class="sd">        either pY (axis = 0) or pX (default, axis = 1)</span>
+</span><span id="marginal-17"><a href="#marginal-17"><span class="linenos">17</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="marginal-18"><a href="#marginal-18"><span class="linenos">18</span></a>    <span class="k">return</span> <span class="n">pXY</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Computer marginals of a joint distribution.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>pXY:</strong>  a joint distribution of shape (|X|, |Y|), corresponding to p(x, y)</li>
+<li><strong>axis:</strong>  the axis along which to compute the marginal</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>either pY (axis = 0) or pX (default, axis = 1)</p>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="joint">
+                            <input id="joint-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">joint</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">pY_X</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>, </span><span class="param"><span class="n">pX</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>:</span></span>
+
+                <label class="view-source-button" for="joint-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#joint"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="joint-21"><a href="#joint-21"><span class="linenos">21</span></a><span class="k">def</span> <span class="nf">joint</span><span class="p">(</span><span class="n">pY_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pX</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="joint-22"><a href="#joint-22"><span class="linenos">22</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a joint distribution from a conditional and a prior.</span>
+</span><span id="joint-23"><a href="#joint-23"><span class="linenos">23</span></a>
+</span><span id="joint-24"><a href="#joint-24"><span class="linenos">24</span></a><span class="sd">    Args:</span>
+</span><span id="joint-25"><a href="#joint-25"><span class="linenos">25</span></a><span class="sd">        pY_X: a conditional distribution of shape (|X|, |Y|), corresponding to p(y|x)</span>
+</span><span id="joint-26"><a href="#joint-26"><span class="linenos">26</span></a><span class="sd">        pX: a prior distribution of shape (|X|,), corresponding to p(x)</span>
+</span><span id="joint-27"><a href="#joint-27"><span class="linenos">27</span></a>
+</span><span id="joint-28"><a href="#joint-28"><span class="linenos">28</span></a><span class="sd">    Returns:</span>
+</span><span id="joint-29"><a href="#joint-29"><span class="linenos">29</span></a><span class="sd">        a joint distribution of shape (|X|, |Y|), corresponding to p(x, y)</span>
+</span><span id="joint-30"><a href="#joint-30"><span class="linenos">30</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="joint-31"><a href="#joint-31"><span class="linenos">31</span></a>    <span class="k">return</span> <span class="n">pY_X</span> <span class="o">*</span> <span class="n">pX</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Compute a joint distribution from a conditional and a prior.</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>pY_X:</strong>  a conditional distribution of shape (|X|, |Y|), corresponding to p(y|x)</li>
+<li><strong>pX:</strong>  a prior distribution of shape (|X|,), corresponding to p(x)</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>a joint distribution of shape (|X|, |Y|), corresponding to p(x, y)</p>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="marginalize">
+                            <input id="marginalize-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">marginalize</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">pY_X</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>, </span><span class="param"><span class="n">pX</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>:</span></span>
+
+                <label class="view-source-button" for="marginalize-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#marginalize"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="marginalize-34"><a href="#marginalize-34"><span class="linenos">34</span></a><span class="k">def</span> <span class="nf">marginalize</span><span class="p">(</span><span class="n">pY_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pX</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="marginalize-35"><a href="#marginalize-35"><span class="linenos">35</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Marginalize a conditional distribution (without a detour through the joint).</span>
+</span><span id="marginalize-36"><a href="#marginalize-36"><span class="linenos">36</span></a>
+</span><span id="marginalize-37"><a href="#marginalize-37"><span class="linenos">37</span></a><span class="sd">    Args:</span>
+</span><span id="marginalize-38"><a href="#marginalize-38"><span class="linenos">38</span></a><span class="sd">        pY_X: a conditional distribution of shape (|X|, |Y|), corresponding to p(y|x)</span>
+</span><span id="marginalize-39"><a href="#marginalize-39"><span class="linenos">39</span></a><span class="sd">        pX: a prior distribution of shape (|X|,), corresponding to p(x)</span>
+</span><span id="marginalize-40"><a href="#marginalize-40"><span class="linenos">40</span></a>
+</span><span id="marginalize-41"><a href="#marginalize-41"><span class="linenos">41</span></a><span class="sd">    Returns:</span>
+</span><span id="marginalize-42"><a href="#marginalize-42"><span class="linenos">42</span></a><span class="sd">        a marginal distribution of shape (|Y|,), corresponding to p(y)</span>
+</span><span id="marginalize-43"><a href="#marginalize-43"><span class="linenos">43</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="marginalize-44"><a href="#marginalize-44"><span class="linenos">44</span></a>    <span class="k">return</span> <span class="n">pY_X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">pX</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Marginalize a conditional distribution (without a detour through the joint).</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>pY_X:</strong>  a conditional distribution of shape (|X|, |Y|), corresponding to p(y|x)</li>
+<li><strong>pX:</strong>  a prior distribution of shape (|X|,), corresponding to p(x)</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>a marginal distribution of shape (|Y|,), corresponding to p(y)</p>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="bayes">
+                            <input id="bayes-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">bayes</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">pY_X</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>, </span><span class="param"><span class="n">pX</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>:</span></span>
+
+                <label class="view-source-button" for="bayes-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#bayes"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="bayes-47"><a href="#bayes-47"><span class="linenos">47</span></a><span class="k">def</span> <span class="nf">bayes</span><span class="p">(</span><span class="n">pY_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pX</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="bayes-48"><a href="#bayes-48"><span class="linenos">48</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform Bayesian inference, computing p(x|y) from p(y|x) and p(x).</span>
+</span><span id="bayes-49"><a href="#bayes-49"><span class="linenos">49</span></a>
+</span><span id="bayes-50"><a href="#bayes-50"><span class="linenos">50</span></a><span class="sd">    Args:</span>
+</span><span id="bayes-51"><a href="#bayes-51"><span class="linenos">51</span></a><span class="sd">        pY_X: a conditional distribution of shape (|X|, |Y|), corresponding to p(y|x)</span>
+</span><span id="bayes-52"><a href="#bayes-52"><span class="linenos">52</span></a><span class="sd">        pX: a prior distribution of shape (|X|,), corresponding to p(x)</span>
+</span><span id="bayes-53"><a href="#bayes-53"><span class="linenos">53</span></a>
+</span><span id="bayes-54"><a href="#bayes-54"><span class="linenos">54</span></a><span class="sd">    Returns:</span>
+</span><span id="bayes-55"><a href="#bayes-55"><span class="linenos">55</span></a><span class="sd">        a posterior distribution of shape (|Y|, |X|), corresponding to p(x|y)</span>
+</span><span id="bayes-56"><a href="#bayes-56"><span class="linenos">56</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="bayes-57"><a href="#bayes-57"><span class="linenos">57</span></a>    <span class="c1"># (|X|, |Y|)</span>
+</span><span id="bayes-58"><a href="#bayes-58"><span class="linenos">58</span></a>    <span class="n">pXY</span> <span class="o">=</span> <span class="n">joint</span><span class="p">(</span><span class="n">pY_X</span><span class="p">,</span> <span class="n">pX</span><span class="p">)</span>
+</span><span id="bayes-59"><a href="#bayes-59"><span class="linenos">59</span></a>    <span class="nb">print</span><span class="p">(</span><span class="n">pXY</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="bayes-60"><a href="#bayes-60"><span class="linenos">60</span></a>    <span class="c1"># (|Y|,)</span>
+</span><span id="bayes-61"><a href="#bayes-61"><span class="linenos">61</span></a>    <span class="n">pY</span> <span class="o">=</span> <span class="n">marginalize</span><span class="p">(</span><span class="n">pY_X</span><span class="p">,</span> <span class="n">pX</span><span class="p">)</span>
+</span><span id="bayes-62"><a href="#bayes-62"><span class="linenos">62</span></a>    <span class="nb">print</span><span class="p">(</span><span class="n">pY</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="bayes-63"><a href="#bayes-63"><span class="linenos">63</span></a>    <span class="c1"># (|Y|, |X|)</span>
+</span><span id="bayes-64"><a href="#bayes-64"><span class="linenos">64</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pY</span> <span class="o">&gt;</span> <span class="n">PRECISION</span><span class="p">,</span> <span class="n">pXY</span> <span class="o">/</span> <span class="n">pY</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">pXY</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Perform Bayesian inference, computing p(x|y) from p(y|x) and p(x).</p>
+
+<h6 id="arguments">Arguments:</h6>
+
+<ul>
+<li><strong>pY_X:</strong>  a conditional distribution of shape (|X|, |Y|), corresponding to p(y|x)</li>
+<li><strong>pX:</strong>  a prior distribution of shape (|X|,), corresponding to p(x)</li>
+</ul>
+
+<h6 id="returns">Returns:</h6>
+
+<blockquote>
+  <p>a posterior distribution of shape (|Y|, |X|), corresponding to p(x|y)</p>
+</blockquote>
+</div>
+
+
+                </section>
     </main>
 <script>
     function escapeHTML(html) {
@@ -238,7 +399,7 @@ ultk    </h1>
                 script.async = true;
                 script.onload = () => resolve(window.pdocSearch);
                 script.onerror = (e) => reject(e);
-                script.src = "search.js";
+                script.src = "../../search.js";
                 document.getElementsByTagName("head")[0].appendChild(script);
             });
         } catch (e) {
@@ -280,7 +441,7 @@ ultk    </h1>
             }
             for (let result of results.slice(0, 10)) {
                 let doc = result.doc;
-                let url = `${doc.modulename.replaceAll(".", "/")}.html`;
+                let url = `../../${doc.modulename.replaceAll(".", "/")}.html`;
                 if (doc.qualname) {
                     url += `#${doc.qualname}`;
                 }

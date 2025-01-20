@@ -29,7 +29,7 @@ First, set up a virtual environment (e.g. via [miniconda](https://docs.conda.io/
 
 ## Getting started
 
-- Check out the [examples](https://github.com/CLMBRs/ultk/tree/main/src/examples), starting with a basic signaling game.  The examples folder also contains a simiple efficient communication analysis of [indefinites](https://github.com/CLMBRs/ultk/tree/main/src/examples/indefinites).
+- Check out the [examples](https://github.com/CLMBRs/ultk/tree/main/src/examples), starting with a simiple efficient communication analysis of [indefinites](https://github.com/CLMBRs/ultk/tree/main/src/examples/indefinites) and a comparison of two approaches to efficient communication, with modals as a test case.
 - To see more scaled up usage examples, visit the codebase for an efficient communication analysis of [modals](https://github.com/nathimel/modals-effcomm) or [sim-max games](https://github.com/nathimel/rdsg).
 - For an introduction to efficient communication research, here is a [survey paper](https://www.annualreviews.org/doi/abs/10.1146/annurev-linguistics-011817-045406) of the field.
 - For an introduction to the RSA framework, see [this online textbook](http://www.problang.org/).
@@ -51,7 +51,7 @@ Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and execut
 <details>
 <summary>Figures:</summary>
 
-> Kemp, C. & Regier, T. (2012) Kinship Categories Across Languages Reflect General Communicative Principles. Science. https://www.science.org/doi/10.1126/science.1218811
+> Kemp, C. & Regier, T. (2012). Kinship Categories Across Languages Reflect General Communicative Principles. Science. https://www.science.org/doi/10.1126/science.1218811
 
 > Zaslavsky, N., Kemp, C., Regier, T., & Tishby, N. (2018). Efficient compression in color naming and its evolution. Proceedings of the National Academy of Sciences, 115(31), 7937–7942. https://doi.org/10.1073/pnas.1800521115
 
@@ -64,7 +64,6 @@ Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and execut
 <details>
 <summary>Links:</summary>
 
-> Imel, N. (2023). The evolution of efficient compression in signaling games. PsyArXiv. https://doi.org/10.31234/osf.io/b62de
 
 > Imel, N., & Steinert-Threlkeld, S. (2022). Modal semantic universals optimize the simplicity/informativeness trade-off. Semantics and Linguistic Theory, 1(0), Article 0. https://doi.org/10.3765/salt.v1i0.5346
 

@@ -29,7 +29,6 @@ dependencies = [
     "pathos",
     "pytest",
     "mypy",
-    "concepts",
     "rdot",
 ]
 
