@@ -14,6 +14,7 @@ from learn_quant.grammar import quantifiers_grammar
 from learn_quant.quantifier import QuantifierUniverse
 
 
+
 def summarize_expression(expression: GrammaticalExpression):
     print(str(expression))
     sample = random.sample(list(expression.meaning.mapping), 10)
@@ -212,3 +213,35 @@ def calculate_term_expression_depth(expression):
         elif char == ")":
             depth -= 1
     return max_depth
+
+
+def create_universe(m_size: int, x_size: int) -> QuantifierUniverse:
+    """
+    Create a quantifier universe based on the given parameters.
+    All references are quantifier models, which are data classes that represent a relation between sets A, B, and M.
+
+    Args:
+        m_size (int): The size of the m set.
+        x_size (int): The size of the x set.
+
+    Returns:
+        QuantifierUniverse: The created quantifier universe.
+    """
+
+    possible_quantifiers = []
+
+    for combination in combinations_with_replacement([0, 1, 2, 3], r=m_size):
+        combo = list(combination) + [4] * (x_size - m_size)
+        permutations_for_combo = set(permutations(combo, r=len(combo)))
+        possible_quantifiers.extend(permutations_for_combo)
+    possible_quantifiers_name = set(
+        ["".join([str(j) for j in i]) for i in possible_quantifiers]
+    )
+
+    quantifier_models = set()
+    for name in possible_quantifiers_name:
+        quantifier_models.add(QuantifierModel(name=name))
+
+    return QuantifierUniverse(
+        referents=tuple(quantifier_models), m_size=m_size, x_size=x_size
+    )

@@ -24,11 +24,6 @@ from ..grammar import add_indices
 from ..util import calculate_term_expression_depth
 from ..sampling import DatasetInitializationError
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
-from ..training_lightning import (
-    LightningModel,
-    ThresholdEarlyStopping,
-    MLFlowConnectivityCallback,
-)
 from ..monotonicity import (
     load_grammar,
     get_verified_models,
@@ -60,6 +55,7 @@ def set_and_log_seeds(mainrun=False):
     seed = random.randint(0, 999999)
 
     # Log the seed in MLFlow
+    mlflow = get_mlflow()
     if mainrun:
         mlflow.log_param("mainrun_seed", seed)
     else:
@@ -110,7 +106,12 @@ def train_lightning(
     validation_dataloader: DataLoader,
     mlf_logger: MLFlowLogger,
 ):
-
+    from ..training_lightning import (
+            LightningModel,
+            ThresholdEarlyStopping,
+            MLFlowConnectivityCallback,
+        )
+    
     n_features = dataset[0][0].shape[1]  # this is number of parallel inputs
     n_timesteps = dataset[0][0].shape[0]  # this is number of timesteps
 
@@ -203,12 +204,16 @@ def main(cfg: DictConfig) -> None:
     # This main is used to circumvent a bug in Hydra
     # See https://github.com/facebookresearch/hydra/issues/2664
 
-    try:
-        mlflow.set_tracking_uri(f"http://{cfg.tracking.host}:{cfg.tracking.port}")
-        # mlflow. disable_system_metrics_logging()
-        # mlflow.set_tracking_uri("file:///mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/mlruns")
-        mlflow.set_experiment(f"{cfg.experiment_name}")
+    from learn_quant.tracking.optionals import set_mlflow, get_mlflow
+    set_mlflow(cfg.tracking.mlflow)
 
+    # 2. Now that we've told mlflow_wrapper our decision, import any modules that do:
+    #    from my_project.mlflow_wrapper import get_mlflow
+
+    try:
+        mlflow = get_mlflow()
+        mlflow.set_tracking_uri(f"http://{cfg.tracking.host}:{cfg.tracking.port}")
+        mlflow.set_experiment(f"{cfg.experiment_name}")
         mlflow.pytorch.autolog()
 
         # Print environment variables for debugging

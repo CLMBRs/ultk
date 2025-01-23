@@ -10,6 +10,7 @@ notes: |
 expression_indices: 2000
 
 tracking:
+  mlflow: true
   max_retries: 8
   backoff_factor: 60
   host: g3116

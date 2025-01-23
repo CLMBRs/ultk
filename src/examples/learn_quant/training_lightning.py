@@ -1,9 +1,9 @@
 import lightning as L
 from learn_quant.training import MV_LSTM
+from learn_quant.tracking.optionals import get_mlflow
 from lightning.pytorch.callbacks import EarlyStopping, Callback
 from collections import deque
 import logging
-import mlflow
 import time
 import socket
 
@@ -12,7 +12,6 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-
 
 class LightningModel(L.LightningModule):
     def __init__(self, model, criterion, optimizer):
@@ -121,6 +120,7 @@ def is_mlflow_server_up(mlflow_tracking_uri, timeout=5):
 
 def wait_for_mlflow(max_retries=30, retry_delay=30):
     """Waits for the MLflow server to become available."""
+    mlflow = get_mlflow()
     mlflow_tracking_uri = mlflow.get_tracking_uri()
     if not mlflow_tracking_uri:
         raise ValueError("Tracking URI not set.")
@@ -138,6 +138,7 @@ def wait_for_mlflow(max_retries=30, retry_delay=30):
 
 class MLFlowConnectivityCallback(Callback):
     def __init__(self, retry_delay=30, max_retries=5):
+        mlflow = get_mlflow()
         self.retry_delay = retry_delay
         self.max_retries = max_retries
         self.mlflow_tracking_uri = mlflow.get_tracking_uri()
@@ -148,6 +149,7 @@ class MLFlowConnectivityCallback(Callback):
             raise ValueError("Tracking URI not set.")
 
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
+        mlflow = get_mlflow()
         if mlflow.active_run() is None:
             logger.warning("No active MLflow run. Skipping connectivity check.")
             return

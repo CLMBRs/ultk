@@ -14,8 +14,7 @@ from typing import Any
 
 from ..quantifier import QuantifierUniverse
 from ..grammar import QuantifierGrammar, add_indices
-from ..monotonicity import create_universe
-from ..util import save_quantifiers, save_inclusive_generation
+from ..util import save_quantifiers, save_inclusive_generation, create_universe
 
 # e.g.:
 # python -m learn_quant.scripts.generate_expressions mode=generate universe.inclusive_universes=false universe.m_size=4 universe.x_size=5 grammar.depth=3 recipe=base grammar.indices=true
@@ -243,7 +242,7 @@ def generate_inclusive_expressions(quantifiers_grammar, cfg, save=True):
             )
 
 
-@hydra.main(version_base=None, config_path="../conf", config_name="config")
+@hydra.main(version_base=None, config_path="../conf", config_name="expressions")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 

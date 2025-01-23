@@ -7,6 +7,7 @@ notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
 tracking:
+  mlflow: true
   host: n3143
   port: 5000
 
