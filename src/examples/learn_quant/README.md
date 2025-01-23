@@ -7,7 +7,29 @@ The code in this example provides experimental code to:
 - 4. calculate metrics given quantifier expressions, such as an entropy-based degree of monotonicity calculation and the depth of the expression
 - 5. analyze and visualize . For a greater understanding of the different components of this example, follow the (tutorial)[tutorial.ipynb].
 
-## Contents
+## Start 
+- Review `src/examples/learn_quant/notebooks/tutorial.ipynb` to familiarize yourself with the data structures to model quantifiers using ULTK. The tutorial interactively covers:
+    - Importing a grammar
+    - Creating a universe of quantifier models 
+    - Enumerating quantifiers given a universe and a grammar 
+    - Reading generated expressions
+
+## Usage
+
+### Generation
+1. From the `src/examples` directory:
+`python -m learn_quant.scripts.generate_expressions`: generates `generated_expressions.yml` files that catalog licensed `QuantifierModel`s given a `Grammar` and `QuantifierUniverse` given a config at `conf/config`
+
+### Learning
+#### With Slurm
+2. Generate randomized index with `notebooks/randomize_expression_index.ipynb`.
+3. Run `HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.learn_quantifiers_slurm --multirun training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false`. This command will read the config at `conf/learn_slurm` and training data based on the chosen quantifier expressions and run 1 training job per expression with the Hydra submitit plugin.
+
+#### Without Slurm
+2. Run `HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.learn_quantifiers training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false`. This command will read the config at `conf/learn` and training data based on the chosen quantifier expressions and run 1 training job for all expressions on your local machine.
+
+
+## Content Descriptions
 
 - `scripts`: a set of scripts for generating `QuantifierModels` and measuring various properties of individual models and sets of models.  These are explained in more detail in the [Usage](#usage) section below.
     - `generate_expressions.py` - This script will reference the configuration file at `conf/config.yaml` to generate a `Universe` of the specified dimensions and generate all expressions from a defined `Grammar`. Outputs will be saved in the `outputs` folder. The script will the _shortest_ expression (ULTK `GrammaticalExpression`s) for each possible `Meaning` (set of `Referent`s) verified by licit permutations of composed functions defined in `grammar.yml`. In particular, ULTK provides methods for enumerating all grammatical expressions up to a given depth, with user-provided keys for uniqueness and for comparison in the case of a clash.  By setting the former to get the `Meaning` from an expression and the latter to compare along length of the expression, the enumeration method returns a mapping from meanings to shortest expressions which express them.
@@ -22,14 +44,6 @@ The code in this example provides experimental code to:
 - `training_lightning.py`: `lightning` classes and helper functions
 - `util.py`: utility functions for I/O and other miscellani
 
-## Usage
-
-1. From the `src/examples` directory:
-`python -m learn_quant.scripts.generate_expressions`: generates `generated_expressions.yml` files that catalog licensed `QuantifierModel`s given a `Grammar` and `QuantifierUniverse` given a config at `conf/config`
-
-### With Slurm
-2. Generate randomized index with `notebooks/randomize_expression_index.ipynb`.
-3. Run `HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.learn_quantifiers_slurm --multirun training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false`. This command will read the config at `conf/learn_slurm` and training data based on the chosen quantifier expressions and run 1 training job per expression with the Hydra submitit plugin.
-
-### Without Slurm
-2. Run `HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.learn_quantifiers training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false`. This command will read the config at `conf/learn` and training data based on the chosen quantifier expressions and run 1 training job for all expressions on your local machine.
+# TODO:
+- Fully implement `hydra`'s `Structured Config` (example begun with `conf/expressions.py`)
+- Show example of adding custom primitives with custom-implemented classes (`quantifiers_grammar_xprimitives`)
