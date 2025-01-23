@@ -90,9 +90,8 @@ def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
         model_ints
     )
 
-    # if cfg.measures.monotonicity.debug:
-
     """
+    if cfg.measures.monotonicity.debug:
         predecessor_prob_library = {}
         for i in range(len(model_ints)):
             predecessor_prob_library.setdefault(model_ints[i], num_preds(model_ints, i) / len(model_ints))
