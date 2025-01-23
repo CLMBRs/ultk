@@ -136,6 +136,7 @@ def wait_for_mlflow(max_retries=30, retry_delay=30):
     raise RuntimeError("MLflow server is unavailable after multiple retries.")
 
 
+
 class MLFlowConnectivityCallback(Callback):
     def __init__(self, retry_delay=30, max_retries=5):
         mlflow = get_mlflow()
@@ -169,3 +170,17 @@ class MLFlowConnectivityCallback(Callback):
                 logger.error(f"An unexpected error occurred during reconnection: {e}")
                 trainer.should_stop = True
                 exit(1)
+
+def get_logger(cfg, mainrun, mlflow):
+    if cfg.tracking.mlflow:
+        from lightning.pytorch.loggers import MLFlowLogger
+        mlf_logger = MLFlowLogger(
+            experiment_name=f"{cfg.experiment_name}",
+            log_model=True,
+            tracking_uri=mlflow.get_tracking_uri(),
+            run_id=mainrun.info.run_id,
+        )
+    else:
+        from lightning.pytorch.loggers.logger import DummyLogger
+        mlf_logger = DummyLogger()
+    return mlf_logger

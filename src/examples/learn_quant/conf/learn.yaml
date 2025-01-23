@@ -11,19 +11,17 @@ tracking:
   host: n3143
   port: 5000
 
-grammar:
-  path: learn_quant/grammar.yml
-  indices: false
-  index_weight: 2.0
-
-universe:
-  x_size: 4
-  m_size: 4
-
 expressions:
   n_limit: 10000
-  depth: 3
   output_dir: learn_quant/outputs/
+  grammar:
+    path: learn_quant/grammar.yml
+    indices: false
+    index_weight: 2.0
+    depth: 3
+  universe:
+    x_size: 4
+    m_size: 4
   representation: one_hot
   downsampling: true
   generation_args:

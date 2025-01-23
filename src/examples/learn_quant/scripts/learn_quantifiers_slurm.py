@@ -8,14 +8,12 @@ import lightning as L
 from lightning.pytorch.callbacks import Timer, EarlyStopping, ModelCheckpoint
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from sklearn.model_selection import KFold
-from lightning.pytorch.loggers import MLFlowLogger
 import os
 import csv
 
 import numpy as np
 from tqdm import tqdm
 import time
-import mlflow
 
 from ultk.util.io import read_grammatical_expressions
 
@@ -100,8 +98,6 @@ def train(
 
 def train_lightning(
     cfg: DictConfig,
-    expression: GrammaticalExpression,
-    dataset: Dataset,
     train_dataloader: DataLoader,
     validation_dataloader: DataLoader,
     mlf_logger: MLFlowLogger,
@@ -112,9 +108,6 @@ def train_lightning(
             MLFlowConnectivityCallback,
         )
     
-    n_features = dataset[0][0].shape[1]  # this is number of parallel inputs
-    n_timesteps = dataset[0][0].shape[0]  # this is number of timesteps
-
     selected_model = instantiate(cfg.model)
     selected_optimizer = instantiate(cfg.optimizer)
 
@@ -158,9 +151,6 @@ def train_base_pytorch(
     train_dataloader: DataLoader,
     validation_dataloader: DataLoader,
 ):
-
-    n_features = dataset[0][0].shape[1]  # this is number of parallel inputs
-    n_timesteps = dataset[0][0].shape[0]  # this is number of timesteps
 
     selected_model = instantiate(cfg.model)
     selected_optimizer = instantiate(cfg.optimizer)
@@ -242,23 +232,23 @@ def main(cfg: DictConfig) -> None:
 
         grammar, indices_tag = add_indices(
             grammar=grammar,
-            indices=cfg.grammar.indices,
-            m_size=cfg.universe.m_size,
-            weight=cfg.grammar.index_weight,
+            indices=cfg.expressions.grammar.indices,
+            m_size=cfg.expressions.universe.m_size,
+            weight=cfg.expressions.grammar.index_weight,
         )
-        print(cfg.grammar.indices)
-        print(cfg.universe.m_size)
-        print(cfg.grammar.index_weight)
+        print(cfg.expressions.grammar.indices)
+        print(cfg.expressions.universe.m_size)
+        print(cfg.expressions.grammar.index_weight)
         print(indices_tag)
 
         expressions_path = (
             cfg.expressions.output_dir
             + "M"
-            + str(cfg.universe.m_size)
+            + str(cfg.expressions.universe.m_size)
             + "/X"
-            + str(cfg.universe.x_size)
+            + str(cfg.expressions.universe.x_size)
             + "/d"
-            + str(cfg.expressions.depth)
+            + str(cfg.expressions.grammar.depth)
             + "/"
             + f"generated_expressions{indices_tag}.yml"
         )
@@ -346,12 +336,7 @@ def main(cfg: DictConfig) -> None:
                     calculate_term_expression_depth(expression.term_expression),
                 )
                 mlflow.set_tag("Notes", cfg.notes)
-                mlf_logger = MLFlowLogger(
-                    experiment_name=f"{cfg.experiment_name}",
-                    log_model=True,
-                    tracking_uri=mlflow.get_tracking_uri(),
-                    run_id=mainrun.info.run_id,
-                )
+                mlf_logger = get_logger(cfg, mainrun, mlflow)
 
                 print("Expression: ", expression.term_expression)
                 try:

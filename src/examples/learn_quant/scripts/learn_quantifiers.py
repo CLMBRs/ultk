@@ -226,23 +226,23 @@ def main(cfg: DictConfig) -> None:
 
     grammar, indices_tag = add_indices(
         grammar=grammar,
-        indices=cfg.grammar.indices,
-        m_size=cfg.universe.m_size,
-        weight=cfg.grammar.index_weight,
+        indices=cfg.expressions.grammar.indices,
+        m_size=cfg.expressions.universe.m_size,
+        weight=cfg.expressions.grammar.index_weight,
     )
-    print(cfg.grammar.indices)
-    print(cfg.universe.m_size)
-    print(cfg.grammar.index_weight)
+    print(cfg.expressions.grammar.indices)
+    print(cfg.expressions.universe.m_size)
+    print(cfg.expressions.grammar.index_weight)
     print(indices_tag)
 
     expressions_path = (
         cfg.expressions.output_dir
         + "M"
-        + str(cfg.universe.m_size)
+        + str(cfg.expressions.universe.m_size)
         + "/X"
-        + str(cfg.universe.x_size)
+        + str(cfg.expressions.universe.x_size)
         + "/d"
-        + str(cfg.expressions.depth)
+        + str(cfg.expressions.grammar.depth)
         + "/"
         + f"generated_expressions{indices_tag}.yml"
     )
