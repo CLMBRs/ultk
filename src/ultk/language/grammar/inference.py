@@ -5,7 +5,12 @@ import copy
 import random
 
 
-def mh_sample(expr: "GrammaticalExpression", grammar: "Grammar", data: Dataset, likelihood_func: Callable[[Dataset, "GrammaticalExpression"], float] = all_or_nothing) -> "GrammaticalExpression":
+def mh_sample(
+    expr: GrammaticalExpression,
+    grammar: Grammar,
+    data: Dataset,
+    likelihood_func: Callable[[Dataset, GrammaticalExpression], float] = all_or_nothing,
+) -> GrammaticalExpression:
     old_tree_prior = grammar.prior(expr)
     old_node_count = expr.node_count()
     while True:
@@ -17,13 +22,26 @@ def mh_sample(expr: "GrammaticalExpression", grammar: "Grammar", data: Dataset, 
         new_node_count = new_tree.node_count()
         new_subtree_prior = grammar.prior(new_node)
         try:
-            mh_accept = min(1, ((new_tree_prior*likelihood_func(data, new_tree))/(old_tree_prior*likelihood_func(data, old_tree)))*((old_subtree_prior/new_node_count)/(new_subtree_prior/old_node_count)))
+            mh_accept = min(
+                1,
+                (
+                    (new_tree_prior * likelihood_func(data, new_tree))
+                    / (old_tree_prior * likelihood_func(data, old_tree))
+                )
+                * (
+                    (old_subtree_prior / new_node_count)
+                    / (new_subtree_prior / old_node_count)
+                ),
+            )
         except ZeroDivisionError:
             mh_accept = 0
         if random.random() < mh_accept:
-            return(new_tree)
+            return new_tree
 
-def mh_select(old_tree: "GrammaticalExpression") -> ("GrammaticalExpression", "GrammaticalExpression"):
+
+def mh_select(
+    old_tree: GrammaticalExpression,
+) -> (GrammaticalExpression, GrammaticalExpression):
     linearized_self = []
     parents = []
     stack = [(old_tree, -1)]
@@ -40,14 +58,21 @@ def mh_select(old_tree: "GrammaticalExpression") -> ("GrammaticalExpression", "G
     parent_node = linearized_self[parents[changing_node]]
     return (current_node, parent_node)
 
- 
-def mh_generate(old_tree: "GrammaticalExpression", current_node: "GrammaticalExpression", parent_node: "GrammaticalExpression", grammar: "Grammar") -> ("GrammaticalExpression", "GrammaticalExpression"):
+
+def mh_generate(
+    old_tree: GrammaticalExpression,
+    current_node: GrammaticalExpression,
+    parent_node: GrammaticalExpression,
+    grammar: Grammar,
+) -> (GrammaticalExpression, GrammaticalExpression):
     if current_node != old_tree:
         new_children = []
         children = parent_node.children if parent_node.children else ()
         for child in children:
             if child is current_node:
-                new_node = grammar.generate(grammar._rules_by_name[current_node.rule_name].lhs)
+                new_node = grammar.generate(
+                    grammar._rules_by_name[current_node.rule_name].lhs
+                )
                 new_children.append(new_node)
             else:
                 new_children.append(child)

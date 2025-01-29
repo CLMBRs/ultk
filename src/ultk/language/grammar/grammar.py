@@ -22,12 +22,13 @@ from ultk.util.frozendict import FrozenDict
 
 T = TypeVar("T")
 
-Dataset = Iterable[tuple["Referent", T]]
+Dataset = Iterable[tuple[Referent, T]]
+
 
 def all_or_nothing(data, tree):
     prob = 1
     for datum in data:
-        if tree(datum[0])==datum[1]:
+        if tree(datum[0]) == datum[1]:
             prob = prob * 1
         else:
             return 0
@@ -175,7 +176,7 @@ class GrammaticalExpression(Expression[T]):
             self.children = tuple([child])
         else:
             self.children = self.children + (child,)
-    
+
     def replace_children(self, children) -> None:
         self.children = children
 
@@ -193,14 +194,14 @@ class GrammaticalExpression(Expression[T]):
         if self.children is None:
             return 1
         return sum(child.count_atoms() for child in self.children)
-    
+
     # def prior(self, grammar: "Grammar") -> float:
     #     probability = grammar.probability(grammar._rules_by_name[self.rule_name])
     #     children = self.children if self.children else ()
     #     for child in children:
     #         probability = probability * (child.prior(grammar))
     #     return probability
-        
+
     @cache
     def node_count(self) -> int:
         counter = 1
@@ -212,8 +213,7 @@ class GrammaticalExpression(Expression[T]):
                 stack.append(child)
                 counter += 1
         return counter
-            
-    
+
     @classmethod
     def from_dict(cls, the_dict: dict, grammar: "Grammar") -> "GrammaticalExpression":
         children = the_dict.get("children")
@@ -294,10 +294,11 @@ class Grammar:
             )
         self._rules_by_name[rule.name] = rule
 
+    # @cache, unhashable, or embed it as a property (change every time Grammar is changed)
     def probability(self, rule: Rule) -> float:
-        return float(rule.weight)/sum([r.weight for r in self._rules[rule.lhs]])
-    
-    def prior(self, expr: "GrammarExpression") -> float:
+        return float(rule.weight) / sum([r.weight for r in self._rules[rule.lhs]])
+
+    def prior(self, expr: GrammaticalExpression) -> float:
         probability = self.probability(self._rules_by_name[expr.rule_name])
         children = expr.children if expr.children else ()
         for child in children:
