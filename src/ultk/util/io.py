@@ -1,7 +1,7 @@
 import pickle
 from ultk.language.language import Expression
 from ultk.language.semantics import Meaning, Universe
-from ultk.language.grammar import Grammar, GrammaticalExpression
+from ultk.language.grammar.grammar import Grammar, GrammaticalExpression
 from typing import Iterable
 from yaml import dump, Dumper, load, Loader
 

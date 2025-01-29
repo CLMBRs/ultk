@@ -1,0 +1,55 @@
+start: bool
+rules:
+# boolean / propositional logic rules
+- lhs: bool
+  rhs:
+    - bool
+    - bool
+  name: "and"
+  func: |
+    lambda p1 , p2 : p1 and p2
+- lhs: bool
+  rhs:
+    - bool
+    - bool
+  name: "or"
+  func: |
+    lambda p1 , p2 : p1 or p2
+- lhs: bool
+  rhs:
+    - bool
+  name: "not"
+  func: |
+    lambda p : not p
+# primitive / feature rules
+# forces
+- lhs: bool
+  rhs: 
+  name: "weak"
+  func: |
+    lambda point: point.force == "weak"
+
+- lhs: bool
+  rhs: 
+  name: "strong"
+  func: |
+    lambda point: point.force == "strong"    
+
+# flavors
+- lhs: bool
+  rhs: 
+  name: "epistemic"
+  func: |
+    lambda point: point.flavor == "epistemic"
+
+- lhs: bool
+  rhs: 
+  name: "deontic"
+  func: |
+    lambda point: point.flavor == "deontic"
+
+- lhs: bool
+  rhs: 
+  name: "circumstantial"
+  func: |
+    lambda point: point.flavor == "circumstantial"
