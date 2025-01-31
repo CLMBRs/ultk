@@ -550,6 +550,9 @@ class Grammar:
         The module should have a list of type-annotated method definitions, each of which will correspond to one Rule in the new Grammar.
         See the docstring for `Rule.from_callable` for more information on how that step works.
 
+        The function will normally attempt to convert all functions (including imported functions) into Rules. However, if a tuple of
+        functions called `grammar_rules` is defined in the module, it will only try to convert the functions contained in the tuple.
+
         The start symbol of the grammar can either be specified by `start = XXX` somewhere in the module,
         or will default to the LHS of the first rule in the module (aka the return type annotation of the first method definition).
 
