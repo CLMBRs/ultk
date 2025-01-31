@@ -5,11 +5,12 @@ from omegaconf import DictConfig, OmegaConf
 import torch
 from torch.utils.data import Dataset, DataLoader
 import lightning as L
-from lightning.pytorch.callbacks import Timer, EarlyStopping
+from lightning.pytorch.callbacks import Timer, EarlyStopping, ModelCheckpoint
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from sklearn.model_selection import KFold
 from lightning.pytorch.loggers import MLFlowLogger
 import os
+import csv
 
 import numpy as np
 from tqdm import tqdm
@@ -17,12 +18,17 @@ import time
 import mlflow
 
 from ultk.util.io import read_grammatical_expressions
+
 from ultk.language.grammar import GrammaticalExpression
 from ..grammar import add_indices
 from ..util import calculate_term_expression_depth
 from ..sampling import DatasetInitializationError
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
-from ..training_lightning import LightningModel, ThresholdEarlyStopping
+from ..training_lightning import (
+    LightningModel,
+    ThresholdEarlyStopping,
+    MLFlowConnectivityCallback,
+)
 from ..monotonicity import (
     load_grammar,
     get_verified_models,
@@ -35,7 +41,7 @@ from ..monotonicity import (
 import random
 from collections.abc import MutableMapping
 
-# HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.learn_quantifiers training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false
+# HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.script training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false
 
 
 def flatten(dictionary, parent_key="", separator="_"):
@@ -61,16 +67,6 @@ def set_and_log_seeds(mainrun=False):
         np.random.seed(seed)
         torch.manual_seed(seed)
         mlflow.log_param("childrun_seed", seed)
-
-
-# Weight initialization function (Xavier initialization)
-"""
-def init_weights(m):
-    if isinstance(m, nn.Linear):
-        nn.init.xavier_uniform_(m.weight)
-        if m.bias is not None:
-            nn.init.zeros_(m.bias)
-"""
 
 
 def train(
@@ -105,9 +101,6 @@ def train_lightning(
     mlf_logger: MLFlowLogger,
 ):
 
-    n_features = dataset[0][0].shape[1]  # this is number of parallel inputs
-    n_timesteps = dataset[0][0].shape[0]  # this is number of timesteps
-
     selected_model = instantiate(cfg.model)
     selected_optimizer = instantiate(cfg.optimizer)
 
@@ -121,25 +114,20 @@ def train_lightning(
     trainer = L.Trainer(
         max_epochs=cfg.training.epochs,
         accelerator=cfg.training.device,
-        val_check_interval=1,
+        val_check_interval=0.1,
         logger=mlf_logger,
         callbacks=[
             timer_callback,
-            EarlyStopping(
-                monitor="val_loss_epoch",
-                verbose=True,
-                mode="min",
-                min_delta=0.01,
-                patience=3,
-            ),
-            ThresholdEarlyStopping(
-                threshold=cfg.training.early_stopping.threshold,
-                monitor=cfg.training.early_stopping.monitor,
-                patience=cfg.training.early_stopping.patience,
-                min_delta=cfg.training.early_stopping.min_delta,
-                mode=cfg.training.early_stopping.mode,
-                check_on_train_epoch_end=cfg.training.early_stopping.check_on_train_epoch_end,  # Check at the step level, not at the epoch level
-            ),
+            # EarlyStopping(monitor="val_loss_epoch", verbose=True, mode="min", min_delta=.01, patience=3),
+            # ThresholdEarlyStopping(
+            #            threshold=cfg.training.early_stopping.threshold,
+            #            monitor=cfg.training.early_stopping.monitor,
+            #            patience=cfg.training.early_stopping.patience,
+            #            min_delta=cfg.training.early_stopping.min_delta,
+            #            mode=cfg.training.early_stopping.mode,
+            #            check_on_train_epoch_end=cfg.training.early_stopping.check_on_train_epoch_end, # Check at the step level, not at the epoch level
+            #            ),
+            MLFlowConnectivityCallback(),
         ],
     )
     trainer.fit(lightning, train_dataloader, validation_dataloader)
@@ -156,9 +144,6 @@ def train_base_pytorch(
     train_dataloader: DataLoader,
     validation_dataloader: DataLoader,
 ):
-
-    n_features = dataset[0][0].shape[1]  # this is number of parallel inputs
-    n_timesteps = dataset[0][0].shape[0]  # this is number of timesteps
 
     selected_model = instantiate(cfg.model)
     selected_optimizer = instantiate(cfg.optimizer)
@@ -194,229 +179,278 @@ def train_base_pytorch(
     print("Validation loss: ", running_vloss.item())
 
 
-@hydra.main(version_base=None, config_path="../conf", config_name="learn")
+@hydra.main(version_base=None, config_path="../conf", config_name="learn_slurm")
 def main(cfg: DictConfig) -> None:
+    import sys
+    import traceback
 
-    mlflow.set_tracking_uri(f"http://{cfg.tracking.host}:{cfg.tracking.port}")
-    # mlflow. disable_system_metrics_logging()
-    # mlflow.set_tracking_uri("file:///mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/mlruns")
-    mlflow.set_experiment(f"{cfg.experiment_name}")
-
-    mlflow.pytorch.autolog()
-
-    # Print environment variables for debugging
-    print(
-        "MLFLOW_TRACKING_URI environment variable:",
-        os.environ.get("MLFLOW_TRACKING_URI"),
-    )
-    print("MLflow version:", mlflow.version.VERSION)
-    # Disable system metrics tracking
-    os.environ["MLFLOW_SYSTEM_METRICS_ENABLED"] = "true"
-
-    # Verify settings
-    print(
-        "MLFLOW_SYSTEM_METRICS_ENABLED:",
-        os.environ.get("MLFLOW_SYSTEM_METRICS_ENABLED"),
-    )
-    print("Current MLflow Tracking URI:", mlflow.get_tracking_uri())
-
-    print(OmegaConf.to_yaml(cfg))
-
-    grammar = load_grammar(cfg)
-
-    grammar, indices_tag = add_indices(
-        grammar=grammar,
-        indices=cfg.expressions.grammar.indices,
-        m_size=cfg.expressions.universe.m_size,
-        weight=cfg.expressions.grammar.index_weight,
-    )
-    print(cfg.expressions.grammar.indices)
-    print(cfg.expressions.universe.m_size)
-    print(cfg.expressions.grammar.index_weight)
-    print(indices_tag)
-
-    expressions_path = (
-        cfg.expressions.output_dir
-        + "M"
-        + str(cfg.expressions.universe.m_size)
-        + "/X"
-        + str(cfg.expressions.universe.x_size)
-        + "/d"
-        + str(cfg.expressions.grammar.depth)
-        + "/"
-        + f"generated_expressions{indices_tag}.yml"
-    )
-    print("Reading expressions from: ", expressions_path)
-    expressions, _ = read_grammatical_expressions(expressions_path, grammar)
-
-    print("Number of expressions: ", len(expressions))
-    import time
-
-    # time.sleep(5)
-    device = set_device(cfg.training.device)
-
-    print("Loading universe...")
-    universe = load_universe(cfg)
-    universe = filter_universe(cfg, universe)
+    # This main is used to circumvent a bug in Hydra
+    # See https://github.com/facebookresearch/hydra/issues/2664
 
     try:
-        if cfg.training.resume.term_expression:
-            for i, expression in enumerate(expressions):
-                if expression.term_expression == cfg.training.resume.term_expression:
-                    print(
-                        "Resuming training from expression: ",
-                        expression.term_expression,
-                    )
-                    start_index = i
-    except Exception as e:
-        print("Could not resume training from specified expression.")
-        print(e)
-        start_index = 0
+        mlflow.set_tracking_uri(f"http://{cfg.tracking.host}:{cfg.tracking.port}")
+        # mlflow. disable_system_metrics_logging()
+        # mlflow.set_tracking_uri("file:///mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/mlruns")
+        mlflow.set_experiment(f"{cfg.experiment_name}")
 
-    for expression in tqdm(expressions[start_index : 1 + cfg.expressions.n_limit]):
+        mlflow.pytorch.autolog()
 
-        print("Calculating montonicity for expression: ", expression.term_expression)
-        all_models, flipped_models, quantifiers, expression_names = get_verified_models(
-            cfg, [expression], universe
+        # Print environment variables for debugging
+        print(
+            "MLFLOW_TRACKING_URI environment variable:",
+            os.environ.get("MLFLOW_TRACKING_URI"),
         )
-        monotonicity = measure_monotonicity(
-            all_models,
-            flipped_models,
-            quantifiers[0],
-            upward_monotonicity_entropy,
-            cfg,
-            name=expression_names[0],
+        print("MLflow version:", mlflow.version.VERSION)
+        # Disable system metrics tracking
+        os.environ["MLFLOW_SYSTEM_METRICS_ENABLED"] = "true"
+        os.environ["MLFLOW_HTTP_REQUEST_MAX_RETRIES"] = str(cfg.tracking.max_retries)
+        os.environ["MLFLOW_HTTP_REQUEST_BACKOFF_FACTOR"] = str(
+            cfg.tracking.backoff_factor
         )
-        print("Monotonicity: ", monotonicity)
 
-        run_name = f"{expression.term_expression}"
-        print("Running experiment: ", run_name)
+        # Verify settings
+        print(
+            "MLFLOW_SYSTEM_METRICS_ENABLED:",
+            os.environ.get("MLFLOW_SYSTEM_METRICS_ENABLED"),
+        )
+        print("Current MLflow Tracking URI:", mlflow.get_tracking_uri())
 
-        with mlflow.start_run(log_system_metrics=False, run_name=run_name) as mainrun:
-            mlflow.log_metric("monotonicity_entropic", float(monotonicity))
+        print(OmegaConf.to_yaml(cfg))
 
-            set_and_log_seeds(mainrun=True)
+        grammar = load_grammar(cfg)
 
-            mlflow.log_params(flatten(OmegaConf.to_container(cfg)))
-            mlflow.log_param("expression", expression.term_expression)
-            mlflow.log_param(
-                "expression_depth",
-                calculate_term_expression_depth(expression.term_expression),
+        grammar, indices_tag = add_indices(
+            grammar=grammar,
+            indices=cfg.expressions.grammar.indices,
+            m_size=cfg.expressions.universe.m_size,
+            weight=cfg.expressions.grammar.index_weight,
+        )
+        print(cfg.expressions.grammar.indices)
+        print(cfg.expressions.universe.m_size)
+        print(cfg.expressions.grammar.index_weight)
+        print(indices_tag)
+
+        expressions_path = (
+            cfg.expressions.output_dir
+            + "M"
+            + str(cfg.expressions.universe.m_size)
+            + "/X"
+            + str(cfg.expressions.universe.x_size)
+            + "/d"
+            + str(cfg.expressions.grammar.depth)
+            + "/"
+            + f"generated_expressions{indices_tag}.yml"
+        )
+        print("Reading expressions from: ", expressions_path)
+        expressions, _ = read_grammatical_expressions(expressions_path, grammar)
+
+        print("Number of expressions: ", len(expressions))
+        import time
+
+        # time.sleep(5)
+        device = set_device(cfg.training.device)
+
+        print("Loading universe...")
+        universe = load_universe(cfg)
+        universe = filter_universe(cfg, universe)
+
+        try:
+            if cfg.training.resume.term_expression:
+                for i, expression in enumerate(expressions):
+                    if (
+                        expression.term_expression
+                        == cfg.training.resume.term_expression
+                    ):
+                        print(
+                            "Resuming training from expression: ",
+                            expression.term_expression,
+                        )
+                        start_index = i
+        except Exception as e:
+            print("Could not resume training from specified expression.")
+            print(e)
+            start_index = 0
+
+        def define_indices(cfg) -> tuple:
+            if "index" in cfg.expressions:
+                return (cfg.expressions.index, cfg.expressions.index + 1)
+            elif cfg.expressions.n_limit:
+                return (start_index, 1 + cfg.expressions.n_limit)
+
+        start, end = define_indices(cfg)
+
+        filename = "/mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/expressions_sample_2k.csv"
+
+        original_index_list = []
+        with open(filename, "r", newline="") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                # Convert to int if needed
+                original_index_list.append(int(row["original_index"]))
+
+        for original_index in tqdm(original_index_list[start:end]):
+
+            expression = expressions[original_index]
+
+            print(
+                "Calculating montonicity for expression: ", expression.term_expression
             )
-            mlflow.set_tag("Notes", cfg.notes)
-            mlf_logger = MLFlowLogger(
-                experiment_name=f"{cfg.experiment_name}",
-                log_model=True,
-                tracking_uri=mlflow.get_tracking_uri(),
-                run_id=mainrun.info.run_id,
+            all_models, flipped_models, quantifiers, expression_names = (
+                get_verified_models(cfg, [expression], universe)
             )
+            monotonicity = measure_monotonicity(
+                all_models,
+                flipped_models,
+                quantifiers[0],
+                upward_monotonicity_entropy,
+                cfg,
+                name=expression_names[0],
+            )
+            print("Monotonicity: ", monotonicity)
 
-            print("Expression: ", expression.term_expression)
-            try:
-                if cfg.expressions.generation_args:
-                    print("Using generation args: ", cfg.expressions.generation_args)
-                    dataset = QuantifierDataset(
-                        expression,
-                        representation=cfg.expressions.representation,
-                        downsampling=cfg.expressions.downsampling,
-                        generation_args=cfg.expressions.generation_args,
-                    )
-                else:
-                    print("No generation args provided")
-                    dataset = QuantifierDataset(
-                        expression,
-                        representation=cfg.expressions.representation,
-                        downsampling=cfg.expressions.downsampling,
-                    )
-            except DatasetInitializationError as e:
-                print(f"Skipping the expression due to error: {e}")
-                continue
+            run_name = f"{expression.term_expression}"
+            print("Running experiment: ", run_name)
 
-            dataset.inputs = dataset.inputs.to(device)
-            dataset.targets = dataset.targets.to(device)
+            with mlflow.start_run(
+                log_system_metrics=False, run_name=run_name
+            ) as mainrun:
+                mlflow.log_metric("monotonicity_entropic", float(monotonicity))
 
-            if cfg.training.strategy == "kfold":
+                set_and_log_seeds(mainrun=True)
 
-                kfold = KFold(n_splits=cfg.training.k_splits, shuffle=True)
-                print(
-                    "Running k-fold training with {} splits".format(
-                        cfg.training.k_splits
-                    )
+                mlflow.log_params(flatten(OmegaConf.to_container(cfg)))
+                mlflow.log_param("expression", expression.term_expression)
+                mlflow.log_param(
+                    "expression_depth",
+                    calculate_term_expression_depth(expression.term_expression),
                 )
-                for fold, (train_ids, valid_ids) in enumerate(kfold.split(dataset)):
+                mlflow.set_tag("Notes", cfg.notes)
+                mlf_logger = MLFlowLogger(
+                    experiment_name=f"{cfg.experiment_name}",
+                    log_model=True,
+                    tracking_uri=mlflow.get_tracking_uri(),
+                    run_id=mainrun.info.run_id,
+                )
 
-                    with mlflow.start_run(run_name=f"{fold}", nested=True) as childrun:
-                        set_and_log_seeds()
-
-                        print(f"FOLD {fold}")
-                        print("--------------------------------")
-                        train_subsampler = SubsetRandomSampler(train_ids)
-                        valid_subsampler = SubsetRandomSampler(valid_ids)
-
-                        train_dataloader = DataLoader(
-                            dataset,
-                            batch_size=cfg.expressions.batch_size,
-                            sampler=train_subsampler,
-                        )
-                        validation_dataloader = DataLoader(
-                            dataset,
-                            batch_size=cfg.expressions.batch_size,
-                            sampler=valid_subsampler,
-                        )
-
+                print("Expression: ", expression.term_expression)
+                try:
+                    if cfg.expressions.generation_args:
                         print(
-                            "Training set size: ",
-                            len(train_dataloader) * cfg.expressions.batch_size,
+                            "Using generation args: ", cfg.expressions.generation_args
                         )
-                        print(
-                            "Validation set size: ",
-                            len(validation_dataloader) * cfg.expressions.batch_size,
-                        )
-
-                        train(
-                            cfg,
+                        dataset = QuantifierDataset(
                             expression,
-                            dataset,
-                            train_dataloader,
-                            validation_dataloader,
-                            mlf_logger,
+                            representation=cfg.expressions.representation,
+                            downsampling=cfg.expressions.downsampling,
+                            generation_args=cfg.expressions.generation_args,
                         )
-
-            elif cfg.training.strategy == "multirun":
-
-                for i in range(cfg.training.n_runs):
-
-                    with mlflow.start_run(run_name=f"{i}", nested=True) as childrun:
-                        set_and_log_seeds()
-
-                        print(f"RUN {i}")
-                        print("--------------------------------")
-                        train_data, validation_data = torch.utils.data.random_split(
-                            dataset, [cfg.expressions.split, 1 - cfg.expressions.split]
-                        )
-
-                        train_dataloader = DataLoader(
-                            train_data,
-                            batch_size=cfg.expressions.batch_size,
-                            shuffle=True,
-                        )
-                        validation_dataloader = DataLoader(
-                            validation_data,
-                            batch_size=cfg.expressions.batch_size,
-                            shuffle=True,
-                        )
-
-                        print("Training set size: ", len(train_dataloader))
-                        print("Validation set size: ", len(validation_dataloader))
-
-                        train(
-                            cfg,
+                    else:
+                        print("No generation args provided")
+                        dataset = QuantifierDataset(
                             expression,
-                            dataset,
-                            train_dataloader,
-                            validation_dataloader,
-                            mlf_logger,
+                            representation=cfg.expressions.representation,
+                            downsampling=cfg.expressions.downsampling,
                         )
+                except DatasetInitializationError as e:
+                    print(f"Skipping the expression due to error: {e}")
+                    continue
+
+                dataset.inputs = dataset.inputs.to(device)
+                dataset.targets = dataset.targets.to(device)
+
+                if cfg.training.strategy == "kfold":
+
+                    kfold = KFold(n_splits=cfg.training.k_splits, shuffle=True)
+                    print(
+                        "Running k-fold training with {} splits".format(
+                            cfg.training.k_splits
+                        )
+                    )
+                    for fold, (train_ids, valid_ids) in enumerate(kfold.split(dataset)):
+
+                        with mlflow.start_run(
+                            run_name=f"{fold}", nested=True
+                        ) as childrun:
+                            set_and_log_seeds()
+
+                            print(f"FOLD {fold}")
+                            print("--------------------------------")
+                            train_subsampler = SubsetRandomSampler(train_ids)
+                            valid_subsampler = SubsetRandomSampler(valid_ids)
+
+                            train_dataloader = DataLoader(
+                                dataset,
+                                batch_size=cfg.expressions.batch_size,
+                                sampler=train_subsampler,
+                            )
+                            validation_dataloader = DataLoader(
+                                dataset,
+                                batch_size=cfg.expressions.batch_size,
+                                sampler=valid_subsampler,
+                            )
+
+                            print(
+                                "Training set size: ",
+                                len(train_dataloader) * cfg.expressions.batch_size,
+                            )
+                            print(
+                                "Validation set size: ",
+                                len(validation_dataloader) * cfg.expressions.batch_size,
+                            )
+
+                            train(
+                                cfg,
+                                expression,
+                                dataset,
+                                train_dataloader,
+                                validation_dataloader,
+                                mlf_logger,
+                            )
+
+                elif cfg.training.strategy == "multirun":
+
+                    for i in range(cfg.training.n_runs):
+
+                        with mlflow.start_run(run_name=f"{i}", nested=True) as childrun:
+                            set_and_log_seeds()
+
+                            print(f"RUN {i}")
+                            print("--------------------------------")
+                            train_data, validation_data = torch.utils.data.random_split(
+                                dataset,
+                                [cfg.expressions.split, 1 - cfg.expressions.split],
+                            )
+
+                            train_dataloader = DataLoader(
+                                train_data,
+                                batch_size=cfg.expressions.batch_size,
+                                shuffle=True,
+                            )
+                            validation_dataloader = DataLoader(
+                                validation_data,
+                                batch_size=cfg.expressions.batch_size,
+                                shuffle=True,
+                            )
+
+                            print("Training set size: ", len(train_dataloader))
+                            print("Validation set size: ", len(validation_dataloader))
+
+                            train(
+                                cfg,
+                                expression,
+                                dataset,
+                                train_dataloader,
+                                validation_dataloader,
+                                mlf_logger,
+                            )
+
+    except BaseException:
+        traceback.print_exc(file=sys.stderr)
+        raise
+    finally:
+        # fflush everything
+        sys.stdout.flush()
+        sys.stderr.flush()
 
 
 if __name__ == "__main__":

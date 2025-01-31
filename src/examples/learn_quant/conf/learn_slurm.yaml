@@ -1,13 +1,12 @@
 defaults:
   - _self_
   - model: ???
-  - override hydra/launcher: hyak_swarm
+  - override hydra/launcher: swarm
+  - override hydra/sweeper: sweep
 
-experiment_name: repeated_runs
+experiment_name: transformers_1
 notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
-
-expression_indices: 2000
 
 tracking:
   mlflow: true
@@ -17,13 +16,13 @@ tracking:
   port: 5000
 
 expressions:
-  n_limit: 8
+  n_limit: 2000
   output_dir: learn_quant/outputs/
   grammar:
+    depth: 5
     path: learn_quant/grammar.yml
     indices: false
     index_weight: 2.0
-    depth: 5
   universe:
     x_size: 4
     m_size: 4
@@ -72,19 +71,3 @@ measures:
     universe_filter:
       - 3
       - 4
-
-hydra:
-  launcher:
-    partition: gpu-l40                   # The partition/queue to submit jobs
-    account: clmbr         # Your account (if required by your cluster)
-    time: 2880                        # Time in minutes (48 hours)
-    cpus_per_task: 1
-    mem_gb: 8
-    # gpus_per_node: 0
-    # mem_per_gpu: 32GB
-    # If you want to requeue on timeout:
-    max_num_timeout: 10               # number of times to re-queue job after timeout
-    array_parallelism: 120           # number of jobs to launch in parallel
-  sweeper:
-    params:
-      +expressions.index: range(0, ${expression_indices})

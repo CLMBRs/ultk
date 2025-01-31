@@ -1,0 +1,6 @@
+# @package _global_
+
+hydra: 
+  sweeper:
+    params:
+      +expressions.index: range(0, ${expression.n_limit})

@@ -1,0 +1,11 @@
+submitit_folder: ${hydra.sweep.dir}/.submitit/%j
+timeout_min: 1440
+_target_: hydra_plugins.hydra_submitit_launcher.submitit_launcher.SlurmLauncher
+partition: gpu-l40
+account: clmbr         # Your account (if required by your cluster)
+time: 2880                        # Time in minutes (48 hours)
+cpus_per_task: 4
+mem_gb: 8
+additional_parameters: {"gpus": "0", "time": "1-00"}
+max_num_timeout: 10               # number of times to re-queue job after timeout
+array_parallelism: 120           # number of jobs to launch in parallel
