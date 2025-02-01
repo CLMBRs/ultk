@@ -34,7 +34,6 @@ from ..monotonicity import (
     get_verified_models,
     load_universe,
     filter_universe,
-    filter_universe,
     measure_monotonicity,
     upward_monotonicity_entropy,
 )
@@ -217,7 +216,7 @@ def main(cfg: DictConfig) -> None:
 
         print(OmegaConf.to_yaml(cfg))
 
-        grammar = load_grammar(cfg)
+        grammar = load_grammar(cfg.expressions)
 
         grammar, indices_tag = add_indices(
             grammar=grammar,
@@ -279,7 +278,7 @@ def main(cfg: DictConfig) -> None:
 
         start, end = define_indices(cfg)
 
-        filename = "/mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/expressions_sample_2k.csv"
+        filename = "learn_quant/expressions_sample_2k.csv"
 
         original_index_list = []
         with open(filename, "r", newline="") as csvfile:

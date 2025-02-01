@@ -232,8 +232,8 @@ def filter_universe(cfg, uni):
         print("Size of filtered universe: ", len(test_referents))
         uni = QuantifierUniverse(
             referents=test_referents,
-            m_size=cfg.universe.m_size,
-            x_size=cfg.universe.x_size,
+            m_size=cfg.expressions.universe.m_size,
+            x_size=cfg.expressions.universe.x_size,
         )
     return uni
 
@@ -308,7 +308,7 @@ def main(cfg: DictConfig) -> None:
     expressions, _ = read_expressions(
         Path.cwd()
         / Path("learn_quant/outputs")
-        / Path(cfg.measures.target)
+        / Path(cfg.target)
         / f"generated_expressions{indices_tag}.yml",
         uni,
         add_indices=cfg.grammar.indices,

@@ -12,7 +12,7 @@ tracking:
   mlflow: true
   max_retries: 8
   backoff_factor: 60
-  host: g3116
+  host: 127.0.0.1
   port: 5000
 
 expressions:
@@ -37,6 +37,7 @@ expressions:
     inclusive: False
   batch_size: 64
   split: 0.8
+  target: "M${expressions.universe.m_size}/X${expressions.universe.x_size}/d${expressions.grammar.depth}"
 
 training:
   strategy: multirun
@@ -63,7 +64,7 @@ criterion:
   _target_: torch.nn.BCEWithLogitsLoss
 
 measures:
-  target: "M${universe.m_size}/X${universe.x_size}/d${expressions.depth}"
+  target: "M${expressions.universe.m_size}/X${expressions.universe.x_size}/d${expressions.grammar.depth}"
   monotonicity:
     debug: false
     direction:
