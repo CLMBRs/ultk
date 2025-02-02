@@ -1,24 +1,30 @@
 defaults:
   - _self_
   - model: ???
+  - override hydra/launcher: swarm # For use with sweeping over 
+  - override hydra/sweeper: sweep
 
-experiment_name: learn_quant_e50
+experiment_name: transformers_2
 notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
 tracking:
-  mlflow: true
-  host: n3143
-  port: 5000
+  mlflow:
+    host: g3116
+    port: 5000
+    vars:
+      MLFLOW_SYSTEM_METRICS_ENABLED: "true"
+      MLFLOW_HTTP_REQUEST_MAX_RETRIES: "8"
+      MLFLOW_HTTP_REQUEST_BACKOFF_FACTOR: "60"
 
 expressions:
-  n_limit: 10000
+  n_limit: 2000
   output_dir: learn_quant/outputs/
   grammar:
+    depth: 5
     path: learn_quant/grammar.yml
     indices: false
     index_weight: 2.0
-    depth: 3
   universe:
     x_size: 4
     m_size: 4
@@ -33,6 +39,8 @@ expressions:
     inclusive: False
   batch_size: 64
   split: 0.8
+  target: "M${expressions.universe.m_size}/X${expressions.universe.x_size}/d${expressions.grammar.depth}"
+  index_file: "learn_quant/expressions_sample_2k.csv"
 
 training:
   strategy: multirun
@@ -40,7 +48,7 @@ training:
   n_runs: 1
   lightning: true
   device: cpu
-  epochs: 100
+  epochs: 50
   conditions: false
   early_stopping:
     threshold: 0.05
@@ -59,7 +67,6 @@ criterion:
   _target_: torch.nn.BCEWithLogitsLoss
 
 measures:
-  target: "M${universe.m_size}/X${universe.x_size}/d${expressions.depth}"
   monotonicity:
     debug: false
     direction:

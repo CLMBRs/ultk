@@ -85,7 +85,7 @@ def set_mlflow_experiment(cfg):
         mlflow.set_experiment(f"{cfg.experiment_name}")
         mlflow.pytorch.autolog()
 
-@hydra.main(version_base=None, config_path="../conf", config_name="learn_slurm")
+@hydra.main(version_base=None, config_path="../conf", config_name="learn")
 def main(cfg: DictConfig) -> None:
     import sys
     import traceback
