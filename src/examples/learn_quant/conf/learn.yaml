@@ -1,10 +1,9 @@
 defaults:
   - _self_
   - model: ???
-  - override hydra/launcher: swarm # For use with sweeping over 
-  - override hydra/sweeper: sweep
+  - override hydra/launcher: swarm # For use with slurm 
 
-experiment_name: transformers_2
+experiment_name: transformers_3
 notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
@@ -74,3 +73,8 @@ measures:
     universe_filter:
       - 3
       - 4
+
+hydra: 
+  sweeper:
+    params:
+      +expressions.index: range(0, ${expressions.n_limit})
