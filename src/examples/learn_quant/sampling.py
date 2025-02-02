@@ -3,11 +3,11 @@ from learn_quant.quantifier import QuantifierModel
 import random
 import numpy as np
 from scipy.stats import entropy
-
+from torch.utils.data import Dataset, DataLoader, DataLoader, SubsetRandomSampler
+import torch
 
 class DatasetInitializationError(Exception):
     """Custom exception to indicate dataset initialization failure."""
-
     pass
 
 
@@ -16,7 +16,6 @@ def get_random_n_items(dictionary, n):
         raise ValueError("Sample size cannot be larger than the dictionary size.")
     selected_keys = random.sample(list(dictionary), n)
     return {key: dictionary[key] for key in selected_keys}
-
 
 def shuffle_dictionary(dictionary):
     items = list(dictionary.items())
@@ -145,3 +144,57 @@ def sample_by_expression(
     )
     sample_shuffled = shuffle_dictionary(sample)
     return sample_shuffled
+
+
+def get_data_loaders(cfg, dataset, mode="kfold", train_val_ids=None, fold=None, i=None):
+
+    if mode == "kfold":
+        print(f"FOLD {fold}")
+        print("--------------------------------")
+        train_ids, valid_ids = train_val_ids[:2]
+
+        train_subsampler = SubsetRandomSampler(train_ids)
+        valid_subsampler = SubsetRandomSampler(valid_ids)
+
+        train_dataloader = DataLoader(
+            dataset,
+            batch_size=cfg.expressions.batch_size,
+            sampler=train_subsampler,
+        )
+        validation_dataloader = DataLoader(
+            dataset,
+            batch_size=cfg.expressions.batch_size,
+            sampler=valid_subsampler,
+        )
+
+        print(
+            "Training set size: ",
+            len(train_dataloader) * cfg.expressions.batch_size,
+        )
+        print(
+            "Validation set size: ",
+            len(validation_dataloader) * cfg.expressions.batch_size,
+        )
+    elif mode == "multirun":
+        print(f"RUN {i}")
+        print("--------------------------------")
+
+        train_data, validation_data = torch.utils.data.random_split(
+            dataset,
+            [cfg.expressions.split, 1 - cfg.expressions.split],
+        )
+
+        train_dataloader = DataLoader(
+            train_data,
+            batch_size=cfg.expressions.batch_size,
+            shuffle=True,
+        )
+        validation_dataloader = DataLoader(
+            validation_data,
+            batch_size=cfg.expressions.batch_size,
+            shuffle=True,
+        )
+    print("Training set size: ", len(train_dataloader))
+    print("Validation set size: ", len(validation_dataloader))
+
+    return train_dataloader, validation_dataloader

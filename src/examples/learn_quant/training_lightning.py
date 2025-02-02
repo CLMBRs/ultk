@@ -1,8 +1,15 @@
 import lightning as L
+from hydra.utils import instantiate
+from omegaconf import DictConfig, OmegaConf
+import torch
+from torch.utils.data import Dataset, DataLoader, DataLoader
 from learn_quant.training import MV_LSTM
 from learn_quant.tracking.optionals import get_mlflow
 from lightning.pytorch.callbacks import EarlyStopping, Callback
+from lightning.pytorch.loggers import MLFlowLogger
 from collections import deque
+from lightning.pytorch.callbacks import Timer
+
 import logging
 import time
 import socket
@@ -172,7 +179,7 @@ class MLFlowConnectivityCallback(Callback):
                 exit(1)
 
 def get_logger(cfg, mainrun, mlflow):
-    if cfg.tracking.mlflow:
+    if "mlflow" in cfg.tracking:
         from lightning.pytorch.loggers import MLFlowLogger
         mlf_logger = MLFlowLogger(
             experiment_name=f"{cfg.experiment_name}",
@@ -184,3 +191,45 @@ def get_logger(cfg, mainrun, mlflow):
         from lightning.pytorch.loggers.logger import DummyLogger
         mlf_logger = DummyLogger()
     return mlf_logger
+
+def train_lightning(
+    cfg: DictConfig,
+    train_dataloader: DataLoader,
+    validation_dataloader: DataLoader,
+    mlf_logger: MLFlowLogger,
+):
+
+    selected_model = instantiate(cfg.model)
+    selected_optimizer = instantiate(cfg.optimizer)
+
+    model = selected_model(device=cfg.training.device)
+
+    optimizer = selected_optimizer(model.parameters())
+    lightning = LightningModel(
+        model, criterion=instantiate(cfg.criterion), optimizer=optimizer
+    )
+    timer_callback = Timer()
+    trainer = L.Trainer(
+        max_epochs=cfg.training.epochs,
+        accelerator=cfg.training.device,
+        val_check_interval=0.1,
+        logger=mlf_logger,
+        callbacks=[
+            timer_callback,
+            # EarlyStopping(monitor="val_loss_epoch", verbose=True, mode="min", min_delta=.01, patience=3),
+            # ThresholdEarlyStopping(
+            #            threshold=cfg.training.early_stopping.threshold,
+            #            monitor=cfg.training.early_stopping.monitor,
+            #            patience=cfg.training.early_stopping.patience,
+            #            min_delta=cfg.training.early_stopping.min_delta,
+            #            mode=cfg.training.early_stopping.mode,
+            #            check_on_train_epoch_end=cfg.training.early_stopping.check_on_train_epoch_end, # Check at the step level, not at the epoch level
+            #            ),
+            MLFlowConnectivityCallback(),
+        ],
+    )
+    trainer.fit(lightning, train_dataloader, validation_dataloader)
+    total_time = timer_callback.time_elapsed("train")
+    print(f"Total training time: {total_time:.2f} seconds")
+    print(trainer.callback_metrics)
+    print("_______")

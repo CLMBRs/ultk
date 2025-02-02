@@ -1,47 +1,38 @@
 import hydra
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
-
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, DataLoader
 import lightning as L
-from lightning.pytorch.callbacks import Timer, EarlyStopping, ModelCheckpoint
-from torch.utils.data import DataLoader, SubsetRandomSampler
 from sklearn.model_selection import KFold
 from lightning.pytorch.loggers import MLFlowLogger
-import os
-import csv
 
 import numpy as np
 from tqdm import tqdm
-import time
 import mlflow
 
 from ultk.util.io import read_grammatical_expressions
 
 from ultk.language.grammar import GrammaticalExpression
+from ..util import set_vars, print_vars, determine_start_index, define_index_bounds, reorder_by_index_file
 from ..grammar import add_indices
-from ..util import calculate_term_expression_depth
-from ..sampling import DatasetInitializationError
-from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device
+from ..sampling import DatasetInitializationError, get_data_loaders
+from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device, train_base_pytorch
 from ..training_lightning import (
+    train_lightning,
     LightningModel,
-    ThresholdEarlyStopping,
     MLFlowConnectivityCallback,
 )
-from ..monotonicity import (
+from ..measures import (
     load_grammar,
-    get_verified_models,
     load_universe,
     filter_universe,
-    measure_monotonicity,
-    upward_monotonicity_entropy,
+    calculate_measure
 )
 import random
 from collections.abc import MutableMapping
 
 # HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.script training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false
-
 
 def flatten(dictionary, parent_key="", separator="_"):
     items = []
@@ -79,250 +70,95 @@ def train(
     if cfg.training.lightning:
         train_lightning(
             cfg,
-            expression,
-            dataset,
             train_dataloader,
             validation_dataloader,
             mlf_logger,
         )
     else:
         train_base_pytorch(
-            cfg, expression, dataset, train_dataloader, validation_dataloader
+            cfg, train_dataloader, validation_dataloader
         )
 
-
-def train_lightning(
-    cfg: DictConfig,
-    expression: GrammaticalExpression,
-    dataset: Dataset,
-    train_dataloader: DataLoader,
-    validation_dataloader: DataLoader,
-    mlf_logger: MLFlowLogger,
-):
-
-    selected_model = instantiate(cfg.model)
-    selected_optimizer = instantiate(cfg.optimizer)
-
-    model = selected_model(device=cfg.training.device)
-
-    optimizer = selected_optimizer(model.parameters())
-    lightning = LightningModel(
-        model, criterion=instantiate(cfg.criterion), optimizer=optimizer
-    )
-    timer_callback = Timer()
-    trainer = L.Trainer(
-        max_epochs=cfg.training.epochs,
-        accelerator=cfg.training.device,
-        val_check_interval=0.1,
-        logger=mlf_logger,
-        callbacks=[
-            timer_callback,
-            # EarlyStopping(monitor="val_loss_epoch", verbose=True, mode="min", min_delta=.01, patience=3),
-            # ThresholdEarlyStopping(
-            #            threshold=cfg.training.early_stopping.threshold,
-            #            monitor=cfg.training.early_stopping.monitor,
-            #            patience=cfg.training.early_stopping.patience,
-            #            min_delta=cfg.training.early_stopping.min_delta,
-            #            mode=cfg.training.early_stopping.mode,
-            #            check_on_train_epoch_end=cfg.training.early_stopping.check_on_train_epoch_end, # Check at the step level, not at the epoch level
-            #            ),
-            MLFlowConnectivityCallback(),
-        ],
-    )
-    trainer.fit(lightning, train_dataloader, validation_dataloader)
-    total_time = timer_callback.time_elapsed("train")
-    print(f"Total training time: {total_time:.2f} seconds")
-    print(trainer.callback_metrics)
-    print("_______")
-
-
-def train_base_pytorch(
-    cfg: DictConfig,
-    expression: GrammaticalExpression,
-    dataset: Dataset,
-    train_dataloader: DataLoader,
-    validation_dataloader: DataLoader,
-):
-
-    selected_model = instantiate(cfg.model)
-    selected_optimizer = instantiate(cfg.optimizer)
-
-    model = selected_model(device=cfg.training.device)
-    print(model)
-    criterion = instantiate(cfg.criterion)
-    optimizer = selected_optimizer(model.parameters())
-
-    start = time.time()
-    train_loop(
-        train_dataloader,
-        model,
-        criterion,
-        optimizer,
-        cfg.training.epochs,
-        conditions=cfg.training.conditions,
-    )
-    end = time.time()
-    print("Training time: ", end - start)
-    model.eval()
-
-    # Disable gradient computation and reduce memory consumption.
-    with torch.no_grad():
-        running_vloss = 0.0
-        for i, vdata in enumerate(validation_dataloader):
-            v_inputs, v_targets = vdata
-            if isinstance(model, MV_LSTM):
-                model.init_hidden(v_inputs.size(0))
-            v_outputs = model(v_inputs)
-            vloss = criterion(v_outputs, v_targets)
-            running_vloss += vloss
-    print("Validation loss: ", running_vloss.item())
-
+def set_mlflow_experiment(cfg):
+    if "mlflow" in cfg.tracking:
+        mlflow.set_tracking_uri(f"http://{cfg.tracking.mlflow.host}:{cfg.tracking.mlflow.port}")
+        mlflow.set_experiment(f"{cfg.experiment_name}")
+        mlflow.pytorch.autolog()
 
 @hydra.main(version_base=None, config_path="../conf", config_name="learn_slurm")
 def main(cfg: DictConfig) -> None:
     import sys
     import traceback
 
-    # This main is used to circumvent a bug in Hydra
+    # This try-except is required to circumvent an stderr flushing bug in Hydra
     # See https://github.com/facebookresearch/hydra/issues/2664
 
     try:
-        mlflow.set_tracking_uri(f"http://{cfg.tracking.host}:{cfg.tracking.port}")
-        # mlflow. disable_system_metrics_logging()
-        # mlflow.set_tracking_uri("file:///mmfs1/gscratch/clmbr/haberc/altk/src/examples/learn_quant/mlruns")
-        mlflow.set_experiment(f"{cfg.experiment_name}")
 
-        mlflow.pytorch.autolog()
+        # Set tracking experiment if tracking is on
+        set_mlflow_experiment(cfg)
 
-        # Print environment variables for debugging
-        print(
-            "MLFLOW_TRACKING_URI environment variable:",
-            os.environ.get("MLFLOW_TRACKING_URI"),
-        )
-        print("MLflow version:", mlflow.version.VERSION)
-        # Disable system metrics tracking
-        os.environ["MLFLOW_SYSTEM_METRICS_ENABLED"] = "true"
-        os.environ["MLFLOW_HTTP_REQUEST_MAX_RETRIES"] = str(cfg.tracking.max_retries)
-        os.environ["MLFLOW_HTTP_REQUEST_BACKOFF_FACTOR"] = str(
-            cfg.tracking.backoff_factor
-        )
+        for key, _ in cfg.tracking.items():
+            if "vars":
+                set_vars(cfg.tracking[key])
 
-        # Verify settings
-        print(
-            "MLFLOW_SYSTEM_METRICS_ENABLED:",
-            os.environ.get("MLFLOW_SYSTEM_METRICS_ENABLED"),
-        )
-        print("Current MLflow Tracking URI:", mlflow.get_tracking_uri())
+        # Verify settings by printing
+        print_vars(cfg)
 
-        print(OmegaConf.to_yaml(cfg))
+        # Load grammar
 
         grammar = load_grammar(cfg.expressions)
 
+        # Add indices as primitives to the grammar if specified. 
+        # If expressions.grammar.indices is set to False, no index primitives are added to the grammar.
         grammar, indices_tag = add_indices(
             grammar=grammar,
             indices=cfg.expressions.grammar.indices,
             m_size=cfg.expressions.universe.m_size,
             weight=cfg.expressions.grammar.index_weight,
         )
-        print(cfg.expressions.grammar.indices)
-        print(cfg.expressions.universe.m_size)
-        print(cfg.expressions.grammar.index_weight)
-        print(indices_tag)
 
-        expressions_path = (
-            cfg.expressions.output_dir
-            + "M"
-            + str(cfg.expressions.universe.m_size)
-            + "/X"
-            + str(cfg.expressions.universe.x_size)
-            + "/d"
-            + str(cfg.expressions.grammar.depth)
-            + "/"
-            + f"generated_expressions{indices_tag}.yml"
-        )
-        print("Reading expressions from: ", expressions_path)
+        expressions_path = cfg.expressions.output_dir + cfg.expressions.target + f"/generated_expressions{indices_tag}.yml"
         expressions, _ = read_grammatical_expressions(expressions_path, grammar)
-
+        print("Read expressions from: ", expressions_path)
         print("Number of expressions: ", len(expressions))
-        import time
 
-        # time.sleep(5)
         device = set_device(cfg.training.device)
 
         print("Loading universe...")
         universe = load_universe(cfg)
-        universe = filter_universe(cfg, universe)
+        universe = filter_universe(cfg, universe) # This is ensuring that the universe does not have "M-only" or "X-only" subreferents, necessary for monotonicity calculation
 
-        try:
-            if cfg.training.resume.term_expression:
-                for i, expression in enumerate(expressions):
-                    if (
-                        expression.term_expression
-                        == cfg.training.resume.term_expression
-                    ):
-                        print(
-                            "Resuming training from expression: ",
-                            expression.term_expression,
-                        )
-                        start_index = i
-        except Exception as e:
-            print("Could not resume training from specified expression.")
-            print(e)
-            start_index = 0
+        # If an expression is set for training.resume.term_expression, the start index will be set at that expression's index.
+        # For running expressions one at a time, use expressions.index.
+        # Determine index bounds will use expressions.n_limit if set to determine the number of expressions to run.
+        start_index = determine_start_index(cfg)
+        start, end = define_index_bounds(cfg, start_index)
 
-        def define_indices(cfg) -> tuple:
-            if "index" in cfg.expressions:
-                return (cfg.expressions.index, cfg.expressions.index + 1)
-            elif cfg.expressions.n_limit:
-                return (start_index, 1 + cfg.expressions.n_limit)
-
-        start, end = define_indices(cfg)
-
-        filename = "learn_quant/expressions_sample_2k.csv"
-
-        original_index_list = []
-        with open(filename, "r", newline="") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                # Convert to int if needed
-                original_index_list.append(int(row["original_index"]))
+        # If index_file is set, make sure to reorder the expressions according to the index file. Useful for getting random samples.
+        if "index_file" in cfg.expressions:
+            original_index_list = reorder_by_index_file(cfg.expressions.index_file)
 
         for original_index in tqdm(original_index_list[start:end]):
 
             expression = expressions[original_index]
-
-            print(
-                "Calculating montonicity for expression: ", expression.term_expression
-            )
-            all_models, flipped_models, quantifiers, expression_names = (
-                get_verified_models(cfg, [expression], universe)
-            )
-            monotonicity = measure_monotonicity(
-                all_models,
-                flipped_models,
-                quantifiers[0],
-                upward_monotonicity_entropy,
-                cfg,
-                name=expression_names[0],
-            )
-            print("Monotonicity: ", monotonicity)
-
             run_name = f"{expression.term_expression}"
             print("Running experiment: ", run_name)
 
             with mlflow.start_run(
                 log_system_metrics=False, run_name=run_name
             ) as mainrun:
-                mlflow.log_metric("monotonicity_entropic", float(monotonicity))
 
                 set_and_log_seeds(mainrun=True)
 
+                # Calculate specified measures
+                if "measures" in cfg:
+                    for measure in cfg.measures:
+                        calculate_measure(cfg, measure, expression, universe)
+
                 mlflow.log_params(flatten(OmegaConf.to_container(cfg)))
                 mlflow.log_param("expression", expression.term_expression)
-                mlflow.log_param(
-                    "expression_depth",
-                    calculate_term_expression_depth(expression.term_expression),
-                )
+
                 mlflow.set_tag("Notes", cfg.notes)
                 mlf_logger = MLFlowLogger(
                     experiment_name=f"{cfg.experiment_name}",
@@ -371,32 +207,11 @@ def main(cfg: DictConfig) -> None:
                             run_name=f"{fold}", nested=True
                         ) as childrun:
                             set_and_log_seeds()
-
-                            print(f"FOLD {fold}")
-                            print("--------------------------------")
-                            train_subsampler = SubsetRandomSampler(train_ids)
-                            valid_subsampler = SubsetRandomSampler(valid_ids)
-
-                            train_dataloader = DataLoader(
-                                dataset,
-                                batch_size=cfg.expressions.batch_size,
-                                sampler=train_subsampler,
-                            )
-                            validation_dataloader = DataLoader(
-                                dataset,
-                                batch_size=cfg.expressions.batch_size,
-                                sampler=valid_subsampler,
-                            )
-
-                            print(
-                                "Training set size: ",
-                                len(train_dataloader) * cfg.expressions.batch_size,
-                            )
-                            print(
-                                "Validation set size: ",
-                                len(validation_dataloader) * cfg.expressions.batch_size,
-                            )
-
+                            train_dataloader, validation_dataloader = get_data_loaders(cfg, 
+                                                                                       dataset, 
+                                                                                       mode=cfg.training.strategy, 
+                                                                                       train_val_ids=(train_ids, valid_ids),
+                                                                                       fold=fold)
                             train(
                                 cfg,
                                 expression,
@@ -411,29 +226,9 @@ def main(cfg: DictConfig) -> None:
                     for i in range(cfg.training.n_runs):
 
                         with mlflow.start_run(run_name=f"{i}", nested=True) as childrun:
+                            
                             set_and_log_seeds()
-
-                            print(f"RUN {i}")
-                            print("--------------------------------")
-                            train_data, validation_data = torch.utils.data.random_split(
-                                dataset,
-                                [cfg.expressions.split, 1 - cfg.expressions.split],
-                            )
-
-                            train_dataloader = DataLoader(
-                                train_data,
-                                batch_size=cfg.expressions.batch_size,
-                                shuffle=True,
-                            )
-                            validation_dataloader = DataLoader(
-                                validation_data,
-                                batch_size=cfg.expressions.batch_size,
-                                shuffle=True,
-                            )
-
-                            print("Training set size: ", len(train_dataloader))
-                            print("Validation set size: ", len(validation_dataloader))
-
+                            train_dataloader, validation_dataloader = get_data_loaders(cfg, dataset, mode=cfg.training.strategy, i=i)
                             train(
                                 cfg,
                                 expression,

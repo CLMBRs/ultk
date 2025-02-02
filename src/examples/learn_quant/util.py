@@ -4,6 +4,10 @@ import dill as pkl
 import random
 import os
 from pathlib import Path
+import mlflow
+from omegaconf import OmegaConf
+import csv
+from itertools import combinations_with_replacement, permutations
 
 from ultk.language.grammar import GrammaticalExpression
 from ultk.language.language import Expression
@@ -11,8 +15,7 @@ from ultk.language.semantics import Meaning, Universe
 from ultk.util.io import write_expressions, read_grammatical_expressions
 
 from learn_quant.grammar import quantifiers_grammar
-from learn_quant.quantifier import QuantifierUniverse
-
+from learn_quant.quantifier import QuantifierUniverse, QuantifierModel
 
 
 def summarize_expression(expression: GrammaticalExpression):
@@ -202,18 +205,62 @@ def save_inclusive_generation(
         indices_tag=indices_tag,
     )
 
+def set_vars(items):
+    for key, value in items.items():
+        os.environ[key] = str(value)
 
-def calculate_term_expression_depth(expression):
-    depth = 0
-    max_depth = 0
-    for char in expression:
-        if char == "(":
-            depth += 1
-            max_depth = max(max_depth, depth)
-        elif char == ")":
-            depth -= 1
-    return max_depth
+def determine_start_index(cfg) -> int:
+    try:
+        if cfg.training.resume.term_expression:
+            for i, expression in enumerate(expressions):
+                if (
+                    expression.term_expression
+                    == cfg.training.resume.term_expression
+                ):
+                    print(
+                        "Resuming training from expression: ",
+                        expression.term_expression,
+                    )
+                    return i
+    except Exception as e:
+        print("Could not resume training from specified expression.")
+        print(e)
+        return 0
 
+def define_index_bounds(cfg, start_index) -> tuple:
+    if "index" in cfg.expressions:
+        return (cfg.expressions.index, cfg.expressions.index + 1)
+    elif cfg.expressions.n_limit:
+        return (start_index, 1 + cfg.expressions.n_limit)
+
+def reorder_by_index_file(index_file):
+    original_index_list = []
+    with open(index_file, "r", newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            # Convert to int if needed
+            original_index_list.append(int(row["original_index"]))
+    return original_index_list
+
+
+def print_vars(cfg):
+    # Print environment variables for debugging
+    print(
+        "MLFLOW_TRACKING_URI environment variable:",
+        os.environ.get("MLFLOW_TRACKING_URI"),
+    )
+    print("MLflow version:", mlflow.version.VERSION)
+
+    # Disable system metrics tracking
+    print(
+        "MLFLOW_SYSTEM_METRICS_ENABLED:",
+        os.environ.get("MLFLOW_SYSTEM_METRICS_ENABLED"),
+    )
+    print("Current MLflow Tracking URI:", mlflow.get_tracking_uri())
+    print(OmegaConf.to_yaml(cfg))
+    print("expressions.grammar.indices:", cfg.expressions.grammar.indices)
+    print("expressions.universe.m_size:", cfg.expressions.universe.m_size)
+    print("expressions.grammar.index_weight:", cfg.expressions.grammar.index_weight)
 
 def create_universe(m_size: int, x_size: int) -> QuantifierUniverse:
     """

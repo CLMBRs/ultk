@@ -1,8 +1,13 @@
+from hydra.utils import instantiate
 import torch
+from torch.utils.data import Dataset, DataLoader, DataLoader
 import torch.nn as nn
-import numpy as np
 from ultk.language.grammar import GrammaticalExpression
+from omegaconf import DictConfig
+from hydra.utils import instantiate
+from torch.utils.data import Dataset, DataLoader, DataLoader
 from typing import Iterable
+import time
 
 import torch
 from torch.utils.data import Dataset
@@ -343,3 +348,42 @@ class TransformerModel(nn.Module):
 
         output = self.fc_out(x)  # Shape: (batch_size, num_classes)
         return output
+
+def train_base_pytorch(
+    cfg: DictConfig,
+    train_dataloader: DataLoader,
+    validation_dataloader: DataLoader,
+):
+
+    selected_model = instantiate(cfg.model)
+    selected_optimizer = instantiate(cfg.optimizer)
+
+    model = selected_model(device=cfg.training.device)
+    print(model)
+    criterion = instantiate(cfg.criterion)
+    optimizer = selected_optimizer(model.parameters())
+
+    start = time.time()
+    train_loop(
+        train_dataloader,
+        model,
+        criterion,
+        optimizer,
+        cfg.training.epochs,
+        conditions=cfg.training.conditions,
+    )
+    end = time.time()
+    print("Training time: ", end - start)
+    model.eval()
+
+    # Disable gradient computation and reduce memory consumption.
+    with torch.no_grad():
+        running_vloss = 0.0
+        for _, vdata in enumerate(validation_dataloader):
+            v_inputs, v_targets = vdata
+            if isinstance(model, MV_LSTM):
+                model.init_hidden(v_inputs.size(0))
+            v_outputs = model(v_inputs)
+            vloss = criterion(v_outputs, v_targets)
+            running_vloss += vloss
+    print("Validation loss: ", running_vloss.item())
