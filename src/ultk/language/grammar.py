@@ -90,7 +90,7 @@ class Rule:
             del args["weight"]
         # allow custon names too
         rule_name = func.__name__
-        if "name" in args:
+        if "name" in args and args["name"].default is not inspect._empty:
             rule_name = args["name"].default
             del args["name"]
         # parameters = {'name': Parameter} ordereddict, so we want the values
@@ -550,6 +550,9 @@ class Grammar:
         The module should have a list of type-annotated method definitions, each of which will correspond to one Rule in the new Grammar.
         See the docstring for `Rule.from_callable` for more information on how that step works.
 
+        The function will normally attempt to convert all functions (including imported functions) into Rules. However, if a tuple of
+        functions called `grammar_rules` is defined in the module, it will only try to convert the functions contained in the tuple.
+
         The start symbol of the grammar can either be specified by `start = XXX` somewhere in the module,
         or will default to the LHS of the first rule in the module (aka the return type annotation of the first method definition).
 
@@ -558,7 +561,11 @@ class Grammar:
         """
         module = import_module(module_name)
         grammar = cls(None)
-        for name, value in inspect.getmembers(module):
+        if hasattr(module, "grammar_rules") and type(module.grammar_rules) == tuple:
+            possible_rules = module.grammar_rules
+        else:
+            possible_rules = tuple(value for _, value in inspect.getmembers(module))
+        for value in possible_rules:
             # functions become rules
             if inspect.isfunction(value):
                 grammar.add_rule(Rule.from_callable(value))
