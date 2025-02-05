@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from importlib import import_module
 from itertools import product
-from typing import Any, Callable, Generator, TypedDict, TypeVar, Iterable
+from typing import Any, Callable, Generator, TypedDict, TypeVar
 from yaml import load
 from functools import cache
 
@@ -20,7 +20,6 @@ from ultk.language.semantics import Meaning, Referent, Universe
 from ultk.util.frozendict import FrozenDict
 
 T = TypeVar("T")
-Dataset = Iterable[tuple[Referent, T]]
 
 
 @dataclass(frozen=True)
@@ -185,6 +184,11 @@ class GrammaticalExpression(Expression[T]):
 
     @cache
     def node_count(self) -> int:
+        """Count the node of a GrammaticalExpression
+
+        Returns:
+            int: node count
+        """
         counter = 1
         stack = [self]
         while stack:
@@ -280,6 +284,14 @@ class Grammar:
         return float(rule.weight) / sum([r.weight for r in self._rules[rule.lhs]])
 
     def prior(self, expr: GrammaticalExpression) -> float:
+        """Prior of a GrammaticalExpression
+
+        Args:
+            expr (GrammaticalExpression): the GrammaticalExpression for compuation
+
+        Returns:
+            float: prior
+        """
         probability = self.probability(self._rules_by_name[expr.rule_name])
         children = expr.children if expr.children else ()
         for child in children:
