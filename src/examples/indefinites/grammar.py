@@ -1,4 +1,4 @@
-from ultk.language.grammar import Grammar, Rule
+from ultk.language.grammar.grammar import Grammar, Rule
 
 # indefinites_grammar = Grammar.from_yaml("indefinites/grammar.yml")
 indefinites_grammar = Grammar.from_module("indefinites.grammar_functions")
