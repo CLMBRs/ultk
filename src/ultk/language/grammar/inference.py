@@ -11,6 +11,17 @@ def mh_sample(
     data: Dataset,
     likelihood_func: Callable[[Dataset, GrammaticalExpression], float] = all_or_nothing,
 ) -> GrammaticalExpression:
+    """Sample a new GrammaticalExpression from an exsiting one and data using Metropolis Hastings
+
+    Args:
+        expr (GrammaticalExpression): the exsiting GrammaticalExpression
+        grammar (Grammar): the grammar for generation
+        data (Dataset): data used for calculation of acceptance probability
+        likelihood_func (Callable[[Dataset, GrammaticalExpression], float], optional): _description_. Defaults to all_or_nothing.
+
+    Returns:
+        GrammaticalExpression: newly sampled GrammaticalExpression
+    """
     old_tree_prior = grammar.prior(expr)
     old_node_count = expr.node_count()
     while True:
@@ -41,7 +52,15 @@ def mh_sample(
 
 def mh_select(
     old_tree: GrammaticalExpression,
-) -> (GrammaticalExpression, GrammaticalExpression):
+) -> tuple[GrammaticalExpression, GrammaticalExpression]:
+    """Select a node for futher change from a GrammaticalExpression
+
+    Args:
+        old_tree (GrammaticalExpression): input GrammaticalExpression
+
+    Returns:
+        tuple[GrammaticalExpression, GrammaticalExpression]: the node selected for change and its parent node
+    """
     linearized_self = []
     parents = []
     stack = [(old_tree, -1)]
@@ -64,7 +83,18 @@ def mh_generate(
     current_node: GrammaticalExpression,
     parent_node: GrammaticalExpression,
     grammar: Grammar,
-) -> (GrammaticalExpression, GrammaticalExpression):
+) -> tuple[GrammaticalExpression, GrammaticalExpression]:
+    """Generate a new GrammaticalExpression
+
+    Args:
+        old_tree (GrammaticalExpression): the original full GrammaticalExpression
+        current_node (GrammaticalExpression): the node selected for change
+        parent_node (GrammaticalExpression): the parent node for the chaging node
+        grammar (Grammar): grammar used for generation
+
+    Returns:
+        tuple[GrammaticalExpression, GrammaticalExpression]: the new full GrammaticalExpression and the changed node
+    """
     if current_node != old_tree:
         new_children = []
         children = parent_node.children if parent_node.children else ()
