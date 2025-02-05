@@ -8,6 +8,7 @@ from importlib import import_module
 from itertools import product
 from typing import Any, Callable, Generator, TypedDict, TypeVar
 from yaml import load
+from functools import cache
 
 try:
     from yaml import CLoader as Loader
@@ -178,6 +179,26 @@ class GrammaticalExpression(Expression[T]):
             return 1
         return sum(child.count_atoms() for child in self.children)
 
+    def replace_children(self, children) -> None:
+        self.children = children
+
+    @cache
+    def node_count(self) -> int:
+        """Count the node of a GrammaticalExpression
+
+        Returns:
+            int: node count
+        """
+        counter = 1
+        stack = [self]
+        while stack:
+            current_node = stack.pop()
+            children = current_node.children if current_node.children else ()
+            for child in children:
+                stack.append(child)
+                counter += 1
+        return counter
+
     @classmethod
     def from_dict(cls, the_dict: dict, grammar: "Grammar") -> "GrammaticalExpression":
         children = the_dict.get("children")
@@ -257,6 +278,25 @@ class Grammar:
                 f"Rules of a grammar must have unique names. This grammar already has a rule named {rule.name}."
             )
         self._rules_by_name[rule.name] = rule
+
+    # @cache, unhashable, or embed it as a property (change every time Grammar is changed)
+    def probability(self, rule: Rule) -> float:
+        return float(rule.weight) / sum([r.weight for r in self._rules[rule.lhs]])
+
+    def prior(self, expr: GrammaticalExpression) -> float:
+        """Prior of a GrammaticalExpression
+
+        Args:
+            expr (GrammaticalExpression): the GrammaticalExpression for compuation
+
+        Returns:
+            float: prior
+        """
+        probability = self.probability(self._rules_by_name[expr.rule_name])
+        children = expr.children if expr.children else ()
+        for child in children:
+            probability = probability * (self.prior(child))
+        return probability
 
     def parse(
         self,
