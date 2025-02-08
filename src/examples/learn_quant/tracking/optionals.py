@@ -1,7 +1,7 @@
 import importlib
 
 # Global state to store whether MLflow is enabled and whether we've done a "real" import yet.
-_MLFLOW_FLAG = True
+_MLFLOW_FLAG = False
 _ACTUAL_MLFLOW = None
 
 class _MLFlowDummy():
@@ -14,6 +14,8 @@ class _MLFlowDummy():
         return self
     def __exit__(self, *args, **kwargs):
         pass
+    def get_tracking_uri(self):
+        return None
 
 def set_mlflow(flag: bool):
     """

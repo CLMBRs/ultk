@@ -209,9 +209,9 @@ def set_vars(items):
     for key, value in items.items():
         os.environ[key] = str(value)
 
-def determine_start_index(cfg) -> int:
-    try:
-        if cfg.training.resume.term_expression:
+def determine_start_index(cfg, expressions) -> int:
+    if "resume" in cfg.training:
+        try:
             for i, expression in enumerate(expressions):
                 if (
                     expression.term_expression
@@ -222,16 +222,16 @@ def determine_start_index(cfg) -> int:
                         expression.term_expression,
                     )
                     return i
-    except Exception as e:
-        print("Could not resume training from specified expression.")
-        print(e)
-        return 0
+        except Exception as e:
+            print("Could not resume training from specified expression.")
+            print(e)
+            return 0
 
 def define_index_bounds(cfg, start_index) -> tuple:
     if "index" in cfg.expressions:
         return (cfg.expressions.index, cfg.expressions.index + 1)
     elif cfg.expressions.n_limit:
-        return (start_index, 1 + cfg.expressions.n_limit)
+        return (start_index, start_index + cfg.expressions.n_limit)
 
 def reorder_by_index_file(index_file):
     original_index_list = []

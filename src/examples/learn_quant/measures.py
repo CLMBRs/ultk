@@ -198,8 +198,6 @@ def calculate_measure(cfg, measure, expression, universe):
         expression_depth = calculate_term_expression_depth(expression.term_expression)
         print("Monotonicity: ", monotonicity)
         mlflow.log_param("expression_depth", expression_depth)
-    else:
-        print("Measure not recognized.")
 
 def get_true_predecessors(all_models, quantifier, flip=False):
 

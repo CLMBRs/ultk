@@ -9,7 +9,6 @@ from lightning.pytorch.callbacks import EarlyStopping, Callback
 from lightning.pytorch.loggers import MLFlowLogger
 from collections import deque
 from lightning.pytorch.callbacks import Timer
-
 import logging
 import time
 import socket
@@ -108,6 +107,11 @@ class ThresholdEarlyStopping(EarlyStopping):
 
 def is_mlflow_server_up(mlflow_tracking_uri, timeout=5):
     """Checks if the MLflow server is reachable."""
+
+    if not mlflow_tracking_uri or not isinstance(mlflow_tracking_uri, str):
+        # If it's None or not a string, assume we're in dummy mode and skip
+        return True  # or False, or short-circuit however you like
+
     try:
         # Extract hostname and port from the URI
         if mlflow_tracking_uri.startswith("http://"):
@@ -129,6 +133,9 @@ def wait_for_mlflow(max_retries=30, retry_delay=30):
     """Waits for the MLflow server to become available."""
     mlflow = get_mlflow()
     mlflow_tracking_uri = mlflow.get_tracking_uri()
+    if mlflow.active_run() is None:
+        logger.warning("No active MLflow run. Skipping connectivity check.")
+        return
     if not mlflow_tracking_uri:
         raise ValueError("Tracking URI not set.")
     for attempt in range(max_retries):
@@ -158,8 +165,11 @@ class MLFlowConnectivityCallback(Callback):
 
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         mlflow = get_mlflow()
-        if mlflow.active_run() is None:
-            logger.warning("No active MLflow run. Skipping connectivity check.")
+        mlflow_tracking_uri = mlflow.get_tracking_uri()
+
+        #  If there's no real URI (meaning mlflow is dummy), skip connectivity checks
+        if not mlflow_tracking_uri or mlflow_tracking_uri.startswith("dummy"):
+            logger.debug("MLflow is disabled or dummy; skipping server connectivity check.")
             return
 
         if not is_mlflow_server_up(self.mlflow_tracking_uri):
@@ -196,7 +206,7 @@ def train_lightning(
     cfg: DictConfig,
     train_dataloader: DataLoader,
     validation_dataloader: DataLoader,
-    mlf_logger: MLFlowLogger,
+    mlf_logger: MLFlowLogger | None,
 ):
 
     selected_model = instantiate(cfg.model)

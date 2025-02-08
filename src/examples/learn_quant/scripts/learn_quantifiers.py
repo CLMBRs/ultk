@@ -15,6 +15,7 @@ from ultk.util.io import read_grammatical_expressions
 
 from ultk.language.grammar import GrammaticalExpression
 from ..util import set_vars, print_vars, determine_start_index, define_index_bounds, reorder_by_index_file
+from ..tracking.optionals import set_mlflow, get_mlflow
 from ..grammar import add_indices
 from ..sampling import DatasetInitializationError, get_data_loaders
 from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device, train_base_pytorch
@@ -47,6 +48,7 @@ def flatten(dictionary, parent_key="", separator="_"):
 
 def set_and_log_seeds(mainrun=False):
     # Set the seeds
+    mlflow = get_mlflow()
     seed = random.randint(0, 999999)
 
     # Log the seed in MLFlow
@@ -65,7 +67,7 @@ def train(
     dataset: Dataset,
     train_dataloader: DataLoader,
     validation_dataloader: DataLoader,
-    mlf_logger: MLFlowLogger,
+    mlf_logger: MLFlowLogger | None,
 ):
     if cfg.training.lightning:
         train_lightning(
@@ -81,9 +83,15 @@ def train(
 
 def set_mlflow_experiment(cfg):
     if "mlflow" in cfg.tracking:
-        mlflow.set_tracking_uri(f"http://{cfg.tracking.mlflow.host}:{cfg.tracking.mlflow.port}")
-        mlflow.set_experiment(f"{cfg.experiment_name}")
-        mlflow.pytorch.autolog()
+        if cfg.tracking.mlflow.active:
+            set_mlflow(True)
+    else:
+        set_mlflow(False)
+    mlflow = get_mlflow()
+    mlflow.set_tracking_uri(f"http://{cfg.tracking.mlflow.host}:{cfg.tracking.mlflow.port}")
+    mlflow.set_experiment(f"{cfg.experiment_name}")
+    mlflow.pytorch.autolog()
+    return mlflow
 
 @hydra.main(version_base=None, config_path="../conf", config_name="learn")
 def main(cfg: DictConfig) -> None:
@@ -96,7 +104,7 @@ def main(cfg: DictConfig) -> None:
     try:
 
         # Set tracking experiment if tracking is on
-        set_mlflow_experiment(cfg)
+        mlflow = set_mlflow_experiment(cfg)
 
         for key, _ in cfg.tracking.items():
             if "vars":
@@ -132,12 +140,15 @@ def main(cfg: DictConfig) -> None:
         # If an expression is set for training.resume.term_expression, the start index will be set at that expression's index.
         # For running expressions one at a time, use expressions.index.
         # Determine index bounds will use expressions.n_limit if set to determine the number of expressions to run.
-        start_index = determine_start_index(cfg)
+        start_index = determine_start_index(cfg, expressions)
         start, end = define_index_bounds(cfg, start_index)
+        print(start, end)
 
         # If index_file is set, make sure to reorder the expressions according to the index file. Useful for getting random samples.
         if "index_file" in cfg.expressions:
             original_index_list = reorder_by_index_file(cfg.expressions.index_file)
+        else:
+            original_index_list = list(range(len(expressions)))
 
         for original_index in tqdm(original_index_list[start:end]):
 
@@ -158,14 +169,18 @@ def main(cfg: DictConfig) -> None:
 
                 mlflow.log_params(flatten(OmegaConf.to_container(cfg)))
                 mlflow.log_param("expression", expression.term_expression)
-
                 mlflow.set_tag("Notes", cfg.notes)
-                mlf_logger = MLFlowLogger(
-                    experiment_name=f"{cfg.experiment_name}",
-                    log_model=True,
-                    tracking_uri=mlflow.get_tracking_uri(),
-                    run_id=mainrun.info.run_id,
-                )
+
+                if "mlflow" in cfg.tracking:
+                    if cfg.tracking.mlflow.active:
+                        mlf_logger = MLFlowLogger(
+                            experiment_name=f"{cfg.experiment_name}",
+                            log_model=True,
+                            tracking_uri=mlflow.get_tracking_uri(),
+                            run_id=mainrun.info.run_id,
+                        )
+                    else:
+                        mlf_logger = None
 
                 print("Expression: ", expression.term_expression)
                 try:
