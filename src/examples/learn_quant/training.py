@@ -8,7 +8,9 @@ from hydra.utils import instantiate
 from torch.utils.data import Dataset, DataLoader, DataLoader
 from typing import Iterable
 import time
-
+import torch.optim as optim
+from torch.optim.lr_scheduler import StepLR
+import math
 import torch
 from torch.utils.data import Dataset
 from learn_quant.sampling import sample_by_expression, downsample_quantifier_models
@@ -197,6 +199,7 @@ def compute_accuracy(outputs, targets):
 
     return accuracy
 
+from torch.optim.lr_scheduler import LambdaLR
 
 def train_loop(dataloader, model, criterion, optimizer, epochs, conditions=None):
 
@@ -209,6 +212,7 @@ def train_loop(dataloader, model, criterion, optimizer, epochs, conditions=None)
             return True
         return False
 
+
     size = len(dataloader.dataset)
     # Loop over epochs
     ledger = {"loss_tally": 0, "accuracy_tally": 0}
@@ -219,6 +223,7 @@ def train_loop(dataloader, model, criterion, optimizer, epochs, conditions=None)
         running_accuracy = 0.0
         print(f"Epoch {epoch+1}/{epochs}")
         # Set the model to training mode
+        # scheduler = StepLR(optimizer, step_size=3, gamma=0.15)
         model.train()
         for batch, (X, y) in enumerate(dataloader):
 
@@ -254,6 +259,7 @@ def train_loop(dataloader, model, criterion, optimizer, epochs, conditions=None)
                 "batch": batch,
                 "epoch": epoch,
             }
+            #scheduler.step()
 
         avg_train_loss = running_loss / len(dataloader)
         avg_train_accuracy = running_accuracy / len(dataloader)
@@ -281,7 +287,7 @@ class PositionalEncoding(nn.Module):
     def forward(self, x):
         # x shape: (batch_size, seq_len, d_model)
         # Add positional encoding to each sequence
-        x = x + self.pe[:, : x.size(1), :]  # Apply across the sequence length dimension
+        x = x + self.pe[:, : x.size(1), :].detach()  # Apply across the sequence length dimension
         return x
 
 
@@ -300,9 +306,11 @@ class TransformerModel(nn.Module):
         num_encoder_layers=2,
         dim_feedforward=32,
         device="cpu",
+        pool_mode="mean"
     ):
         super(TransformerModel, self).__init__()
         self.device = device
+        self.pool_mode = pool_mode
 
         self.embedding = nn.Linear(input_dim, d_model, device=device)
 
@@ -316,21 +324,36 @@ class TransformerModel(nn.Module):
             num_encoder_layers=num_encoder_layers,
             dim_feedforward=dim_feedforward,
             device=device,
+            #dropout=0.1,
+            norm_first=True
         )
+
+        # In the __init__ of TransformerModel
+        self.src_mask = nn.Transformer.generate_square_subsequent_mask(seq_len).to(self.device)
 
         self.fc_out = nn.Linear(
             d_model, num_classes, device=device
         )  # Flatten transformer output to predict [0, 1] or [1, 0]
         # COMMENT: Instead of flattening, we can take just the final token - that would be taking out seq len
 
+        # Apply custom initialization to all modules
+        # self.apply(self._init_weights)
+
+    def _init_weights(self, module):
+        """Custom weight initialization."""
+        if isinstance(module, nn.Linear):
+            # Xavier (Glorot) uniform initialization for linear layers
+            nn.init.xavier_uniform_(module.weight)
+            if module.bias is not None:
+                nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.LayerNorm):
+            # For LayerNorm, initialize weights to 1 and biases to 0
+            nn.init.ones_(module.weight)
+            nn.init.zeros_(module.bias)
+
     def forward(self, x):
         # x shape: (batch_size, seq_len, input_dim)
         batch_size, seq_len, input_dim = x.shape
-
-        # x = x.view(batch_size * seq_len, input_dim)
-        self.src_mask = nn.Transformer.generate_square_subsequent_mask(
-            x.size(1), device=torch.device(self.device)
-        )
 
         x = self.embedding(x)  # Shape: (batch_size * seq_len, d_model)
 
@@ -345,6 +368,8 @@ class TransformerModel(nn.Module):
 
         x = x.permute(1, 0, 2)[:, -1, :]  # Shape: (batch_size, seq_len * d_model)
         # COMMENT: x.permute(1, 0, 2)[:, -1, :] ? maybe squeeze because we want a final shape of (batch_size, d_model)
+
+        # x = x.mean(dim=1) # avg. pooling
 
         output = self.fc_out(x)  # Shape: (batch_size, num_classes)
         return output

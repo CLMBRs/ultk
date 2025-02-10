@@ -4,6 +4,6 @@ input_dim: 6
 seq_len: ${expressions.generation_args.X_size}
 num_classes: 2
 d_model: 12
-nhead: 2
-num_encoder_layers: 1
-dim_feedforward: 8
+nhead: 4
+num_encoder_layers: 2
+dim_feedforward: 16
