@@ -1,16 +1,16 @@
 defaults:
   - _self_
   - model: ???
-#  - override hydra/launcher: swarm # For use with sweeping over 
+  - override hydra/launcher: swarm # For use with Slurm 
 #  - override hydra/sweeper: sweep
 
-experiment_name: transformers_3
+experiment_name: transformers_improved_2
 notes: |
   This run is to evaluate the neural learning quantifiers and logging in MLFlow.
 
 tracking:
   mlflow:
-    active: false
+    active: true
     host: g3116
     port: 5000
     vars:
@@ -19,7 +19,7 @@ tracking:
       MLFLOW_HTTP_REQUEST_BACKOFF_FACTOR: "60"
 
 expressions:
-  n_limit: 1
+  n_limit: 2000
   output_dir: learn_quant/outputs/
   grammar:
     depth: 5
@@ -41,11 +41,9 @@ expressions:
   batch_size: 64
   split: 0.8
   target: "M${expressions.universe.m_size}/X${expressions.universe.x_size}/d${expressions.grammar.depth}"
-#  index_file: "learn_quant/expressions_sample_2k.csv" # If set, examples will be trained in order according to the index file
+  index_file: "learn_quant/expressions_sample_2k.csv" # If set, examples will be trained in order according to the index file
 
 training:
-  resume:
-    term_expression: and(and(not(subset_eq(A, B)), equals(cardinality(A), cardinality(B))), subset_eq(index(cardinality(A), union(A, B)), union(difference(A, B), difference(B, A))))
   strategy: multirun
   k_splits: 5
   n_runs: 1

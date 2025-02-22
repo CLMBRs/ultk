@@ -2,7 +2,7 @@
 #SBATCH --job-name=mlflow_postgres
 #SBATCH --output=mlflow_postgres.out
 #SBATCH --error=mlflow_postgres.err
-#SBATCH --time=4-00 # Adjust as needed
+#SBATCH --time=5-00 # Adjust as needed
 #SBATCH --requeue
 #SBATCH --partition=gpu-l40 # Replace with your partition
 #SBATCH --nodes=1
