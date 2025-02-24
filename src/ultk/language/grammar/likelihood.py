@@ -1,6 +1,7 @@
 from typing import Callable, TypeVar, Iterable
 from ultk.language.grammar.grammar import GrammaticalExpression
 from ultk.language.semantics import Referent
+from math import log
 
 T = TypeVar("T")
 Dataset = Iterable[tuple[Referent, T]]
@@ -64,9 +65,11 @@ def noise_match(
 ) -> Callable[[Dataset, GrammaticalExpression], float]:
     """Taken from Piantadosi et al. Attempts to discern the probability by believing that the output is correct
     and was passed through a noise function which has an `alpha` chance to corrupt each item in the output list.
-    
+
     Takes in the number of possible values the output can be and the percent chance of a corruption and returns a
     probability function which `mh_sample` is able to use.
+
+    Specifically for log_mh_accept only.
 
     See also: https://github.com/piantado/LOTlib3/blob/master/Hypotheses/Likelihoods/BinaryLikelihood.py
 
@@ -82,11 +85,10 @@ def noise_match(
             Returns:
                 float: likelihood
     """
-
+    correct_chance = log(1 - alpha + alpha / possible_outputs)
+    incorrect_chance = log(alpha / possible_outputs)
     def noise_match_probability(data: Dataset, tree: GrammaticalExpression) -> float:
         matches = sum([tree(datum[0]) == datum[1] for datum in data])
-        return (alpha / possible_outputs) ** (len(data) - matches) * (
-            1 - alpha + alpha / possible_outputs
-        ) ** matches
+        return (len(data) - matches)*(incorrect_chance) + matches*(correct_chance)
 
     return noise_match_probability
