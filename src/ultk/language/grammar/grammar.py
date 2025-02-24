@@ -286,7 +286,9 @@ class Grammar:
 
     # @cache, unhashable, or embed it as a property (change every time Grammar is changed)
     def log_probability(self, rule: Rule) -> float:
-        return log(float(rule.weight)) - log(sum([r.weight for r in self._rules[rule.lhs]]))
+        return log(float(rule.weight)) - log(
+            sum([r.weight for r in self._rules[rule.lhs]])
+        )
 
     def prior(self, expr: GrammaticalExpression) -> float:
         """Prior of a GrammaticalExpression
@@ -384,13 +386,13 @@ class Grammar:
             raise ValueError("Could not parse string {expression}")
         return stack[0]
 
-    def generate(self, lhs: Any = None, max_depth = 3, depth = 0) -> GrammaticalExpression:
+    def generate(self, lhs: Any = None, max_depth=3, depth=0) -> GrammaticalExpression:
         """Generate an expression from a given lhs."""
         if lhs is None:
             lhs = self._start
         rules = self._rules[lhs]
         # Stop there from being a high chance of infinite recusion
-        if (depth > max_depth):
+        if depth > max_depth:
             filtered_rules = list(filter(lambda rule: rule.rhs is None, rules))
             if len(filtered_rules) != 0:
                 rules = filtered_rules
@@ -400,7 +402,12 @@ class Grammar:
         children = (
             None
             if the_rule.rhs is None
-            else tuple([self.generate(child_lhs, max_depth=max_depth, depth=depth + 1) for child_lhs in the_rule.rhs])
+            else tuple(
+                [
+                    self.generate(child_lhs, max_depth=max_depth, depth=depth + 1)
+                    for child_lhs in the_rule.rhs
+                ]
+            )
         )
         # if the rule is terminal, rhs will be empty, so no recursive calls to generate will be made in this comprehension
         return GrammaticalExpression(
