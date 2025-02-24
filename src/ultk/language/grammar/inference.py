@@ -34,16 +34,16 @@ def log_mh_sample(
         new_node_count = new_tree.node_count()
         new_subtree_prior = grammar.log_prior(new_node)
         mh_accept = (
-                (new_tree_prior + likelihood_func(data, new_tree))
-                - (old_tree_prior + likelihood_func(data, old_tree))
-            ) + (
-                (old_subtree_prior + new_node_count)
-                - (new_subtree_prior + old_node_count)
-            )
+            (new_tree_prior + likelihood_func(data, new_tree))
+            - (old_tree_prior + likelihood_func(data, old_tree))
+        ) + (
+            (old_subtree_prior + new_node_count) - (new_subtree_prior + old_node_count)
+        )
         if isnan(mh_accept) or isinf(mh_accept):
             return False
         if mh_accept >= 0 or random.random() < exp(mh_accept):
             return new_tree
+
 
 def mh_sample(
     expr: GrammaticalExpression,

@@ -87,8 +87,9 @@ def noise_match(
     """
     correct_chance = log(1 - alpha + alpha / possible_outputs)
     incorrect_chance = log(alpha / possible_outputs)
+
     def noise_match_probability(data: Dataset, tree: GrammaticalExpression) -> float:
         matches = sum([tree(datum[0]) == datum[1] for datum in data])
-        return (len(data) - matches)*(incorrect_chance) + matches*(correct_chance)
+        return (len(data) - matches) * (incorrect_chance) + matches * (correct_chance)
 
     return noise_match_probability

@@ -1,5 +1,6 @@
 from typing import Generic, TypeVar
 from yaml import YAMLObject
+from copy import deepcopy
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -10,6 +11,13 @@ class FrozenDict(dict[K, V], Generic[K, V], YAMLObject):
 
     def __hash__(self):
         return hash(frozenset(self.items()))
+
+    def __deepcopy__(self, memo):
+        output = FrozenDict(
+            {deepcopy(k, memo): deepcopy(v, memo) for k, v in self.items()}
+        )
+        memo[id(self)] = output
+        return output
 
     def __setitem__(self, key, value):
         raise TypeError("FrozenDict is immutable")
