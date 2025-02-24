@@ -1,9 +1,49 @@
 from typing import TypeVar, Iterable, Callable
 from ultk.language.grammar.grammar import Grammar, GrammaticalExpression
 from ultk.language.grammar.likelihood import Dataset, all_or_nothing
+from math import isnan, isinf, exp
 import copy
 import random
 
+
+def log_mh_sample(
+    expr: GrammaticalExpression,
+    grammar: Grammar,
+    data: Dataset,
+    likelihood_func: Callable[[Dataset, GrammaticalExpression], float] = all_or_nothing,
+) -> GrammaticalExpression:
+    """Sample a new GrammaticalExpression from an exsiting one and data using Metropolis Hastings using log probabilities
+
+    Args:
+        expr (GrammaticalExpression): the exsiting GrammaticalExpression
+        grammar (Grammar): the grammar for generation
+        data (Dataset): data used for calculation of acceptance probability
+        likelihood_func (Callable[[Dataset, GrammaticalExpression], float], optional): _description_. Defaults to all_or_nothing.
+
+    Returns:
+        GrammaticalExpression: newly sampled GrammaticalExpression
+    """
+    old_tree_prior = grammar.log_prior(expr)
+    old_node_count = expr.node_count()
+    while True:
+        old_tree = copy.deepcopy(expr)
+        current_node, parent_node = mh_select(old_tree)
+        old_subtree_prior = grammar.log_prior(current_node)
+        new_tree, new_node = mh_generate(old_tree, current_node, parent_node, grammar)
+        new_tree_prior = grammar.log_prior(new_tree)
+        new_node_count = new_tree.node_count()
+        new_subtree_prior = grammar.log_prior(new_node)
+        mh_accept = (
+                (new_tree_prior + likelihood_func(data, new_tree))
+                - (old_tree_prior + likelihood_func(data, old_tree))
+            ) + (
+                (old_subtree_prior + new_node_count)
+                - (new_subtree_prior + old_node_count)
+            )
+        if isnan(mh_accept) or isinf(mh_accept):
+            return False
+        if mh_accept >= 0 or random.random() < exp(mh_accept):
+            return new_tree
 
 def mh_sample(
     expr: GrammaticalExpression,
