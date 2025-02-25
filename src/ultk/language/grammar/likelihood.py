@@ -69,7 +69,7 @@ def noise_match(
     Takes in the number of possible values the output can be and the percent chance of a corruption and returns a
     probability function which `mh_sample` is able to use.
 
-    Specifically for log_mh_accept only.
+    Specifically for log_mh_sample only.
 
     See also: https://github.com/piantado/LOTlib3/blob/master/Hypotheses/Likelihoods/BinaryLikelihood.py
 
@@ -80,10 +80,10 @@ def noise_match(
     Returns:
         Callable likelihood function:
             Args:
-                data (Dataset): data for likelihood calculation
+                data (Dataset): Data for likelihood calculation
                 tree (GrammaticalExpression): GrammaticalExpression for likelihood calculation
             Returns:
-                float: likelihood
+                float: Likelihood in log probability
     """
     correct_chance = log(1 - alpha + alpha / possible_outputs)
     incorrect_chance = log(alpha / possible_outputs)
@@ -93,3 +93,37 @@ def noise_match(
         return (len(data) - matches) * (incorrect_chance) + matches * (correct_chance)
 
     return noise_match_probability
+
+
+def aggregate_individual_likelihoods(
+    likelihood_function: Callable[[tuple[Referent, T], GrammaticalExpression], float],
+) -> Callable[[Dataset, GrammaticalExpression], float]:
+    """Takes in a likelihood function for an individual datum (in log probability) returns a likelihood function which calls the
+    individual probability function and calls it across the dataset, summing it to get the final probability.
+
+    Specifically for log_mh_sample only.
+
+    Args:
+        Callable individual likelihood function:
+            Args:
+                datum (Tuple[Referent, T]): An individual element from the dataset, the first element is the input, the second the output.
+                tree (GrammarticalExpression): GrammaticalExpression for likelihood calculation
+            Returns:
+                float: Likelihood in log probability.
+
+    Returns:
+        Callable likelihood function:
+            Args:
+                data (Dataset): Data for likelihood calculation
+                tree (GrammaticalExpression): GrammaticalExpression for likelihood calculation
+            Returns:
+                float: Likelihood in log probability
+    """
+
+    def output(data: Dataset, tree: GrammaticalExpression) -> float:
+        output = 0
+        for datum in data:
+            output += likelihood_function(datum, tree)
+        return output
+
+    return output
