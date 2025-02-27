@@ -37,7 +37,7 @@ def log_mh_sample(
             (new_tree_prior + likelihood_func(data, new_tree))
             - (old_tree_prior + likelihood_func(data, old_tree))
         ) + (
-            (old_subtree_prior + new_node_count) - (new_subtree_prior + old_node_count)
+            (old_subtree_prior - new_node_count) - (new_subtree_prior - old_node_count)
         )
         if not (isnan(mh_accept) or isinf(mh_accept)) and (
             mh_accept >= 0 or random.random() < exp(mh_accept)
