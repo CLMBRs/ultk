@@ -39,9 +39,9 @@ def log_mh_sample(
         ) + (
             (old_subtree_prior + new_node_count) - (new_subtree_prior + old_node_count)
         )
-        if isnan(mh_accept) or isinf(mh_accept):
-            return False
-        if mh_accept >= 0 or random.random() < exp(mh_accept):
+        if not (isnan(mh_accept) or isinf(mh_accept)) and (
+            mh_accept >= 0 or random.random() < exp(mh_accept)
+        ):
             return new_tree
 
 
