@@ -1,7 +1,7 @@
 from typing import TypeVar, Iterable, Callable
 from ultk.language.grammar.grammar import Grammar, GrammaticalExpression
 from ultk.language.grammar.likelihood import Dataset, all_or_nothing
-from math import isnan, isinf, exp
+from math import isnan, isinf, exp, log
 import copy
 import random
 
@@ -11,6 +11,8 @@ def log_mh_sample(
     grammar: Grammar,
     data: Dataset,
     likelihood_func: Callable[[Dataset, GrammaticalExpression], float] = all_or_nothing,
+    likelihood_weight: float = 1,
+    subtree_weight: float = 1,
 ) -> GrammaticalExpression:
     """Sample a new GrammaticalExpression from an exsiting one and data using Metropolis Hastings using log probabilities
 
@@ -19,28 +21,32 @@ def log_mh_sample(
         grammar (Grammar): the grammar for generation
         data (Dataset): data used for calculation of acceptance probability
         likelihood_func (Callable[[Dataset, GrammaticalExpression], float], optional): _description_. Defaults to all_or_nothing.
+        likelihood_weight (float, optional): Weight for the likelihood/prior of the full tree. Defaults to 1.
+        subtree_weight (float, optional): Weight for the subtree prior and length. Defaults to 1.
 
     Returns:
         GrammaticalExpression: newly sampled GrammaticalExpression
     """
     old_tree_prior = grammar.log_prior(expr)
-    old_node_count = expr.node_count()
+    old_node_count = log(expr.node_count())
     while True:
         old_tree = copy.deepcopy(expr)
         current_node, parent_node = mh_select(old_tree)
         old_subtree_prior = grammar.log_prior(current_node)
         new_tree, new_node = mh_generate(old_tree, current_node, parent_node, grammar)
         new_tree_prior = grammar.log_prior(new_tree)
-        new_node_count = new_tree.node_count()
+        new_node_count = log(new_tree.node_count())
         new_subtree_prior = grammar.log_prior(new_node)
-        mh_accept = (
+        mh_accept = likelihood_weight * (
             (new_tree_prior + likelihood_func(data, new_tree))
             - (old_tree_prior + likelihood_func(data, old_tree))
-        ) + (
+        ) + subtree_weight * (
             (old_subtree_prior - new_node_count) - (new_subtree_prior - old_node_count)
         )
-        if not (isnan(mh_accept) or isinf(mh_accept)) and (
-            mh_accept >= 0 or random.random() < exp(mh_accept)
+        if not (isnan(mh_accept) or (isinf(mh_accept) and mh_accept < 0)) and (
+            mh_accept >= 0
+            or random.random()
+            < exp(mh_accept)  # Perhaps change later if rounding errors occur
         ):
             return new_tree
 
