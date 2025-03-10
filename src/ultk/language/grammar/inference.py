@@ -29,6 +29,7 @@ def log_mh_sample(
     """
     old_tree_prior = grammar.log_prior(expr)
     old_node_count = log(expr.node_count())
+    old_tree_likelihood = likelihood_func(data, expr)
     while True:
         old_tree = copy.deepcopy(expr)
         current_node, parent_node = mh_select(old_tree)
@@ -39,7 +40,7 @@ def log_mh_sample(
         new_subtree_prior = grammar.log_prior(new_node)
         mh_accept = likelihood_weight * (
             (new_tree_prior + likelihood_func(data, new_tree))
-            - (old_tree_prior + likelihood_func(data, old_tree))
+            - (old_tree_prior + old_tree_likelihood)
         ) + subtree_weight * (
             (old_subtree_prior - new_node_count) - (new_subtree_prior - old_node_count)
         )
@@ -70,6 +71,7 @@ def mh_sample(
     """
     old_tree_prior = grammar.prior(expr)
     old_node_count = expr.node_count()
+    old_tree_likelihood = likelihood_func(data, expr)
     while True:
         old_tree = copy.deepcopy(expr)
         current_node, parent_node = mh_select(old_tree)
@@ -83,7 +85,7 @@ def mh_sample(
                 1,
                 (
                     (new_tree_prior * likelihood_func(data, new_tree))
-                    / (old_tree_prior * likelihood_func(data, old_tree))
+                    / (old_tree_prior * old_tree_likelihood)
                 )
                 * (
                     (old_subtree_prior / new_node_count)
