@@ -28,7 +28,7 @@ def binary_to_int(arr):
     return arr.dot(1 << np.arange(arr.shape[-1]))
 
 
-def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
+def upward_monotonicity_entropy(all_models, set_reference_models, quantifier, cfg, flip=False):
     """Measures degree of upward monotonicity of a quantifiers as
     1 - H(Q | true_pred) / H(Q) where H is (conditional) entropy, and true_pred is the
     variable over models saying whether there's a true _predecessor_ in the
@@ -41,6 +41,9 @@ def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
 
     quantifier = quantifier.flatten()
 
+    model_ints = binary_to_int(all_models)
+    ref_model_ints = binary_to_int(set_reference_models)
+
     if np.all(quantifier) or not np.any(quantifier):
         return 1
     # uniform distributions
@@ -48,32 +51,9 @@ def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
     p_q_false = 1 - p_q_true
     q_ent = -p_q_true * np.log2(p_q_true) - p_q_false * np.log2(p_q_false)
 
-    # get integers corresponding to each model
-    model_ints = binary_to_int(all_models)
-
-    def get_preds(num_arr, num, flip=False):
-        """Given an array of ints, and an int, get all predecessors of the
-        model corresponding to int.
-        Returns an array of same shape as num_arr, but with bools
-        """
-        if not flip:
-            return num_arr & num == num_arr
-        else:
-            return num_arr & num == num
-
-    def num_preds(num_arr, num, flip=False):
-        preds = get_preds(num_arr, num, flip).astype(int)
-        return sum(preds)
-
-    def has_true_pred(num_arr, quantifier, num, flip=False):
-        preds = get_preds(num_arr, num, flip)
-        return np.any(quantifier * preds)
-
     # vector of length quantifier, has a 1 if that model has a true
     # predecessor, 0 otherwise
-    true_preds = np.vectorize(
-        lambda num: has_true_pred(model_ints, quantifier, num, flip)
-    )(model_ints).astype(int)
+    true_preds = get_true_predecessors(all_models, set_reference_models, quantifier, flip)
 
     # TODO: how to handle cases where true_preds is all 0s or all 1s, i.e.
     # where every model does have a true predecessor?  In that case, we have
@@ -86,8 +66,8 @@ def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
         return q_ent
     """
 
-    pred_weights = np.vectorize(lambda num: num_preds(model_ints, num, flip))(
-        model_ints
+    pred_weights = np.vectorize(lambda num, r_num: num_preds(model_ints, ref_model_ints, num, r_num, flip))(
+        model_ints, ref_model_ints
     )
 
     """
@@ -126,6 +106,7 @@ def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
     # TODO: return 0 if q_ent == 0 else 1 - (cond_ent / q_ent)
     # TODO: integrate with a logger
     if cfg.measures.monotonicity.debug:
+    #if True:
         print("q_ent", q_ent)
         print("p_pred", p_pred)
         print("p_nopred", p_nopred)
@@ -143,11 +124,11 @@ def upward_monotonicity_entropy(all_models, quantifier, cfg, flip=False):
 
 def measure_monotonicity(
     all_models,
-    flipped_models,
+    set_reference_models_A,
+    set_reference_models_B,
     quantifier,
     measure=upward_monotonicity_entropy,
     cfg=None,
-    name=None,
 ):
     """Measures degree of monotonicity, as max of the degree of
     positive/negative monotonicty, for a given quantifier _and its negation_
@@ -160,38 +141,60 @@ def measure_monotonicity(
     of those
     """
 
+    def swap_models(all_models):
+        # Get the number of rows and columns
+        n, m = all_models.shape
+
+        # Ensure that the number of columns is a multiple of 3
+        if m % 3 != 0:
+            raise ValueError("The number of columns must be a multiple of 3.")
+
+        # Reshape the array to (n, number_of_groups, 3)
+        reshaped = all_models.reshape(n, m // 3, 3)
+
+        # Swap the first and second columns of each group
+        reshaped[:, :, [0, 1]] = reshaped[:, :, [1, 0]]
+
+        # Reshape back to the original 2D array shape
+        swapped = reshaped.reshape(n, m)
+
+        return swapped
+
     interpretations = [
+        # upward monotonicity
         measure(
             all_models,
+            set_reference_models_A,
             quantifier,
             cfg,
         ),  # right upward monotonicity
         measure(
-            flipped_models,
+            all_models,
+            set_reference_models_B,
             quantifier,
             cfg,
         ),  # left upward monotonicity
         # downward monotonicity
-        measure(all_models, quantifier, cfg, flip=True),  # right downward monotonicity
-        measure(flipped_models, quantifier, cfg, flip=True),
-    ]  # left downward monotonicity
+        measure(all_models, set_reference_models_A, quantifier, cfg, flip=True),  # right downward monotonicity
+        measure(all_models, set_reference_models_B, quantifier, cfg, flip=True), # left downward monotonicity
+    ]
 
     # assert measure(all_models, quantifier, cfg,) == measure(1- all_models, quantifier, cfg, flip=True) == measure(flipped_models - both_models, quantifier, cfg, flip=True)
 
-    print(name)
     print("\t", interpretations)
 
-    return np.max(np.clip(interpretations, 0.0, 1.0))
+    return interpretations
+    #return np.max(np.clip(interpretations, 0.0, 1.0))
 
 def calculate_measure(cfg, measure, expression, universe):
     if measure == "monotonicity":
         print(
             "Calculating montonicity for expression: ", expression.term_expression
         )
-        all_models, flipped_models, quantifiers, expression_names = (
+        all_models, set_reference_models_A, set_reference_models_B, quantifiers, expression_names = (
             get_verified_models([expression], universe)
         )
-        monotonicity = measure_monotonicity(all_models, flipped_models, quantifiers[0], upward_monotonicity_entropy, cfg=cfg, name=expression_names[0])
+        monotonicity = measure_monotonicity(all_models, set_reference_models_A, set_reference_models_B, quantifiers[0], upward_monotonicity_entropy, cfg=cfg, name=expression_names[0])
         print("Monotonicity: ", monotonicity)
         mlflow.log_metric("monotonicity_entropic", float(monotonicity))
     if measure == "expression_depth":
@@ -199,36 +202,53 @@ def calculate_measure(cfg, measure, expression, universe):
         print("Monotonicity: ", monotonicity)
         mlflow.log_param("expression_depth", expression_depth)
 
-def get_true_predecessors(all_models, quantifier, flip=False):
+def has_same_base_model(ref_model_ints, r_num):
+    return (ref_model_ints == r_num)# & (ref_model_ints < 7)
 
-    quantifier = quantifier.flatten()
+def get_preds(num_arr, num, flip=False):
+    """Given an array of ints, and an int, get all predecessors of the
+    model corresponding to int.
+    Returns an array of same shape as num_arr, but with bools
+    """
+    if not flip:
+        return num_arr & num == num_arr
+    else:
+        return num_arr & num == num
+
+def has_true_pred(num_arr, ref_model_ints, quantifier, num, r_num, flip=False):
+    preds = get_preds(num_arr, num, flip)
+    #print(num)
+    #print(np.stack([quantifier, preds, has_same_base_model(ref_model_ints, r_num)], axis=1))
+    return np.any(quantifier * (preds * has_same_base_model(ref_model_ints, r_num)))
+
+def num_preds(num_arr, ref_model_ints, num, r_num, flip=False):
+    preds = get_preds(num_arr, num, flip).astype(int)
+    return sum(preds & has_same_base_model(ref_model_ints, r_num))
+
+def get_true_predecessors(all_models, set_reference_models, quantifier, flip=False):
 
     # get integers corresponding to each model
     model_ints = binary_to_int(all_models)
-
-    def get_preds(num_arr, num, flip):
-        """Given an array of ints, and an int, get all predecessors of the
-        model corresponding to int.
-        Returns an array of same shape as num_arr, but with bools
-        """
-        if not flip:
-            return num_arr & num == num_arr
-        elif flip:
-            return num_arr & num == num
-
-    def num_preds(num_arr, num, flip):
-        preds = get_preds(num_arr, num, flip).astype(int)
-        return sum(preds)
-
-    def has_true_pred(num_arr, quantifier, num, flip):
-        preds = get_preds(num_arr, num, flip)
-        return np.any(quantifier * preds)
+    ref_model_ints = binary_to_int(set_reference_models)
 
     # vector of length quantifier, has a 1 if that model has a true
     # predecessor, 0 otherwise
     true_preds = np.vectorize(
-        lambda num: has_true_pred(model_ints, quantifier, num, flip=flip)
-    )(model_ints).astype(int)
+        lambda num, r_num: has_true_pred(model_ints, ref_model_ints, quantifier, num, r_num, flip)
+    )(model_ints, ref_model_ints).astype(int)
+
+    # Find indices where true_preds equals 1
+    """
+    if not flip:
+        indices = np.where(true_preds == 1)[0]
+        if indices.size > 0:
+            # Check that for every row in ref_model_ints corresponding to these indices,
+            # all values are 1. This assumes ref_model_ints is 2D, with each row a model.
+            # np.all(..., axis=1) returns a boolean array for each row; then np.all() on that
+            # boolean array checks that every flagged row is entirely ones.
+            if np.all(np.all(set_reference_models[indices] == 1, axis=1)):
+                true_preds[indices] = 0
+    """
 
     return true_preds
 
@@ -284,22 +304,23 @@ def load_universe(cfg):
 
 
 def load_grammar(cfg):
-    if hasattr(cfg.grammar, "typed_rules"):
+    if hasattr(cfg.expressions.grammar, "typed_rules"):
         print("Loading rules from module...")
         primitives_grammar = QuantifierGrammar.from_module(
-            cfg.grammar.typed_rules.module_path
+            cfg.expressions.grammar.typed_rules.module_path
         )
-        quantifiers_grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
+        quantifiers_grammar = QuantifierGrammar.from_yaml(cfg.expressions.grammar.path)
         grammar = quantifiers_grammar | primitives_grammar
     else:
-        grammar = QuantifierGrammar.from_yaml(cfg.grammar.path)
+        grammar = QuantifierGrammar.from_yaml(cfg.expressions.grammar.path)
     return grammar
 
 
 def get_verified_models(expressions, uni):
     print("Binarizing referents")
-    all_models = uni.binarize_referents(mode="B")
-    flipped_models = uni.binarize_referents(mode="A")
+    all_models = uni.binarize_referents(mode="set_vectors_w_padding")
+    set_reference_models_A = uni.binarize_referents(mode="A")
+    set_reference_models_B = uni.binarize_referents(mode="B")
 
     # Create quantifiers like in original code
     print("Creating quantifiers")
@@ -316,7 +337,7 @@ def get_verified_models(expressions, uni):
     expression_names = np.array(
         [expression.term_expression for expression in expressions]
     )
-    return all_models, flipped_models, quantifiers, expression_names
+    return all_models, set_reference_models_A, set_reference_models_B, quantifiers, expression_names
 
 def calculate_term_expression_depth(expression):
     depth = 0
@@ -329,32 +350,47 @@ def calculate_term_expression_depth(expression):
             depth -= 1
     return max_depth
 
-@hydra.main(version_base=None, config_path="conf", config_name="expressions")
+import numpy as np
+import pandas as pd
+
+
+@hydra.main(version_base=None, config_path="conf", config_name="learn")
 def main(cfg: DictConfig) -> None:
 
-    uni = load_universe(cfg)
+    try:
+        uni = load_universe(cfg)
+    except FileNotFoundError:
+        print("Couldn't load the universe. Falling back to creating universe")
+        uni = create_universe(cfg.measures.monotonicity.universe.m_size, cfg.measures.monotonicity.universe.x_size)
     # Filter out referents with certain digits in their names (e.g. 3, 4)
-    uni = filter_universe(cfg, uni)
+    # EDIT: This is not recommended - M-only idices are intuitively 
+    # required to be represented to obtain interpretations of monotoncity that match intuition 
+    # uni = filter_universe(cfg, uni)
 
     grammar = load_grammar(cfg)
 
+    from omegaconf import OmegaConf 
+    print(OmegaConf.to_yaml(cfg))
+
     print("Reading expressions")
 
-    indices_tag = get_indices_tag(indices=cfg.grammar.indices)
+    indices_tag = get_indices_tag(indices=cfg.expressions.grammar.indices)
     expressions, _ = read_expressions(
         Path.cwd()
         / Path("learn_quant/outputs")
-        / Path(cfg.target)
+        / Path(cfg.expressions.target)
         / f"generated_expressions{indices_tag}.yml",
         uni,
-        add_indices=cfg.grammar.indices,
+        add_indices=cfg.expressions.grammar.indices,
         grammar=grammar,
     )
 
+    print("Finished loading expressions")
+
     # All models should not use binarize referents, but "get_truth_matrix"
     # Use b only and both?
-    all_models, flipped_models, quantifiers, expression_names = get_verified_models(
-        cfg, expressions, uni
+    all_models, set_reference_models_A, set_reference_models_B, quantifiers, expression_names = get_verified_models(
+        expressions, uni
     )
 
     # Select only quantifiers in the expression list (unless 'all' specified)
@@ -364,33 +400,46 @@ def main(cfg: DictConfig) -> None:
         quantifiers = quantifiers[indices]
         expression_names = expression_names[indices]
 
+    print(expression_names)
+
     print("Measuring monotonicity")
 
+    from tqdm import tqdm
     if "all" in cfg.measures.monotonicity.direction:
-        mon_values = np.empty(shape=(len(quantifiers), 1))
-        for i in range(len(quantifiers)):
+        mon_values = np.empty(shape=(len(quantifiers), 4))
+        for i in tqdm(range(len(quantifiers))):
             mon_values[i] = measure_monotonicity(
                 all_models,
-                flipped_models,
+                set_reference_models_A, 
+                set_reference_models_B,
                 quantifiers[i],
                 upward_monotonicity_entropy,
                 cfg,
-                name=expression_names[i],
             )
-        order_indices = np.argsort(mon_values, axis=0)[::-1]
+        #order_indices = np.argsort(mon_values, axis=0)[::-1]
         print("Monotonicity values len:", len(mon_values))
         print("expression_names len:", len(expression_names))
         print("quantifiers len:", len(quantifiers))
-        outputs = [
-            (expression_name, quantifier, mon_value)
-            for expression_name, quantifier, mon_value in zip(
-                expression_names[order_indices].tolist(),
-                quantifiers[order_indices].tolist(),
-                mon_values[order_indices].tolist(),
-            )
-        ]
-        for x in outputs:
-            print(x[0], " : ", x[2])
+
+        print(mon_values.shape)
+        print(expression_names.shape)
+        print(quantifiers.shape)
+            
+        df_mon = pd.DataFrame({
+            'expression_name': expression_names,
+            'right_upward': mon_values[:, 0],
+            'left_upward': mon_values[:, 1],
+            'right_downward': mon_values[:, 2],
+            'left_downward': mon_values[:, 3],
+            'degree': np.max(np.clip(mon_values, 0.0, 1.0), axis=1)
+        })
+
+        df_mon.to_csv(
+            Path.cwd()
+            / Path("learn_quant/outputs")
+            / Path(cfg.expressions.target)
+            / Path("monotonicity_values.csv")
+        )
 
 
 if __name__ == "__main__":

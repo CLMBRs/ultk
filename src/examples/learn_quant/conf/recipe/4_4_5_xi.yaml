@@ -16,14 +16,4 @@ universe:
   x_size: 4
   inclusive_universes: ${universe.inclusive_universes}
 
-measures:
-  expressions:
-    - subset_eq(A, B)
-  monotonicity:
-    debug: false
-    universe_filter:
-      - 3
-      - 4
-    direction:
-      - all
 

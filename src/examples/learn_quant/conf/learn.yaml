@@ -1,7 +1,7 @@
 defaults:
   - _self_
-  - model: ???
-  - override hydra/launcher: swarm # For use with Slurm 
+  - model: null
+#  - override hydra/launcher: swarm # For use with sweeping over 
 #  - override hydra/sweeper: sweep
 
 experiment_name: transformers_improved_2
@@ -44,6 +44,8 @@ expressions:
   index_file: "learn_quant/expressions_sample_2k.csv" # If set, examples will be trained in order according to the index file
 
 training:
+  #resume:
+  #  term_expression: and(and(not(subset_eq(A, B)), equals(cardinality(A), cardinality(B))), subset_eq(index(cardinality(A), union(A, B)), union(difference(A, B), difference(B, A))))
   strategy: multirun
   k_splits: 5
   n_runs: 1
@@ -68,13 +70,18 @@ criterion:
   _target_: torch.nn.BCEWithLogitsLoss
 
 measures:
+  expressions:
+      - all
   monotonicity:
     debug: false
     direction:
       - all
-    universe_filter:
-      - 3
-      - 4
+    universe:
+      x_size: 16
+      m_size: 16
+    #universe_filter:
+    #  - 3
+    #  - 4
 
 hydra: 
   sweeper:

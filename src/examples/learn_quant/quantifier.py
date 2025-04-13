@@ -74,6 +74,7 @@ class QuantifierModel(Referent):
 
     def binarize(self, mode="B") -> np.ndarray:
         """
+        Naive binarization of the quantifier name. Not suitable for monotonicity calculations / sub/supermodel identification.
         Binarizes the sequence of characters in the name attribute.
 
         Returns:
@@ -182,7 +183,64 @@ class QuantifierUniverse(Universe):
         return [referent.name for referent in self.referents]
 
     def binarize_referents(self, mode="B") -> np.ndarray:
-        return np.array([referent.binarize(mode=mode) for referent in self.referents])
+
+        lookup = np.array([
+                [1, 0, 1],  # digit '0'
+                [0, 1, 1],  # digit '1'
+                [1, 1, 1],  # digit '2'
+                [0, 0, 1],  # digit '3'
+                [0, 0, 0]   # digit '4'
+            ], dtype=np.uint8)
+
+        def encode_string(s):
+            # Convert the string to a numpy array of integers.
+            # Using frombuffer with encode and subtracting 48 (the ASCII value for '0') is efficient.
+            digits = np.frombuffer(s.encode('ascii'), dtype=np.uint8) - 48
+            # Lookup the binary arrays and flatten the result.
+            return lookup[digits].ravel()
+
+        def encode_array_of_strings(strings):
+            # Define the lookup table:
+            
+            """
+            Expects `strings` to be a NumPy array of fixed-length byte strings (dtype='S{L}').
+            Returns a 2D NumPy array where each row is the concatenated binary encoding.
+            """
+            # Determine fixed string length from the dtype.
+            L = strings.dtype.itemsize
+            
+            # Convert the entire array's bytes into a 2D array of shape (N, L)
+            # Each byte corresponds to the ASCII value of a digit.
+            digits = np.frombuffer(strings.tobytes(), dtype=np.uint8).reshape(-1, L) - ord('0')
+            
+            # Use the digits to index into the lookup table.
+            # This yields an array of shape (N, L, 4)
+            encoded = lookup[digits]
+            
+            # Flatten the last two dimensions for each string to get a (N, L*4) array.
+            return encoded.reshape(len(strings), -1)
+
+        if mode == "set_vectors_w_padding":
+
+            # Assume self.referents is your list of referents and each has a .name attribute.
+            names_list = [referent.name for referent in self.referents]
+
+            # Determine the maximum length among the strings.
+            max_length = max(len(name) for name in names_list)
+
+            # Convert the list into a fixed-length NumPy array.
+            # This will pad shorter strings with null bytes (b'\x00').
+            names_array = np.array(names_list, dtype=f'S{max_length}')
+
+            # Now you can pass `names_array` to encode_array_of_strings.
+            encoded = encode_array_of_strings(names_array)
+            return encoded
+        
+        elif mode == "set_vectors":
+            return np.array([encode_string(referent.name) for referent in self.referents])
+        
+        else:
+            return np.array([referent.binarize(mode=mode) for referent in self.referents])
 
 
 import random
