@@ -403,10 +403,8 @@ class Grammar:
             None
             if the_rule.rhs is None
             else tuple(
-                [
-                    self.generate(child_lhs, max_depth=max_depth, depth=depth + 1)
-                    for child_lhs in the_rule.rhs
-                ]
+                self.generate(child_lhs, max_depth=max_depth, depth=depth + 1)
+                for child_lhs in the_rule.rhs
             )
         )
         # if the rule is terminal, rhs will be empty, so no recursive calls to generate will be made in this comprehension
