@@ -4,7 +4,8 @@ from ultk.language.semantics import Referent
 from math import log
 
 T = TypeVar("T")
-Dataset = Iterable[tuple[Referent, T]]
+Datum = tuple[Referent, T]
+Dataset = Iterable[Datum]
 
 
 def all_or_nothing(data: Dataset, tree: GrammaticalExpression) -> float:
@@ -85,18 +86,20 @@ def noise_match(
             Returns:
                 float: Likelihood in log probability
     """
+    # If the item is correct then it was either correct or was mutated to from an incorrect option
+    # It could also have been the correct option originally and still mutated
     correct_chance = log(1 - alpha + alpha / possible_outputs)
+    # If the item is incorrect then it could've been mutated from a correct option
     incorrect_chance = log(alpha / possible_outputs)
 
-    def noise_match_probability(data: Dataset, tree: GrammaticalExpression) -> float:
-        matches = sum([tree(datum[0]) == datum[1] for datum in data])
-        return (len(data) - matches) * (incorrect_chance) + matches * (correct_chance)
+    def noise_match_probability(datum: Datum, tree: GrammaticalExpression) -> float:
+        return correct_chance if tree(datum[0]) == datum[1] else incorrect_chance
 
-    return noise_match_probability
+    return aggregate_individual_likelihoods(noise_match_probability)
 
 
 def aggregate_individual_likelihoods(
-    likelihood_function: Callable[[tuple[Referent, T], GrammaticalExpression], float],
+    likelihood_function: Callable[[Datum, GrammaticalExpression], float],
 ) -> Callable[[Dataset, GrammaticalExpression], float]:
     """Takes in a likelihood function for an individual datum (in log probability) returns a likelihood function which calls the
     individual probability function and calls it across the dataset, summing it to get the final probability.
@@ -106,7 +109,7 @@ def aggregate_individual_likelihoods(
     Args:
         Callable individual likelihood function:
             Args:
-                datum (Tuple[Referent, T]): An individual element from the dataset, the first element is the input, the second the output.
+                datum (Datum): An individual element from the dataset, the first element is the input, the second the output.
                 tree (GrammarticalExpression): GrammaticalExpression for likelihood calculation
             Returns:
                 float: Likelihood in log probability.
@@ -120,10 +123,10 @@ def aggregate_individual_likelihoods(
                 float: Likelihood in log probability
     """
 
-    def output(data: Dataset, tree: GrammaticalExpression) -> float:
+    def output_func(data: Dataset, tree: GrammaticalExpression) -> float:
         output = 0
         for datum in data:
             output += likelihood_function(datum, tree)
         return output
 
-    return output
+    return output_func
