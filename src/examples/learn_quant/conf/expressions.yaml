@@ -1,0 +1,15 @@
+# This file is used to generate expressions given a desired recipe for a grammar and universe. 
+# Resulting expressions are saved in nested folders organized by the size of models generated at `./outputs`.
+
+defaults:
+  - _self_
+  - recipe: ???
+
+output: "learn_quant/outputs/"
+
+mode: 
+  - generate
+
+save: true
+time_trial_log: M${universe.m_size}_X${universe.x_size}_D${grammar.depth}_idx-${grammar.indices}.csv
+
