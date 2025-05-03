@@ -1,0 +1,9 @@
+pandas
+numpy
+hydra
+hydra-submitit-launcher
+torch
+lightning
+scipy
+mlflow
+dill
