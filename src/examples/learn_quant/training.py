@@ -199,7 +199,9 @@ def compute_accuracy(outputs, targets):
 
     return accuracy
 
+
 from torch.optim.lr_scheduler import LambdaLR
+
 
 def train_loop(dataloader, model, criterion, optimizer, epochs, conditions=None):
 
@@ -211,7 +213,6 @@ def train_loop(dataloader, model, criterion, optimizer, epochs, conditions=None)
         if ledger["accuracy_tally"] >= 100 or ledger["loss_tally"] >= 100:
             return True
         return False
-
 
     size = len(dataloader.dataset)
     # Loop over epochs
@@ -259,7 +260,7 @@ def train_loop(dataloader, model, criterion, optimizer, epochs, conditions=None)
                 "batch": batch,
                 "epoch": epoch,
             }
-            #scheduler.step()
+            # scheduler.step()
 
         avg_train_loss = running_loss / len(dataloader)
         avg_train_accuracy = running_accuracy / len(dataloader)
@@ -287,7 +288,9 @@ class PositionalEncoding(nn.Module):
     def forward(self, x):
         # x shape: (batch_size, seq_len, d_model)
         # Add positional encoding to each sequence
-        x = x + self.pe[:, : x.size(1), :].detach()  # Apply across the sequence length dimension
+        x = (
+            x + self.pe[:, : x.size(1), :].detach()
+        )  # Apply across the sequence length dimension
         return x
 
 
@@ -306,7 +309,7 @@ class TransformerModel(nn.Module):
         num_encoder_layers=2,
         dim_feedforward=32,
         device="cpu",
-        pool_mode="mean"
+        pool_mode="mean",
     ):
         super(TransformerModel, self).__init__()
         self.device = device
@@ -324,12 +327,14 @@ class TransformerModel(nn.Module):
             num_encoder_layers=num_encoder_layers,
             dim_feedforward=dim_feedforward,
             device=device,
-            #dropout=0.1,
-            norm_first=True
+            # dropout=0.1,
+            norm_first=True,
         )
 
         # In the __init__ of TransformerModel
-        self.src_mask = nn.Transformer.generate_square_subsequent_mask(seq_len).to(self.device)
+        self.src_mask = nn.Transformer.generate_square_subsequent_mask(seq_len).to(
+            self.device
+        )
 
         self.fc_out = nn.Linear(
             d_model, num_classes, device=device
@@ -373,6 +378,7 @@ class TransformerModel(nn.Module):
 
         output = self.fc_out(x)  # Shape: (batch_size, num_classes)
         return output
+
 
 def train_base_pytorch(
     cfg: DictConfig,

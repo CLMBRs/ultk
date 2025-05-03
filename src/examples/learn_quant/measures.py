@@ -17,6 +17,7 @@ import mlflow
 # python -m learn_quant.monotonicity recipe=test_monotonicity
 # python -m learn_quant.monotonicity recipe=4_4_5_xi grammar.indices=false
 
+
 def binary_to_int(arr):
     """Converts a 2-D numpy array of 1s and 0s into integers, assuming each
     row is a binary number.  By convention, left-most column is 1, then 2, and
@@ -28,7 +29,9 @@ def binary_to_int(arr):
     return arr.dot(1 << np.arange(arr.shape[-1]))
 
 
-def upward_monotonicity_entropy(all_models, set_reference_models, quantifier, cfg, flip=False):
+def upward_monotonicity_entropy(
+    all_models, set_reference_models, quantifier, cfg, flip=False
+):
     """Measures degree of upward monotonicity of a quantifiers as
     1 - H(Q | true_pred) / H(Q) where H is (conditional) entropy, and true_pred is the
     variable over models saying whether there's a true _predecessor_ in the
@@ -53,7 +56,9 @@ def upward_monotonicity_entropy(all_models, set_reference_models, quantifier, cf
 
     # vector of length quantifier, has a 1 if that model has a true
     # predecessor, 0 otherwise
-    true_preds = get_true_predecessors(all_models, set_reference_models, quantifier, flip)
+    true_preds = get_true_predecessors(
+        all_models, set_reference_models, quantifier, flip
+    )
 
     # TODO: how to handle cases where true_preds is all 0s or all 1s, i.e.
     # where every model does have a true predecessor?  In that case, we have
@@ -66,9 +71,9 @@ def upward_monotonicity_entropy(all_models, set_reference_models, quantifier, cf
         return q_ent
     """
 
-    pred_weights = np.vectorize(lambda num, r_num: num_preds(model_ints, ref_model_ints, num, r_num, flip))(
-        model_ints, ref_model_ints
-    )
+    pred_weights = np.vectorize(
+        lambda num, r_num: num_preds(model_ints, ref_model_ints, num, r_num, flip)
+    )(model_ints, ref_model_ints)
 
     pred_prob = pred_weights / sum(pred_weights)
     # TODO: should these be weighted by pred_weights, i.e. pred_prob?
@@ -165,8 +170,12 @@ def measure_monotonicity(
             cfg,
         ),  # left upward monotonicity
         # downward monotonicity
-        measure(all_models, set_reference_models_A, quantifier, cfg, flip=True),  # right downward monotonicity
-        measure(all_models, set_reference_models_B, quantifier, cfg, flip=True), # left downward monotonicity
+        measure(
+            all_models, set_reference_models_A, quantifier, cfg, flip=True
+        ),  # right downward monotonicity
+        measure(
+            all_models, set_reference_models_B, quantifier, cfg, flip=True
+        ),  # left downward monotonicity
     ]
 
     # assert measure(all_models, quantifier, cfg,) == measure(1- all_models, quantifier, cfg, flip=True) == measure(flipped_models - both_models, quantifier, cfg, flip=True)
@@ -174,17 +183,28 @@ def measure_monotonicity(
     print("\t", interpretations)
 
     return interpretations
-    #return np.max(np.clip(interpretations, 0.0, 1.0))
+    # return np.max(np.clip(interpretations, 0.0, 1.0))
+
 
 def calculate_measure(cfg, measure, expression, universe):
     if measure == "monotonicity":
-        print(
-            "Calculating montonicity for expression: ", expression.term_expression
+        print("Calculating montonicity for expression: ", expression.term_expression)
+        (
+            all_models,
+            set_reference_models_A,
+            set_reference_models_B,
+            quantifiers,
+            expression_names,
+        ) = get_verified_models([expression], universe)
+        monotonicity = measure_monotonicity(
+            all_models,
+            set_reference_models_A,
+            set_reference_models_B,
+            quantifiers[0],
+            upward_monotonicity_entropy,
+            cfg=cfg,
+            name=expression_names[0],
         )
-        all_models, set_reference_models_A, set_reference_models_B, quantifiers, expression_names = (
-            get_verified_models([expression], universe)
-        )
-        monotonicity = measure_monotonicity(all_models, set_reference_models_A, set_reference_models_B, quantifiers[0], upward_monotonicity_entropy, cfg=cfg, name=expression_names[0])
         print("Monotonicity: ", monotonicity)
         mlflow.log_metric("monotonicity_entropic", float(monotonicity))
     if measure == "expression_depth":
@@ -192,8 +212,10 @@ def calculate_measure(cfg, measure, expression, universe):
         print("Monotonicity: ", monotonicity)
         mlflow.log_param("expression_depth", expression_depth)
 
+
 def has_same_base_model(ref_model_ints, r_num):
-    return (ref_model_ints == r_num)# & (ref_model_ints < 7)
+    return ref_model_ints == r_num  # & (ref_model_ints < 7)
+
 
 def get_preds(num_arr, num, flip=False):
     """Given an array of ints, and an int, get all predecessors of the
@@ -205,15 +227,18 @@ def get_preds(num_arr, num, flip=False):
     else:
         return num_arr & num == num
 
+
 def has_true_pred(num_arr, ref_model_ints, quantifier, num, r_num, flip=False):
     preds = get_preds(num_arr, num, flip)
-    #print(num)
-    #print(np.stack([quantifier, preds, has_same_base_model(ref_model_ints, r_num)], axis=1))
+    # print(num)
+    # print(np.stack([quantifier, preds, has_same_base_model(ref_model_ints, r_num)], axis=1))
     return np.any(quantifier * (preds * has_same_base_model(ref_model_ints, r_num)))
+
 
 def num_preds(num_arr, ref_model_ints, num, r_num, flip=False):
     preds = get_preds(num_arr, num, flip).astype(int)
     return sum(preds & has_same_base_model(ref_model_ints, r_num))
+
 
 def get_true_predecessors(all_models, set_reference_models, quantifier, flip=False):
 
@@ -224,7 +249,9 @@ def get_true_predecessors(all_models, set_reference_models, quantifier, flip=Fal
     # vector of length quantifier, has a 1 if that model has a true
     # predecessor, 0 otherwise
     true_preds = np.vectorize(
-        lambda num, r_num: has_true_pred(model_ints, ref_model_ints, quantifier, num, r_num, flip)
+        lambda num, r_num: has_true_pred(
+            model_ints, ref_model_ints, quantifier, num, r_num, flip
+        )
     )(model_ints, ref_model_ints).astype(int)
 
     # Find indices where true_preds equals 1
@@ -287,7 +314,9 @@ def load_universe(cfg):
         )
     except FileNotFoundError:
         print("Creating universe")
-        uni = create_universe(cfg.expressions.universe.m_size, cfg.expressions.universe.x_size)
+        uni = create_universe(
+            cfg.expressions.universe.m_size, cfg.expressions.universe.x_size
+        )
 
     print("Size of universe: ", len(uni.referents))
     return uni
@@ -327,7 +356,14 @@ def get_verified_models(expressions, uni):
     expression_names = np.array(
         [expression.term_expression for expression in expressions]
     )
-    return all_models, set_reference_models_A, set_reference_models_B, quantifiers, expression_names
+    return (
+        all_models,
+        set_reference_models_A,
+        set_reference_models_B,
+        quantifiers,
+        expression_names,
+    )
+
 
 def calculate_term_expression_depth(expression):
     depth = 0
@@ -340,6 +376,7 @@ def calculate_term_expression_depth(expression):
             depth -= 1
     return max_depth
 
+
 import numpy as np
 import pandas as pd
 
@@ -351,15 +388,19 @@ def main(cfg: DictConfig) -> None:
         uni = load_universe(cfg)
     else:
         print("Couldn't load the universe. Falling back to creating universe")
-        uni = create_universe(cfg.measures.monotonicity.universe.m_size, cfg.measures.monotonicity.universe.x_size)
+        uni = create_universe(
+            cfg.measures.monotonicity.universe.m_size,
+            cfg.measures.monotonicity.universe.x_size,
+        )
     # Filter out referents with certain digits in their names (e.g. 3, 4)
-    # EDIT: This is not recommended - M-only idices are intuitively 
-    # required to be represented to obtain interpretations of monotoncity that match intuition 
+    # EDIT: This is not recommended - M-only idices are intuitively
+    # required to be represented to obtain interpretations of monotoncity that match intuition
     # uni = filter_universe(cfg, uni)
 
     grammar = load_grammar(cfg)
 
-    from omegaconf import OmegaConf 
+    from omegaconf import OmegaConf
+
     print(OmegaConf.to_yaml(cfg))
 
     print("Reading expressions")
@@ -379,9 +420,13 @@ def main(cfg: DictConfig) -> None:
 
     # All models should not use binarize referents, but "get_truth_matrix"
     # Use b only and both?
-    all_models, set_reference_models_A, set_reference_models_B, quantifiers, expression_names = get_verified_models(
-        expressions, uni
-    )
+    (
+        all_models,
+        set_reference_models_A,
+        set_reference_models_B,
+        quantifiers,
+        expression_names,
+    ) = get_verified_models(expressions, uni)
 
     # Select only quantifiers in the expression list (unless 'all' specified)
     if "all" not in cfg.measures.expressions:
@@ -395,18 +440,19 @@ def main(cfg: DictConfig) -> None:
     print("Measuring monotonicity")
 
     from tqdm import tqdm
+
     if "all" in cfg.measures.monotonicity.direction:
         mon_values = np.empty(shape=(len(quantifiers), 4))
         for i in tqdm(range(len(quantifiers))):
             mon_values[i] = measure_monotonicity(
                 all_models,
-                set_reference_models_A, 
+                set_reference_models_A,
                 set_reference_models_B,
                 quantifiers[i],
                 upward_monotonicity_entropy,
                 cfg,
             )
-        #order_indices = np.argsort(mon_values, axis=0)[::-1]
+        # order_indices = np.argsort(mon_values, axis=0)[::-1]
         print("Monotonicity values len:", len(mon_values))
         print("expression_names len:", len(expression_names))
         print("quantifiers len:", len(quantifiers))
@@ -414,15 +460,17 @@ def main(cfg: DictConfig) -> None:
         print(mon_values.shape)
         print(expression_names.shape)
         print(quantifiers.shape)
-            
-        df_mon = pd.DataFrame({
-            'expression_name': expression_names,
-            'right_upward': mon_values[:, 0],
-            'left_upward': mon_values[:, 1],
-            'right_downward': mon_values[:, 2],
-            'left_downward': mon_values[:, 3],
-            'degree': np.max(np.clip(mon_values, 0.0, 1.0), axis=1)
-        })
+
+        df_mon = pd.DataFrame(
+            {
+                "expression_name": expression_names,
+                "right_upward": mon_values[:, 0],
+                "left_upward": mon_values[:, 1],
+                "right_downward": mon_values[:, 2],
+                "left_downward": mon_values[:, 3],
+                "degree": np.max(np.clip(mon_values, 0.0, 1.0), axis=1),
+            }
+        )
 
         df_mon.to_csv(
             Path.cwd()

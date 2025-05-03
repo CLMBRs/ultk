@@ -205,18 +205,17 @@ def save_inclusive_generation(
         indices_tag=indices_tag,
     )
 
+
 def set_vars(items):
     for key, value in items.items():
         os.environ[key] = str(value)
+
 
 def determine_start_index(cfg, expressions) -> int:
     if "resume" in cfg.training:
         try:
             for i, expression in enumerate(expressions):
-                if (
-                    expression.term_expression
-                    == cfg.training.resume.term_expression
-                ):
+                if expression.term_expression == cfg.training.resume.term_expression:
                     print(
                         "Resuming training from expression: ",
                         expression.term_expression,
@@ -227,11 +226,13 @@ def determine_start_index(cfg, expressions) -> int:
             print(e)
             return 0
 
+
 def define_index_bounds(cfg, start_index) -> tuple:
     if "index" in cfg.expressions:
         return (cfg.expressions.index, cfg.expressions.index + 1)
     elif cfg.expressions.n_limit:
         return (start_index, start_index + cfg.expressions.n_limit)
+
 
 def reorder_by_index_file(index_file):
     original_index_list = []
@@ -261,6 +262,7 @@ def print_vars(cfg):
     print("expressions.grammar.indices:", cfg.expressions.grammar.indices)
     print("expressions.universe.m_size:", cfg.expressions.universe.m_size)
     print("expressions.grammar.index_weight:", cfg.expressions.grammar.index_weight)
+
 
 def create_universe(m_size: int, x_size: int) -> QuantifierUniverse:
     """

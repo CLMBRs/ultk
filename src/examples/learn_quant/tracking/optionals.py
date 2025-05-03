@@ -6,18 +6,25 @@ import importlib
 _MLFLOW_FLAG = False
 _ACTUAL_MLFLOW = None
 
-class _MLFlowDummy():
-    '''Dummy element that can be called with everything.'''
+
+class _MLFlowDummy:
+    """Dummy element that can be called with everything."""
+
     def __getattribute__(self, name):
         return self
+
     def __call__(self, *args, **kwargs):
         return self
+
     def __enter__(self):
         return self
+
     def __exit__(self, *args, **kwargs):
         pass
+
     def get_tracking_uri(self):
         return None
+
 
 def set_mlflow(flag: bool):
     """
@@ -26,6 +33,7 @@ def set_mlflow(flag: bool):
     """
     global _MLFLOW_FLAG
     _MLFLOW_FLAG = flag
+
 
 def get_mlflow():
     """

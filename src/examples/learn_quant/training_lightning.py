@@ -19,6 +19,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 class LightningModel(L.LightningModule):
     def __init__(self, model, criterion, optimizer):
         super().__init__()
@@ -150,7 +151,6 @@ def wait_for_mlflow(max_retries=30, retry_delay=30):
     raise RuntimeError("MLflow server is unavailable after multiple retries.")
 
 
-
 class MLFlowConnectivityCallback(Callback):
     def __init__(self, retry_delay=30, max_retries=5):
         mlflow = get_mlflow()
@@ -169,7 +169,9 @@ class MLFlowConnectivityCallback(Callback):
 
         #  If there's no real URI (meaning mlflow is dummy), skip connectivity checks
         if not mlflow_tracking_uri or mlflow_tracking_uri.startswith("dummy"):
-            logger.debug("MLflow is disabled or dummy; skipping server connectivity check.")
+            logger.debug(
+                "MLflow is disabled or dummy; skipping server connectivity check."
+            )
             return
 
         if not is_mlflow_server_up(self.mlflow_tracking_uri):
@@ -188,9 +190,11 @@ class MLFlowConnectivityCallback(Callback):
                 trainer.should_stop = True
                 exit(1)
 
+
 def get_logger(cfg, mainrun, mlflow):
     if "mlflow" in cfg.tracking:
         from lightning.pytorch.loggers import MLFlowLogger
+
         mlf_logger = MLFlowLogger(
             experiment_name=f"{cfg.experiment_name}",
             log_model=True,
@@ -199,8 +203,10 @@ def get_logger(cfg, mainrun, mlflow):
         )
     else:
         from lightning.pytorch.loggers.logger import DummyLogger
+
         mlf_logger = DummyLogger()
     return mlf_logger
+
 
 def train_lightning(
     cfg: DictConfig,

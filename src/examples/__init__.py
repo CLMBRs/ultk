@@ -1,3 +1,1 @@
-"""Minimal examples demonstrating how to use ULTK.
-
-"""
+"""Minimal examples demonstrating how to use ULTK."""
