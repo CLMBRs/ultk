@@ -48,7 +48,7 @@ def enumerate_quantifiers(
 def generate_expressions(
     quantifiers_grammar: QuantifierGrammar,
     cfg: DictConfig,
-    universe = None,
+    universe=None,
 ):
 
     quantifiers_grammar, indices_tag = add_indices(
@@ -240,7 +240,7 @@ def generate_inclusive_expressions(quantifiers_grammar, cfg, save=True):
                 cfg.grammar.depth,
                 indices_tag=indices_tag,
             )
-            
+
 
 @hydra.main(version_base=None, config_path="../conf", config_name="expressions")
 def main(cfg: DictConfig) -> None:

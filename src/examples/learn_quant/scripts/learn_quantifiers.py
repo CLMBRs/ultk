@@ -14,26 +14,34 @@ import mlflow
 from ultk.util.io import read_grammatical_expressions
 
 from ultk.language.grammar import GrammaticalExpression
-from ..util import set_vars, print_vars, determine_start_index, define_index_bounds, reorder_by_index_file
+from ..util import (
+    set_vars,
+    print_vars,
+    determine_start_index,
+    define_index_bounds,
+    reorder_by_index_file,
+)
 from ..tracking.optionals import set_mlflow, get_mlflow
 from ..grammar import add_indices
 from ..sampling import DatasetInitializationError, get_data_loaders
-from ..training import QuantifierDataset, train_loop, MV_LSTM, set_device, train_base_pytorch
+from ..training import (
+    QuantifierDataset,
+    train_loop,
+    MV_LSTM,
+    set_device,
+    train_base_pytorch,
+)
 from ..training_lightning import (
     train_lightning,
     LightningModel,
     MLFlowConnectivityCallback,
 )
-from ..measures import (
-    load_grammar,
-    load_universe,
-    filter_universe,
-    calculate_measure
-)
+from ..measures import load_grammar, load_universe, filter_universe, calculate_measure
 import random
 from collections.abc import MutableMapping
 
 # HYDRA_FULL_ERROR=1 python -m learn_quant.scripts.script training.lightning=true training.strategy=multirun training.device=cpu model=mvlstm grammar.indices=false
+
 
 def flatten(dictionary, parent_key="", separator="_"):
     items = []
@@ -77,9 +85,8 @@ def train(
             mlf_logger,
         )
     else:
-        train_base_pytorch(
-            cfg, train_dataloader, validation_dataloader
-        )
+        train_base_pytorch(cfg, train_dataloader, validation_dataloader)
+
 
 def set_mlflow_experiment(cfg):
     if "mlflow" in cfg.tracking:
@@ -88,10 +95,13 @@ def set_mlflow_experiment(cfg):
     else:
         set_mlflow(False)
     mlflow = get_mlflow()
-    mlflow.set_tracking_uri(f"http://{cfg.tracking.mlflow.host}:{cfg.tracking.mlflow.port}")
+    mlflow.set_tracking_uri(
+        f"http://{cfg.tracking.mlflow.host}:{cfg.tracking.mlflow.port}"
+    )
     mlflow.set_experiment(f"{cfg.experiment_name}")
     mlflow.pytorch.autolog()
     return mlflow
+
 
 @hydra.main(version_base=None, config_path="../conf", config_name="learn")
 def main(cfg: DictConfig) -> None:
@@ -117,7 +127,7 @@ def main(cfg: DictConfig) -> None:
 
         grammar = load_grammar(cfg.expressions)
 
-        # Add indices as primitives to the grammar if specified. 
+        # Add indices as primitives to the grammar if specified.
         # If expressions.grammar.indices is set to False, no index primitives are added to the grammar.
         grammar, indices_tag = add_indices(
             grammar=grammar,
@@ -126,7 +136,11 @@ def main(cfg: DictConfig) -> None:
             weight=cfg.expressions.grammar.index_weight,
         )
 
-        expressions_path = cfg.expressions.output_dir + cfg.expressions.target + f"/generated_expressions{indices_tag}.yml"
+        expressions_path = (
+            cfg.expressions.output_dir
+            + cfg.expressions.target
+            + f"/generated_expressions{indices_tag}.yml"
+        )
         expressions, _ = read_grammatical_expressions(expressions_path, grammar)
         print("Read expressions from: ", expressions_path)
         print("Number of expressions: ", len(expressions))
@@ -135,7 +149,9 @@ def main(cfg: DictConfig) -> None:
 
         print("Loading universe...")
         universe = load_universe(cfg)
-        universe = filter_universe(cfg, universe) # This is ensuring that the universe does not have "M-only" or "X-only" subreferents, necessary for monotonicity calculation
+        universe = filter_universe(
+            cfg, universe
+        )  # This is ensuring that the universe does not have "M-only" or "X-only" subreferents, necessary for monotonicity calculation
 
         # If an expression is set for training.resume.term_expression, the start index will be set at that expression's index.
         # For running expressions one at a time, use expressions.index.
@@ -222,11 +238,13 @@ def main(cfg: DictConfig) -> None:
                             run_name=f"{fold}", nested=True
                         ) as childrun:
                             set_and_log_seeds()
-                            train_dataloader, validation_dataloader = get_data_loaders(cfg, 
-                                                                                       dataset, 
-                                                                                       mode=cfg.training.strategy, 
-                                                                                       train_val_ids=(train_ids, valid_ids),
-                                                                                       fold=fold)
+                            train_dataloader, validation_dataloader = get_data_loaders(
+                                cfg,
+                                dataset,
+                                mode=cfg.training.strategy,
+                                train_val_ids=(train_ids, valid_ids),
+                                fold=fold,
+                            )
                             train(
                                 cfg,
                                 expression,
@@ -241,9 +259,11 @@ def main(cfg: DictConfig) -> None:
                     for i in range(cfg.training.n_runs):
 
                         with mlflow.start_run(run_name=f"{i}", nested=True) as childrun:
-                            
+
                             set_and_log_seeds()
-                            train_dataloader, validation_dataloader = get_data_loaders(cfg, dataset, mode=cfg.training.strategy, i=i)
+                            train_dataloader, validation_dataloader = get_data_loaders(
+                                cfg, dataset, mode=cfg.training.strategy, i=i
+                            )
                             train(
                                 cfg,
                                 expression,

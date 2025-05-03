@@ -6,8 +6,10 @@ from scipy.stats import entropy
 from torch.utils.data import Dataset, DataLoader, DataLoader, SubsetRandomSampler
 import torch
 
+
 class DatasetInitializationError(Exception):
     """Custom exception to indicate dataset initialization failure."""
+
     pass
 
 
@@ -16,6 +18,7 @@ def get_random_n_items(dictionary, n):
         raise ValueError("Sample size cannot be larger than the dictionary size.")
     selected_keys = random.sample(list(dictionary), n)
     return {key: dictionary[key] for key in selected_keys}
+
 
 def shuffle_dictionary(dictionary):
     items = list(dictionary.items())
