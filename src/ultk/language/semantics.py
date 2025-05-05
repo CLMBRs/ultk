@@ -73,8 +73,9 @@ class Universe:
 
     referents: tuple[Referent, ...]
     prior: tuple[float, ...]
+    
+    def __init__(self, referents: tuple[Referent, ...], prior: tuple[float, ...] = None):
 
-    def __init__(self, referents, prior=None):
         # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
         object.__setattr__(self, "referents", referents)
         # When only referents are passed in, make the priors a unifrom distribution
