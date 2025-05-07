@@ -68,7 +68,7 @@ class IBLanguage:
     # Expected KL Divergence for the language
     # TODO: Check this
     @cached_property
-    def expected_divergence(self):
+    def expected_divergence(self) -> float:
         left = self.qwm * self.structure.meanings_prior
         # This should be able to be done better
         right = np.array(
