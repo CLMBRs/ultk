@@ -4,9 +4,9 @@ import numpy as np
 # Turns off warnings for functions which are known to take the log of 0
 def np_log_ignore(f):
     def wrap(*args, **kwargs):
-        np.seterr(divide="ignore")
+        np.seterr(divide="ignore", invalid="ignore")
         res = f(*args, **kwargs)
-        np.seterr(divide="warn")
+        np.seterr(divide="warn", invalid="warn")
         return res
 
     return wrap
