@@ -1,9 +1,11 @@
 
 from ultk.language.ib.ib_language import IBLanguage
 from ultk.language.ib.ib_structure import IBStructure
-from ultk.language.ib.ib_utils import kl_divergence
+from ultk.language.ib.ib_utils import generate_random_expressions, kl_divergence
 
 import numpy as np
+
+EPSILON = 0.00001
 
 
 # The original paper "The information bottleneck method" uses x̃ instead of w, x instead of m, and y instead of u
@@ -19,7 +21,9 @@ def normal(language: IBLanguage, beta: float) -> np.ndarray:
     return np.sum(np.exp(-beta*divergences)*language.expressions_prior[:, None])
     
 
-# Do an interation of the BA Algorithm
+# Do an iteration of the BA Algorithm
+# TODO: For some reason this always converges to a one-expression language
+# Most likely has something to do with the fact normalization is needed
 def recalculate_language(language: IBLanguage, beta: float) -> IBLanguage:
     # Recalculate qwm distribution
     left = language.expressions_prior/normal(language, beta)
@@ -31,10 +35,23 @@ def recalculate_language(language: IBLanguage, beta: float) -> IBLanguage:
     ))
     # Recalculate q(w|m)
     recalculated_qwm = (left[:, None]*right)
+    # Drop unused dimensions
+    recalculated_qwm = recalculated_qwm[~np.all(recalculated_qwm <= EPSILON, axis=1)]
     # Normalize (?????) TODO: This should not be needed, investigate
     recalculated_qwm /= np.sum(recalculated_qwm, axis=0)
     # Create new language
     return IBLanguage(language.structure, tuple({k: v for k, v in zip(language.structure.meanings, e)} for e in recalculated_qwm))
 
 def calculate_optimal(structure: IBStructure, beta: float) -> IBLanguage:
-    pass
+    language = IBLanguage(structure, expressions=generate_random_expressions(structure.meanings))
+
+    converged = False
+
+    while not converged:
+        old = language.complexity - beta*language.iwu
+        language = recalculate_language(language, beta)
+        if abs(language.complexity - beta*language.iwu - old) <= EPSILON:
+            converged = True
+        old = language.complexity - beta*language.iwu
+        
+    return language
