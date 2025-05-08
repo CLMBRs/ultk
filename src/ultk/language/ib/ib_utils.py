@@ -15,7 +15,7 @@ def np_log_ignore(f):
 # Take log of array and set all negative infinities to 0
 @np_log_ignore
 def safe_log(arr: np.ndarray):
-    A = np.log(arr)
+    A = np.log2(arr)
     A[np.isinf(A)] = 0
     A[np.isnan(A)] = 0
     return A
