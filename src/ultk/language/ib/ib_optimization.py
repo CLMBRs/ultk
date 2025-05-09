@@ -1,10 +1,8 @@
 from ultk.language.ib.ib_language import IBLanguage
 from ultk.language.ib.ib_structure import IBStructure
-from ultk.language.ib.ib_utils import generate_random_expressions, kl_divergence
+from ultk.language.ib.ib_utils import generate_random_expressions, kl_divergence, IB_EPSILON
 
 import numpy as np
-
-EPSILON = 0.00001
 
 
 # Calculate the normal function results for the meanings
@@ -19,8 +17,6 @@ def normal(language: IBLanguage, beta: float) -> np.ndarray:
 
 
 # Do an iteration of the BA Algorithm
-# TODO: For some reason this always converges to a one-expression language
-# Most likely has something to do with the fact normalization is needed
 def recalculate_language(language: IBLanguage, beta: float) -> IBLanguage:
     # Recalculate qwm distribution
     left = language.expressions_prior / normal(language, beta)
@@ -36,7 +32,7 @@ def recalculate_language(language: IBLanguage, beta: float) -> IBLanguage:
     # Recalculate q(w|m)
     recalculated_qwm = left[:, None] * right
     # Drop unused dimensions
-    recalculated_qwm = recalculated_qwm[~np.all(recalculated_qwm <= EPSILON, axis=1)]
+    recalculated_qwm = recalculated_qwm[~np.all(recalculated_qwm <= IB_EPSILON, axis=1)]
     # Normalize (?????) TODO: This should not be needed, investigate
     recalculated_qwm /= np.sum(recalculated_qwm, axis=0)
     # Create new language
@@ -59,7 +55,7 @@ def calculate_optimal(structure: IBStructure, beta: float) -> IBLanguage:
     while not converged:
         old = language.complexity - beta * language.iwu
         language = recalculate_language(language, beta)
-        if abs(language.complexity - beta * language.iwu - old) <= EPSILON:
+        if abs(language.complexity - beta * language.iwu - old) <= IB_EPSILON:
             converged = True
         old = language.complexity - beta * language.iwu
 

@@ -7,6 +7,8 @@ from ultk.util.frozendict import FrozenDict
 import numpy as np
 
 
+# TODO: REWRITE THIS TO HAVE NON-ZERO MEANINGS
+
 def generate_number_meanings(referents):
     return tuple(
         Meaning(FrozenDict({r: 1 if r.amount == i + 1 else 0 for r in referents}), None)

@@ -3,6 +3,7 @@ import numpy as np
 from ultk.language.semantics import Meaning
 from ultk.util.frozendict import FrozenDict
 
+IB_EPSILON = 0.00001
 
 # Turns off warnings for functions which are known to take the log of 0
 def np_log_ignore(f):
@@ -25,9 +26,10 @@ def safe_log(arr: np.ndarray):
 
 
 # Calculate the KL Divegence of 2 matricies
-# TODO: For some reason this gives a different result than scipy.stats' entropy
 @np_log_ignore
 def kl_divergence(arr1: np.ndarray, arr2: np.ndarray) -> float:
+    if (abs(np.sum(arr1) - 1) > IB_EPSILON or abs(np.sum(arr2) - 1) > IB_EPSILON):
+        raise ValueError("Arrays are not probability distributions")
     return np.sum(arr1 * safe_log(arr1 / arr2))
 
 

@@ -45,8 +45,8 @@ class IBStructure:
         # I do not want to assume everything is in a nice order
         return np.array(
             [
-                [meaning.mapping[referent] for referent in self.referents]
-                for meaning in self.meanings
+                [meaning.mapping[referent] for meaning in self.meanings]
+                for referent in self.referents
             ]
         )
 
