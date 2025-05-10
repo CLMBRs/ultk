@@ -2,7 +2,7 @@ import numpy as np
 
 from functools import cached_property
 from ultk.language.ib.ib_structure import IBStructure
-from ultk.language.ib.ib_utils import safe_log, kl_divergence
+from ultk.language.ib.ib_utils import mutual_information, kl_divergence
 from ultk.language.semantics import Meaning
 from ultk.util.frozendict import FrozenDict
 
@@ -10,49 +10,36 @@ from ultk.util.frozendict import FrozenDict
 # TODO: May or may not make this frozen, who knows
 class IBLanguage:
     structure: IBStructure
-    expressions: tuple[FrozenDict[Meaning, float], ...]
-    expressions_prior: np.ndarray
+    # qwm: Matrix to go from meaning probability distribution to word probability distribtion
+    qwm: np.ndarray
 
     def __init__(
         self,
         structure: IBStructure,
-        expressions: tuple[FrozenDict[Meaning, float], ...],
+        qwm: np.ndarray,
     ):
-        if len(expressions) == 0:
-            raise ValueError("Cannot have no expressions")
-        for expression in expressions:
-            for meaning in structure.meanings:
-                if meaning not in expression:
-                    raise ValueError("Expression list is invalid for given structure")
+        if len(qwm.shape) != 2:
+            raise ValueError("Must be a 2d matrix")
+        if qwm.shape[1] != structure.mu.shape[1]:
+            raise ValueError(
+                f"Input matrix is for {qwm.shape[1]} meanings, not {len(structure.meanings)}"
+            )
         self.structure = structure
-        self.expressions = expressions
-
-    # qwm: Matrix to go from meaning probability distribution to word probability distribution
-    @cached_property
-    def qwm(self) -> np.ndarray:
-        return np.array(
-            [
-                [expression[meaning] for meaning in self.structure.meanings]
-                for expression in self.expressions
-            ]
-        )
+        self.qwm = qwm
 
     # qmw: Matrix to go from word probability distribution to meaning probability distribution
     @cached_property
     def qmw(self) -> np.ndarray:
         # Apply Bayes' rule
         return (
-            self.qwm.transpose()
-            * self.structure.meanings_prior[:, None]
-            / self.expressions_prior
+            self.qwm.T * self.structure.meanings_prior[:, None] / self.expressions_prior
         )
 
-    # TODO: CHECK THIS MORE EXTENSIVELY
+    # This is consistent with IB Color naming data
     @cached_property
     def complexity(self) -> float:
-        return np.sum(
-            safe_log(self.qwm / self.expressions_prior[:, None])
-            * (self.qwm * self.structure.meanings_prior)
+        return mutual_information(
+            self.qwm, self.expressions_prior, self.structure.meanings_prior
         )
 
     @cached_property
@@ -84,7 +71,22 @@ class IBLanguage:
     # TODO: Check this extensively
     @cached_property
     def iwu(self) -> float:
-        A = safe_log(
-            self.reconstructed_meanings / self.structure.referents_prior[:, None]
+        return mutual_information(
+            self.reconstructed_meanings,
+            self.structure.referents_prior,
+            self.expressions_prior,
         )
-        return np.sum(A * (self.reconstructed_meanings * self.expressions_prior))
+
+
+def language_from_meaning_dict(
+    expressions: tuple[FrozenDict[Meaning[float], float], ...], structure: IBStructure
+) -> IBLanguage:
+    return IBLanguage(
+        structure,
+        np.array(
+            [
+                [expression[meaning] for meaning in structure.meanings]
+                for expression in expressions
+            ]
+        ),
+    )

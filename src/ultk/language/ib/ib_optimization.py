@@ -1,6 +1,10 @@
 from ultk.language.ib.ib_language import IBLanguage
 from ultk.language.ib.ib_structure import IBStructure
-from ultk.language.ib.ib_utils import generate_random_expressions, kl_divergence, IB_EPSILON
+from ultk.language.ib.ib_utils import (
+    generate_random_expressions,
+    kl_divergence,
+    IB_EPSILON,
+)
 
 import numpy as np
 
@@ -38,17 +42,12 @@ def recalculate_language(language: IBLanguage, beta: float) -> IBLanguage:
     # Create new language
     return IBLanguage(
         language.structure,
-        tuple(
-            {k: v for k, v in zip(language.structure.meanings, e)}
-            for e in recalculated_qwm
-        ),
+        recalculated_qwm,
     )
 
 
 def calculate_optimal(structure: IBStructure, beta: float) -> IBLanguage:
-    language = IBLanguage(
-        structure, expressions=generate_random_expressions(structure.meanings)
-    )
+    language = IBLanguage(structure, generate_random_expressions(structure.mu.shape[1]))
 
     converged = False
 
@@ -58,5 +57,8 @@ def calculate_optimal(structure: IBStructure, beta: float) -> IBLanguage:
         if abs(language.complexity - beta * language.iwu - old) <= IB_EPSILON:
             converged = True
         old = language.complexity - beta * language.iwu
+        print(
+            language.complexity, language.iwu, language.complexity - beta * language.iwu
+        )
 
     return language
