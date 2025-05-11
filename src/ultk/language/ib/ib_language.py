@@ -47,28 +47,29 @@ class IBLanguage:
         return self.qwm @ self.structure.meanings_prior
 
     # The reconstructed meanings from the decoder
-    # TODO: Check this
     @cached_property
     def reconstructed_meanings(self) -> np.ndarray:
         return self.structure.mu @ self.qmw
 
-    # Expected KL Divergence for the language
-    # TODO: Check this
+    # This is used in multiple places
+    # TODO: Check this, seems wrong in optimizer
     @cached_property
-    def expected_divergence(self) -> float:
-        left = self.qwm * self.structure.meanings_prior
-        # This should be able to be done better
-        right = np.array(
+    def divergence_array(self) -> np.ndarray:
+        return np.array(
             [
                 [kl_divergence(k, r) for k in self.structure.mu.T]
                 for r in self.reconstructed_meanings.T
             ]
         )
-        return np.sum(left * right)
+
+    # Expected KL Divergence for the language
+    @cached_property
+    def expected_divergence(self) -> float:
+        left = self.qwm * self.structure.meanings_prior
+        return np.sum(left * self.divergence_array)
 
     # I(W; U): Accuracy of the lexicon
     # Note: self.structure.mutual_information - self.iwu == self.expected_divergence
-    # TODO: Check this extensively
     @cached_property
     def iwu(self) -> float:
         return mutual_information(

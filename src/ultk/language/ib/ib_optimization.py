@@ -1,44 +1,35 @@
 from ultk.language.ib.ib_language import IBLanguage
 from ultk.language.ib.ib_structure import IBStructure
-from ultk.language.ib.ib_utils import (
-    generate_random_expressions,
-    kl_divergence,
-    IB_EPSILON,
-)
+from ultk.language.ib.ib_utils import generate_random_expressions, IB_EPSILON
 
 import numpy as np
 
 
 # Calculate the normal function results for the meanings
-def normal(language: IBLanguage, beta: float) -> np.ndarray:
-    divergences = np.array(
-        [
-            [kl_divergence(k, r) for k in language.structure.mu.T]
-            for r in language.reconstructed_meanings.T
-        ]
+def normals(language: IBLanguage, beta: float) -> np.ndarray:
+    return np.sum(
+        np.exp(-beta * language.divergence_array) * language.expressions_prior[:, None],
+        axis=0,
     )
-    return np.sum(np.exp(-beta * divergences) * language.expressions_prior[:, None])
 
 
 # Do an iteration of the BA Algorithm
 def recalculate_language(language: IBLanguage, beta: float) -> IBLanguage:
-    # Recalculate qwm distribution
-    left = language.expressions_prior / normal(language, beta)
-    right = np.exp(
-        -beta
-        * np.array(
-            [
-                [kl_divergence(k, r) for k in language.structure.mu.T]
-                for r in language.reconstructed_meanings.T
-            ]
-        )
-    )
     # Recalculate q(w|m)
-    recalculated_qwm = left[:, None] * right
+    recalculated_qwm = (
+        language.expressions_prior[:, None]
+        * np.exp(-beta * language.divergence_array)
+        / normals(language, beta)
+    )
+
+    # Normalize (This is not in the paper but embo does it)
+    # This should not be needed but its a nice sanity check, probably should throw a warning if
+    # recalculated_qwm's columns do not sum to 1
+    recalculated_qwm /= np.sum(recalculated_qwm, axis=0)
+
     # Drop unused dimensions
     recalculated_qwm = recalculated_qwm[~np.all(recalculated_qwm <= IB_EPSILON, axis=1)]
-    # Normalize (?????) TODO: This should not be needed, investigate
-    recalculated_qwm /= np.sum(recalculated_qwm, axis=0)
+
     # Create new language
     return IBLanguage(
         language.structure,

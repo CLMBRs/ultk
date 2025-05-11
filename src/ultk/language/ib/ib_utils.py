@@ -1,8 +1,5 @@
 import numpy as np
 
-from ultk.language.semantics import Meaning
-from ultk.util.frozendict import FrozenDict
-
 IB_EPSILON = 0.00001
 
 
