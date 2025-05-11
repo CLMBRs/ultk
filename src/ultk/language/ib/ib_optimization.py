@@ -3,6 +3,7 @@ from ultk.language.ib.ib_structure import IBStructure
 from ultk.language.ib.ib_utils import generate_random_expressions, IB_EPSILON
 
 import numpy as np
+import multiprocessing as mp
 
 
 # Calculate the normal function results for the meanings
@@ -48,8 +49,29 @@ def calculate_optimal(structure: IBStructure, beta: float) -> IBLanguage:
         if abs(language.complexity - beta * language.iwu - old) <= IB_EPSILON:
             converged = True
         old = language.complexity - beta * language.iwu
+        # TODO: Remove after debugging
         print(
-            language.complexity, language.iwu, language.complexity - beta * language.iwu
+            language.complexity,
+            language.iwu,
+            language.complexity - beta * language.iwu,
+            sep="\t",
         )
 
     return language
+
+
+# Modified from embo/Lindsay Skinner's code
+# TODO: Test
+def get_optimial_languages(
+    structure: IBStructure, start: float, end: float, steps: int, threads: int = 1
+) -> tuple[tuple[IBLanguage, float], ...]:
+    # Get beta values
+    beta_vec = np.linspace(start, end, steps)
+
+    # Parallel computing of compression for desired beta values
+    with mp.Pool(processes=threads) as pool:
+        results = [
+            pool.apply_async(calculate_optimal, args=(structure, b)) for b in beta_vec
+        ]
+        langs = tuple(p.get() for p in results)
+    return tuple(zip(langs, beta_vec))
