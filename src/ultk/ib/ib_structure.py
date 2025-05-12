@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import cached_property
-from ultk.language.ib.ib_utils import mutual_information
+from ultk.ib.ib_utils import mutual_information
 from ultk.language.semantics import Meaning, Referent
 
 import numpy as np

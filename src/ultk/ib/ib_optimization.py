@@ -1,15 +1,18 @@
-from ultk.language.ib.ib_language import IBLanguage
-from ultk.language.ib.ib_structure import IBStructure
-from ultk.language.ib.ib_utils import generate_random_expressions, IB_EPSILON
+from ultk.ib.ib_language import IBLanguage
+from ultk.ib.ib_structure import IBStructure
+from ultk.ib.ib_utils import generate_random_expressions, IB_EPSILON
 
 import numpy as np
 import multiprocessing as mp
+import math
+
+LOG_2 = math.log(2)
 
 
 # Calculate the normal function results for the meanings
 def normals(language: IBLanguage, beta: float) -> np.ndarray:
     return np.sum(
-        np.exp(-beta * language.divergence_array) * language.expressions_prior[:, None],
+        np.exp(-beta * language.divergence_array * LOG_2) * language.expressions_prior[:, None],
         axis=0,
     )
 
@@ -19,7 +22,7 @@ def recalculate_language(language: IBLanguage, beta: float) -> IBLanguage:
     # Recalculate q(w|m)
     recalculated_qwm = (
         language.expressions_prior[:, None]
-        * np.exp(-beta * language.divergence_array)
+        * np.exp(-beta * language.divergence_array * LOG_2)
         / normals(language, beta)
     )
 
@@ -42,12 +45,20 @@ def calculate_optimal(structure: IBStructure, beta: float) -> IBLanguage:
     language = IBLanguage(structure, generate_random_expressions(structure.mu.shape[1]))
 
     converged = False
+    close_attempts = 0
+
+    languages = []
 
     while not converged:
+        languages.append(language)
         old = language.complexity - beta * language.iwu
         language = recalculate_language(language, beta)
         if abs(language.complexity - beta * language.iwu - old) <= IB_EPSILON:
-            converged = True
+            close_attempts += 1
+            if close_attempts > 5:
+                converged = True
+        else:
+            close_attempts = 0
         old = language.complexity - beta * language.iwu
         # TODO: Remove after debugging
         print(
@@ -57,7 +68,9 @@ def calculate_optimal(structure: IBStructure, beta: float) -> IBLanguage:
             sep="\t",
         )
 
-    return language
+    languages.append(language)
+
+    return languages
 
 
 # Modified from embo/Lindsay Skinner's code

@@ -1,8 +1,8 @@
 import numpy as np
 
 from functools import cached_property
-from ultk.language.ib.ib_structure import IBStructure
-from ultk.language.ib.ib_utils import mutual_information, kl_divergence
+from ultk.ib.ib_structure import IBStructure
+from ultk.ib.ib_utils import mutual_information, kl_divergence
 from ultk.language.semantics import Meaning
 from ultk.util.frozendict import FrozenDict
 
