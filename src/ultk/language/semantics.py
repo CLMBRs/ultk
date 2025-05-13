@@ -1,20 +1,20 @@
 """Classes for modeling the meanings of a language.
 
-    Meanings are modeled as things which map linguistic forms to objects of reference. The linguistic forms and objects of reference can in principle be very detailed, and future work may elaborate the meaning classes and implement a Form class.
+Meanings are modeled as things which map linguistic forms to objects of reference. The linguistic forms and objects of reference can in principle be very detailed, and future work may elaborate the meaning classes and implement a Form class.
 
-    In efficient communication analyses, simplicity and informativeness can be measured as properties of semantic aspects of a language. E.g., a meaning is simple if it is easy to represent, or to compress into some code; a meaning is informative if it is easy for a listener to recover a speaker's intended literal meaning.
+In efficient communication analyses, simplicity and informativeness can be measured as properties of semantic aspects of a language. E.g., a meaning is simple if it is easy to represent, or to compress into some code; a meaning is informative if it is easy for a listener to recover a speaker's intended literal meaning.
 
-    Examples:
+Examples:
 
-        >>> from ultk.language.semantics import Referent, Meaning, Universe
-        >>> from ultk.language.language import Expression
-        >>> # construct the meaning space for numerals
-        >>> numerals_universe = NumeralUniverse(referents=[NumeralReferent(str(i)) for i in range(1, 100)])
-        >>> # construct a list of referents for the expression 'a few'
-        >>> a_few_refs = [NumeralReferent(name=str(i)) for i in range(2, 6)]
-        >>> a_few_meaning = NumeralMeaning(referents=a_few_refs, universe=numerals_universe)
-        >>> # define the expression
-        >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
+    >>> from ultk.language.semantics import Referent, Meaning, Universe
+    >>> from ultk.language.language import Expression
+    >>> # construct the meaning space for numerals
+    >>> numerals_universe = NumeralUniverse(referents=[NumeralReferent(str(i)) for i in range(1, 100)])
+    >>> # construct a list of referents for the expression 'a few'
+    >>> a_few_refs = [NumeralReferent(name=str(i)) for i in range(2, 6)]
+    >>> a_few_meaning = NumeralMeaning(referents=a_few_refs, universe=numerals_universe)
+    >>> # define the expression
+    >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
 """
 
 from dataclasses import dataclass
@@ -110,6 +110,14 @@ class Universe:
         return len(self.referents)
 
     @classmethod
+    def _calculate_prior(cls, referents: tuple[Referent]):
+        default_prob = 1 / len(referents)
+        prior = tuple(
+            getattr(referent, "probability", default_prob) for referent in referents
+        )
+        return prior
+
+    @classmethod
     def from_dataframe(cls, df: pd.DataFrame):
         """Build a Universe from a DataFrame.
         It's assumed that each row specifies one Referent, and each column will be a property
@@ -184,6 +192,9 @@ class Meaning(Generic[T]):
     def is_uniformly_false(self) -> bool:
         """Return True if all referents in the meaning are mapped to False (or coercible to False).In the case where the meaning type is boolean, this corresponds to the characteristic function of the empty set."""
         return all(not value for value in self.mapping.values())
+
+    def get_binarized_meaning(self):
+        return np.array(list(self.mapping.values())).astype(int)
 
     def __getitem__(self, key: Referent) -> T:
         return self.mapping[key]

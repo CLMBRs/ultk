@@ -1,0 +1,108 @@
+# This configuration is used to train Pytorch models generated quantifier expressions.
+# It can be modified to either run a loop in a single process over multiple expressions, or to swarm learning jobs using `slurm`.
+
+
+defaults:
+  - _self_
+  - model: null
+# To use the slurm launcher, you need to set the following options in the defaults list:
+#  - override hydra/launcher: swarm # For use with launching multiple jobs via slurm 
+#  - override hydra/sweeper: sweep
+
+experiment_name: transformers_improved_2 # Name of the experiment to be created in MLFlow
+notes: |
+  This run is to evaluate the neural learning quantifiers and logging in MLFlow.
+
+tracking:
+  mlflow:
+    active: true
+    host: g3116 # This could be an IP address or a hostname (job name in slurm)
+    port: 5000
+    vars:
+      MLFLOW_SYSTEM_METRICS_ENABLED: "true"
+      MLFLOW_HTTP_REQUEST_MAX_RETRIES: "8"
+      MLFLOW_HTTP_REQUEST_BACKOFF_FACTOR: "60"
+
+# Options to define where the expressions should be created and/or loaded, how they should be represented, and how they should be generated.
+# The expressions are generated from a grammar, which is defined in the grammar.yml file.
+# The grammar is used to generate the expressions, and the expressions are then used to create the dataset used by the training script.
+expressions:
+  n_limit: 2000
+  output_dir: learn_quant/outputs/
+  grammar:
+    depth: 5
+    path: learn_quant/grammar.yml
+    indices: false # If set to true, the index primitives will be used in the grammar. Specific integer indices can also be set.
+    index_weight: 2.0
+  universe:
+    x_size: 4
+    m_size: 4
+  representation: one_hot
+  downsampling: true
+  generation_args:
+    batch_size: 1000
+    n_limit: 5000 # Minimum number of sample rows in dataset for a *single* class. Full dataset length is 2 * n_limit.
+    M_size: 12
+    X_size: 16
+    entropy_threshold: 0.01
+    inclusive: False
+  batch_size: 64
+  split: 0.8
+  target: "M${expressions.universe.m_size}/X${expressions.universe.x_size}/d${expressions.grammar.depth}"
+  index_file: "learn_quant/expressions_sample_2k.csv" # If set, examples will be trained in order according to the index file
+
+training:
+  # Given an expressions file, the "resume" key will ensure that the training will continue from the designated expression in the file.
+  #resume:
+  #  term_expression: and(and(not(subset_eq(A, B)), equals(cardinality(A), cardinality(B))), subset_eq(index(cardinality(A), union(A, B)), union(difference(A, B), difference(B, A))))
+  strategy: multirun
+  k_splits: 5
+  n_runs: 1
+  lightning: true
+  device: cpu
+  epochs: 50
+  conditions: false
+  early_stopping:
+    threshold: 0.05
+    monitor: val_loss
+    min_delta: 0.001
+    patience: 20
+    mode: min
+    check_on_train_epoch_end: false
+
+optimizer:
+  _partial_: true
+  _target_: torch.optim.Adam
+  lr: 1e-3
+
+criterion:
+  _target_: torch.nn.BCEWithLogitsLoss
+
+
+# This section defines how the measures will be calculated.
+# This is an example of how to use the measures module to calculate the monotonicity of the expressions.
+# This will search for an expressions file that fits the given arguments and then calculate the monotonicity of the expressions. 
+# HYDRA_FULL_ERROR=1 python -m learn_quant.measures ++expressions.grammar.depth=3 ++expressions.grammar.index_weight=5.0 ++expressions.grammar.indices="[0,3]"
+measures:
+  expressions:
+    - all
+    #  - or(subset_eq(A, B), subset_eq(B, A))
+  monotonicity:
+    debug: false
+    direction:
+      - all
+    create_universe: false # This creates a universe for the purpose of evaluating monotonicity
+    universe:
+      x_size: 6
+      m_size: 6
+    # If you want to filter out certain representations in the universe, you can use the 'universe_filter' key.
+    # This will filter out models with indices of the given
+    #universe_filter:
+    #  - 3
+    #  - 4
+
+# The hydra sweeper is used in tandem with the hydra slurm launcher to launch individual jobs for each expression.
+hydra: 
+  sweeper:
+    params:
+      +expressions.index: range(0, ${expressions.n_limit})
