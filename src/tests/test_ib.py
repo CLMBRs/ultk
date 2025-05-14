@@ -2,7 +2,7 @@ from math import log2
 import pytest
 import numpy as np
 
-from ultk.effcomm.ib.ib_language import IBLanguage
+from ultk.effcomm.ib.ib_language import IBLanguage, language_from_meaning_dict
 from ultk.effcomm.ib.ib_structure import IBStructure, structure_from_meanings
 from ultk.effcomm.ib.ib_utils import (
     IB_EPSILON,
@@ -165,6 +165,25 @@ class TestIB:
             == self.simple_lang.expected_divergence
         )
 
+    def test_language_from_meaning(self):
+        referents = (Referent("1", prob=0.25), Referent("2", prob=0.75))
+        meanings = tuple(
+            Meaning(FrozenDict({r: r.prob for r in referents}), None) for _ in range(2)
+        )
+        expressions = (FrozenDict({m: 1 for m in meanings}),)
+        output = language_from_meaning_dict(expressions, meanings, self.simple_struct)
+        assert np.array_equal(output.qwm, np.array([[1, 1]]))
+
+    def test_ib_langauge_check(self):
+        with pytest.raises(ValueError):
+            lang_wrong_shape = IBLanguage(self.simple_struct, np.array([1]))
+        with pytest.raises(ValueError):
+            lang_wrong_shape2 = IBLanguage(self.simple_struct, np.array([[1]]))
+        with pytest.raises(ValueError):
+            lang_invalid_probability = IBLanguage(
+                self.simple_struct, np.array([[2, 2]])
+            )
+
     # Tests for ib_optimization.py
     def test_normals_calculation(self):
         assert np.array_equal(normals(self.simple_lang, 1), np.array([1, 1]))
@@ -174,4 +193,4 @@ class TestIB:
         recalculated = recalculate_language(self.simple_lang, 1)
         assert np.array_equal(self.simple_lang.qwm, recalculated.qwm)
         recalculated = recalculate_language(self.complex_lang, 1)
-        assert np.array_equal(self.simple_lang.qwm, recalculated.qwm)
+        assert np.array_equal(recalculated.qwm, np.array([[0.5, 0.5], [0.5, 0.5]]))
