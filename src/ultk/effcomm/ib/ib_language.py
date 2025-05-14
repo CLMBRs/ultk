@@ -46,7 +46,7 @@ class IBLanguage:
             raise ValueError("Must be a 2d matrix")
         if qwm.shape[1] != structure.pum.shape[1]:
             raise ValueError(
-                f"Input matrix is for {qwm.shape[1]} meanings, not {len(structure.meanings)}"
+                f"Input matrix is for {qwm.shape[1]} meanings, not {structure.pum.shape[1]}"
             )
         if (np.abs(np.sum(qwm, axis=0) - 1) > IB_EPSILON).any():
             raise ValueError(

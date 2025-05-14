@@ -56,7 +56,7 @@ class IBStructure:
             (
                 prior
                 if prior is not None
-                else np.array([1 / len(pum.shape[1]) for _ in range(pum.shape[1])])
+                else np.array([1 / pum.shape[1] for _ in range(pum.shape[1])])
             ),
         )
         object.__setattr__(self, "pum", pum)

@@ -59,6 +59,8 @@ def mutual_information(pxy: np.ndarray, px: np.ndarray, py: np.ndarray) -> float
         raise ValueError("Arrays are not probability distributions")
     if (np.abs(np.sum(pxy, axis=0) - 1) > IB_EPSILON).any():
         raise ValueError("All columns of conditional probability matrix must sum to 1")
+    if pxy.shape[0] != px.shape[0] or pxy.shape[1] != py.shape[0]:
+        raise ValueError("pxy is not ||px|| x ||py||")
     return np.sum(safe_log(pxy / px[:, None]) * (pxy * py))
 
 
