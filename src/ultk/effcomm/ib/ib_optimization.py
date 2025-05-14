@@ -73,7 +73,7 @@ def calculate_optimal(
 
     Args:
         structure (IBStructure): The structure for which the language will be optimized
-        beta (float): Beta to calculate the normal at
+        beta (float): Beta to calculate the optimal at
         start (IBLanguage, optional): A starting point for the optimizer. If not passed in a random langauge will be generated and used
 
     Returns:
@@ -106,6 +106,18 @@ def calculate_optimal(
 def get_optimial_languages(
     structure: IBStructure, start: float, end: float, steps: int, threads: int = 1
 ) -> tuple[tuple[IBLanguage, float], ...]:
+    """Finds the optimal languages for a given range of beta values, can be multithreaded
+
+    Args:
+        structure (IBStructure): The structure for which the language will be optimized
+        start (float): Start of the beta range
+        end (float): End of the beta range
+        steps (int): The number of betas to calculate
+        threads (int, default 1): The number of threads to parallel process
+
+    Returns:
+        tuple[tuple[IBLanguage, float], ...]: Languages and their respective beta values.
+    """
     # Get beta values
     beta_vec = np.linspace(start, end, steps)
 
