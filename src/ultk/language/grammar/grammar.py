@@ -383,7 +383,7 @@ class Grammar:
                     )
                 )
         if len(stack) != 1:
-            raise ValueError("Could not parse string {expression}")
+            raise ValueError(f"Could not parse string {expression}")
         return stack[0]
 
     def generate(self, lhs: Any = None, max_depth=3, depth=0) -> GrammaticalExpression:
