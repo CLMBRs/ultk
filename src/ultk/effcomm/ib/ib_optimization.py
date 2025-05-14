@@ -1,4 +1,3 @@
-import pickle
 from ultk.effcomm.ib.ib_language import IBLanguage
 from ultk.effcomm.ib.ib_structure import IBStructure
 from ultk.effcomm.ib.ib_utils import generate_random_expressions, IB_EPSILON
@@ -12,6 +11,17 @@ LOG_2 = math.log(2)
 
 # Calculate the normal function results for the meanings
 def normals(language: IBLanguage, beta: float) -> np.ndarray:
+    """Calculates the normals (Z(x, b)) for a given language.
+    NOTE: This will break if beta is too high and the language is not near fully complex (i.e. language.qwm is not nearing the identity matrix).
+    This is because language.divergence_array will have extremely high values which will cause the exponentiation to go down to a full 0 array.
+
+    Args:
+        language (IBLanguage): Language to calculate the normals of
+        beta (float): Beta to calculate the normal at
+
+    Returns:
+        np.ndarray: Array of normals for each meaning in the structure .
+    """
     return np.sum(
         np.exp(-beta * language.divergence_array * LOG_2)
         * language.expressions_prior[:, None],
@@ -19,8 +29,18 @@ def normals(language: IBLanguage, beta: float) -> np.ndarray:
     )
 
 
-# Do an iteration of the BA Algorithm
 def recalculate_language(language: IBLanguage, beta: float) -> IBLanguage:
+    """Run an iteration of the BA algorithm to get the language closer to the optimal language for the given beta
+    NOTE: As with normals this function will break if beta is too high and the language is not nearly fully complex (i.e. language.qwm is not nearing the identity matrix).
+    This is because normals will return a matrix filled with 0s, which will invalidate the math inside the function.
+
+    Args:
+        language (IBLanguage): Language to run the BA algorithm on
+        beta (float): Beta to calculate the normal at
+
+    Returns:
+        IBLanguage: An updated language which is closer to the optimal language.
+    """
     # Recalculate q(w|m)
     recalculated_qwm = (
         language.expressions_prior[:, None]
@@ -46,10 +66,23 @@ def recalculate_language(language: IBLanguage, beta: float) -> IBLanguage:
 def calculate_optimal(
     structure: IBStructure, beta: float, start: IBLanguage = None
 ) -> IBLanguage:
+    """Find the optimal language for a given beta given a structure
+    NOTE: As with recalculate_language this function will break if beta is too high and the seed language is not nearly fully complex (i.e. language.qwm is not nearing the identity matrix).
+    This is because recalculate_language will break under these conditions (see notes for it).
+    NOTE: This is not guaranteed to find the exact optimal language, as it can get stuck near the optimal frontier. It may be based to use run_deterministic_annealing
+
+    Args:
+        structure (IBStructure): The structure for which the language will be optimized
+        beta (float): Beta to calculate the normal at
+        start (IBLanguage, optional): A starting point for the optimizer. If not passed in a random langauge will be generated and used
+
+    Returns:
+        IBLanguage: An updated language which is closer to the optimal language.
+    """
     language = (
         start
         if start is not None
-        else IBLanguage(structure, generate_random_expressions(structure.mu.shape[1]))
+        else IBLanguage(structure, generate_random_expressions(structure.pum.shape[1]))
     )
 
     converged = False
@@ -85,16 +118,30 @@ def get_optimial_languages(
     return tuple(zip(langs, beta_vec))
 
 
-# Notes about this to include in docstrings
-# If going for a deverse deterministic annealing approach, make sure that the seed
-# is a language where qwm is the idenitity matrix, this is because otherwise recalculate_language
-# will have floating point rounding error
 def run_deterministic_annealing(
     structure: IBStructure,
     betas: tuple[float, ...],
     verbose: bool = False,
     seed: IBLanguage = None,
 ) -> tuple[tuple[IBLanguage, float], ...]:
+    """Run forward or reverse deterministic annealing approach. This means that it will start either with a very high value of beta and work down (reverse)
+    or a very low value of beta and work up (forward). When going to a new value of beta it will seed the optimizer with the output of the previous beta iteration
+    in an attempt to avoid getting stuck on local maxima.
+
+    For reverse deterministic annealing betas can start at around 2^13, and for forward they can start at 0. Betas should not be evenly spaced.
+
+    NOTE: If doing reverse deterministic annealing you should seed the function with a near fully complex language (i.e. one where the qwm is near the idenity matrix).
+    For more information on why see the notes for calculate_optimial
+
+    Args:
+        structure (IBStructure): The structure for which the languages will be optimized
+        betas (float): The betas to optimize for, this will be iterated through in order
+        verbose (bool): Output to console when languages converge
+        start (IBLanguage, optional): A starting point for the annealing run. If not passed in a random langauge will be generated and used
+
+    Returns:
+        tuple[tuple[IBLanguage, float], ...]: Languages and their respective beta values.
+    """
     languages = [calculate_optimal(structure, betas[0], seed)]
 
     if verbose:
