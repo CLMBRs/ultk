@@ -1,0 +1,55 @@
+,expression_name,right_upward,left_upward,right_downward,left_downward,degree
+0,"subset_eq(A, A)",1.0,1.0,1.0,1.0,1.0
+1,"subset_eq(A, B)",1.0,0.0,0.0,1.0,1.0
+2,"subset_eq(B, A)",0.0,1.0,1.0,0.0,1.0
+3,"and(subset_eq(A, B), subset_eq(B, A))",0.3274295335058224,0.3274295335058224,0.3274295335058224,0.3274295335058224,0.3274295335058224
+4,"or(subset_eq(A, B), subset_eq(B, A))",0.0,0.0,0.0,0.0,0.0
+5,"not(subset_eq(A, B))",0.12265103249181153,1.0,1.0,0.12265103249181153,1.0
+6,"not(subset_eq(B, A))",1.0,0.12265103249181153,0.12265103249181153,1.0,1.0
+7,"equals(0, cardinality(A))",1.0,0.0,1.0,1.0,1.0
+8,"subset_eq(A, difference(A, B))",0.0,0.0,1.0,1.0,1.0
+9,"subset_eq(A, index(0, A))",1.0,0.0,1.0,1.0,1.0
+10,"subset_eq(A, index(0, B))",0.6698098006392883,0.0,0.6926300777028094,1.0,1.0
+11,"subset_eq(A, index(3, B))",1.0,0.0,0.646256509653487,1.0,1.0
+12,"equals(0, cardinality(B))",0.0,1.0,1.0,1.0,1.0
+13,"subset_eq(B, index(0, A))",0.0,0.6698098006392883,1.0,0.6926300777028094,1.0
+14,"subset_eq(B, index(0, B))",0.0,1.0,1.0,1.0,1.0
+15,"subset_eq(B, index(3, A))",0.0,1.0,1.0,0.646256509653487,1.0
+16,"subset_eq(index(0, A), B)",1.0,0.0,0.0,0.5102091098991903,1.0
+17,"subset_eq(index(0, B), A)",0.0,1.0,0.5102091098991903,0.0,1.0
+18,"subset_eq(index(3, A), B)",1.0,0.0,0.0,1.0,1.0
+19,"subset_eq(index(3, B), A)",0.0,1.0,1.0,0.0,1.0
+20,"subset_eq(union(A, B), difference(A, A))",0.428314266273062,0.428314266273062,1.0,1.0,1.0
+21,"subset_eq(union(A, B), index(0, A))",0.27801473339659377,0.40562380764262673,1.0,0.7941022027990039,1.0
+22,"subset_eq(union(A, B), index(0, B))",0.40562380764262673,0.27801473339659377,0.7941022027990039,1.0,1.0
+23,"subset_eq(intersection(A, B), index(0, A))",0.0,0.0,1.0,1.0,1.0
+24,"subset_eq(intersection(A, B), index(0, B))",0.0,0.0,1.0,1.0,1.0
+25,"subset_eq(intersection(A, B), index(3, A))",0.0,0.0,1.0,0.8472874862593256,1.0
+26,"subset_eq(intersection(A, B), index(3, B))",0.0,0.0,0.8472874862593256,1.0,1.0
+27,"subset_eq(difference(A, B), index(0, A))",1.0,0.0,0.0,1.0,1.0
+28,"subset_eq(difference(A, B), index(3, A))",1.0,0.0,0.0,0.8472874862593256,1.0
+29,"subset_eq(difference(B, A), index(0, B))",0.0,1.0,1.0,0.0,1.0
+30,"subset_eq(difference(B, A), index(3, B))",0.0,1.0,0.8472874862593256,0.0,1.0
+31,"subset_eq(index(0, A), difference(A, B))",0.0,0.0,1.0,0.5102091098991903,1.0
+32,"subset_eq(index(0, A), index(0, B))",0.5483204103904731,0.0,0.25316915965633924,0.3261638365103722,0.5483204103904731
+33,"subset_eq(index(0, B), difference(B, A))",0.0,0.0,0.5102091098991903,1.0,1.0
+34,"subset_eq(index(0, B), index(0, A))",0.0,0.5483204103904731,0.3261638365103722,0.25316915965633924,0.5483204103904731
+35,"subset_eq(index(3, A), difference(A, A))",1.0,0.0,1.0,1.0,1.0
+36,"subset_eq(index(3, A), difference(A, B))",0.0,0.0,1.0,1.0,1.0
+37,"subset_eq(index(3, A), index(0, B))",0.4418898300930877,0.0,0.8864117240057774,1.0,1.0
+38,"subset_eq(index(3, A), index(3, B))",1.0,0.0,0.0,1.0,1.0
+39,"subset_eq(index(3, B), difference(A, A))",0.0,1.0,1.0,1.0,1.0
+40,"subset_eq(index(3, B), difference(B, A))",0.0,0.0,1.0,1.0,1.0
+41,"subset_eq(index(3, B), index(0, A))",0.0,0.4418898300930877,1.0,0.8864117240057774,1.0
+42,"subset_eq(index(3, B), index(3, A))",0.0,1.0,1.0,0.0,1.0
+43,"equals(3, cardinality(A))",1.0,0.7219171541168985,1.0,0.03319136567036207,1.0
+44,"equals(3, cardinality(B))",0.7219171541168985,1.0,0.03319136567036207,1.0,1.0
+45,"equals(cardinality(A), cardinality(B))",0.2585332880754543,0.2585332880754543,0.2585332880754543,0.2585332880754543,0.2585332880754543
+46,"greater_than(3, cardinality(A))",1.0,0.0,1.0,1.0,1.0
+47,"greater_than(3, cardinality(B))",0.0,1.0,1.0,1.0,1.0
+48,"greater_than(cardinality(A), 0)",1.0,1.0,1.0,0.0,1.0
+49,"greater_than(cardinality(A), 3)",1.0,1.0,1.0,0.0,1.0
+50,"greater_than(cardinality(B), 0)",1.0,1.0,0.0,1.0,1.0
+51,"greater_than(cardinality(B), 3)",1.0,1.0,0.0,1.0,1.0
+52,"greater_than(cardinality(A), cardinality(B))",0.04485415499027745,1.0,1.0,0.04485415499027745,1.0
+53,"greater_than(cardinality(B), cardinality(A))",1.0,0.04485415499027745,0.04485415499027745,1.0,1.0
