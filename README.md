@@ -3,7 +3,7 @@
 
 ## Introduction
 
-ULTK is an open-source Python library for computational semantic typology research (\url{https://clmbr.shane.st/ultk/}). ULTK's key features include unifying data structures, algorithms for generating artificial languages, and data analysis tools for related computational experiments.
+ULTK is an open-source Python library for computational semantic typology research. ULTK's key features include unifying data structures, algorithms for generating artificial languages, and data analysis tools for related computational experiments.
 
 Read the [documentation](https://clmbr.shane.st/ultk).
 
