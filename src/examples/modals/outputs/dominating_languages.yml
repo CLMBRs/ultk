@@ -1,73 +1,82 @@
-- comm_cost: 0.1899492104756404
-  complexity: 6
+- comm_cost: 0.3333333333333335
+  complexity: 2
+  degree_iff: 1.0
   expressions:
-  - and(strong, circumstantial)
+  - strong
   - weak
-  - epistemic
-  - deontic
   name: dominating-0
   type: dominant
-- comm_cost: 0.12826160215674975
-  complexity: 8
+- comm_cost: 0.2180820335066438
+  complexity: 5
+  degree_iff: 1.0
   expressions:
-  - and(strong, circumstantial)
-  - weak
-  - and(strong, deontic)
   - epistemic
+  - circumstantial
+  - and(strong, deontic)
   name: dominating-1
   type: dominant
 - comm_cost: 0.5492971307529368
   complexity: 1
+  degree_iff: 1.0
   expressions:
   - strong
   name: dominating-2
   type: dominant
-- comm_cost: 0.06080300404390537
-  complexity: 13
+- comm_cost: 0.1899492104756404
+  complexity: 6
+  degree_iff: 1.0
   expressions:
-  - and(weak, circumstantial)
-  - and(strong, deontic)
-  - and(weak, deontic)
   - epistemic
   - and(strong, circumstantial)
+  - deontic
+  - weak
   name: dominating-3
-  type: dominant
-- comm_cost: 0.10283073367995388
-  complexity: 10
-  expressions:
-  - and(strong, circumstantial)
-  - and(weak, circumstantial)
-  - and(strong, deontic)
-  - epistemic
-  name: dominating-4
-  type: dominant
-- comm_cost: 0.2180820335066438
-  complexity: 5
-  expressions:
-  - circumstantial
-  - and(strong, deontic)
-  - epistemic
-  name: dominating-5
   type: dominant
 - comm_cost: 0.04202772963604873
   complexity: 15
+  degree_iff: 1.0
   expressions:
-  - and(weak, circumstantial)
-  - and(strong, deontic)
   - and(weak, epistemic)
-  - and(strong, circumstantial)
+  - and(strong, deontic)
+  - and(weak, circumstantial)
   - and(strong, epistemic)
+  - and(strong, circumstantial)
+  name: dominating-4
+  type: dominant
+- comm_cost: 0.12826160215674975
+  complexity: 8
+  degree_iff: 1.0
+  expressions:
+  - epistemic
+  - and(strong, circumstantial)
+  - weak
+  - and(strong, deontic)
+  name: dominating-5
+  type: dominant
+- comm_cost: 0.06080300404390537
+  complexity: 13
+  degree_iff: 1.0
+  expressions:
+  - epistemic
+  - and(strong, deontic)
+  - and(weak, circumstantial)
+  - and(strong, circumstantial)
+  - and(weak, deontic)
   name: dominating-6
   type: dominant
-- comm_cost: 0.3333333333333335
-  complexity: 2
+- comm_cost: 0.10283073367995388
+  complexity: 10
+  degree_iff: 1.0
   expressions:
-  - weak
-  - strong
+  - epistemic
+  - and(strong, circumstantial)
+  - and(weak, circumstantial)
+  - and(strong, deontic)
   name: dominating-7
   type: dominant
 - comm_cost: 0.2500000000000001
   complexity: 3
+  degree_iff: 1.0
   expressions:
   - epistemic
   - circumstantial
@@ -76,12 +85,13 @@
   type: dominant
 - comm_cost: 2.220446049250313e-16
   complexity: 18
+  degree_iff: 1.0
   expressions:
-  - and(weak, circumstantial)
-  - and(strong, deontic)
   - and(weak, epistemic)
-  - and(weak, deontic)
-  - and(strong, circumstantial)
+  - and(strong, deontic)
+  - and(weak, circumstantial)
   - and(strong, epistemic)
+  - and(strong, circumstantial)
+  - and(weak, deontic)
   name: dominating-9
   type: dominant

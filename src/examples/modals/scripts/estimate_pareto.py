@@ -4,7 +4,7 @@ from ultk.util.io import read_grammatical_expressions, write_languages
 
 from ..grammar import modals_grammar
 from ..meaning import universe as modals_universe
-from ..measures import comm_cost, complexity
+from ..measures import comm_cost, complexity, iff
 
 if __name__ == "__main__":
     expressions, expressions_by_meaning = read_grammatical_expressions(
@@ -38,6 +38,7 @@ if __name__ == "__main__":
             "type": lambda _1, _2: "dominant",
             "complexity": lambda _, lang: lang_complexity(lang),
             "comm_cost": lambda _, lang: comm_cost(lang),
+            "degree_iff": lambda _, lang: lang.degree_property(iff),
         },
     )
     write_languages(
@@ -48,5 +49,6 @@ if __name__ == "__main__":
             "type": lambda _1, _2: "explored",
             "complexity": lambda _, lang: lang_complexity(lang),
             "comm_cost": lambda _, lang: comm_cost(lang),
+            "degree_iff": lambda _, lang: lang.degree_property(iff),
         },
     )
