@@ -1,19 +1,9 @@
 # The Unnatural Language ToolKit (ULTK)
 
-<img alt="Four examples of many recent results showing that natural languages are optimized for efficient communication." src="https://raw.githubusercontent.com/CLMBRs/ultk/main/images/plots.jpeg" width="100%" />
 
 ## Introduction
 
-ULTK is a software library that aims to support [efficient communication analyses](https://github.com/CLMBRs/ultk/blob/main/images/mit-altk.pdf) of natural language. This is a line of research that aims to explain why natural languages have the structure that they do in terms competing pressures to minimize cognitive complexity and maximize communicative accuracy.
-
-Key features:
-
-- Primitives for constructing semantic spaces, expressions, and languages
-- Tools for measuring informativity of languages, communicative success of RSA speakers and listeners
-- Language population sampling and optimization w.r.t Pareto fronts
-
-
-ULTK is a long term project and it is currently in its early stages. It is intended to help lower the barrier to entry for certain research in computational semantics, and to unify methodologies. If you find something confusing, please open an issue. If you have a phenomena of interest in linguistic semantics that you want to run an efficient communication analysis on, please contact the contributors.
+ULTK is an open-source Python library for computational semantic typology research (\url{https://clmbr.shane.st/ultk/}). ULTK's key features include unifying data structures, algorithms for generating artificial languages, and data analysis tools for related computational experiments.
 
 Read the [documentation](https://clmbr.shane.st/ultk).
 
@@ -29,8 +19,7 @@ First, set up a virtual environment (e.g. via [miniconda](https://docs.conda.io/
 
 ## Getting started
 
-- Check out the [examples](https://github.com/CLMBRs/ultk/tree/main/src/examples), starting with a simiple efficient communication analysis of [indefinites](https://github.com/CLMBRs/ultk/tree/main/src/examples/indefinites) and [modals](https://github.com/CLMBRs/ultk/tree/main/src/examples/modals).
-- To see more scaled up usage examples, visit the codebase for an efficient communication analysis of [modals](https://github.com/nathimel/modals-effcomm) or [sim-max games](https://github.com/nathimel/rdsg).
+- Check out the [examples](https://github.com/CLMBRs/ultk/tree/main/src/examples), starting with a simple efficient communication analysis of [indefinites](https://github.com/CLMBRs/ultk/tree/main/src/examples/indefinites) and [modals](https://github.com/CLMBRs/ultk/tree/main/src/examples/modals).
 - For an introduction to efficient communication research, here is a [survey paper](https://www.annualreviews.org/doi/abs/10.1146/annurev-linguistics-011817-045406) of the field.
 - For an introduction to the RSA framework, see [this online textbook](http://www.problang.org/).
 
