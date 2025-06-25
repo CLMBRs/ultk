@@ -31,8 +31,11 @@ if __name__ == "__main__":
     )
 
     from ultk.effcomm.tradeoff import pareto_min_distances
+
     all_points = all_data[["complexity", "comm_cost"]].values
-    pareto_points = all_data[all_data["type"] == "dominant"][["complexity", "comm_cost"]].values
+    pareto_points = all_data[all_data["type"] == "dominant"][
+        ["complexity", "comm_cost"]
+    ].values
     min_distances = pareto_min_distances(points=all_points, pareto_points=pareto_points)
     all_data["distance"] = min_distances
 
