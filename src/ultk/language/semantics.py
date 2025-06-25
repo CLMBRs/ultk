@@ -1,20 +1,20 @@
 """Classes for modeling the meanings of a language.
 
-    Meanings are modeled as things which map linguistic forms to objects of reference. The linguistic forms and objects of reference can in principle be very detailed, and future work may elaborate the meaning classes and implement a Form class.
+Meanings are modeled as things which map linguistic forms to objects of reference. The linguistic forms and objects of reference can in principle be very detailed, and future work may elaborate the meaning classes and implement a Form class.
 
-    In efficient communication analyses, simplicity and informativeness can be measured as properties of semantic aspects of a language. E.g., a meaning is simple if it is easy to represent, or to compress into some code; a meaning is informative if it is easy for a listener to recover a speaker's intended literal meaning.
+In efficient communication analyses, simplicity and informativeness can be measured as properties of semantic aspects of a language. E.g., a meaning is simple if it is easy to represent, or to compress into some code; a meaning is informative if it is easy for a listener to recover a speaker's intended literal meaning.
 
-    Examples:
+Examples:
 
-        >>> from ultk.language.semantics import Referent, Meaning, Universe
-        >>> from ultk.language.language import Expression
-        >>> # construct the meaning space for numerals
-        >>> numerals_universe = NumeralUniverse(referents=[NumeralReferent(str(i)) for i in range(1, 100)])
-        >>> # construct a list of referents for the expression 'a few'
-        >>> a_few_refs = [NumeralReferent(name=str(i)) for i in range(2, 6)]
-        >>> a_few_meaning = NumeralMeaning(referents=a_few_refs, universe=numerals_universe)
-        >>> # define the expression
-        >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
+    >>> from ultk.language.semantics import Referent, Meaning, Universe
+    >>> from ultk.language.language import Expression
+    >>> # construct the meaning space for numerals
+    >>> numerals_universe = NumeralUniverse(referents=[NumeralReferent(str(i)) for i in range(1, 100)])
+    >>> # construct a list of referents for the expression 'a few'
+    >>> a_few_refs = [NumeralReferent(name=str(i)) for i in range(2, 6)]
+    >>> a_few_meaning = NumeralMeaning(referents=a_few_refs, universe=numerals_universe)
+    >>> # define the expression
+    >>> a_few = NumeralExpression(form="a few", meaning=a_few_meaning)
 """
 
 from dataclasses import dataclass

@@ -1,4 +1,4 @@
-"""Tools for measuring languages for communicative efficiency. 
+"""Tools for measuring languages for communicative efficiency.
 
 Submodules divide the labor of a computational experiment performing an efficiency analysis of a language into several parts: generating and sampling the space of possible languages, measuring their properties, and determining which languages optimize efficient trade-offs w.r.t these properties.
 
