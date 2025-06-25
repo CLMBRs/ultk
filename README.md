@@ -59,3 +59,19 @@ Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and execut
 > Kemp, C., Xu, Y., & Regier, T. (2018). Semantic Typology and Efficient Communication. Annual Review of Linguistics, 4(1), 109–128. https://doi.org/10.1146/annurev-linguistics-011817-045406
 
 </details>
+
+## Citation
+
+```
+@article{imel2025ultk,
+  author    = {Imel, Nathaniel and Haberland, Chris and Steinert-Threlkeld, Shane},
+  title     = {The Unnatural Language ToolKit (ULTK)},
+  journal   = {Proceedings of the Society for Computation in Linguistics},
+  volume    = {8},
+  number    = {1},
+  pages     = {46},
+  year      = {2025},
+  doi       = {10.7275/scil.3144},
+  url       = {https://doi.org/10.7275/scil.3144}
+}
+```

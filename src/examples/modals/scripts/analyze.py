@@ -30,11 +30,10 @@ if __name__ == "__main__":
             pn.aes(
                 fill="degree_iff",
                 # shape="type",
-            ),        
+            ),
             color="black",
             size=6,
         )
-
         + pn.geom_point(  # The natural languages
             natural_data,
             color="red",
@@ -48,10 +47,10 @@ if __name__ == "__main__":
             size=6,  # orig 9
             nudge_x=1,
             # color="white",
-        )         
+        )
         + pn.scale_fill_continuous(
             "cividis",
-            name="naturalness", 
+            name="naturalness",
         )
         + pn.theme_classic()
         + pn.xlab("Complexity")
@@ -66,6 +65,7 @@ if __name__ == "__main__":
 
     import numpy as np
     from scipy.stats import ttest_1samp, linregress
+
     print(
         ttest_1samp(
             explored_data["distance"].values,
