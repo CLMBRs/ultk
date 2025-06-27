@@ -10,8 +10,6 @@ The `ultk.effcomm.informativity` submodule implements tools for computing the li
 
 The `ultk.effcomm.optimization` submodule contains a general implementation of an evolutionary algorithm, which can be used to estimate a Pareto frontier of optimal solutions to an efficiency trade-off. It can also be used as a technique for randomly exploring the space of possible languages.
 
-The `ultk.effcomm.probability` submodule includes helper functions for working with probability and information. Several methods are taken or adapted from https://github.com/nogazs/ib-color-naming/blob/master/src/tools.py.
-
 The `ultk.effcomm.sampling` submodule implements several methods for generating hypothetically possible languages of a given type, by sampling from a set of possible expressions, or permuting the expression-meaning mapping of an existing language.
 
 The `ultk.effcomm.tradeoff` submodule contains tools for measuring a pool of languages for various properties, finding which languages are Pareto dominant with respect to two properties, and setting attributes of the language objects for further analysis.
