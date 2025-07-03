@@ -5,7 +5,7 @@ from ultk.language.language import (
     Referent,
     aggregate_expression_complexity,
 )
-from ultk.language.grammar import GrammaticalExpression
+from ultk.language.grammar.grammar import GrammaticalExpression
 from ultk.effcomm.informativity import informativity, build_pairwise_matrix
 
 from .meaning import universe as modals_universe

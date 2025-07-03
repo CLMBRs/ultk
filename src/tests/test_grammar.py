@@ -1,4 +1,4 @@
-from ultk.language.grammar import Grammar, GrammaticalExpression, Rule
+from ultk.language.grammar.grammar import Grammar, GrammaticalExpression, Rule
 from ultk.language.semantics import Meaning, Referent, Universe
 
 
