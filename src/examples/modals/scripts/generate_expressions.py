@@ -1,7 +1,7 @@
 from ultk.util.io import write_expressions
 
 from ultk.language.semantics import Meaning
-from ultk.language.grammar import GrammaticalExpression
+from ultk.language.grammar.grammar import GrammaticalExpression
 from ..grammar import modals_grammar
 from ..meaning import universe as modals_universe
 

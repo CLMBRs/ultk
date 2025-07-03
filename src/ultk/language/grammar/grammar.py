@@ -8,6 +8,8 @@ from importlib import import_module
 from itertools import product
 from typing import Any, Callable, Generator, TypedDict, TypeVar
 from yaml import load
+from functools import cache
+from math import log
 
 try:
     from yaml import CLoader as Loader
@@ -90,7 +92,7 @@ class Rule:
             del args["weight"]
         # allow custon names too
         rule_name = func.__name__
-        if "name" in args:
+        if "name" in args and args["name"].default is not inspect._empty:
             rule_name = args["name"].default
             del args["name"]
         # parameters = {'name': Parameter} ordereddict, so we want the values
@@ -178,6 +180,26 @@ class GrammaticalExpression(Expression[T]):
             return 1
         return sum(child.count_atoms() for child in self.children)
 
+    def replace_children(self, children) -> None:
+        self.children = children
+
+    @cache
+    def node_count(self) -> int:
+        """Count the node of a GrammaticalExpression
+
+        Returns:
+            int: node count
+        """
+        counter = 1
+        stack = [self]
+        while stack:
+            current_node = stack.pop()
+            children = current_node.children if current_node.children else ()
+            for child in children:
+                stack.append(child)
+                counter += 1
+        return counter
+
     @classmethod
     def from_dict(cls, the_dict: dict, grammar: "Grammar") -> "GrammaticalExpression":
         children = the_dict.get("children")
@@ -258,6 +280,46 @@ class Grammar:
             )
         self._rules_by_name[rule.name] = rule
 
+    # @cache, unhashable, or embed it as a property (change every time Grammar is changed)
+    def probability(self, rule: Rule) -> float:
+        return float(rule.weight) / sum([r.weight for r in self._rules[rule.lhs]])
+
+    # @cache, unhashable, or embed it as a property (change every time Grammar is changed)
+    def log_probability(self, rule: Rule) -> float:
+        return log(float(rule.weight)) - log(
+            sum([r.weight for r in self._rules[rule.lhs]])
+        )
+
+    def prior(self, expr: GrammaticalExpression) -> float:
+        """Prior of a GrammaticalExpression
+
+        Args:
+            expr (GrammaticalExpression): the GrammaticalExpression for compuation
+
+        Returns:
+            float: prior
+        """
+        probability = self.probability(self._rules_by_name[expr.rule_name])
+        children = expr.children if expr.children else ()
+        for child in children:
+            probability = probability * (self.prior(child))
+        return probability
+
+    def log_prior(self, expr: GrammaticalExpression) -> float:
+        """Prior of a GrammaticalExpression in log probability
+
+        Args:
+            expr (GrammaticalExpression): the GrammaticalExpression for compuation
+
+        Returns:
+            float: log prior
+        """
+        probability = self.log_probability(self._rules_by_name[expr.rule_name])
+        children = expr.children if expr.children else ()
+        for child in children:
+            probability = probability + (self.log_prior(child))
+        return probability
+
     def parse(
         self,
         expression: str,
@@ -321,21 +383,29 @@ class Grammar:
                     )
                 )
         if len(stack) != 1:
-            raise ValueError("Could not parse string {expression}")
+            raise ValueError(f"Could not parse string {expression}")
         return stack[0]
 
-    def generate(self, lhs: Any = None) -> GrammaticalExpression:
+    def generate(self, lhs: Any = None, max_depth=3, depth=0) -> GrammaticalExpression:
         """Generate an expression from a given lhs."""
         if lhs is None:
             lhs = self._start
         rules = self._rules[lhs]
+        # Stop there from being a high chance of infinite recusion
+        if depth > max_depth:
+            filtered_rules = list(filter(lambda rule: rule.rhs is None, rules))
+            if len(filtered_rules) != 0:
+                rules = filtered_rules
         the_rule = random.choices(rules, weights=[rule.weight for rule in rules], k=1)[
             0
         ]
         children = (
             None
             if the_rule.rhs is None
-            else tuple([self.generate(child_lhs) for child_lhs in the_rule.rhs])
+            else tuple(
+                self.generate(child_lhs, max_depth=max_depth, depth=depth + 1)
+                for child_lhs in the_rule.rhs
+            )
         )
         # if the rule is terminal, rhs will be empty, so no recursive calls to generate will be made in this comprehension
         return GrammaticalExpression(
@@ -550,6 +620,9 @@ class Grammar:
         The module should have a list of type-annotated method definitions, each of which will correspond to one Rule in the new Grammar.
         See the docstring for `Rule.from_callable` for more information on how that step works.
 
+        The function will normally attempt to convert all functions (including imported functions) into Rules. However, if a tuple of
+        functions called `grammar_rules` is defined in the module, it will only try to convert the functions contained in the tuple.
+
         The start symbol of the grammar can either be specified by `start = XXX` somewhere in the module,
         or will default to the LHS of the first rule in the module (aka the return type annotation of the first method definition).
 
@@ -558,7 +631,11 @@ class Grammar:
         """
         module = import_module(module_name)
         grammar = cls(None)
-        for name, value in inspect.getmembers(module):
+        if hasattr(module, "grammar_rules") and type(module.grammar_rules) == tuple:
+            possible_rules = module.grammar_rules
+        else:
+            possible_rules = tuple(value for _, value in inspect.getmembers(module))
+        for value in possible_rules:
             # functions become rules
             if inspect.isfunction(value):
                 grammar.add_rule(Rule.from_callable(value))
