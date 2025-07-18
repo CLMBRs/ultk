@@ -164,7 +164,7 @@ class GrammaticalExpression(Expression[T]):
             self.children = tuple([child])
         else:
             self.children = self.children + (child,)
-    
+
     def complement(self) -> Meaning:
         """Get the complement of the meaning of this expression, i.e. the set of all referents for which
         the expression evaluates to False."""

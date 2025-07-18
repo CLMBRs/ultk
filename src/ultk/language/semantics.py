@@ -108,7 +108,7 @@ class Universe:
 
     def __len__(self) -> int:
         return len(self.referents)
-    
+
     @classmethod
     def _calculate_prior(cls, referents: tuple[Referent]):
         default_prob = 1 / len(referents)
@@ -192,7 +192,7 @@ class Meaning(Generic[T]):
     def is_uniformly_false(self) -> bool:
         """Return True if all referents in the meaning are mapped to False (or coercible to False).In the case where the meaning type is boolean, this corresponds to the characteristic function of the empty set."""
         return all(not value for value in self.mapping.values())
-    
+
     def get_binarized_meaning(self):
         return np.array(list(self.mapping.values())).astype(int)
 
