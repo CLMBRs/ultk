@@ -1,6 +1,8 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+# requires = ["setuptools>=42", "wheel"]
+# build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
 
 [project]
 name = "ultk"
@@ -28,8 +30,12 @@ dependencies = [
     "plotnine",
     "pathos",
     "pytest",
+    "scipy>=1.7.3",
 ]
 
 [project.urls]
 "Homepage" = "https://clmbr.shane.st/ultk"
 "Bug Tracker" = "https://github.com/CLMBRs/ultk/issues"
+
+# [tool.uv]
+# package = true

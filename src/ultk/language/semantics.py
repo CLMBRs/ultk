@@ -73,6 +73,7 @@ class Universe:
 
     referents: tuple[Referent, ...]
     prior: tuple[float, ...]
+    _ref_to_idx: FrozenDict[Referent, int]
 
     def __init__(self, referents, prior=None):
         # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
@@ -80,6 +81,11 @@ class Universe:
         # When only referents are passed in, make the priors a unifrom distribution
         object.__setattr__(
             self, "prior", prior or tuple(1 / len(referents) for _ in referents)
+        )
+        object.__setattr__(
+            self,
+            "_ref_to_idx",
+            FrozenDict({referent: idx for idx, referent in enumerate(self.referents)}),
         )
 
     @cached_property
@@ -160,44 +166,35 @@ class Meaning(Generic[T]):
         _dist: a mapping representing a probability distribution over referents to associate with the meaning. By default, will be assumed to be uniform over the "true-like" `Referent`s in `mapping` (see `.dist`).
     """
 
-    mapping: FrozenDict[Referent, T]
+    mapping: tuple[T, ...]
     # With the mapping, `universe` is not conceptually needed, but it is very useful to have it lying around.
     # `universe` should be the keys to `mapping`.
     universe: Universe
+    dist: tuple[float, ...]
     # _dist: FrozenDict[Referent, float] = FrozenDict({})
-    _dist = False  # TODO: clean up
+    # _dist = False  # TODO: clean up
 
-    @property
-    def dist(self) -> FrozenDict[Referent, float]:
-        if self._dist:
-            # normalize weights to distribution
-            total_weight = sum(self._dist.values())
-            return FrozenDict(
-                {
-                    referent: weight / total_weight
-                    for referent, weight in self._dist.items()
-                }
-            )
-        else:
-            num_true_like = sum(1 for value in self.mapping.values() if value)
-            if num_true_like == 0:
-                raise ValueError("Meaning must have at least one true-like referent.")
-            return FrozenDict(
-                {
-                    referent: (1 / num_true_like if self.mapping[referent] else 0)
-                    for referent in self.mapping
-                }
-            )
+    def __init__(self, mapping: tuple[T, ...], universe: Universe, dist=None):
+        # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
+        object.__setattr__(self, "mapping", mapping)
+        object.__setattr__(self, "universe", universe)
+        # When only referents are passed in, make the priors a unifrom distribution
+        num_true_like = sum(1 for value in self.mapping if value)
+        object.__setattr__(
+            self,
+            "dist",
+            dist or tuple(1 / num_true_like if value else 0 for value in self.mapping),
+        )
 
     def is_uniformly_false(self) -> bool:
         """Return True if all referents in the meaning are mapped to False (or coercible to False).In the case where the meaning type is boolean, this corresponds to the characteristic function of the empty set."""
-        return all(not value for value in self.mapping.values())
+        return all(not value for value in self.mapping)
 
     def get_binarized_meaning(self):
-        return np.array(list(self.mapping.values())).astype(int)
+        return np.array(self.mapping).astype(int)
 
     def __getitem__(self, key: Referent) -> T:
-        return self.mapping[key]
+        return self.mapping[self.universe._ref_to_idx[key]]
 
     def __iter__(self):
         """Iterate over the referents in the meaning."""
@@ -208,5 +205,5 @@ class Meaning(Generic[T]):
 
     def __str__(self):
         return "Mapping:\n\t{0}".format(
-            "\n".join(f"{ref}: {self.mapping[ref]}" for ref in self.mapping)
+            "\n".join(f"{ref}: {self[ref]}" for ref in self.universe)
         )  # \ \nDistribution:\n\t{self.dist}\n"

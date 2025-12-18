@@ -152,9 +152,7 @@ class GrammaticalExpression(Expression[T]):
         # Expression.__init__ initializes an "empty" meaning if `None` is passed
         if not self.meaning:
             self.meaning = Meaning(
-                FrozenDict(
-                    {referent: self(referent) for referent in universe.referents}
-                ),
+                tuple(self(referent) for referent in universe.referents),
                 universe,
             )
         return self.meaning
