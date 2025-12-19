@@ -14,7 +14,7 @@ authors = [
 ]
 description = "ULTK is a software library that aims to support efficient communication analyses of natural language. This is a line of research that aims to explain why natural languages have the structure that they do in terms competing pressures to minimize cognitive complexity and maximize communicative accuracy."
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.13"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
@@ -31,6 +31,7 @@ dependencies = [
     "pathos",
     "pytest",
     "scipy>=1.7.3",
+    "scipy-stubs[scipy]>=1.16.3.3",
 ]
 
 [project.urls]
