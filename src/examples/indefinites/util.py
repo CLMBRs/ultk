@@ -36,11 +36,8 @@ def read_natural_languages(filename: str) -> set[Language]:
         for item in items.itertuples():
             # generate Meaning from list of flavors
             cur_meaning = Meaning(
-                FrozenDict(
-                    {
-                        referent: referent.name in item.flavors
-                        for referent in indefinites_universe
-                    }
+                tuple(
+                    referent.name in item.flavors for referent in indefinites_universe
                 ),
                 indefinites_universe,
             )
