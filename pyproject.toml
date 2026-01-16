@@ -1,7 +1,3 @@
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "ultk"
 version = "0.0.1c"
@@ -12,7 +8,7 @@ authors = [
 ]
 description = "ULTK is a software library that aims to support efficient communication analyses of natural language. This is a line of research that aims to explain why natural languages have the structure that they do in terms competing pressures to minimize cognitive complexity and maximize communicative accuracy."
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.13"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
@@ -28,8 +24,20 @@ dependencies = [
     "plotnine",
     "pathos",
     "pytest",
+    "scipy>=1.7.3",
+    "scipy-stubs[scipy]>=1.16.3.3",
 ]
 
 [project.urls]
 "Homepage" = "https://clmbr.shane.st/ultk"
 "Bug Tracker" = "https://github.com/CLMBRs/ultk/issues"
+
+[build-system]
+# requires = ["setuptools>=42", "wheel"]
+# build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
+
+# [tool.uv]
+# package = true

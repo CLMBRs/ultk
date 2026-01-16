@@ -1,103 +1,103 @@
-- comm_cost: 0.1625000000000003
-  complexity: 8
-  expressions:
-  - Nplus
-  - _and(Nminus, Rplus)
-  - Rminus
-  - _and(SEminus, Sminus)
-  name: dominating-0
-  type: dominant
-- comm_cost: 0.08125000000000027
-  complexity: 9
-  expressions:
-  - Nplus
-  - _and(Nminus, Rplus)
-  - _and(SEminus, Sminus)
-  - Rminus
-  - K+
-  name: dominating-1
-  type: dominant
-- comm_cost: 0.06093750000000031
-  complexity: 10
-  expressions:
-  - Nplus
-  - _and(Nminus, Rplus)
-  - Splus
-  - _and(SEminus, Sminus)
-  - Rminus
-  - K+
-  name: dominating-2
-  type: dominant
 - comm_cost: 0.3812500000000003
   complexity: 5
   expressions:
   - SEminus
-  - Nplus
   - _and(Nminus, Rplus)
-  name: dominating-3
-  type: dominant
-- comm_cost: 0.4843750000000001
-  complexity: 4
-  expressions:
-  - SEminus
   - Nplus
-  - Rplus
-  - Rminus
-  name: dominating-4
-  type: dominant
-- comm_cost: 2.220446049250313e-16
-  complexity: 12
-  expressions:
-  - Nplus
-  - _and(K-, Splus)
-  - _and(Nminus, Rplus)
-  - _and(SEminus, Sminus)
-  - Rminus
-  - K+
-  name: dominating-5
+  name: dominating-0
   type: dominant
 - comm_cost: 0.6197916666666669
   complexity: 2
   expressions:
   - SEminus
   - Rplus
-  name: dominating-6
-  type: dominant
-- comm_cost: 0.2562500000000003
-  complexity: 7
-  expressions:
-  - Nplus
-  - _and(Nminus, Rplus)
-  - SEminus
-  - Rminus
-  - K+
-  name: dominating-7
-  type: dominant
-- comm_cost: 0.28333333333333366
-  complexity: 6
-  expressions:
-  - SEminus
-  - Nplus
-  - _and(Nminus, Rplus)
-  - Rminus
-  name: dominating-8
-  type: dominant
-- comm_cost: 0.5218750000000001
-  complexity: 3
-  expressions:
-  - SEminus
-  - Rplus
-  - Rminus
-  name: dominating-9
+  name: dominating-1
   type: dominant
 - comm_cost: 0.08125000000000027
   complexity: 9
   expressions:
-  - Nplus
-  - _and(Nminus, Rplus)
-  - Splus
+  - K+
   - _and(SEminus, Sminus)
   - Rminus
+  - Nplus
+  - _and(Nminus, Rplus)
+  name: dominating-2
+  type: dominant
+- comm_cost: 0.5218750000000001
+  complexity: 3
+  expressions:
+  - Rminus
+  - SEminus
+  - Rplus
+  name: dominating-3
+  type: dominant
+- comm_cost: 2.220446049250313e-16
+  complexity: 12
+  expressions:
+  - K+
+  - Rminus
+  - _and(SEminus, Sminus)
+  - _and(K-, Splus)
+  - Nplus
+  - _and(Nminus, Rplus)
+  name: dominating-4
+  type: dominant
+- comm_cost: 0.08125000000000027
+  complexity: 9
+  expressions:
+  - Rminus
+  - _and(SEminus, Sminus)
+  - Nplus
+  - Splus
+  - _and(Nminus, Rplus)
+  name: dominating-5
+  type: dominant
+- comm_cost: 0.28333333333333366
+  complexity: 6
+  expressions:
+  - Rminus
+  - SEminus
+  - _and(Nminus, Rplus)
+  - Nplus
+  name: dominating-6
+  type: dominant
+- comm_cost: 0.1625000000000003
+  complexity: 8
+  expressions:
+  - Rminus
+  - _and(Nminus, Rplus)
+  - Nplus
+  - _and(SEminus, Sminus)
+  name: dominating-7
+  type: dominant
+- comm_cost: 0.06093750000000031
+  complexity: 10
+  expressions:
+  - K+
+  - Rminus
+  - _and(SEminus, Sminus)
+  - Nplus
+  - Splus
+  - _and(Nminus, Rplus)
+  name: dominating-8
+  type: dominant
+- comm_cost: 0.4843750000000001
+  complexity: 4
+  expressions:
+  - Rminus
+  - SEminus
+  - Nplus
+  - Rplus
+  name: dominating-9
+  type: dominant
+- comm_cost: 0.2562500000000003
+  complexity: 7
+  expressions:
+  - K+
+  - Rminus
+  - SEminus
+  - Nplus
+  - _and(Nminus, Rplus)
   name: dominating-10
   type: dominant
 - comm_cost: 0.7614583333333336

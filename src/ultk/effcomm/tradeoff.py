@@ -6,7 +6,7 @@ from ultk.language.language import Language
 from typing import Any, Callable, Sequence
 from tqdm import tqdm
 
-from scipy import interpolate
+# from scipy import interpolate
 from scipy.spatial.distance import cdist
 
 ##############################################################################
@@ -157,10 +157,9 @@ def interpolate_data(
     )
 
     pareto_x, pareto_y = list(zip(*points))
-    interpolated = interpolate.interp1d(pareto_x, pareto_y, fill_value="extrapolate")
 
     pareto_costs = list(set(np.linspace(min_cost, max_cost, num=num).tolist()))
-    pareto_complexities = interpolated(pareto_costs)
+    pareto_complexities = np.interp(pareto_costs, pareto_x, pareto_y)
     interpolated_points = np.array(list(zip(pareto_costs, pareto_complexities)))
     return interpolated_points
 

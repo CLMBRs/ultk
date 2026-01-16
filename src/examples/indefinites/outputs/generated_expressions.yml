@@ -1,39 +1,52 @@
 - form: ''
   length: 1
-  meaning: &id009 !!python/object:ultk.language.semantics.Meaning
-    _dist: &id007 !frozendict {}
-    mapping: !frozendict
-      ? &id004 !!python/object:ultk.language.semantics.Referent
-        _frozen: true
-        name: freechoice
-        probability: 0.0979166666666667
-      : true
-      ? &id005 !!python/object:ultk.language.semantics.Referent
-        _frozen: true
-        name: negative-indefinite
-        probability: 0.15
-      : true
-      ? &id003 !!python/object:ultk.language.semantics.Referent
-        _frozen: true
-        name: nonspecific
-        probability: 0.2625
-      : true
-      ? &id006 !!python/object:ultk.language.semantics.Referent
-        _frozen: true
-        name: npi
-        probability: 0.327083333333333
-      : true
-      ? &id001 !!python/object:ultk.language.semantics.Referent
-        _frozen: true
-        name: specific-known
-        probability: 0.08125
-      : false
-      ? &id002 !!python/object:ultk.language.semantics.Referent
-        _frozen: true
-        name: specific-unknown
-        probability: 0.08125
-      : true
-    universe: &id008 !!python/object:ultk.language.semantics.Universe
+  meaning: &id008 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0.2
+    - 0.2
+    - 0.2
+    - 0.2
+    - 0.2
+    mapping: !!python/tuple
+    - false
+    - true
+    - true
+    - true
+    - true
+    - true
+    universe: &id007 !!python/object:ultk.language.semantics.Universe
+      _ref_to_idx: !frozendict
+        ? &id004 !!python/object:ultk.language.semantics.Referent
+          _frozen: true
+          name: freechoice
+          probability: 0.0979166666666667
+        : 3
+        ? &id005 !!python/object:ultk.language.semantics.Referent
+          _frozen: true
+          name: negative-indefinite
+          probability: 0.15
+        : 4
+        ? &id003 !!python/object:ultk.language.semantics.Referent
+          _frozen: true
+          name: nonspecific
+          probability: 0.2625
+        : 2
+        ? &id006 !!python/object:ultk.language.semantics.Referent
+          _frozen: true
+          name: npi
+          probability: 0.327083333333333
+        : 5
+        ? &id001 !!python/object:ultk.language.semantics.Referent
+          _frozen: true
+          name: specific-known
+          probability: 0.08125
+        : 0
+        ? &id002 !!python/object:ultk.language.semantics.Referent
+          _frozen: true
+          name: specific-unknown
+          probability: 0.08125
+        : 1
       prior: !!python/tuple
       - 0.08125
       - 0.08125
@@ -52,1878 +65,2250 @@
   term_expression: K-
 - form: ''
   length: 1
-  meaning: &id017 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: false
-      *id006: false
-      *id001: true
-      *id002: false
-    universe: *id008
+  meaning: &id016 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 1.0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - true
+    - false
+    - false
+    - false
+    - false
+    - false
+    universe: *id007
   rule_name: K+
   term_expression: K+
 - form: ''
   length: 1
-  meaning: &id010 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: true
-      *id006: true
-      *id001: true
-      *id002: true
-    universe: *id008
+  meaning: &id009 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.2
+    - 0.2
+    - 0.2
+    - 0.2
+    - 0
+    - 0.2
+    mapping: !!python/tuple
+    - true
+    - true
+    - true
+    - true
+    - false
+    - true
+    universe: *id007
   rule_name: Nminus
   term_expression: Nminus
 - form: ''
   length: 1
-  meaning: &id018 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: false
-      *id006: false
-      *id001: false
-      *id002: false
-    universe: *id008
+  meaning: &id017 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0
+    - 0
+    - 1.0
+    - 0
+    mapping: !!python/tuple
+    - false
+    - false
+    - false
+    - false
+    - true
+    - false
+    universe: *id007
   rule_name: Nplus
   term_expression: Nplus
 - form: ''
   length: 1
-  meaning: &id016 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: false
-      *id006: false
-      *id001: false
-      *id002: false
-    universe: *id008
+  meaning: &id015 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0
+    - 1.0
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - false
+    - false
+    - false
+    - true
+    - false
+    - false
+    universe: *id007
   rule_name: Rminus
   term_expression: Rminus
 - form: ''
   length: 1
-  meaning: &id013 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: false
-      *id006: true
-      *id001: false
-      *id002: false
-    universe: *id008
+  meaning: &id012 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0.5
+    - 0.5
+    mapping: !!python/tuple
+    - false
+    - false
+    - false
+    - false
+    - true
+    - true
+    universe: *id007
   rule_name: Rplus
   term_expression: Rplus
 - form: ''
   length: 1
-  meaning: &id011 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: true
-      *id006: false
-      *id001: true
-      *id002: true
-    universe: *id008
+  meaning: &id010 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - true
+    - true
+    - true
+    - false
+    - false
+    - false
+    universe: *id007
   rule_name: SEminus
   term_expression: SEminus
 - form: ''
   length: 1
-  meaning: &id014 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: false
-      *id006: true
-      *id001: false
-      *id002: false
-    universe: *id008
+  meaning: &id013 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0.3333333333333333
+    mapping: !!python/tuple
+    - false
+    - false
+    - false
+    - true
+    - true
+    - true
+    universe: *id007
   rule_name: SEplus
   term_expression: SEplus
 - form: ''
   length: 1
-  meaning: &id015 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: true
-      *id006: true
-      *id001: false
-      *id002: false
-    universe: *id008
+  meaning: &id014 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0.25
+    mapping: !!python/tuple
+    - false
+    - false
+    - true
+    - true
+    - true
+    - true
+    universe: *id007
   rule_name: Sminus
   term_expression: Sminus
 - form: ''
   length: 1
-  meaning: &id012 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: false
-      *id006: false
-      *id001: true
-      *id002: true
-    universe: *id008
+  meaning: &id011 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.5
+    - 0.5
+    - 0
+    - 0
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - true
+    - true
+    - false
+    - false
+    - false
+    - false
+    universe: *id007
   rule_name: Splus
   term_expression: Splus
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id009
     rule_name: Nminus
     term_expression: Nminus
   form: ''
   length: 3
-  meaning: &id029 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: true
-      *id006: true
-      *id001: false
-      *id002: true
-    universe: *id008
+  meaning: &id028 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0
+    - 0.25
+    mapping: !!python/tuple
+    - false
+    - true
+    - true
+    - true
+    - false
+    - true
+    universe: *id007
   rule_name: _and
   term_expression: _and(K-, Nminus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: SEminus
     term_expression: SEminus
   form: ''
   length: 3
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: true
-      *id006: false
-      *id001: false
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0.5
+    - 0.5
+    - 0
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - false
+    - true
+    - true
+    - false
+    - false
+    - false
+    universe: *id007
   rule_name: _and
   term_expression: _and(K-, SEminus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - form: ''
     length: 1
-    meaning: *id012
+    meaning: *id011
     rule_name: Splus
     term_expression: Splus
   form: ''
   length: 3
-  meaning: &id034 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: false
-      *id006: false
-      *id001: false
-      *id002: true
-    universe: *id008
+  meaning: &id033 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 1.0
+    - 0
+    - 0
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - false
+    - true
+    - false
+    - false
+    - false
+    - false
+    universe: *id007
   rule_name: _and
   term_expression: _and(K-, Splus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id009
     rule_name: Nminus
     term_expression: Nminus
   - form: ''
     length: 1
-    meaning: *id013
+    meaning: *id012
     rule_name: Rplus
     term_expression: Rplus
   form: ''
   length: 3
-  meaning: &id031 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: false
-      *id006: true
-      *id001: false
-      *id002: false
-    universe: *id008
+  meaning: &id030 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 1.0
+    mapping: !!python/tuple
+    - false
+    - false
+    - false
+    - false
+    - false
+    - true
+    universe: *id007
   rule_name: _and
   term_expression: _and(Nminus, Rplus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id009
     rule_name: Nminus
     term_expression: Nminus
   - form: ''
     length: 1
-    meaning: *id014
+    meaning: *id013
     rule_name: SEplus
     term_expression: SEplus
   form: ''
   length: 3
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: false
-      *id006: true
-      *id001: false
-      *id002: false
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0
+    - 0.5
+    - 0
+    - 0.5
+    mapping: !!python/tuple
+    - false
+    - false
+    - false
+    - true
+    - false
+    - true
+    universe: *id007
   rule_name: _and
   term_expression: _and(Nminus, SEplus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id009
     rule_name: Nminus
     term_expression: Nminus
   - form: ''
     length: 1
-    meaning: *id015
+    meaning: *id014
     rule_name: Sminus
     term_expression: Sminus
   form: ''
   length: 3
-  meaning: &id030 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: true
-      *id006: true
-      *id001: false
-      *id002: false
-    universe: *id008
+  meaning: &id029 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    mapping: !!python/tuple
+    - false
+    - false
+    - true
+    - true
+    - false
+    - true
+    universe: *id007
   rule_name: _and
   term_expression: _and(Nminus, Sminus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: SEminus
     term_expression: SEminus
   - form: ''
     length: 1
-    meaning: *id015
+    meaning: *id014
     rule_name: Sminus
     term_expression: Sminus
   form: ''
   length: 3
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: true
-      *id006: false
-      *id001: false
-      *id002: false
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 1.0
+    - 0
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - false
+    - false
+    - true
+    - false
+    - false
+    - false
+    universe: *id007
   rule_name: _and
   term_expression: _and(SEminus, Sminus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id016
+    meaning: *id015
     rule_name: Rminus
     term_expression: Rminus
   form: ''
   length: 2
-  meaning: &id019 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: true
-      *id006: true
-      *id001: true
-      *id002: true
-    universe: *id008
+  meaning: &id018 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.2
+    - 0.2
+    - 0.2
+    - 0
+    - 0.2
+    - 0.2
+    mapping: !!python/tuple
+    - true
+    - true
+    - true
+    - false
+    - true
+    - true
+    universe: *id007
   rule_name: _not
   term_expression: _not(Rminus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id013
+    meaning: *id012
     rule_name: Rplus
     term_expression: Rplus
   form: ''
   length: 2
-  meaning: &id020 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: true
-      *id006: false
-      *id001: true
-      *id002: true
-    universe: *id008
+  meaning: &id019 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - true
+    - true
+    - true
+    - true
+    - false
+    - false
+    universe: *id007
   rule_name: _not
   term_expression: _not(Rplus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - form: ''
     length: 1
-    meaning: *id017
+    meaning: *id016
     rule_name: K+
     term_expression: K+
   form: ''
   length: 3
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: true
-      *id006: true
-      *id001: true
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0.16666666666666666
+    - 0.16666666666666666
+    - 0.16666666666666666
+    - 0.16666666666666666
+    - 0.16666666666666666
+    - 0.16666666666666666
+    mapping: !!python/tuple
+    - true
+    - true
+    - true
+    - true
+    - true
+    - true
+    universe: *id007
   rule_name: _or
   term_expression: _or(K-, K+)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id017
+    meaning: *id016
     rule_name: K+
     term_expression: K+
   - form: ''
     length: 1
-    meaning: *id018
+    meaning: *id017
     rule_name: Nplus
     term_expression: Nplus
   form: ''
   length: 3
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: false
-      *id006: false
-      *id001: true
-      *id002: false
-    universe: *id008
+    dist: !!python/tuple
+    - 0.5
+    - 0
+    - 0
+    - 0
+    - 0.5
+    - 0
+    mapping: !!python/tuple
+    - true
+    - false
+    - false
+    - false
+    - true
+    - false
+    universe: *id007
   rule_name: _or
   term_expression: _or(K+, Nplus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id017
-    rule_name: K+
-    term_expression: K+
-  - form: ''
-    length: 1
     meaning: *id016
-    rule_name: Rminus
-    term_expression: Rminus
-  form: ''
-  length: 3
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: false
-      *id006: false
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _or
-  term_expression: _or(K+, Rminus)
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id017
-    rule_name: K+
-    term_expression: K+
-  - form: ''
-    length: 1
-    meaning: *id013
-    rule_name: Rplus
-    term_expression: Rplus
-  form: ''
-  length: 3
-  meaning: &id026 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: false
-      *id006: true
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _or
-  term_expression: _or(K+, Rplus)
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id017
-    rule_name: K+
-    term_expression: K+
-  - form: ''
-    length: 1
-    meaning: *id014
-    rule_name: SEplus
-    term_expression: SEplus
-  form: ''
-  length: 3
-  meaning: &id027 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: false
-      *id006: true
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _or
-  term_expression: _or(K+, SEplus)
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id017
     rule_name: K+
     term_expression: K+
   - form: ''
     length: 1
     meaning: *id015
+    rule_name: Rminus
+    term_expression: Rminus
+  form: ''
+  length: 3
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.5
+    - 0
+    - 0
+    - 0.5
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - true
+    - false
+    - false
+    - true
+    - false
+    - false
+    universe: *id007
+  rule_name: _or
+  term_expression: _or(K+, Rminus)
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id016
+    rule_name: K+
+    term_expression: K+
+  - form: ''
+    length: 1
+    meaning: *id012
+    rule_name: Rplus
+    term_expression: Rplus
+  form: ''
+  length: 3
+  meaning: &id025 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.3333333333333333
+    - 0
+    - 0
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    mapping: !!python/tuple
+    - true
+    - false
+    - false
+    - false
+    - true
+    - true
+    universe: *id007
+  rule_name: _or
+  term_expression: _or(K+, Rplus)
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id016
+    rule_name: K+
+    term_expression: K+
+  - form: ''
+    length: 1
+    meaning: *id013
+    rule_name: SEplus
+    term_expression: SEplus
+  form: ''
+  length: 3
+  meaning: &id026 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.25
+    - 0
+    - 0
+    - 0.25
+    - 0.25
+    - 0.25
+    mapping: !!python/tuple
+    - true
+    - false
+    - false
+    - true
+    - true
+    - true
+    universe: *id007
+  rule_name: _or
+  term_expression: _or(K+, SEplus)
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id016
+    rule_name: K+
+    term_expression: K+
+  - form: ''
+    length: 1
+    meaning: *id014
     rule_name: Sminus
     term_expression: Sminus
   form: ''
   length: 3
-  meaning: &id028 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: true
-      *id006: true
-      *id001: true
-      *id002: false
-    universe: *id008
+  meaning: &id027 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.2
+    - 0
+    - 0.2
+    - 0.2
+    - 0.2
+    - 0.2
+    mapping: !!python/tuple
+    - true
+    - false
+    - true
+    - true
+    - true
+    - true
+    universe: *id007
   rule_name: _or
   term_expression: _or(K+, Sminus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id018
+    meaning: *id017
     rule_name: Nplus
     term_expression: Nplus
   - form: ''
     length: 1
-    meaning: *id016
+    meaning: *id015
     rule_name: Rminus
     term_expression: Rminus
   form: ''
   length: 3
-  meaning: &id032 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: false
-      *id006: false
-      *id001: false
-      *id002: false
-    universe: *id008
+  meaning: &id031 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0
+    - 0.5
+    - 0.5
+    - 0
+    mapping: !!python/tuple
+    - false
+    - false
+    - false
+    - true
+    - true
+    - false
+    universe: *id007
   rule_name: _or
   term_expression: _or(Nplus, Rminus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id018
+    meaning: *id017
     rule_name: Nplus
     term_expression: Nplus
   - form: ''
     length: 1
-    meaning: *id011
+    meaning: *id010
     rule_name: SEminus
     term_expression: SEminus
   form: ''
   length: 3
-  meaning: &id021 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: true
-      *id006: false
-      *id001: true
-      *id002: true
-    universe: *id008
+  meaning: &id020 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0
+    - 0.25
+    - 0
+    mapping: !!python/tuple
+    - true
+    - true
+    - true
+    - false
+    - true
+    - false
+    universe: *id007
   rule_name: _or
   term_expression: _or(Nplus, SEminus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id018
+    meaning: *id017
     rule_name: Nplus
     term_expression: Nplus
   - form: ''
     length: 1
-    meaning: *id012
+    meaning: *id011
     rule_name: Splus
     term_expression: Splus
   form: ''
   length: 3
-  meaning: &id022 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: false
-      *id006: false
-      *id001: true
-      *id002: true
-    universe: *id008
+  meaning: &id021 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    - 0
+    - 0.3333333333333333
+    - 0
+    mapping: !!python/tuple
+    - true
+    - true
+    - false
+    - false
+    - true
+    - false
+    universe: *id007
   rule_name: _or
   term_expression: _or(Nplus, Splus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id016
+    meaning: *id015
     rule_name: Rminus
     term_expression: Rminus
   - form: ''
     length: 1
-    meaning: *id012
+    meaning: *id011
     rule_name: Splus
     term_expression: Splus
   form: ''
   length: 3
-  meaning: &id023 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: false
-      *id006: false
-      *id001: true
-      *id002: true
-    universe: *id008
+  meaning: &id022 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - true
+    - true
+    - false
+    - true
+    - false
+    - false
+    universe: *id007
   rule_name: _or
   term_expression: _or(Rminus, Splus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id013
+    meaning: *id012
     rule_name: Rplus
     term_expression: Rplus
   - form: ''
     length: 1
-    meaning: *id012
+    meaning: *id011
     rule_name: Splus
     term_expression: Splus
   form: ''
   length: 3
-  meaning: &id024 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: false
-      *id006: true
-      *id001: true
-      *id002: true
-    universe: *id008
+  meaning: &id023 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.25
+    - 0.25
+    - 0
+    - 0
+    - 0.25
+    - 0.25
+    mapping: !!python/tuple
+    - true
+    - true
+    - false
+    - false
+    - true
+    - true
+    universe: *id007
   rule_name: _or
   term_expression: _or(Rplus, Splus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id014
+    meaning: *id013
     rule_name: SEplus
     term_expression: SEplus
   - form: ''
     length: 1
-    meaning: *id012
+    meaning: *id011
     rule_name: Splus
     term_expression: Splus
   form: ''
   length: 3
-  meaning: &id025 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: false
-      *id006: true
-      *id001: true
-      *id002: true
-    universe: *id008
+  meaning: &id024 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.2
+    - 0.2
+    - 0
+    - 0.2
+    - 0.2
+    - 0.2
+    mapping: !!python/tuple
+    - true
+    - true
+    - false
+    - true
+    - true
+    - true
+    universe: *id007
   rule_name: _or
   term_expression: _or(SEplus, Splus)
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id016
+      meaning: *id015
       rule_name: Rminus
       term_expression: Rminus
     form: ''
     length: 2
-    meaning: *id019
+    meaning: *id018
     rule_name: _not
     term_expression: _not(Rminus)
   form: ''
   length: 4
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: true
-      *id006: true
-      *id001: false
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0.25
+    - 0.25
+    - 0
+    - 0.25
+    - 0.25
+    mapping: !!python/tuple
+    - false
+    - true
+    - true
+    - false
+    - true
+    - true
+    universe: *id007
   rule_name: _and
   term_expression: _and(K-, _not(Rminus))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Rplus
       term_expression: Rplus
     form: ''
     length: 2
-    meaning: *id020
+    meaning: *id019
     rule_name: _not
     term_expression: _not(Rplus)
   form: ''
   length: 4
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: true
-      *id006: false
-      *id001: false
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - false
+    - true
+    - true
+    - true
+    - false
+    - false
+    universe: *id007
   rule_name: _and
   term_expression: _and(K-, _not(Rplus))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id018
+      meaning: *id017
       rule_name: Nplus
       term_expression: Nplus
     - form: ''
       length: 1
-      meaning: *id011
+      meaning: *id010
       rule_name: SEminus
       term_expression: SEminus
     form: ''
     length: 3
-    meaning: *id021
+    meaning: *id020
     rule_name: _or
     term_expression: _or(Nplus, SEminus)
   form: ''
   length: 5
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: true
-      *id006: false
-      *id001: false
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    - 0
+    mapping: !!python/tuple
+    - false
+    - true
+    - true
+    - false
+    - true
+    - false
+    universe: *id007
   rule_name: _and
   term_expression: _and(K-, _or(Nplus, SEminus))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id018
+      meaning: *id017
       rule_name: Nplus
       term_expression: Nplus
     - form: ''
       length: 1
-      meaning: *id012
+      meaning: *id011
+      rule_name: Splus
+      term_expression: Splus
+    form: ''
+    length: 3
+    meaning: *id021
+    rule_name: _or
+    term_expression: _or(Nplus, Splus)
+  form: ''
+  length: 5
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0.5
+    - 0
+    - 0
+    - 0.5
+    - 0
+    mapping: !!python/tuple
+    - false
+    - true
+    - false
+    - false
+    - true
+    - false
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(K-, _or(Nplus, Splus))
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id008
+    rule_name: K-
+    term_expression: K-
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id015
+      rule_name: Rminus
+      term_expression: Rminus
+    - form: ''
+      length: 1
+      meaning: *id011
       rule_name: Splus
       term_expression: Splus
     form: ''
     length: 3
     meaning: *id022
     rule_name: _or
-    term_expression: _or(Nplus, Splus)
+    term_expression: _or(Rminus, Splus)
   form: ''
   length: 5
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: false
-      *id006: false
-      *id001: false
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0.5
+    - 0
+    - 0.5
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - false
+    - true
+    - false
+    - true
+    - false
+    - false
+    universe: *id007
   rule_name: _and
-  term_expression: _and(K-, _or(Nplus, Splus))
+  term_expression: _and(K-, _or(Rminus, Splus))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id016
-      rule_name: Rminus
-      term_expression: Rminus
+      meaning: *id012
+      rule_name: Rplus
+      term_expression: Rplus
     - form: ''
       length: 1
-      meaning: *id012
+      meaning: *id011
       rule_name: Splus
       term_expression: Splus
     form: ''
     length: 3
     meaning: *id023
     rule_name: _or
-    term_expression: _or(Rminus, Splus)
-  form: ''
-  length: 5
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: false
-      *id006: false
-      *id001: false
-      *id002: true
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(K-, _or(Rminus, Splus))
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id009
-    rule_name: K-
-    term_expression: K-
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id013
-      rule_name: Rplus
-      term_expression: Rplus
-    - form: ''
-      length: 1
-      meaning: *id012
-      rule_name: Splus
-      term_expression: Splus
-    form: ''
-    length: 3
-    meaning: *id024
-    rule_name: _or
     term_expression: _or(Rplus, Splus)
   form: ''
   length: 5
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: false
-      *id006: true
-      *id001: false
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0.3333333333333333
+    - 0
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    mapping: !!python/tuple
+    - false
+    - true
+    - false
+    - false
+    - true
+    - true
+    universe: *id007
   rule_name: _and
   term_expression: _and(K-, _or(Rplus, Splus))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id014
+      meaning: *id013
       rule_name: SEplus
       term_expression: SEplus
     - form: ''
       length: 1
-      meaning: *id012
-      rule_name: Splus
-      term_expression: Splus
-    form: ''
-    length: 3
-    meaning: *id025
-    rule_name: _or
-    term_expression: _or(SEplus, Splus)
-  form: ''
-  length: 5
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: false
-      *id006: true
-      *id001: false
-      *id002: true
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(K-, _or(SEplus, Splus))
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id010
-    rule_name: Nminus
-    term_expression: Nminus
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id016
-      rule_name: Rminus
-      term_expression: Rminus
-    form: ''
-    length: 2
-    meaning: *id019
-    rule_name: _not
-    term_expression: _not(Rminus)
-  form: ''
-  length: 4
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: true
-      *id006: true
-      *id001: true
-      *id002: true
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(Nminus, _not(Rminus))
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id010
-    rule_name: Nminus
-    term_expression: Nminus
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id017
-      rule_name: K+
-      term_expression: K+
-    - form: ''
-      length: 1
-      meaning: *id013
-      rule_name: Rplus
-      term_expression: Rplus
-    form: ''
-    length: 3
-    meaning: *id026
-    rule_name: _or
-    term_expression: _or(K+, Rplus)
-  form: ''
-  length: 5
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: false
-      *id006: true
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(Nminus, _or(K+, Rplus))
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id010
-    rule_name: Nminus
-    term_expression: Nminus
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id017
-      rule_name: K+
-      term_expression: K+
-    - form: ''
-      length: 1
-      meaning: *id014
-      rule_name: SEplus
-      term_expression: SEplus
-    form: ''
-    length: 3
-    meaning: *id027
-    rule_name: _or
-    term_expression: _or(K+, SEplus)
-  form: ''
-  length: 5
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: false
-      *id006: true
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(Nminus, _or(K+, SEplus))
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id010
-    rule_name: Nminus
-    term_expression: Nminus
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id017
-      rule_name: K+
-      term_expression: K+
-    - form: ''
-      length: 1
-      meaning: *id015
-      rule_name: Sminus
-      term_expression: Sminus
-    form: ''
-    length: 3
-    meaning: *id028
-    rule_name: _or
-    term_expression: _or(K+, Sminus)
-  form: ''
-  length: 5
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: true
-      *id006: true
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(Nminus, _or(K+, Sminus))
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id010
-    rule_name: Nminus
-    term_expression: Nminus
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id013
-      rule_name: Rplus
-      term_expression: Rplus
-    - form: ''
-      length: 1
-      meaning: *id012
+      meaning: *id011
       rule_name: Splus
       term_expression: Splus
     form: ''
     length: 3
     meaning: *id024
     rule_name: _or
-    term_expression: _or(Rplus, Splus)
+    term_expression: _or(SEplus, Splus)
   form: ''
   length: 5
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: false
-      *id006: true
-      *id001: true
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0.25
+    - 0
+    - 0.25
+    - 0.25
+    - 0.25
+    mapping: !!python/tuple
+    - false
+    - true
+    - false
+    - true
+    - true
+    - true
+    universe: *id007
   rule_name: _and
-  term_expression: _and(Nminus, _or(Rplus, Splus))
+  term_expression: _and(K-, _or(SEplus, Splus))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id009
     rule_name: Nminus
     term_expression: Nminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id014
-      rule_name: SEplus
-      term_expression: SEplus
-    - form: ''
-      length: 1
-      meaning: *id012
-      rule_name: Splus
-      term_expression: Splus
-    form: ''
-    length: 3
-    meaning: *id025
-    rule_name: _or
-    term_expression: _or(SEplus, Splus)
-  form: ''
-  length: 5
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: false
-      *id006: true
-      *id001: true
-      *id002: true
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(Nminus, _or(SEplus, Splus))
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id011
-    rule_name: SEminus
-    term_expression: SEminus
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id017
-      rule_name: K+
-      term_expression: K+
-    - form: ''
-      length: 1
       meaning: *id015
-      rule_name: Sminus
-      term_expression: Sminus
-    form: ''
-    length: 3
-    meaning: *id028
-    rule_name: _or
-    term_expression: _or(K+, Sminus)
-  form: ''
-  length: 5
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: true
-      *id006: false
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(SEminus, _or(K+, Sminus))
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id015
-    rule_name: Sminus
-    term_expression: Sminus
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id016
       rule_name: Rminus
       term_expression: Rminus
     form: ''
     length: 2
-    meaning: *id019
+    meaning: *id018
     rule_name: _not
     term_expression: _not(Rminus)
   form: ''
   length: 4
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: true
-      *id006: true
-      *id001: false
-      *id002: false
-    universe: *id008
+    dist: !!python/tuple
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0
+    - 0
+    - 0.25
+    mapping: !!python/tuple
+    - true
+    - true
+    - true
+    - false
+    - false
+    - true
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(Nminus, _not(Rminus))
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id009
+    rule_name: Nminus
+    term_expression: Nminus
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id016
+      rule_name: K+
+      term_expression: K+
+    - form: ''
+      length: 1
+      meaning: *id012
+      rule_name: Rplus
+      term_expression: Rplus
+    form: ''
+    length: 3
+    meaning: *id025
+    rule_name: _or
+    term_expression: _or(K+, Rplus)
+  form: ''
+  length: 5
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.5
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0.5
+    mapping: !!python/tuple
+    - true
+    - false
+    - false
+    - false
+    - false
+    - true
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(Nminus, _or(K+, Rplus))
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id009
+    rule_name: Nminus
+    term_expression: Nminus
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id016
+      rule_name: K+
+      term_expression: K+
+    - form: ''
+      length: 1
+      meaning: *id013
+      rule_name: SEplus
+      term_expression: SEplus
+    form: ''
+    length: 3
+    meaning: *id026
+    rule_name: _or
+    term_expression: _or(K+, SEplus)
+  form: ''
+  length: 5
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.3333333333333333
+    - 0
+    - 0
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    mapping: !!python/tuple
+    - true
+    - false
+    - false
+    - true
+    - false
+    - true
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(Nminus, _or(K+, SEplus))
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id009
+    rule_name: Nminus
+    term_expression: Nminus
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id016
+      rule_name: K+
+      term_expression: K+
+    - form: ''
+      length: 1
+      meaning: *id014
+      rule_name: Sminus
+      term_expression: Sminus
+    form: ''
+    length: 3
+    meaning: *id027
+    rule_name: _or
+    term_expression: _or(K+, Sminus)
+  form: ''
+  length: 5
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.25
+    - 0
+    - 0.25
+    - 0.25
+    - 0
+    - 0.25
+    mapping: !!python/tuple
+    - true
+    - false
+    - true
+    - true
+    - false
+    - true
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(Nminus, _or(K+, Sminus))
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id009
+    rule_name: Nminus
+    term_expression: Nminus
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id012
+      rule_name: Rplus
+      term_expression: Rplus
+    - form: ''
+      length: 1
+      meaning: *id011
+      rule_name: Splus
+      term_expression: Splus
+    form: ''
+    length: 3
+    meaning: *id023
+    rule_name: _or
+    term_expression: _or(Rplus, Splus)
+  form: ''
+  length: 5
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    - 0
+    - 0
+    - 0.3333333333333333
+    mapping: !!python/tuple
+    - true
+    - true
+    - false
+    - false
+    - false
+    - true
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(Nminus, _or(Rplus, Splus))
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id009
+    rule_name: Nminus
+    term_expression: Nminus
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id013
+      rule_name: SEplus
+      term_expression: SEplus
+    - form: ''
+      length: 1
+      meaning: *id011
+      rule_name: Splus
+      term_expression: Splus
+    form: ''
+    length: 3
+    meaning: *id024
+    rule_name: _or
+    term_expression: _or(SEplus, Splus)
+  form: ''
+  length: 5
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.25
+    - 0.25
+    - 0
+    - 0.25
+    - 0
+    - 0.25
+    mapping: !!python/tuple
+    - true
+    - true
+    - false
+    - true
+    - false
+    - true
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(Nminus, _or(SEplus, Splus))
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id010
+    rule_name: SEminus
+    term_expression: SEminus
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id016
+      rule_name: K+
+      term_expression: K+
+    - form: ''
+      length: 1
+      meaning: *id014
+      rule_name: Sminus
+      term_expression: Sminus
+    form: ''
+    length: 3
+    meaning: *id027
+    rule_name: _or
+    term_expression: _or(K+, Sminus)
+  form: ''
+  length: 5
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.5
+    - 0
+    - 0.5
+    - 0
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - true
+    - false
+    - true
+    - false
+    - false
+    - false
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(SEminus, _or(K+, Sminus))
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id014
+    rule_name: Sminus
+    term_expression: Sminus
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id015
+      rule_name: Rminus
+      term_expression: Rminus
+    form: ''
+    length: 2
+    meaning: *id018
+    rule_name: _not
+    term_expression: _not(Rminus)
+  form: ''
+  length: 4
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    mapping: !!python/tuple
+    - false
+    - false
+    - true
+    - false
+    - true
+    - true
+    universe: *id007
   rule_name: _and
   term_expression: _and(Sminus, _not(Rminus))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id015
+    meaning: *id014
     rule_name: Sminus
     term_expression: Sminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Rplus
       term_expression: Rplus
     form: ''
     length: 2
-    meaning: *id020
+    meaning: *id019
     rule_name: _not
     term_expression: _not(Rplus)
   form: ''
   length: 4
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: true
-      *id006: false
-      *id001: false
-      *id002: false
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0.5
+    - 0.5
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - false
+    - false
+    - true
+    - true
+    - false
+    - false
+    universe: *id007
   rule_name: _and
   term_expression: _and(Sminus, _not(Rplus))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id015
+    meaning: *id014
     rule_name: Sminus
     term_expression: Sminus
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id018
+      meaning: *id017
       rule_name: Nplus
       term_expression: Nplus
     - form: ''
       length: 1
-      meaning: *id011
+      meaning: *id010
       rule_name: SEminus
       term_expression: SEminus
     form: ''
     length: 3
-    meaning: *id021
+    meaning: *id020
     rule_name: _or
     term_expression: _or(Nplus, SEminus)
   form: ''
   length: 5
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: true
-      *id006: false
-      *id001: false
-      *id002: false
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0.5
+    - 0
+    - 0.5
+    - 0
+    mapping: !!python/tuple
+    - false
+    - false
+    - true
+    - false
+    - true
+    - false
+    universe: *id007
   rule_name: _and
   term_expression: _and(Sminus, _or(Nplus, SEminus))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id009
+      meaning: *id008
       rule_name: K-
       term_expression: K-
     - form: ''
       length: 1
-      meaning: *id010
+      meaning: *id009
       rule_name: Nminus
       term_expression: Nminus
     form: ''
     length: 3
-    meaning: *id029
+    meaning: *id028
     rule_name: _and
     term_expression: _and(K-, Nminus)
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id016
+      meaning: *id015
       rule_name: Rminus
       term_expression: Rminus
     form: ''
     length: 2
-    meaning: *id019
+    meaning: *id018
     rule_name: _not
     term_expression: _not(Rminus)
   form: ''
   length: 6
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: true
-      *id006: true
-      *id001: false
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    - 0
+    - 0.3333333333333333
+    mapping: !!python/tuple
+    - false
+    - true
+    - true
+    - false
+    - false
+    - true
+    universe: *id007
   rule_name: _and
   term_expression: _and(_and(K-, Nminus), _not(Rminus))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id009
+      meaning: *id008
       rule_name: K-
       term_expression: K-
     - form: ''
       length: 1
-      meaning: *id010
+      meaning: *id009
       rule_name: Nminus
       term_expression: Nminus
     form: ''
     length: 3
-    meaning: *id029
+    meaning: *id028
     rule_name: _and
     term_expression: _and(K-, Nminus)
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id013
+      meaning: *id012
       rule_name: Rplus
       term_expression: Rplus
-    - form: ''
-      length: 1
-      meaning: *id012
-      rule_name: Splus
-      term_expression: Splus
-    form: ''
-    length: 3
-    meaning: *id024
-    rule_name: _or
-    term_expression: _or(Rplus, Splus)
-  form: ''
-  length: 7
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: false
-      *id006: true
-      *id001: false
-      *id002: true
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(_and(K-, Nminus), _or(Rplus, Splus))
-- children: !!python/tuple
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id009
-      rule_name: K-
-      term_expression: K-
-    - form: ''
-      length: 1
-      meaning: *id010
-      rule_name: Nminus
-      term_expression: Nminus
-    form: ''
-    length: 3
-    meaning: *id029
-    rule_name: _and
-    term_expression: _and(K-, Nminus)
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id014
-      rule_name: SEplus
-      term_expression: SEplus
-    - form: ''
-      length: 1
-      meaning: *id012
-      rule_name: Splus
-      term_expression: Splus
-    form: ''
-    length: 3
-    meaning: *id025
-    rule_name: _or
-    term_expression: _or(SEplus, Splus)
-  form: ''
-  length: 7
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: false
-      *id006: true
-      *id001: false
-      *id002: true
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(_and(K-, Nminus), _or(SEplus, Splus))
-- children: !!python/tuple
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id010
-      rule_name: Nminus
-      term_expression: Nminus
-    - form: ''
-      length: 1
-      meaning: *id015
-      rule_name: Sminus
-      term_expression: Sminus
-    form: ''
-    length: 3
-    meaning: *id030
-    rule_name: _and
-    term_expression: _and(Nminus, Sminus)
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id016
-      rule_name: Rminus
-      term_expression: Rminus
-    form: ''
-    length: 2
-    meaning: *id019
-    rule_name: _not
-    term_expression: _not(Rminus)
-  form: ''
-  length: 6
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: true
-      *id006: true
-      *id001: false
-      *id002: false
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(_and(Nminus, Sminus), _not(Rminus))
-- children: !!python/tuple
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id016
-      rule_name: Rminus
-      term_expression: Rminus
-    form: ''
-    length: 2
-    meaning: *id019
-    rule_name: _not
-    term_expression: _not(Rminus)
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id017
-      rule_name: K+
-      term_expression: K+
-    - form: ''
-      length: 1
-      meaning: *id015
-      rule_name: Sminus
-      term_expression: Sminus
-    form: ''
-    length: 3
-    meaning: *id028
-    rule_name: _or
-    term_expression: _or(K+, Sminus)
-  form: ''
-  length: 6
-  meaning: &id035 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: true
-      *id006: true
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(_not(Rminus), _or(K+, Sminus))
-- children: !!python/tuple
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id013
-      rule_name: Rplus
-      term_expression: Rplus
-    form: ''
-    length: 2
-    meaning: *id020
-    rule_name: _not
-    term_expression: _not(Rplus)
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id017
-      rule_name: K+
-      term_expression: K+
-    - form: ''
-      length: 1
-      meaning: *id015
-      rule_name: Sminus
-      term_expression: Sminus
-    form: ''
-    length: 3
-    meaning: *id028
-    rule_name: _or
-    term_expression: _or(K+, Sminus)
-  form: ''
-  length: 6
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: false
-      *id003: true
-      *id006: false
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(_not(Rplus), _or(K+, Sminus))
-- children: !!python/tuple
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id017
-      rule_name: K+
-      term_expression: K+
-    - form: ''
-      length: 1
-      meaning: *id015
-      rule_name: Sminus
-      term_expression: Sminus
-    form: ''
-    length: 3
-    meaning: *id028
-    rule_name: _or
-    term_expression: _or(K+, Sminus)
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id018
-      rule_name: Nplus
-      term_expression: Nplus
     - form: ''
       length: 1
       meaning: *id011
-      rule_name: SEminus
-      term_expression: SEminus
-    form: ''
-    length: 3
-    meaning: *id021
-    rule_name: _or
-    term_expression: _or(Nplus, SEminus)
-  form: ''
-  length: 7
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: true
-      *id003: true
-      *id006: false
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _and
-  term_expression: _and(_or(K+, Sminus), _or(Nplus, SEminus))
-- children: !!python/tuple
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id010
-      rule_name: Nminus
-      term_expression: Nminus
-    - form: ''
-      length: 1
-      meaning: *id013
-      rule_name: Rplus
-      term_expression: Rplus
-    form: ''
-    length: 3
-    meaning: *id031
-    rule_name: _and
-    term_expression: _and(Nminus, Rplus)
-  form: ''
-  length: 4
-  meaning: &id033 !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: true
-      *id006: false
-      *id001: true
-      *id002: true
-    universe: *id008
-  rule_name: _not
-  term_expression: _not(_and(Nminus, Rplus))
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id017
-    rule_name: K+
-    term_expression: K+
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id018
-      rule_name: Nplus
-      term_expression: Nplus
-    - form: ''
-      length: 1
-      meaning: *id016
-      rule_name: Rminus
-      term_expression: Rminus
-    form: ''
-    length: 3
-    meaning: *id032
-    rule_name: _or
-    term_expression: _or(Nplus, Rminus)
-  form: ''
-  length: 5
-  meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: false
-      *id006: false
-      *id001: true
-      *id002: false
-    universe: *id008
-  rule_name: _or
-  term_expression: _or(K+, _or(Nplus, Rminus))
-- children: !!python/tuple
-  - form: ''
-    length: 1
-    meaning: *id018
-    rule_name: Nplus
-    term_expression: Nplus
-  - children: !!python/tuple
-    - form: ''
-      length: 1
-      meaning: *id016
-      rule_name: Rminus
-      term_expression: Rminus
-    - form: ''
-      length: 1
-      meaning: *id012
       rule_name: Splus
       term_expression: Splus
     form: ''
     length: 3
     meaning: *id023
     rule_name: _or
+    term_expression: _or(Rplus, Splus)
+  form: ''
+  length: 7
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0.5
+    - 0
+    - 0
+    - 0
+    - 0.5
+    mapping: !!python/tuple
+    - false
+    - true
+    - false
+    - false
+    - false
+    - true
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(_and(K-, Nminus), _or(Rplus, Splus))
+- children: !!python/tuple
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id008
+      rule_name: K-
+      term_expression: K-
+    - form: ''
+      length: 1
+      meaning: *id009
+      rule_name: Nminus
+      term_expression: Nminus
+    form: ''
+    length: 3
+    meaning: *id028
+    rule_name: _and
+    term_expression: _and(K-, Nminus)
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id013
+      rule_name: SEplus
+      term_expression: SEplus
+    - form: ''
+      length: 1
+      meaning: *id011
+      rule_name: Splus
+      term_expression: Splus
+    form: ''
+    length: 3
+    meaning: *id024
+    rule_name: _or
+    term_expression: _or(SEplus, Splus)
+  form: ''
+  length: 7
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    mapping: !!python/tuple
+    - false
+    - true
+    - false
+    - true
+    - false
+    - true
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(_and(K-, Nminus), _or(SEplus, Splus))
+- children: !!python/tuple
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id009
+      rule_name: Nminus
+      term_expression: Nminus
+    - form: ''
+      length: 1
+      meaning: *id014
+      rule_name: Sminus
+      term_expression: Sminus
+    form: ''
+    length: 3
+    meaning: *id029
+    rule_name: _and
+    term_expression: _and(Nminus, Sminus)
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id015
+      rule_name: Rminus
+      term_expression: Rminus
+    form: ''
+    length: 2
+    meaning: *id018
+    rule_name: _not
+    term_expression: _not(Rminus)
+  form: ''
+  length: 6
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0.5
+    - 0
+    - 0
+    - 0.5
+    mapping: !!python/tuple
+    - false
+    - false
+    - true
+    - false
+    - false
+    - true
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(_and(Nminus, Sminus), _not(Rminus))
+- children: !!python/tuple
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id015
+      rule_name: Rminus
+      term_expression: Rminus
+    form: ''
+    length: 2
+    meaning: *id018
+    rule_name: _not
+    term_expression: _not(Rminus)
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id016
+      rule_name: K+
+      term_expression: K+
+    - form: ''
+      length: 1
+      meaning: *id014
+      rule_name: Sminus
+      term_expression: Sminus
+    form: ''
+    length: 3
+    meaning: *id027
+    rule_name: _or
+    term_expression: _or(K+, Sminus)
+  form: ''
+  length: 6
+  meaning: &id034 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.25
+    - 0
+    - 0.25
+    - 0
+    - 0.25
+    - 0.25
+    mapping: !!python/tuple
+    - true
+    - false
+    - true
+    - false
+    - true
+    - true
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(_not(Rminus), _or(K+, Sminus))
+- children: !!python/tuple
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id012
+      rule_name: Rplus
+      term_expression: Rplus
+    form: ''
+    length: 2
+    meaning: *id019
+    rule_name: _not
+    term_expression: _not(Rplus)
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id016
+      rule_name: K+
+      term_expression: K+
+    - form: ''
+      length: 1
+      meaning: *id014
+      rule_name: Sminus
+      term_expression: Sminus
+    form: ''
+    length: 3
+    meaning: *id027
+    rule_name: _or
+    term_expression: _or(K+, Sminus)
+  form: ''
+  length: 6
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    - 0
+    mapping: !!python/tuple
+    - true
+    - false
+    - true
+    - true
+    - false
+    - false
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(_not(Rplus), _or(K+, Sminus))
+- children: !!python/tuple
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id016
+      rule_name: K+
+      term_expression: K+
+    - form: ''
+      length: 1
+      meaning: *id014
+      rule_name: Sminus
+      term_expression: Sminus
+    form: ''
+    length: 3
+    meaning: *id027
+    rule_name: _or
+    term_expression: _or(K+, Sminus)
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id017
+      rule_name: Nplus
+      term_expression: Nplus
+    - form: ''
+      length: 1
+      meaning: *id010
+      rule_name: SEminus
+      term_expression: SEminus
+    form: ''
+    length: 3
+    meaning: *id020
+    rule_name: _or
+    term_expression: _or(Nplus, SEminus)
+  form: ''
+  length: 7
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    - 0
+    mapping: !!python/tuple
+    - true
+    - false
+    - true
+    - false
+    - true
+    - false
+    universe: *id007
+  rule_name: _and
+  term_expression: _and(_or(K+, Sminus), _or(Nplus, SEminus))
+- children: !!python/tuple
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id009
+      rule_name: Nminus
+      term_expression: Nminus
+    - form: ''
+      length: 1
+      meaning: *id012
+      rule_name: Rplus
+      term_expression: Rplus
+    form: ''
+    length: 3
+    meaning: *id030
+    rule_name: _and
+    term_expression: _and(Nminus, Rplus)
+  form: ''
+  length: 4
+  meaning: &id032 !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.2
+    - 0.2
+    - 0.2
+    - 0.2
+    - 0.2
+    - 0
+    mapping: !!python/tuple
+    - true
+    - true
+    - true
+    - true
+    - true
+    - false
+    universe: *id007
+  rule_name: _not
+  term_expression: _not(_and(Nminus, Rplus))
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id016
+    rule_name: K+
+    term_expression: K+
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id017
+      rule_name: Nplus
+      term_expression: Nplus
+    - form: ''
+      length: 1
+      meaning: *id015
+      rule_name: Rminus
+      term_expression: Rminus
+    form: ''
+    length: 3
+    meaning: *id031
+    rule_name: _or
+    term_expression: _or(Nplus, Rminus)
+  form: ''
+  length: 5
+  meaning: !!python/object:ultk.language.semantics.Meaning
+    dist: !!python/tuple
+    - 0.3333333333333333
+    - 0
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    mapping: !!python/tuple
+    - true
+    - false
+    - false
+    - true
+    - true
+    - false
+    universe: *id007
+  rule_name: _or
+  term_expression: _or(K+, _or(Nplus, Rminus))
+- children: !!python/tuple
+  - form: ''
+    length: 1
+    meaning: *id017
+    rule_name: Nplus
+    term_expression: Nplus
+  - children: !!python/tuple
+    - form: ''
+      length: 1
+      meaning: *id015
+      rule_name: Rminus
+      term_expression: Rminus
+    - form: ''
+      length: 1
+      meaning: *id011
+      rule_name: Splus
+      term_expression: Splus
+    form: ''
+    length: 3
+    meaning: *id022
+    rule_name: _or
     term_expression: _or(Rminus, Splus)
   form: ''
   length: 5
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: false
-      *id006: false
-      *id001: true
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0.25
+    - 0.25
+    - 0
+    - 0.25
+    - 0.25
+    - 0
+    mapping: !!python/tuple
+    - true
+    - true
+    - false
+    - true
+    - true
+    - false
+    universe: *id007
   rule_name: _or
   term_expression: _or(Nplus, _or(Rminus, Splus))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id009
+    meaning: *id008
     rule_name: K-
     term_expression: K-
   - children: !!python/tuple
     - children: !!python/tuple
       - form: ''
         length: 1
-        meaning: *id010
+        meaning: *id009
         rule_name: Nminus
         term_expression: Nminus
       - form: ''
         length: 1
-        meaning: *id013
+        meaning: *id012
         rule_name: Rplus
         term_expression: Rplus
       form: ''
       length: 3
-      meaning: *id031
+      meaning: *id030
       rule_name: _and
       term_expression: _and(Nminus, Rplus)
     form: ''
     length: 4
-    meaning: *id033
+    meaning: *id032
     rule_name: _not
     term_expression: _not(_and(Nminus, Rplus))
   form: ''
   length: 6
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: true
-      *id006: false
-      *id001: false
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0
+    mapping: !!python/tuple
+    - false
+    - true
+    - true
+    - true
+    - true
+    - false
+    universe: *id007
   rule_name: _and
   term_expression: _and(K-, _not(_and(Nminus, Rplus)))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id009
+      meaning: *id008
       rule_name: K-
       term_expression: K-
     - form: ''
       length: 1
-      meaning: *id012
+      meaning: *id011
       rule_name: Splus
       term_expression: Splus
     form: ''
     length: 3
-    meaning: *id034
+    meaning: *id033
     rule_name: _and
     term_expression: _and(K-, Splus)
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id018
+      meaning: *id017
       rule_name: Nplus
       term_expression: Nplus
     - form: ''
       length: 1
-      meaning: *id016
+      meaning: *id015
       rule_name: Rminus
       term_expression: Rminus
     form: ''
     length: 3
-    meaning: *id032
+    meaning: *id031
     rule_name: _or
     term_expression: _or(Nplus, Rminus)
   form: ''
   length: 7
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: false
-      *id006: false
-      *id001: false
-      *id002: true
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    mapping: !!python/tuple
+    - false
+    - true
+    - false
+    - true
+    - true
+    - false
+    universe: *id007
   rule_name: _or
   term_expression: _or(_and(K-, Splus), _or(Nplus, Rminus))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id015
+    meaning: *id014
     rule_name: Sminus
     term_expression: Sminus
   - children: !!python/tuple
     - children: !!python/tuple
       - form: ''
         length: 1
-        meaning: *id010
+        meaning: *id009
         rule_name: Nminus
         term_expression: Nminus
       - form: ''
         length: 1
-        meaning: *id013
+        meaning: *id012
         rule_name: Rplus
         term_expression: Rplus
       form: ''
       length: 3
-      meaning: *id031
+      meaning: *id030
       rule_name: _and
       term_expression: _and(Nminus, Rplus)
     form: ''
     length: 4
-    meaning: *id033
+    meaning: *id032
     rule_name: _not
     term_expression: _not(_and(Nminus, Rplus))
   form: ''
   length: 6
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: true
-      *id006: false
-      *id001: false
-      *id002: false
-    universe: *id008
+    dist: !!python/tuple
+    - 0
+    - 0
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0.3333333333333333
+    - 0
+    mapping: !!python/tuple
+    - false
+    - false
+    - true
+    - true
+    - true
+    - false
+    universe: *id007
   rule_name: _and
   term_expression: _and(Sminus, _not(_and(Nminus, Rplus)))
 - children: !!python/tuple
   - form: ''
     length: 1
-    meaning: *id010
+    meaning: *id009
     rule_name: Nminus
     term_expression: Nminus
   - children: !!python/tuple
     - children: !!python/tuple
       - form: ''
         length: 1
-        meaning: *id016
+        meaning: *id015
         rule_name: Rminus
         term_expression: Rminus
       form: ''
       length: 2
-      meaning: *id019
+      meaning: *id018
       rule_name: _not
       term_expression: _not(Rminus)
     - children: !!python/tuple
       - form: ''
         length: 1
-        meaning: *id017
+        meaning: *id016
         rule_name: K+
         term_expression: K+
       - form: ''
         length: 1
-        meaning: *id015
+        meaning: *id014
         rule_name: Sminus
         term_expression: Sminus
       form: ''
       length: 3
-      meaning: *id028
+      meaning: *id027
       rule_name: _or
       term_expression: _or(K+, Sminus)
     form: ''
     length: 6
-    meaning: *id035
+    meaning: *id034
     rule_name: _and
     term_expression: _and(_not(Rminus), _or(K+, Sminus))
   form: ''
   length: 8
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: false
-      *id005: false
-      *id003: true
-      *id006: true
-      *id001: true
-      *id002: false
-    universe: *id008
+    dist: !!python/tuple
+    - 0.3333333333333333
+    - 0
+    - 0.3333333333333333
+    - 0
+    - 0
+    - 0.3333333333333333
+    mapping: !!python/tuple
+    - true
+    - false
+    - true
+    - false
+    - false
+    - true
+    universe: *id007
   rule_name: _and
   term_expression: _and(Nminus, _and(_not(Rminus), _or(K+, Sminus)))
 - children: !!python/tuple
   - children: !!python/tuple
     - form: ''
       length: 1
-      meaning: *id017
+      meaning: *id016
       rule_name: K+
       term_expression: K+
     - form: ''
       length: 1
-      meaning: *id015
+      meaning: *id014
       rule_name: Sminus
       term_expression: Sminus
     form: ''
     length: 3
-    meaning: *id028
+    meaning: *id027
     rule_name: _or
     term_expression: _or(K+, Sminus)
   - children: !!python/tuple
     - children: !!python/tuple
       - form: ''
         length: 1
-        meaning: *id010
+        meaning: *id009
         rule_name: Nminus
         term_expression: Nminus
       - form: ''
         length: 1
-        meaning: *id013
+        meaning: *id012
         rule_name: Rplus
         term_expression: Rplus
       form: ''
       length: 3
-      meaning: *id031
+      meaning: *id030
       rule_name: _and
       term_expression: _and(Nminus, Rplus)
     form: ''
     length: 4
-    meaning: *id033
+    meaning: *id032
     rule_name: _not
     term_expression: _not(_and(Nminus, Rplus))
   form: ''
   length: 8
   meaning: !!python/object:ultk.language.semantics.Meaning
-    _dist: *id007
-    mapping: !frozendict
-      *id004: true
-      *id005: true
-      *id003: true
-      *id006: false
-      *id001: true
-      *id002: false
-    universe: *id008
+    dist: !!python/tuple
+    - 0.25
+    - 0
+    - 0.25
+    - 0.25
+    - 0.25
+    - 0
+    mapping: !!python/tuple
+    - true
+    - false
+    - true
+    - true
+    - true
+    - false
+    universe: *id007
   rule_name: _and
   term_expression: _and(_or(K+, Sminus), _not(_and(Nminus, Rplus)))
