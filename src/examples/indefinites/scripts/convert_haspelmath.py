@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 if __name__ == "__main__":
     haspelmath_data = pd.read_csv("indefinites/data/raw/languages_real_40_updated.csv")
     # restrict to person

@@ -7,7 +7,6 @@ from typing import Any
 from ultk.language.semantics import FrozenDict, Universe
 from ultk.language.language import Expression, Meaning, Language
 
-
 ALLOWED_REFERENCE_TYPES = ["paper-journal", "elicitation"]
 REFERENCE_GRAMMAR = "reference-grammar"
 REFERENCE_TYPES = [REFERENCE_GRAMMAR] + ALLOWED_REFERENCE_TYPES
