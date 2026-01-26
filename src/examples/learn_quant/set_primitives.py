@@ -1,7 +1,6 @@
 from typing import Callable
 from ultk.language.semantics import Referent
 
-
 global start
 start = "bool"
 

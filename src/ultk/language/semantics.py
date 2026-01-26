@@ -78,7 +78,7 @@ class Universe:
     def __init__(self, referents, prior=None):
         # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
         object.__setattr__(self, "referents", referents)
-        # When only referents are passed in, make the priors a unifrom distribution
+        # When only referents are passed in, make the priors a uniform distribution
         object.__setattr__(
             self, "prior", prior or tuple(1 / len(referents) for _ in referents)
         )
@@ -156,7 +156,7 @@ class Meaning(Generic[T]):
 
     For instance, sentence meanings are often modeled as sets of points (e.g. possible worlds).
     These correspond to mappings from points (i.e. Referents) to truth values, corresponding to the characteristic function of a set.
-    But, in general, meanings can have a different output type for, e.g. sub-sentential meanings..
+    But, in general, meanings can have a different output type for, e.g. sub-sentential meanings.
 
     Properties:
         mapping: a `FrozenDict` with `Referent` keys, but arbitrary type `T` as values.
@@ -178,7 +178,7 @@ class Meaning(Generic[T]):
         # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
         object.__setattr__(self, "mapping", mapping)
         object.__setattr__(self, "universe", universe)
-        # When only referents are passed in, make the priors a unifrom distribution
+        # if no dist given, make it uniform over `true-like` referents
         num_true_like = sum(1 for value in self.mapping if value)
         object.__setattr__(
             self,
@@ -186,8 +186,9 @@ class Meaning(Generic[T]):
             dist or tuple(1 / num_true_like if value else 0 for value in self.mapping),
         )
 
+    @cached_property
     def is_uniformly_false(self) -> bool:
-        """Return True if all referents in the meaning are mapped to False (or coercible to False).In the case where the meaning type is boolean, this corresponds to the characteristic function of the empty set."""
+        """Return True if all referents in the meaning are mapped to False (or coercible to False). In the case where the meaning type is boolean, this corresponds to the characteristic function of the empty set."""
         return all(not value for value in self.mapping)
 
     def get_binarized_meaning(self):

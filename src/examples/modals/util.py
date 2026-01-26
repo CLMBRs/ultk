@@ -7,7 +7,6 @@ from typing import Any
 from ultk.language.semantics import FrozenDict, Universe
 from ultk.language.language import Expression, Meaning, Language
 
-
 ALLOWED_REFERENCE_TYPES = ["paper-journal", "elicitation"]
 REFERENCE_GRAMMAR = "reference-grammar"
 REFERENCE_TYPES = [REFERENCE_GRAMMAR] + ALLOWED_REFERENCE_TYPES
@@ -159,7 +158,7 @@ def dataframe_to_language(
         )
 
         if (
-            meaning.is_uniformly_false()
+            meaning.is_uniformly_false
         ):  # often there will be no usable referents due to can_express being False, above
             continue
         # search for a matching recorded meaning

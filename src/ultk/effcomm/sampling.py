@@ -8,7 +8,6 @@ from ultk.effcomm.agent import Speaker, LiteralSpeaker
 from math import comb
 from tqdm import tqdm
 
-
 ##############################################################################
 # Methods for generating languages from expressions, or permuting the stochastic mapping from words to meanings of an existing language
 ##############################################################################
