@@ -158,7 +158,7 @@ def dataframe_to_language(
         )
 
         if (
-            meaning.is_uniformly_false()
+            meaning.is_uniformly_false
         ):  # often there will be no usable referents due to can_express being False, above
             continue
         # search for a matching recorded meaning
