@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # filter out the trivial meaning, results in NaNs
     # iterate over keys, since we need to change the dict itself
     for meaning in list(expressions_by_meaning.keys()):
-        if meaning.is_uniformly_false():
+        if meaning.is_uniformly_false:
             del expressions_by_meaning[meaning]
 
     print(f"Generated {len(expressions_by_meaning)} unique expressions.")
