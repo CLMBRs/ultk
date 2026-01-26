@@ -33,11 +33,5 @@ dependencies = [
 "Bug Tracker" = "https://github.com/CLMBRs/ultk/issues"
 
 [build-system]
-# requires = ["setuptools>=42", "wheel"]
-# build-backend = "setuptools.build_meta"
 requires = ["uv_build>=0.9.18,<0.10.0"]
 build-backend = "uv_build"
-
-
-# [tool.uv]
-# package = true
