@@ -98,9 +98,9 @@ class Rule:
         # parameters = {'name': Parameter} ordereddict, so we want the values
         # each value is a Paramter, with .annotation being the actual annotation
         rhs: tuple[Any, ...] | None = tuple(arg.annotation for arg in args.values())
-        # if one type annotation, a type of Referent, treat this as a terminal, no children = None RHS
+        # if one type annotation is class, a type of Referent, treat this as a terminal, no children = None RHS
         # TODO: make this more general?
-        if rhs and len(rhs) == 1 and issubclass(rhs[0], Referent):
+        if rhs and len(rhs) == 1 and inspect.isclass(rhs[0]) and issubclass(rhs[0], Referent):
             rhs = None
         return cls(
             name=rule_name,
