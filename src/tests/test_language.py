@@ -83,8 +83,7 @@ class TestLanguage:
                         form="dog",
                         meaning=Meaning(
                             mapping=tuple(
-                                ref.name == "dog"
-                                for ref in TestLanguage.uni.referents
+                                ref.name == "dog" for ref in TestLanguage.uni.referents
                             ),
                             universe=TestLanguage.uni2,
                         ),
