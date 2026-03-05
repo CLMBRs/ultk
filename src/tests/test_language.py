@@ -4,7 +4,6 @@ import pytest
 
 from ultk.language.language import Expression, Language
 from ultk.language.semantics import Referent, Universe, Meaning
-from ultk.util.frozendict import FrozenDict
 
 
 class TestLanguage:
@@ -27,35 +26,35 @@ class TestLanguage:
     dog = Expression(
         form="dog",
         meaning=Meaning(
-            mapping=FrozenDict({ref: ref.name == "dog" for ref in uni_refs}),
+            mapping=tuple(ref.name == "dog" for ref in uni_refs),
             universe=uni,
         ),
     )
     cat = Expression(
         form="cat",
         meaning=Meaning(
-            mapping=FrozenDict({ref: ref.name == "cat" for ref in uni_refs}),
+            mapping=tuple(ref.name == "cat" for ref in uni_refs),
             universe=uni,
         ),
     )
     tree = Expression(
         form="tree",
         meaning=Meaning(
-            mapping=FrozenDict({ref: ref.name == "tree" for ref in uni_refs}),
+            mapping=tuple(ref.name == "tree" for ref in uni_refs),
             universe=uni,
         ),
     )
     shroom = Expression(
         form="shroom",
         meaning=Meaning(
-            mapping=FrozenDict({ref: ref.name == "shroom" for ref in uni_refs}),
+            mapping=tuple(ref.name == "shroom" for ref in uni_refs),
             universe=uni,
         ),
     )
     bird = Expression(
         form="bird",
         meaning=Meaning(
-            mapping=FrozenDict({ref: ref.name == "bird" for ref in uni_refs}),
+            mapping=tuple(ref.name == "bird" for ref in uni_refs),
             universe=uni,
         ),
     )
@@ -65,7 +64,7 @@ class TestLanguage:
     lang_subset_expr = Language(expressions=tuple([dog, cat, tree]))
     lang_of_different_order = Language(expressions=tuple([dog, cat, shroom, tree]))
 
-    def test_exp_subset(self):
+    def test_exp_can_express_positive(self):
         assert TestLanguage.dog.can_express(Referent("dog", {"phylum": "animal"}))
 
     def test_exp_subset(self):
@@ -83,11 +82,9 @@ class TestLanguage:
                     Expression(
                         form="dog",
                         meaning=Meaning(
-                            mapping=FrozenDict(
-                                {
-                                    ref: ref.name == "dog"
-                                    for ref in TestLanguage.uni.referents
-                                }
+                            mapping=tuple(
+                                ref.name == "dog"
+                                for ref in TestLanguage.uni.referents
                             ),
                             universe=TestLanguage.uni2,
                         ),
@@ -98,8 +95,8 @@ class TestLanguage:
     def test_language_degree(self):
         def isAnimal(exp: Expression) -> bool:
             print("checking phylum of " + str(exp))
-            for k, v in exp.meaning.mapping.items():
-                if v and k.phylum != "animal":
+            for ref, v in zip(exp.meaning.universe.referents, exp.meaning.mapping):
+                if v and ref.phylum != "animal":
                     return False
             return True
 

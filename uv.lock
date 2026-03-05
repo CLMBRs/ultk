@@ -934,31 +934,41 @@ wheels = [
 
 [[package]]
 name = "ultk"
-version = "0.0.1rc0"
+version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "mypy" },
     { name = "nltk" },
     { name = "numpy" },
     { name = "pandas" },
     { name = "pathos" },
     { name = "plotnine" },
-    { name = "pytest" },
     { name = "pyyaml" },
     { name = "scipy" },
+    { name = "tqdm" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "mypy" },
+    { name = "pytest" },
     { name = "scipy-stubs", extra = ["scipy"] },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "mypy" },
     { name = "nltk" },
     { name = "numpy" },
     { name = "pandas" },
     { name = "pathos" },
     { name = "plotnine" },
-    { name = "pytest" },
     { name = "pyyaml" },
     { name = "scipy", specifier = ">=1.7.3" },
+    { name = "tqdm" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest" },
     { name = "scipy-stubs", extras = ["scipy"], specifier = ">=1.16.3.3" },
 ]

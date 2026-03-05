@@ -168,15 +168,16 @@ class GrammaticalExpression(Expression[T]):
         the expression evaluates to False."""
 
         return Meaning(
-            tuple(set(self.meaning.universe.referents) - set(self.meaning.referents)),
+            tuple(not val for val in self.meaning.mapping),
             self.meaning.universe,
         )
 
     def draw_referent(self, complement=False):
         """Get a random referent from the meaning's referents."""
+        universe_refs = self.meaning.universe.referents
         if complement:
-            return random.choice(list(self.complement().referents))
-        return random.choice(list(self.meaning.referents))
+            return random.choice([r for r, v in zip(universe_refs, self.meaning.mapping) if not v])
+        return random.choice([r for r, v in zip(universe_refs, self.meaning.mapping) if v])
 
     def to_dict(self) -> dict:
         the_dict = super().to_dict()

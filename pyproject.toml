@@ -1,6 +1,6 @@
 [project]
 name = "ultk"
-version = "0.0.1c"
+version = "0.1.0"
 authors = [
   { name="Chris Haberland", email="haberc@uw.edu"},
   { name="Nathaniel Imel", email="nimel@uci.edu"},
@@ -16,17 +16,18 @@ classifiers = [
 ]
 license = {file = "LICENSE.txt"}
 dependencies = [
-    "mypy",
     "numpy",
     "nltk",
     "pyyaml",
     "pandas",
     "plotnine",
     "pathos",
-    "pytest",
     "scipy>=1.7.3",
-    "scipy-stubs[scipy]>=1.16.3.3",
+    "tqdm",
 ]
+
+[dependency-groups]
+dev = ["mypy", "pytest", "scipy-stubs[scipy]>=1.16.3.3"]
 
 [project.urls]
 "Homepage" = "https://clmbr.shane.st/ultk"
