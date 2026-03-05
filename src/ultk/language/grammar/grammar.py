@@ -100,7 +100,12 @@ class Rule:
         rhs: tuple[Any, ...] | None = tuple(arg.annotation for arg in args.values())
         # if one type annotation is class, a type of Referent, treat this as a terminal, no children = None RHS
         # TODO: make this more general?
-        if rhs and len(rhs) == 1 and inspect.isclass(rhs[0]) and issubclass(rhs[0], Referent):
+        if (
+            rhs
+            and len(rhs) == 1
+            and inspect.isclass(rhs[0])
+            and issubclass(rhs[0], Referent)
+        ):
             rhs = None
         return cls(
             name=rule_name,
@@ -168,15 +173,20 @@ class GrammaticalExpression(Expression[T]):
         the expression evaluates to False."""
 
         return Meaning(
-            tuple(set(self.meaning.universe.referents) - set(self.meaning.referents)),
+            tuple(not val for val in self.meaning.mapping),
             self.meaning.universe,
         )
 
     def draw_referent(self, complement=False):
         """Get a random referent from the meaning's referents."""
+        universe_refs = self.meaning.universe.referents
         if complement:
-            return random.choice(list(self.complement().referents))
-        return random.choice(list(self.meaning.referents))
+            return random.choice(
+                [r for r, v in zip(universe_refs, self.meaning.mapping) if not v]
+            )
+        return random.choice(
+            [r for r, v in zip(universe_refs, self.meaning.mapping) if v]
+        )
 
     def to_dict(self) -> dict:
         the_dict = super().to_dict()

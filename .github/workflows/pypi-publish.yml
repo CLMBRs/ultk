@@ -13,15 +13,12 @@ jobs:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
     # retrieve your distributions here
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
+    - uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v5
       with:
-          python-version: '3.11'
-    - name: Install package 
-      run:  pip install --upgrade build
-            pip install -e .
+        python-version: "3.13"
     - name: Build dist
-      run:  python -m build
+      run: uv build
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:

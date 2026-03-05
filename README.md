@@ -9,13 +9,21 @@ Read the [documentation](https://clmbr.shane.st/ultk).
 
 ## Installing ULTK
 
-First, set up a virtual environment (e.g. via [miniconda](https://docs.conda.io/en/latest/miniconda.html), `conda create -n ultk python=3.11`, and `conda activate ultk`).
+ULTK requires Python 3.13+. We recommend using [uv](https://docs.astral.sh/uv/) to manage dependencies.
 
 1. Download or clone this repository and navigate to the root folder.
 
-2. Install ULTK (We recommend doing this inside a virtual environment)
+2. Install ULTK and all dependencies:
 
-    `pip install -e .`
+    ```
+    uv sync
+    ```
+
+    Alternatively, if you prefer pip inside an activated virtual environment:
+
+    ```
+    pip install -e .
+    ```
 
 ## Getting started
 
@@ -33,7 +41,14 @@ The source code is available on github [here](https://github.com/CLMBRs/ultk).
 
 ## Testing
 
-Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and executed via running `pytest` in the `src/tests` folder.
+Unit tests are written in [pytest](https://docs.pytest.org/en/7.3.x/) and executed via:
+
+```
+uv sync --group dev
+uv run pytest src/tests/
+```
+
+Or, if inside an activated virtual environment: `pytest src/tests/`.
 
 ## References
 

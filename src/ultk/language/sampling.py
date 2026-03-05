@@ -32,7 +32,8 @@ def all_meanings(universe: Universe) -> Generator[Meaning, None, None]:
     """Generate all Meanings (sets of Referents) from a given Universe."""
     referents = universe.referents
     for refset in powerset(referents):
-        yield Meaning(refset, universe)
+        refset_set = set(refset)
+        yield Meaning(tuple(ref in refset_set for ref in referents), universe)
 
 
 def all_expressions(meanings: Iterable[Meaning]) -> Generator[Expression, None, None]:
