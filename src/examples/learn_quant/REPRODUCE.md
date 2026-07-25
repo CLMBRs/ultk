@@ -117,6 +117,7 @@ Writes to `figures/`:
 | `length_vs_auc.png` | Twin of Fig 1 with **leaf count** (length) on the y-axis |
 | `functions_vs_auc.png` | Twin of Fig 1 with **function count** on the y-axis |
 | `monotonicity_vs_training_step.png` | Monotonicity vs step-at-convergence |
+| `first_step_vs_auc.png` | **Appendix figure**: learning speed (`first_step`) vs difficulty (AUC), per-model linear fits; prints & saves the caption's partial Spearman r (controlling for model) to `analysis/tables/10_first_step_auc_partial_spearman.txt`. Reproduced r = 0.893 vs published 0.892 |
 | `depth_vs_learning.png` | 2-panel: expression depth vs `first_step` and AUC |
 | `length_vs_learning.png` | 2-panel: leaf count vs `first_step` and AUC |
 | `functions_vs_learning.png` | 2-panel: function count vs `first_step` and AUC |
@@ -231,7 +232,7 @@ figures. Open it with the `altk` kernel and Run All. (Verified clean on
 
 | script | purpose |
 |---|---|
-| `scripts/reproduce_figures.py` | all figures (paper Fig 1, length/function twins, complexity-vs-learning) from the CSV |
+| `scripts/reproduce_figures.py` | all figures (paper Fig 1, length/function twins, complexity-vs-learning, appendix first-step-vs-AUC) from the CSV |
 | `scripts/deeper_analysis.py` | #1 partial correlations, #4 directional monotonicity, #6 per-operator difficulty (tables to `analysis/tables/`) |
 | `scripts/review_extensions.py` | 2026-07 review figures/diagnostics: clarified redraws, per-architecture operator analysis (with within-architecture rescaling), directional diagnostics, operator prevalence, polarity-counterbalance test |
 | `scripts/reproduce_from_postgres.py` | rebuild the run table directly from the live MLflow Postgres DB (needs tunnel) |

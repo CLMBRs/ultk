@@ -256,6 +256,91 @@ def plot_paper_figure1(df: pd.DataFrame, outpath: Path) -> bool:
     return True
 
 
+def plot_first_step_vs_auc(df: pd.DataFrame, outpath: Path) -> bool:
+    """Reproduce the appendix figure "First Step vs. AUC, Shaded by Model".
+
+    Source: cell 61 of the original exploratory notebook
+    (``statistical_model.ipynb``): learning speed (``first_step`` = step at
+    convergence) vs learning difficulty (``val_loss_step_AOC``), coloured by
+    model, with per-model linear fits (dashed, with SE bands), plotnine
+    default palette on ``theme_bw`` -- matching the published appendix.
+
+    Also recomputes the caption statistic: the partial Spearman correlation
+    between ``first_step`` and ``val_loss_step_AOC`` controlling for model
+    (binary covariate), using the standard first-order partial-correlation
+    formula on pairwise Spearman coefficients (equivalent to
+    ``pingouin.partial_corr(..., method="spearman")`` for one covariate).
+    Published caption value: r = 0.892.
+    """
+    try:
+        from plotnine import (
+            aes,
+            element_text,
+            geom_point,
+            geom_smooth,
+            ggplot,
+            labs,
+            theme,
+            theme_bw,
+        )
+    except ImportError:
+        print("  [skip] plotnine not installed; cannot build first-step figure")
+        return False
+
+    if not {"first_step", "val_loss_step_AOC", "model"}.issubset(df.columns):
+        print("  [skip] CSV missing first_step/val_loss_step_AOC/model")
+        return False
+
+    data = df.dropna(subset=["first_step", "val_loss_step_AOC"]).copy()
+    if data.empty:
+        print("  [skip] no converged rows for first-step figure")
+        return False
+
+    # caption statistic: partial Spearman controlling for model
+    from scipy.stats import spearmanr
+
+    z = (data["model"] == "Transformer").astype(float)
+    rxy = spearmanr(data["first_step"], data["val_loss_step_AOC"]).statistic
+    rxz = spearmanr(data["first_step"], z).statistic
+    ryz = spearmanr(data["val_loss_step_AOC"], z).statistic
+    r_partial = (rxy - rxz * ryz) / np.sqrt((1 - rxz**2) * (1 - ryz**2))
+
+    plot = (
+        ggplot(data, aes(x="first_step", y="val_loss_step_AOC", color="model"))
+        + geom_point(size=2, alpha=0.7)
+        + geom_smooth(aes(fill="model"), method="lm", se=True, linetype="dashed")
+        + labs(
+            x="First Step",
+            y="Area Under Curve (AUC)",
+            title="First Step vs. AUC, Shaded by Model",
+        )
+        + theme_bw()
+        + theme(
+            plot_title=element_text(ha="center", size=16, weight="bold"),
+            axis_title=element_text(size=14),
+            axis_text=element_text(size=12),
+        )
+    )
+    plot.save(outpath, dpi=300, verbose=False)
+    print(f"  saved {rel(outpath)}  ({len(data)} converged runs)")
+    print(
+        f"  partial Spearman first_step ~ AUC | model: r = {r_partial:.3f}"
+        f"  (raw Spearman r = {rxy:.3f}; published caption r = 0.892)"
+    )
+    tab = outpath.parent.parent / "analysis" / "tables" / "10_first_step_auc_partial_spearman.txt"
+    tab.parent.mkdir(parents=True, exist_ok=True)
+    tab.write_text(
+        f"First Step vs. AUC (appendix figure)\n"
+        f"n = {len(data)} converged runs "
+        f"({data.groupby('model').size().to_dict()})\n"
+        f"raw Spearman r(first_step, val_loss_step_AOC)      = {rxy:.4f}\n"
+        f"partial Spearman controlling for model (binary)    = {r_partial:.4f}\n"
+        f"published caption value                             = 0.892\n"
+    )
+    print(f"  table saved to {rel(tab)}")
+    return True
+
+
 def plot_length_vs_auc(
     df: pd.DataFrame,
     outpath: Path,
@@ -445,6 +530,10 @@ def main() -> None:
     # --- Figure 0: exact reproduction of the manuscript's Figure 1 ----------
     print("Figure 0: exact paper Figure 1 (Monotonicity vs Validation Loss AUC)")
     plot_paper_figure1(df, args.outdir / "paper_figure1.png")
+
+    # --- Appendix figure: first_step vs AUC, per-model fits ------------------
+    print("Appendix figure: First Step vs AUC (partial Spearman | model)")
+    plot_first_step_vs_auc(df, args.outdir / "first_step_vs_auc.png")
 
     # --- Figure 0b: twin of Figure 1 with expression LENGTH on the y-axis ----
     print("Figure 0b: length (leaf count) vs Validation Loss AUC")
