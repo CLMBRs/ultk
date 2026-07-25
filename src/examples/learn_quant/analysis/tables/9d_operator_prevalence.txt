@@ -1,0 +1,12 @@
+operator       % expr attested total (uniq expr)  mean/expr total (trained runs)
+and                      28.3%               599       0.30                 2120
+or                       32.4%               755       0.38                 2895
+not                      15.8%               323       0.16                 1237
+cardinality              97.5%              4797       2.40                17506
+subset_eq                97.3%              2736       1.37                 9853
+equals                   10.8%               221       0.11                  773
+greater_than             18.9%               397       0.20                 1561
+union                    73.2%              2267       1.13                 8027
+intersection             33.3%               758       0.38                 2852
+difference               84.4%              3126       1.56                11093
+index                    87.9%              3561       1.78                12838

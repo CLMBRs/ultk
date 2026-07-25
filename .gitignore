@@ -18,3 +18,4 @@ build/
 
 # "model/" above is for saved model artifacts; Hydra config groups must stay tracked
 !**/conf/model/
+src/examples/learn_quant/figures/
