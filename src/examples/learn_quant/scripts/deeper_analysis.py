@@ -48,9 +48,17 @@ from scipy import stats
 from reproduce_figures import count_functions, count_leaves
 
 OPERATORS = [
-    "and", "or", "not",
-    "cardinality", "subset_eq", "equals", "greater_than",
-    "union", "intersection", "difference", "index",
+    "and",
+    "or",
+    "not",
+    "cardinality",
+    "subset_eq",
+    "equals",
+    "greater_than",
+    "union",
+    "intersection",
+    "difference",
+    "index",
 ]
 
 # Learning-difficulty targets. Higher = harder.
@@ -73,7 +81,9 @@ def rel(path):
 
 
 def load() -> pd.DataFrame:
-    df = pd.read_csv(repo_root() / "outputs" / "combined_runs_AOC_monotonicity_updated.csv")
+    df = pd.read_csv(
+        repo_root() / "outputs" / "combined_runs_AOC_monotonicity_updated.csv"
+    )
     df = df[df["expression"].notna()].copy()
     df["leaf_count"] = df["expression"].apply(count_leaves)
     df["func_count"] = df["expression"].apply(count_functions)
@@ -91,7 +101,9 @@ def _z(s: pd.Series) -> pd.Series:
 # --------------------------------------------------------------------------- #
 # 1. Joint model + partial correlations
 # --------------------------------------------------------------------------- #
-def partial_corr(df: pd.DataFrame, x: str, y: str, controls: list[str]) -> tuple[float, float, int]:
+def partial_corr(
+    df: pd.DataFrame, x: str, y: str, controls: list[str]
+) -> tuple[float, float, int]:
     """Partial correlation of x and y controlling for `controls`.
 
     Regress x on controls and y on controls, correlate the residuals.
@@ -119,7 +131,9 @@ def analysis_joint(df: pd.DataFrame, outdir: Path) -> None:
     # paper's Figure 1 plots. (The old `monotonicity_entropic` mean-of-directions
     # column was inconsistent with the directional data and is no longer used.)
     print("\nCorrelations with val_loss_step_AOC (learning difficulty):")
-    print(f"{'predictor':<16}{'raw r':>10}{'partial r':>12}  (partial controls for the other)")
+    print(
+        f"{'predictor':<16}{'raw r':>10}{'partial r':>12}  (partial controls for the other)"
+    )
     for x, ctrl in [
         ("degree", ["func_count"]),
         ("func_count", ["degree"]),
@@ -131,7 +145,9 @@ def analysis_joint(df: pd.DataFrame, outdir: Path) -> None:
         print(f"{x:<16}{raw:>10.3f}{pr:>12.3f}   (n={n}, p={pp:.1e})")
 
     # --- joint OLS: standardized coefficients ---
-    print("\nJoint OLS  (standardized):  val_loss_step_AOC ~ degree + func_count + C(model)")
+    print(
+        "\nJoint OLS  (standardized):  val_loss_step_AOC ~ degree + func_count + C(model)"
+    )
     d = trained.dropna(subset=["val_loss_step_AOC", "degree", "func_count"]).copy()
     d["aoc_z"] = _z(d["val_loss_step_AOC"])
     d["mono_z"] = _z(d["degree"])
@@ -152,8 +168,15 @@ def analysis_joint(df: pd.DataFrame, outdir: Path) -> None:
     ax.set_yticklabels(labels)
     for i in range(len(keyvars)):
         for j in range(len(keyvars)):
-            ax.text(j, i, f"{corr.iloc[i, j]:.2f}", ha="center", va="center",
-                    color="white" if abs(corr.iloc[i, j]) > 0.5 else "black", fontsize=10)
+            ax.text(
+                j,
+                i,
+                f"{corr.iloc[i, j]:.2f}",
+                ha="center",
+                va="center",
+                color="white" if abs(corr.iloc[i, j]) > 0.5 else "black",
+                fontsize=10,
+            )
     ax.set_title("Pearson correlations (trained runs)", fontweight="bold")
     fig.colorbar(im, fraction=0.046, pad=0.04)
     fig.tight_layout()
@@ -191,8 +214,12 @@ def analysis_directional(df: pd.DataFrame, outdir: Path) -> None:
 
     print("\nJoint OLS: val_loss_step_AOC ~ upward + downward + func_count + C(model)")
     d = trained.dropna(subset=["val_loss_step_AOC", "func_count"]).copy()
-    m = smf.ols("val_loss_step_AOC ~ upward + downward + func_count + C(model)", data=d).fit()
-    print(f"  n = {int(m.nobs)}   R^2 = {m.rsquared:.3f}   adj R^2 = {m.rsquared_adj:.3f}")
+    m = smf.ols(
+        "val_loss_step_AOC ~ upward + downward + func_count + C(model)", data=d
+    ).fit()
+    print(
+        f"  n = {int(m.nobs)}   R^2 = {m.rsquared:.3f}   adj R^2 = {m.rsquared_adj:.3f}"
+    )
     print(m.summary().tables[1])
 
     # figure: mean AUC for high vs low in each direction
@@ -200,8 +227,12 @@ def analysis_directional(df: pd.DataFrame, outdir: Path) -> None:
 
     # panel A: AUC vs each directional degree (binned means)
     ax = axes[0]
-    colors = {"right_upward": "#1b9e77", "left_upward": "#66c2a5",
-              "right_downward": "#d95f02", "left_downward": "#fc8d62"}
+    colors = {
+        "right_upward": "#1b9e77",
+        "left_upward": "#66c2a5",
+        "right_downward": "#d95f02",
+        "left_downward": "#fc8d62",
+    }
     for c in dirs:
         sub = trained.dropna(subset=[c, "val_loss_step_AOC"])
         bins = pd.cut(sub[c], np.linspace(0, 1, 6))
@@ -216,10 +247,18 @@ def analysis_directional(df: pd.DataFrame, outdir: Path) -> None:
 
     # panel B: upward vs downward, split by model
     ax = axes[1]
-    trained["up_hi"] = (trained["upward"] > 0.5).map({True: "high upward", False: "low upward"})
-    trained["down_hi"] = (trained["downward"] > 0.5).map({True: "high downward", False: "low downward"})
-    grp = trained.dropna(subset=["val_loss_step_AOC"]).groupby(
-        ["up_hi", "down_hi"], observed=True)["val_loss_step_AOC"].mean().unstack()
+    trained["up_hi"] = (trained["upward"] > 0.5).map(
+        {True: "high upward", False: "low upward"}
+    )
+    trained["down_hi"] = (trained["downward"] > 0.5).map(
+        {True: "high downward", False: "low downward"}
+    )
+    grp = (
+        trained.dropna(subset=["val_loss_step_AOC"])
+        .groupby(["up_hi", "down_hi"], observed=True)["val_loss_step_AOC"]
+        .mean()
+        .unstack()
+    )
     grp.plot(kind="bar", ax=ax, color=["#8da0cb", "#e78ac3"])
     ax.set_ylabel("Mean val_loss_step_AOC", fontweight="bold")
     ax.set_title("Upward vs downward monotonicity", fontweight="bold")
@@ -287,10 +326,13 @@ def analysis_operators(df: pd.DataFrame, outdir: Path) -> None:
     for c in order:
         i = feat.index(c)
         star = "*" if (lo[i] > 0) or (hi[i] < 0) else " "
-        print(f"{c.replace('op_',''):<16}{coef[c]:>10.1f}   [{lo[i]:8.1f},{hi[i]:8.1f}] {star}")
+        print(
+            f"{c.replace('op_',''):<16}{coef[c]:>10.1f}   [{lo[i]:8.1f},{hi[i]:8.1f}] {star}"
+        )
 
     # variance explained: length-only vs operator-identity (via CV-free R^2)
     from sklearn.metrics import r2_score
+
     m_ops = r2_score(y, base.predict(Xz))
     Xlen = d[["func_count", "model_T"]].to_numpy(float)
     Xlenz = (Xlen - Xlen.mean(0)) / Xlen.std(0)
@@ -309,13 +351,17 @@ def analysis_operators(df: pd.DataFrame, outdir: Path) -> None:
 
     fig, ax = plt.subplots(figsize=(9, 6))
     colors = ["#c0392b" if coef[c] > 0 else "#2471a3" for c in op_only]
-    ax.errorbar(cvals, y_pos, xerr=[clo, chi], fmt="none", ecolor="gray", capsize=3, zorder=1)
+    ax.errorbar(
+        cvals, y_pos, xerr=[clo, chi], fmt="none", ecolor="gray", capsize=3, zorder=1
+    )
     ax.scatter(cvals, y_pos, color=colors, zorder=2, s=45)
     ax.axvline(0, color="black", linestyle="--", lw=1)
     ax.set_yticks(y_pos)
     ax.set_yticklabels(names)
-    ax.set_xlabel("Δ val_loss_step_AOC per +1 SD of operator count\n(red = harder, blue = easier; Ridge, bootstrap 95% CI)",
-                  fontweight="bold")
+    ax.set_xlabel(
+        "Δ val_loss_step_AOC per +1 SD of operator count\n(red = harder, blue = easier; Ridge, bootstrap 95% CI)",
+        fontweight="bold",
+    )
     ax.set_title("Per-operator contribution to learning difficulty", fontweight="bold")
     ax.grid(True, axis="x", linestyle="--", alpha=0.4)
     fig.tight_layout()
@@ -354,9 +400,11 @@ def analysis_nested(df: pd.DataFrame, outdir: Path) -> None:
 
     # length = func_count (equivalent to leaf_count, r=0.94); monotonicity = degree.
     # 'degree' is the measure the paper's Figure 1 plots on its y-axis.
-    d = df[df["training"] == True].dropna(  # noqa: E712
-        subset=["val_loss_step_AOC", "func_count", "degree"]
-    ).copy()
+    d = (
+        df[df["training"] == True]
+        .dropna(subset=["val_loss_step_AOC", "func_count", "degree"])  # noqa: E712
+        .copy()
+    )
     d["length_z"] = _z(d["func_count"])
     d["mono_z"] = _z(d["degree"])
     d["aoc"] = d["val_loss_step_AOC"]
@@ -367,7 +415,9 @@ def analysis_nested(df: pd.DataFrame, outdir: Path) -> None:
     LM = smf.ols("aoc ~ length_z + mono_z + C(model)", data=d).fit()
 
     def line(name, m):
-        print(f"  {name:<28} R^2={m.rsquared:6.3f}   AIC={m.aic:9.0f}   BIC={m.bic:9.0f}")
+        print(
+            f"  {name:<28} R^2={m.rsquared:6.3f}   AIC={m.aic:9.0f}   BIC={m.bic:9.0f}"
+        )
 
     print(f"\nModels (n={int(LM.nobs)}), controlling for model type:")
     line("base: model only", base)
@@ -381,10 +431,14 @@ def analysis_nested(df: pd.DataFrame, outdir: Path) -> None:
     fLM_from_M = anova_lm(M, LM)
     dR2_addM = LM.rsquared - L.rsquared
     dR2_addL = LM.rsquared - M.rsquared
-    print(f"  add MONOTONICITY on top of length:  ΔR^2=+{dR2_addM:.3f}  "
-          f"F={fLM_from_L['F'][1]:.1f}  p={fLM_from_L['Pr(>F)'][1]:.2e}")
-    print(f"  add LENGTH on top of monotonicity:  ΔR^2=+{dR2_addL:.3f}  "
-          f"F={fLM_from_M['F'][1]:.1f}  p={fLM_from_M['Pr(>F)'][1]:.2e}")
+    print(
+        f"  add MONOTONICITY on top of length:  ΔR^2=+{dR2_addM:.3f}  "
+        f"F={fLM_from_L['F'][1]:.1f}  p={fLM_from_L['Pr(>F)'][1]:.2e}"
+    )
+    print(
+        f"  add LENGTH on top of monotonicity:  ΔR^2=+{dR2_addL:.3f}  "
+        f"F={fLM_from_M['F'][1]:.1f}  p={fLM_from_M['Pr(>F)'][1]:.2e}"
+    )
 
     # Standardized effect sizes in the full model (compare |beta|).
     print("\nStandardized coefficients in the full model LM (|beta| = strength):")
@@ -393,15 +447,17 @@ def analysis_nested(df: pd.DataFrame, outdir: Path) -> None:
     print(f"  monotonicity (per +1 SD)  : {b['mono_z']:+8.1f}")
     stronger = "monotonicity" if abs(b["mono_z"]) > abs(b["length_z"]) else "length"
     ratio = abs(b["mono_z"]) / abs(b["length_z"])
-    print(f"  => {stronger} is the stronger predictor "
-          f"(|beta| ratio mono/length = {ratio:.2f})")
+    print(
+        f"  => {stronger} is the stronger predictor "
+        f"(|beta| ratio mono/length = {ratio:.2f})"
+    )
 
     # Commonality analysis (variance beyond the model-type baseline).
     r2_base = base.rsquared
-    total = LM.rsquared - r2_base           # explained by L & M jointly
-    unique_L = LM.rsquared - M.rsquared     # length's unique part
-    unique_M = LM.rsquared - L.rsquared     # monotonicity's unique part
-    common = total - unique_L - unique_M    # shared
+    total = LM.rsquared - r2_base  # explained by L & M jointly
+    unique_L = LM.rsquared - M.rsquared  # length's unique part
+    unique_M = LM.rsquared - L.rsquared  # monotonicity's unique part
+    common = total - unique_L - unique_M  # shared
     print("\nCommonality analysis (variance beyond model-type baseline):")
     print(f"  total explained by length+monotonicity : {total:.3f}")
     print(f"    unique to length                     : {unique_L:.3f}")
@@ -419,17 +475,24 @@ def analysis_nested(df: pd.DataFrame, outdir: Path) -> None:
     ax.set_xticklabels(names)
     ax.set_ylabel("R² (Validation Loss AUC)", fontweight="bold")
     ax.set_title("Cumulative variance explained", fontweight="bold")
-    ax.annotate(f"+{dR2_addL:.3f}\n(add length)", xy=(2.5, LM.rsquared),
-                ha="center", va="bottom", fontsize=9)
+    ax.annotate(
+        f"+{dR2_addL:.3f}\n(add length)",
+        xy=(2.5, LM.rsquared),
+        ha="center",
+        va="bottom",
+        fontsize=9,
+    )
     for i, v in enumerate(r2s):
         ax.text(i, v + 0.003, f"{v:.3f}", ha="center", fontsize=9)
     ax.grid(True, axis="y", linestyle="--", alpha=0.4)
 
     ax = axes[1]
     parts = [unique_L, common, unique_M]
-    labels = [f"length only\n{unique_L:.3f}",
-              f"shared\n{common:.3f}",
-              f"monotonicity only\n{unique_M:.3f}"]
+    labels = [
+        f"length only\n{unique_L:.3f}",
+        f"shared\n{common:.3f}",
+        f"monotonicity only\n{unique_M:.3f}",
+    ]
     colors = ["#4C72B0", "#C7C7C7", "#55A868"]
     left = 0
     for p, lab, c in zip(parts, labels, colors):
@@ -477,7 +540,9 @@ def analysis_predict_monotonicity(df: pd.DataFrame, outdir: Path) -> None:
     from statsmodels.stats.anova import anova_lm
 
     print("\n" + "=" * 72)
-    print("8. PREDICTING MONOTONICITY  (complexity vs learnability -- which explains it?)")
+    print(
+        "8. PREDICTING MONOTONICITY  (complexity vs learnability -- which explains it?)"
+    )
     print("=" * 72)
 
     trained = df[df["training"] == True].dropna(  # noqa: E712
@@ -500,7 +565,10 @@ def analysis_predict_monotonicity(df: pd.DataFrame, outdir: Path) -> None:
     print(f"\nAggregated to {n} unique expressions (mean AUC across trained runs).")
 
     print("\nSimple correlations with monotonicity (degree):")
-    for name, col in [("length (func_count)", "func_count"), ("learnability (mean AUC)", "auc")]:
+    for name, col in [
+        ("length (func_count)", "func_count"),
+        ("learnability (mean AUC)", "auc"),
+    ]:
         r, p = stats.pearsonr(agg[col], agg["degree"])
         print(f"  {name:<26} r={r:+.3f}   (p={p:.2e})")
 
@@ -523,19 +591,27 @@ def analysis_predict_monotonicity(df: pd.DataFrame, outdir: Path) -> None:
     f_addL = anova_lm(A, LA)
     dR2_addA = LA.rsquared - L.rsquared
     dR2_addL = LA.rsquared - A.rsquared
-    print(f"  add LEARNABILITY on top of length:  ΔR^2=+{dR2_addA:.3f}  "
-          f"F={f_addA['F'][1]:.1f}  p={f_addA['Pr(>F)'][1]:.2e}")
-    print(f"  add LENGTH on top of learnability:  ΔR^2=+{dR2_addL:.3f}  "
-          f"F={f_addL['F'][1]:.1f}  p={f_addL['Pr(>F)'][1]:.2e}")
+    print(
+        f"  add LEARNABILITY on top of length:  ΔR^2=+{dR2_addA:.3f}  "
+        f"F={f_addA['F'][1]:.1f}  p={f_addA['Pr(>F)'][1]:.2e}"
+    )
+    print(
+        f"  add LENGTH on top of learnability:  ΔR^2=+{dR2_addL:.3f}  "
+        f"F={f_addL['F'][1]:.1f}  p={f_addL['Pr(>F)'][1]:.2e}"
+    )
 
     print("\nStandardized coefficients in the full model (|beta| = strength):")
     b = LA.params
     print(f"  length (per +1 SD)        : {b['length_z']:+7.3f}")
     print(f"  learnability (per +1 SD)  : {b['auc_z']:+7.3f}")
-    stronger = "learnability (AUC)" if abs(b["auc_z"]) > abs(b["length_z"]) else "length"
+    stronger = (
+        "learnability (AUC)" if abs(b["auc_z"]) > abs(b["length_z"]) else "length"
+    )
     ratio = abs(b["auc_z"]) / abs(b["length_z"]) if b["length_z"] else float("inf")
-    print(f"  => {stronger} is the stronger predictor of monotonicity "
-          f"(|beta| ratio AUC/length = {ratio:.2f})")
+    print(
+        f"  => {stronger} is the stronger predictor of monotonicity "
+        f"(|beta| ratio AUC/length = {ratio:.2f})"
+    )
 
     total = LA.rsquared
     unique_L = LA.rsquared - A.rsquared
@@ -564,9 +640,11 @@ def analysis_predict_monotonicity(df: pd.DataFrame, outdir: Path) -> None:
 
     ax = axes[1]
     parts = [unique_L, common, unique_A]
-    labels = [f"length only\n{unique_L:.3f}",
-              f"shared\n{common:.3f}",
-              f"learnability only\n{unique_A:.3f}"]
+    labels = [
+        f"length only\n{unique_L:.3f}",
+        f"shared\n{common:.3f}",
+        f"learnability only\n{unique_A:.3f}",
+    ]
     colors = ["#4C72B0", "#C7C7C7", "#C44E52"]
     left = 0
     for p, lab, c in zip(parts, labels, colors):
@@ -607,7 +685,9 @@ def main() -> None:
     tables_dir = repo_root() / "analysis" / "tables"
     tables_dir.mkdir(parents=True, exist_ok=True)
     df = load()
-    print(f"Loaded {len(df)} rows; {int((df['training'] == True).sum())} trained.")  # noqa: E712
+    print(
+        f"Loaded {len(df)} rows; {int((df['training'] == True).sum())} trained."
+    )  # noqa: E712
 
     # Each section's printed output (correlations, OLS/ridge tables, nested-model
     # stats) is teed verbatim into analysis/tables/<section>.txt.

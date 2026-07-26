@@ -32,7 +32,10 @@ def _dec(v):
 def main() -> None:
     root = Path(__file__).resolve().parent.parent
     ap = argparse.ArgumentParser()
-    ap.add_argument("--csv", default=str(root / "outputs" / "combined_runs_AOC_monotonicity_updated.csv"))
+    ap.add_argument(
+        "--csv",
+        default=str(root / "outputs" / "combined_runs_AOC_monotonicity_updated.csv"),
+    )
     ap.add_argument("--n", type=int, default=150, help="sample size of runs")
     ap.add_argument("--dsn", default=DSN)
     args = ap.parse_args()
@@ -44,13 +47,11 @@ def main() -> None:
     admin = psycopg.connect(args.dsn, connect_timeout=10)
     admin.autocommit = True
     ac = admin.cursor()
-    ac.execute(
-        """
+    ac.execute("""
         SELECT pg_cancel_backend(pid) FROM pg_stat_activity
         WHERE datname='mlflow_db' AND state='active'
           AND query LIKE '%metrics%' AND query NOT LIKE '%pg_stat_activity%'
-        """
-    )
+        """)
     admin.close()
 
     # Sample runs that have an AOC value in the CSV.

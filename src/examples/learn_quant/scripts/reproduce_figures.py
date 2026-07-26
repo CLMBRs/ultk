@@ -140,7 +140,6 @@ def count_functions(expr: str) -> int:
     return 1 + sum(count_functions(arg) for arg in _split_top_level_args(inside))
 
 
-
 def plot_monotonicity_vs_step_from_csv(df: pd.DataFrame, outpath: Path) -> bool:
     """Same flagship figure but built from the aggregated CSV (fast, offline).
 
@@ -327,7 +326,12 @@ def plot_first_step_vs_auc(df: pd.DataFrame, outpath: Path) -> bool:
         f"  partial Spearman first_step ~ AUC | model: r = {r_partial:.3f}"
         f"  (raw Spearman r = {rxy:.3f}; published caption r = 0.892)"
     )
-    tab = outpath.parent.parent / "analysis" / "tables" / "10_first_step_auc_partial_spearman.txt"
+    tab = (
+        outpath.parent.parent
+        / "analysis"
+        / "tables"
+        / "10_first_step_auc_partial_spearman.txt"
+    )
     tab.parent.mkdir(parents=True, exist_ok=True)
     tab.write_text(
         f"First Step vs. AUC (appendix figure)\n"

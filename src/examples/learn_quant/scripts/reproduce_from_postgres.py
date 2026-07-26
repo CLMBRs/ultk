@@ -38,7 +38,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 # Reuse the leaf-count parser from the sibling script.
-from reproduce_figures import count_leaves, count_nodes, plot_complexity_vs_learning, rel
+from reproduce_figures import (
+    count_leaves,
+    count_nodes,
+    plot_complexity_vs_learning,
+    rel,
+)
 
 DEFAULT_DSN = os.environ.get(
     "MLFLOW_PG_DSN", "postgresql://USER:PASSWORD@localhost:5432/mlflow_db"
@@ -78,14 +83,12 @@ def connect(dsn: str):
 def explore(conn) -> None:
     cur = conn.cursor()
 
-    cur.execute(
-        """
+    cur.execute("""
         SELECT e.experiment_id, e.name, count(*) AS n_runs
         FROM runs r JOIN experiments e ON r.experiment_id = e.experiment_id
         GROUP BY e.experiment_id, e.name
         ORDER BY n_runs DESC
-        """
-    )
+        """)
     print("== experiments ==")
     for eid, name, n in cur.fetchall():
         print(f"  id={eid:<6} runs={n:<7} {name}")
@@ -95,7 +98,9 @@ def explore(conn) -> None:
     for k, n in cur.fetchall():
         print(f"  {k:<28} {n}")
 
-    cur.execute("SELECT key, count(*) FROM params GROUP BY key ORDER BY 2 DESC LIMIT 30")
+    cur.execute(
+        "SELECT key, count(*) FROM params GROUP BY key ORDER BY 2 DESC LIMIT 30"
+    )
     print("\n== param keys (top 30) ==")
     for k, n in cur.fetchall():
         print(f"  {k:<28} {n}")
@@ -214,7 +219,9 @@ def fetch_run_table(conn, experiment_ids: list[str] | None) -> pd.DataFrame:
     df = df.rename(columns={"model__target_": "model_target"})
     df["model"] = df["model_target"].apply(_model_short)
     df["expression_depth"] = pd.to_numeric(df["expression_depth"], errors="coerce")
-    df["monotonicity_entropic"] = pd.to_numeric(df["monotonicity_entropic"], errors="coerce")
+    df["monotonicity_entropic"] = pd.to_numeric(
+        df["monotonicity_entropic"], errors="coerce"
+    )
     df["val_loss_step_AOC"] = pd.to_numeric(df["val_loss_step_AOC"], errors="coerce")
     df["first_step"] = pd.to_numeric(df["first_step"], errors="coerce")
 
@@ -243,8 +250,15 @@ def plot_paper_figure1_pg(df: pd.DataFrame, outpath: Path) -> None:
     if data["model"].notna().any():
         for name, sub in data.groupby("model"):
             idx = (data["model"] == name).to_numpy()
-            ax.scatter(x[idx], yj[idx], s=14, alpha=0.5, edgecolors="none",
-                       color=colors.get(str(name)), label=str(name))
+            ax.scatter(
+                x[idx],
+                yj[idx],
+                s=14,
+                alpha=0.5,
+                edgecolors="none",
+                color=colors.get(str(name)),
+                label=str(name),
+            )
     else:
         ax.scatter(x, yj, s=14, alpha=0.5, edgecolors="none", color="#0073C2")
 
@@ -257,7 +271,12 @@ def plot_paper_figure1_pg(df: pd.DataFrame, outpath: Path) -> None:
     ax.set_ylabel("Monotonicity", fontsize=20, fontweight="bold")
     ax.tick_params(labelsize=13)
     ax.grid(True, linestyle="--", color="gray", alpha=0.5)
-    ax.legend(title=f"Model   (r = {r:.2f})", fontsize=14, title_fontsize=15, loc="upper right")
+    ax.legend(
+        title=f"Model   (r = {r:.2f})",
+        fontsize=14,
+        title_fontsize=15,
+        loc="upper right",
+    )
     fig.tight_layout()
     fig.savefig(outpath, dpi=600)
     plt.close(fig)
@@ -268,12 +287,22 @@ def main() -> None:
     root = repo_root()
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--dsn", default=DEFAULT_DSN)
-    p.add_argument("--explore", action="store_true", help="Print DB inventory and exit.")
-    p.add_argument("--experiment", action="append", default=None,
-                   help="Restrict to experiment id(s). Repeatable. Default: all.")
+    p.add_argument(
+        "--explore", action="store_true", help="Print DB inventory and exit."
+    )
+    p.add_argument(
+        "--experiment",
+        action="append",
+        default=None,
+        help="Restrict to experiment id(s). Repeatable. Default: all.",
+    )
     p.add_argument("--outdir", type=Path, default=root / "figures")
-    p.add_argument("--dump-csv", type=Path, default=None,
-                   help="Also write the assembled per-run table to this CSV.")
+    p.add_argument(
+        "--dump-csv",
+        type=Path,
+        default=None,
+        help="Also write the assembled per-run table to this CSV.",
+    )
     args = p.parse_args()
 
     conn = connect(args.dsn)
@@ -287,9 +316,14 @@ def main() -> None:
     df = fetch_run_table(conn, args.experiment)
     print(f"  assembled {len(df)} runs")
     print("  models:", df["model"].value_counts(dropna=False).to_dict())
-    print("  with AOC:", int(df["val_loss_step_AOC"].notna().sum()),
-          " with monotonicity:", int(df["monotonicity_entropic"].notna().sum()),
-          " with first_step:", int(df["first_step"].notna().sum()))
+    print(
+        "  with AOC:",
+        int(df["val_loss_step_AOC"].notna().sum()),
+        " with monotonicity:",
+        int(df["monotonicity_entropic"].notna().sum()),
+        " with first_step:",
+        int(df["first_step"].notna().sum()),
+    )
 
     if args.dump_csv:
         df.to_csv(args.dump_csv, index=False)
@@ -300,14 +334,16 @@ def main() -> None:
 
     print("Figure: depth vs learning")
     plot_complexity_vs_learning(
-        df, xcol="expression_depth",
+        df,
+        xcol="expression_depth",
         xlabel="Expression depth\n(parenthesis nesting)",
         outpath=args.outdir / "depth_vs_learning_postgres.png",
     )
 
     print("Figure: length (leaf count) vs learning")
     plot_complexity_vs_learning(
-        df, xcol="leaf_count",
+        df,
+        xcol="leaf_count",
         xlabel="Expression length\n(number of leaf nodes / atoms)",
         outpath=args.outdir / "length_vs_learning_postgres.png",
     )
