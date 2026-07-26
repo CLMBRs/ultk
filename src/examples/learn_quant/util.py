@@ -225,10 +225,11 @@ def determine_start_index(cfg, expressions) -> int:
             print("Could not resume training from specified expression.")
             print(e)
             return 0
+    return 0
 
 
 def define_index_bounds(cfg, start_index) -> tuple:
-    if "index" in cfg.expressions:
+    if "index" in cfg.expressions and cfg.expressions.index is not None:
         return (cfg.expressions.index, cfg.expressions.index + 1)
     elif cfg.expressions.n_limit:
         return (start_index, start_index + cfg.expressions.n_limit)

@@ -1,0 +1,38 @@
+
+========================================================================
+6. PER-OPERATOR DIFFICULTY
+========================================================================
+
+Operator prevalence (mean count per expression):
+  and            0.30
+  or             0.40
+  not            0.17
+  cardinality    2.44
+  subset_eq      1.37
+  equals         0.11
+  greater_than   0.22
+  union          1.12
+  intersection   0.40
+  difference     1.55
+  index          1.79
+
+Ridge (alpha=10.0) on standardized operator counts + model.
+Coefficient = Δ val_loss_step_AOC per +1 SD of that operator's count:
+operator              coef                95% CI
+not                 -193.7   [  -242.0,  -144.6] *
+greater_than        -193.1   [  -221.7,  -164.1] *
+difference           -78.9   [  -122.0,   -35.3] *
+index                -10.5   [   -47.2,    29.1]  
+subset_eq             13.4   [   -14.8,    44.2]  
+or                    36.6   [     3.1,    72.8] *
+and                   39.1   [     1.5,    74.6] *
+cardinality           62.2   [    31.5,    94.7] *
+intersection         218.6   [   170.0,   263.6] *
+equals               365.5   [   327.0,   401.6] *
+union                781.9   [   708.0,   842.3] *
+
+  length-only (func_count+model) R^2 = 0.101
+  operator-identity R^2              = 0.253
+  improvement from operator identity : +0.152
+
+  saved figures/operator_effects.png

@@ -1,0 +1,5 @@
+mixed model AUC ~ degree * model + (1|expression):
+  degree                             beta=  -1792.6  p=1.13e-34
+  C(model)[T.Transformer]            beta=  +1583.2  p=0.00e+00
+  degree:C(model)[T.Transformer]     beta=  -1058.6  p=1.11e-99
+  saved figures/figure_vs_mixedmodel.png

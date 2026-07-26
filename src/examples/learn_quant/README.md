@@ -4,9 +4,9 @@ This module provides code used in the publication `Quantifiers of Greater Monoto
 This code provides an example of utilizing the `ultk` package for generating abstract data models of ordered referents in a universe and defining a grammar to generate unique quantifier expressions, as well as enumerating quantifier expressions and evaluating their meaning with respect to a universe of referents. 
 The example also includes code for training neural models to correctly verify a given quantifier expression, in addition to functions that compute a quantifier's degree of monotonicity, as described in the published manuscript.
 
-For an introduction to the data structures and research question, please refer to the publication and refer to the (tutorial)[src/examples/learn_quant/notebooks/tutorial.ipynb].
+For an introduction to the data structures and research question, please refer to the publication and refer to the [tutorial](notebooks/tutorial.ipynb).
 
-It is highly recommended that the user review the docs of the (`hydra` package)[www.hydra.cc].
+It is highly recommended that the user review the docs of the [`hydra` package](https://hydra.cc).
 
 # Usage
 
@@ -58,6 +58,15 @@ You may turn off tracking with MLFlow by setting the config value `tracking.mlfl
 The `measures.py` script calculates monotonicity for specified quantifier expressions and at given universe sizes. This references the config `conf/learn.yaml`. For expressions, it references the generated expressions at the folder associated with the parameter values at the `expressions` keyspace. If universe parameters are defined at the `measures.monotonicity.universe` keyspace, they will define the size of the universe at which the monotonicity value will be calculated for each expression. `measures.expressions` specifies which expressions will be calculated.
 
 Run `python -m learn_quant.measures` to generate a `.csv` file of the specified monotonicity measurements.
+
+## Reproducing the SALT 35 paper
+
+See [REPRODUCE.md](REPRODUCE.md) for step-by-step instructions to regenerate
+every figure and statistical result in the SALT 35 monotonicity manuscript
+from the data committed in this example (no database or training runs
+required), and [FIGURES_TECHNICAL.ipynb](FIGURES_TECHNICAL.ipynb) for a
+cell-by-cell technical companion. The manuscript itself is in
+[manuscript/](manuscript/).
 
 # Content Descriptions
 
