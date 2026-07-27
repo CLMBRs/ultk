@@ -1,0 +1,529 @@
+<title>learn_quant · Monotonicity &amp; Learnability — Research Dashboard</title>
+<style>
+  :root {
+    --paper: #FAF9F7;
+    --surface: #FFFFFF;
+    --border: #E6E3DC;
+    --border-soft: #EFEDE7;
+    --ink: #242231;
+    --ink-2: #5C5966;
+    --muted: #8C8894;
+    --accent: #4F3D8B;
+    --accent-soft: #EDEAF6;
+    --gold: #A87F2F;
+    --good: #2E7D4F;      --good-bg: #E7F2EB;
+    --warn: #A06F14;      --warn-bg: #F6EEDC;
+    --bad: #B3443E;       --bad-bg: #F7E8E7;
+    --neutral: #6B7280;   --neutral-bg: #EDEEF1;
+    --track: #EEECE6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #17161C;
+      --surface: #1F1E26;
+      --border: #302E3A;
+      --border-soft: #292732;
+      --ink: #E9E7EF;
+      --ink-2: #ABA7B8;
+      --muted: #7D7989;
+      --accent: #A89BDD;
+      --accent-soft: #2B2740;
+      --gold: #D3B36A;
+      --good: #6FBF8F;    --good-bg: #1E2F26;
+      --warn: #D9A94E;    --warn-bg: #322A18;
+      --bad: #DE8A85;     --bad-bg: #37211F;
+      --neutral: #9CA3AF; --neutral-bg: #282A31;
+      --track: #2A2833;
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #FAF9F7; --surface: #FFFFFF; --border: #E6E3DC; --border-soft: #EFEDE7;
+    --ink: #242231; --ink-2: #5C5966; --muted: #8C8894;
+    --accent: #4F3D8B; --accent-soft: #EDEAF6; --gold: #A87F2F;
+    --good: #2E7D4F; --good-bg: #E7F2EB; --warn: #A06F14; --warn-bg: #F6EEDC;
+    --bad: #B3443E; --bad-bg: #F7E8E7; --neutral: #6B7280; --neutral-bg: #EDEEF1;
+    --track: #EEECE6;
+  }
+  :root[data-theme="dark"] {
+    --paper: #17161C; --surface: #1F1E26; --border: #302E3A; --border-soft: #292732;
+    --ink: #E9E7EF; --ink-2: #ABA7B8; --muted: #7D7989;
+    --accent: #A89BDD; --accent-soft: #2B2740; --gold: #D3B36A;
+    --good: #6FBF8F; --good-bg: #1E2F26; --warn: #D9A94E; --warn-bg: #322A18;
+    --bad: #DE8A85; --bad-bg: #37211F; --neutral: #9CA3AF; --neutral-bg: #282A31;
+    --track: #2A2833;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 48px 24px 96px; }
+
+  h1, h2, h3 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-weight: 600; line-height: 1.25; text-wrap: balance; margin: 0;
+  }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.35rem; margin: 0 0 4px; }
+  h3 { font-size: 1.06rem; }
+  p { margin: 0.5em 0; max-width: 68ch; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  code, .mono {
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.86em;
+  }
+  code { background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
+
+  .eyebrow {
+    font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--gold); font-weight: 650; margin: 0 0 6px;
+  }
+  header.masthead { border-bottom: 2px solid var(--ink); padding-bottom: 20px; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px;
+              font-size: 0.84rem; color: var(--ink-2); }
+  .meta-row .mono { color: var(--ink-2); }
+
+  section { margin-top: 44px; }
+  .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px;
+                  border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  .section-head .sub { color: var(--muted); font-size: 0.85rem; }
+
+  /* summary tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+           gap: 14px; margin-top: 20px; }
+  .tile { background: var(--surface); border: 1px solid var(--border);
+          border-radius: 10px; padding: 16px 18px; }
+  .tile .num {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 2rem; font-weight: 600; color: var(--accent); line-height: 1.15;
+  }
+  .tile .what { font-size: 0.88rem; color: var(--ink-2); margin-top: 4px; }
+
+  /* chips */
+  .chip { display: inline-flex; align-items: center; gap: 6px;
+          font-size: 0.72rem; font-weight: 650; letter-spacing: 0.04em;
+          padding: 2px 10px; border-radius: 999px; white-space: nowrap;
+          text-transform: uppercase; }
+  .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .chip.done      { color: var(--good);    background: var(--good-bg); }
+  .chip.progress  { color: var(--accent);  background: var(--accent-soft); }
+  .chip.open      { color: var(--warn);    background: var(--warn-bg); }
+  .chip.weakened  { color: var(--bad);     background: var(--bad-bg); }
+  .chip.support   { color: var(--good);    background: var(--good-bg); }
+  .chip.pending   { color: var(--neutral); background: var(--neutral-bg); }
+
+  /* cards */
+  .card { background: var(--surface); border: 1px solid var(--border);
+          border-radius: 10px; padding: 18px 20px; }
+  .card + .card { margin-top: 14px; }
+  .card-head { display: flex; justify-content: space-between; gap: 14px; align-items: baseline;
+               flex-wrap: wrap; margin-bottom: 6px; }
+
+  /* tables */
+  .tbl-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+  th { text-align: left; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+       color: var(--muted); font-weight: 650; padding: 8px 12px 6px 0; border-bottom: 1px solid var(--border); }
+  td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-family: ui-monospace, "SF Mono", Menlo, monospace;
+                   font-variant-numeric: tabular-nums; font-size: 0.84rem; }
+  .dim { color: var(--muted); }
+
+  /* bar charts (pure CSS) */
+  .chart { margin: 14px 0 4px; }
+  .chart-title { font-size: 0.84rem; font-weight: 650; color: var(--ink-2); margin-bottom: 10px; }
+  .brow { display: grid; grid-template-columns: 170px 1fr 130px; align-items: center;
+          gap: 10px; padding: 4px 0; }
+  .brow .lab { font-size: 0.82rem; color: var(--ink-2); }
+  .brow .val { font-family: ui-monospace, "SF Mono", Menlo, monospace;
+               font-variant-numeric: tabular-nums; font-size: 0.82rem; color: var(--ink); }
+  .track { background: var(--track); border-radius: 4px; height: 14px; position: relative; }
+  .fill { position: absolute; inset: 0 auto 0 0; border-radius: 4px 4px 4px 4px;
+          background: var(--accent); min-width: 3px; }
+  .fill.ref { background: transparent; border: 1.5px solid var(--muted); box-sizing: border-box; }
+  .legend { display: flex; gap: 18px; font-size: 0.78rem; color: var(--ink-2);
+            margin-top: 10px; align-items: center; flex-wrap: wrap; }
+  .sw { display: inline-block; width: 14px; height: 10px; border-radius: 3px; margin-right: 6px;
+        vertical-align: -1px; }
+  .sw.solid { background: var(--accent); }
+  .sw.outline { border: 1.5px solid var(--muted); box-sizing: border-box; }
+
+  .verdict { border-left: 3px solid var(--accent); background: var(--accent-soft);
+             border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 14px 0 4px;
+             font-size: 0.94rem; }
+  .verdict strong { color: var(--accent); }
+
+  ul.tight { margin: 8px 0; padding-left: 20px; }
+  ul.tight li { margin: 5px 0; max-width: 75ch; }
+  ol.queue { margin: 8px 0; padding-left: 22px; }
+  ol.queue li { margin: 8px 0; max-width: 75ch; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .footnote { font-size: 0.8rem; color: var(--muted); margin-top: 6px; max-width: 75ch; }
+  @media (max-width: 560px) { .brow { grid-template-columns: 110px 1fr 96px; } }
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">learn_quant · SALT 35 follow-up program</p>
+  <h1>Monotonicity &amp; Learnability — Research Dashboard</h1>
+  <div class="meta-row">
+    <span>Session <span class="mono">2026-07-26</span></span>
+    <span>Branch <span class="mono">learn-quant-paper-reproduction</span></span>
+    <span>Commit <span class="mono">8520fe9</span></span>
+    <span>Paper: Haberland &amp; Steinert-Threlkeld, <em>Quantifiers that are more monotone are easier to learn</em> (SALT 35: 286–309)</span>
+  </div>
+  <p style="margin-top:14px; color: var(--ink-2); max-width: 72ch;">
+    Living tracker for the three post-publication research questions. Source of record:
+    <code>src/examples/learn_quant/</code> — this file lives at
+    <code>analysis/research_dashboard.html</code>; update it and republish to the same URL.
+  </p>
+</header>
+
+<!-- ============================ STATE OF PLAY ============================ -->
+<section>
+  <div class="section-head"><h2>State of play</h2><span class="sub">this session's three headline numbers</span></div>
+  <div class="tiles">
+    <div class="tile">
+      <div class="num">0.12</div>
+      <div class="what">Observed ÷ predicted difficulty gap inside complement pairs (T1).
+        At a <em>fixed decision boundary</em>, the learner barely cares which direction is monotone.</div>
+    </div>
+    <div class="tile">
+      <div class="num">−80%</div>
+      <div class="what">Shrinkage of the downward-monotonicity coefficient once truth-set
+        input statistics are controlled (T2): β −708 → −138 per SD.</div>
+    </div>
+    <div class="tile">
+      <div class="num">R² 0.54 <span style="font-size:1rem; color:var(--muted);">vs 0.13</span></div>
+      <div class="what">Truth-set statistics alone vs directional degrees alone, predicting
+        per-expression mean AUC (n = 1,795).</div>
+    </div>
+  </div>
+  <div class="verdict">
+    <strong>Synthesis.</strong> The upward/downward learning asymmetry is mostly <em>not</em> a
+    property of the learner's treatment of individual truth sets. It is carried by which meanings
+    the grammar samples — specifically their <em>class separability</em> in input space — plus
+    measurement noise in the directional degrees. The dominant mediator (class separation) is
+    complement-symmetric, which is exactly why T1 finds no within-pair difference while T2 finds
+    strong population-level mediation. The two results are one coherent story.
+  </div>
+</section>
+
+<!-- ============================ GROUND TRUTH ============================ -->
+<section>
+  <div class="section-head"><h2>Ground truth</h2><span class="sub">verified facts every analysis builds on (HANDOFF §2)</span></div>
+  <div class="card">
+    <ul class="tight">
+      <li><strong>Data:</strong> 8,005 training runs (7,172 trained; 2,000 unique expressions), CSV verified byte-for-byte against the MLflow Postgres backend.</li>
+      <li><strong>Degree:</strong> <code>degree</code> = max of the four clipped directional senses; exact for 100% of rows.</li>
+      <li><strong>Headline correlation:</strong> monotonicity–AUC r = −0.333 (published −0.3453 predates a post-publication fix to the monotonicity computation; published Table 6 reproduces to ≤ 0.2%).</li>
+      <li><strong>Length:</strong> leaf r = +0.234 / function r = +0.219 with AUC; monotonicity's unique R² (0.089) ≈ 3.4× length's (0.026).</li>
+      <li><strong>Composition control:</strong> the degree effect survives length + all 11 operator counts (β −540/SD, mixed p = 2e-38). Not an operator artifact.</li>
+      <li><strong>Directional asymmetry</strong> (Q2's subject): downward β −571/SD (p = 1e-39) vs upward +80/SD (n.s.) under full controls.</li>
+      <li><strong>The gap</strong> (Q3's subject): only 1.7% of expressions have degree in (0, 0.15] vs 8.8% at exactly 0; mechanism traced to bimodality-on-crisp-inputs + equality-type predicates (review §9i).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================ QUESTIONS ============================ -->
+<section>
+  <div class="section-head"><h2>The three questions</h2></div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>Q1 · How does the grammar shape monotonicity?</h3>
+      <span class="chip open">Open — plan ready</span>
+    </div>
+    <p>The grammar affects monotonicity only by steering which meanings get sampled. Design
+    (<code>EXPERIMENT_PLAN.md</code>, now actually ported): one maximal operator inventory
+    (add domain leaf <code>M</code> + integer constants), randomized Dirichlet production
+    weights per batch, ~60k expressions, ZOIB regressions + grammar response surface with
+    Sobol indices. Seven pre-registered predictions in plan §5.4. <strong>Next: Phase 0</strong>
+    (extend <code>grammar.yml</code>, re-derive anchor quantifiers).</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>Q2 · What drives the upward/downward learning asymmetry?</h3>
+      <span class="chip progress">Major progress — T1 &amp; T2 done</span>
+    </div>
+    <p>The puzzle: sigmoid + BCE training is symmetric under label complement, and the complement
+    of an up-set is a down-set — so pure decision-boundary geometry <em>cannot</em> produce a
+    direction effect. Any real asymmetry must come from sample composition, the encoding, the
+    example-sampling, or the measure. This session tested the boundary-level channel directly
+    (T1) and the input-statistics channel (T2). See the scoreboard and findings below.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>Q3 · The gap in (0, 0.15]: measure, sampling, or both?</h3>
+      <span class="chip open">Partially answered</span>
+    </div>
+    <p>Established (review §9i): a joint product — the measure is bimodal <em>on crisp inputs</em>,
+    and the grammar supplies only crisp inputs; equality-type predicates are the only crisp route
+    into the gap. Open items: re-run the family simulation on the real model space; audit the
+    <code>pred ≡ 1</code> and saturation boundary conditions; grammar predictions (ties to Q1);
+    check persistence under the generalized-switches measure.</p>
+  </div>
+</section>
+
+<!-- ============================ HYPOTHESES ============================ -->
+<section>
+  <div class="section-head"><h2>Q2 hypothesis scoreboard</h2><span class="sub">status after this session</span></div>
+  <div class="tbl-scroll"><table>
+    <thead><tr><th>Hypothesis</th><th>Mechanism</th><th>Status</th><th>Evidence this session</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>H1</strong> Sample composition / estimation artifact</td>
+        <td>Upward variation is scarce (57% zero upward degree); suppression flips signs in joint models.</td>
+        <td><span class="chip support">Supported</span></td>
+        <td>T2 confirms the effect is composition-side; H1's statistical piece stands but can't explain the downward magnitude alone.</td>
+      </tr>
+      <tr>
+        <td><strong>H2</strong> Positive-example geometry</td>
+        <td>Positives of downward quantifiers are small models → different input statistics for the positive class.</td>
+        <td><span class="chip weakened">Split verdict</span></td>
+        <td>As an <em>asymmetric</em> (which-class-is-positive) mechanism: weakened — T1 finds ~no within-pair effect. As symmetric <em>class separability</em>: strongly supported (T2's dominant mediator).</td>
+      </tr>
+      <tr>
+        <td><strong>H3</strong> Absence-detection surfaces</td>
+        <td>Down-sets = "no forbidden referent present"; inhibitory solutions found early by SGD.</td>
+        <td><span class="chip weakened">Weakened</span></td>
+        <td>T1: within identical boundaries, direction adds ≤ ~12% of the predicted gap; only a weak, non-significant LSTM hint (+76, p = 0.16) remains.</td>
+      </tr>
+      <tr>
+        <td><strong>H4</strong> Measure-side artifact</td>
+        <td>Directional degrees are noisy/attenuated (saturation, <code>pred ≡ 1</code> boundary case).</td>
+        <td><span class="chip support">Strengthened</span></td>
+        <td>T1's mirror check: up(e) = down(¬e) must hold for true complements; it fails for 50% of pairs (median dev 0.05, max 0.79, r = 0.71). Direct evidence of measurement noise.</td>
+      </tr>
+      <tr>
+        <td><strong>H5</strong> Confound with meaning simplicity</td>
+        <td>Downward-as-sampled meanings have simpler statistical structure.</td>
+        <td><span class="chip support">Made concrete</span></td>
+        <td>T2: "simpler structure" is now measurable as class separation (r = +0.48 with downward degree, r = −0.68 with AUC). H5 and generalized-H2 have merged into one mechanism.</td>
+      </tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============================ EXPERIMENTS ============================ -->
+<section>
+  <div class="section-head"><h2>Experiment ledger</h2><span class="sub">Q2 discriminating experiments, in cost order</span></div>
+  <div class="tbl-scroll"><table>
+    <thead><tr><th>ID</th><th>Design</th><th>Cost</th><th>Status</th><th>Outcome</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="mono">T1</td>
+        <td>Negation-pair test: complement truth vectors ⇒ identical boundary, flipped direction; compare AUC within pairs.</td>
+        <td>hours</td>
+        <td><span class="chip done">Done</span></td>
+        <td>Label symmetry holds; asymmetry is composition/measure-side. <span class="dim">tables/11</span></td>
+      </tr>
+      <tr>
+        <td class="mono">T2</td>
+        <td>Truth-set-statistics mediation: regress AUC on direction ± class-conditional input stats.</td>
+        <td>hours</td>
+        <td><span class="chip done">Done</span></td>
+        <td>Stats explain R² 0.54; downward β shrinks 80%; class separation dominates. <span class="dim">tables/12</span></td>
+      </tr>
+      <tr>
+        <td class="mono">T3</td>
+        <td>Matched minimal pairs (≥k vs ≤k families), small training runs.</td>
+        <td>days</td>
+        <td><span class="chip pending">Deprioritized</span></td>
+        <td>T1 already bounds the boundary-level effect at ~12%; run only if the LSTM hint needs chasing.</td>
+      </tr>
+      <tr>
+        <td class="mono">T4</td>
+        <td>Polarity-balanced regeneration (Phase 4 of the Q1 plan, M-leaf grammar).</td>
+        <td>cluster</td>
+        <td><span class="chip pending">Pending</span></td>
+        <td>— (pre-registered predictions 6–7 in plan §5.4)</td>
+      </tr>
+      <tr>
+        <td class="mono">T5</td>
+        <td>Generalized-switches degrees for all 2,000 expressions; re-run directional analyses.</td>
+        <td>measure work</td>
+        <td><span class="chip open">Next up</span></td>
+        <td>— (H4 now has direct motivating evidence from the mirror check)</td>
+      </tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============================ FINDINGS: T1 ============================ -->
+<section>
+  <div class="section-head"><h2>Finding · T1 negation-pair test</h2>
+    <span class="sub"><span class="mono">scripts/negation_pair_test.py</span> → <span class="mono">analysis/tables/11_negation_pair_test.txt</span></span></div>
+
+  <div class="card">
+    <p><strong>Setup.</strong> Among the 9,550-meaning pool, 884 meanings have their complement in the
+    pool; 44 complement pairs fall entirely inside the trained 2,000. Since the degree measure lives
+    on the 256-model universe but training models were drawn at M=12, X=16, every candidate pair was
+    re-verified as a <em>functional</em> complement on 20,000 training-style models:
+    <strong>41 verified, 3 failed</strong> — those 3 are complements only on the small universe, a
+    standing caveat for any universe-level analysis. 36 verified pairs have trained runs for both members.</p>
+
+    <div class="chart">
+      <div class="chart-title">Within-pair difficulty gap ΔAUC (upward-member − downward-member): population-model prediction vs observation</div>
+      <div class="brow"><span class="lab">All pairs (n=36)</span>
+        <div class="track"><div class="fill ref" style="width:32.6%"></div></div>
+        <span class="val">pred +182</span></div>
+      <div class="brow"><span class="lab"></span>
+        <div class="track"><div class="fill" style="width:2.9%"></div></div>
+        <span class="val">obs +16 ± 42</span></div>
+      <div class="brow" style="margin-top:8px;"><span class="lab">Polarity-contrast pairs (n=11)</span>
+        <div class="track"><div class="fill ref" style="width:100%"></div></div>
+        <span class="val">pred +558</span></div>
+      <div class="brow"><span class="lab"></span>
+        <div class="track"><div class="fill" style="width:11.8%"></div></div>
+        <span class="val">obs +66 ± 94</span></div>
+      <div class="legend">
+        <span><span class="sw outline"></span>predicted by population OLS (AUC ~ downward + upward)</span>
+        <span><span class="sw solid"></span>observed within pairs (± 95% CI)</span>
+      </div>
+    </div>
+
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>Comparison</th><th class="num">n</th><th class="num">mean Δ(U−D)</th><th class="num">median</th><th class="num">frac U harder</th><th class="num">Wilcoxon p</th></tr></thead>
+      <tbody>
+        <tr><td>LSTM</td><td class="num">36</td><td class="num">+65.6</td><td class="num">+21.4</td><td class="num">0.64</td><td class="num">0.16</td></tr>
+        <tr><td>Transformer</td><td class="num">36</td><td class="num">−33.7</td><td class="num">−17.7</td><td class="num">0.42</td><td class="num">0.41</td></tr>
+        <tr><td>Mean of architectures</td><td class="num">36</td><td class="num">+15.9</td><td class="num">−1.2</td><td class="num">0.50</td><td class="num">0.59</td></tr>
+        <tr><td>Contrast subset, mean arch</td><td class="num">11</td><td class="num">+65.5</td><td class="num">+14.6</td><td class="num">0.64</td><td class="num">0.21</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="verdict"><strong>Verdict.</strong> Observed/predicted ratio ≈ 0.12 — at least ~88% of
+    the population directional effect is not boundary-level. Empirically confirms the BCE
+    label-symmetry argument; kills strong forms of H2/H3.</div>
+
+    <p><strong>Bonus (H4).</strong> For true complements, up(e) = down(¬e) is an identity any clean
+    measure must satisfy. Observed: |up(e) − down(¬e)| mean 0.18, median 0.048, max 0.79; 50% of
+    pairs deviate &gt; 0.05; pooled correlation only r = 0.709. The directional degrees are noisy
+    measurements — the strongest direct evidence for H4 to date.</p>
+  </div>
+</section>
+
+<!-- ============================ FINDINGS: T2 ============================ -->
+<section>
+  <div class="section-head"><h2>Finding · T2 truth-set-statistics mediation</h2>
+    <span class="sub"><span class="mono">scripts/truth_set_stats.py</span> → <span class="mono">analysis/tables/12_truth_set_stats.txt</span></span></div>
+
+  <div class="card">
+    <p><strong>Setup.</strong> For each of the 2,000 expressions, class-conditional input statistics
+    on 4,000 training-style models (M=12, X=16): p(true), mean zone counts (|A−B|, |B−A|, |A∩B|)
+    among positives and negatives, within-class variance, class separation (L2 distance between the
+    two class means), and exact truth-boundary edge density on the 256-model universe.</p>
+
+    <div class="chart">
+      <div class="chart-title">Explaining per-expression mean AUC (n = 1,795): model R²</div>
+      <div class="brow"><span class="lab">Directions only</span>
+        <div class="track"><div class="fill" style="width:22.6%"></div></div>
+        <span class="val">R² = 0.126</span></div>
+      <div class="brow"><span class="lab">Truth-set stats only</span>
+        <div class="track"><div class="fill" style="width:96.4%"></div></div>
+        <span class="val">R² = 0.537</span></div>
+      <div class="brow"><span class="lab">Directions + stats</span>
+        <div class="track"><div class="fill" style="width:96.9%"></div></div>
+        <span class="val">R² = 0.540</span></div>
+      <div class="brow"><span class="lab">+ length</span>
+        <div class="track"><div class="fill" style="width:100%"></div></div>
+        <span class="val">R² = 0.557</span></div>
+    </div>
+
+    <div class="chart">
+      <div class="chart-title">Downward coefficient (per SD) before / after truth-set-stats control</div>
+      <div class="brow"><span class="lab">Directions only</span>
+        <div class="track"><div class="fill" style="width:100%"></div></div>
+        <span class="val">β = −708</span></div>
+      <div class="brow"><span class="lab">With stats control</span>
+        <div class="track"><div class="fill" style="width:19.5%"></div></div>
+        <span class="val">β = −138 (p = .002)</span></div>
+    </div>
+
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>Mediator (full model, mean AUC)</th><th class="num">β / SD</th><th class="num">p</th><th class="num">r with AUC</th><th class="num">r with downward</th></tr></thead>
+      <tbody>
+        <tr><td>Class separation (‖mean⁺ − mean⁻‖)</td><td class="num">−1500</td><td class="num">1e-138</td><td class="num">−0.68</td><td class="num">+0.48</td></tr>
+        <tr><td>Mean |A∩B| among positives</td><td class="num">−1089</td><td class="num">2e-11</td><td class="num">+0.11</td><td class="num">−0.33</td></tr>
+        <tr><td>Mean |A|+|B| among positives</td><td class="num">+422</td><td class="num">3e-4</td><td class="num">+0.23</td><td class="num">−0.38</td></tr>
+        <tr><td>Within-class variance (positives)</td><td class="num">−203</td><td class="num">4e-7</td><td class="num">+0.06</td><td class="num">−0.20</td></tr>
+        <tr><td>Boundary edge density (universe)</td><td class="num">−161</td><td class="num">1e-5</td><td class="num">+0.16</td><td class="num">−0.07</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="verdict"><strong>Verdict.</strong> The downward advantage is mostly carried by input-statistic
+    separability of the truth set's two classes. Consistent per architecture (shrinkage: LSTM 76%,
+    Transformer 83%). A small residual direction effect (β −138, p = .002) survives — matching T1's
+    small non-zero residual. Note class separation is complement-<em>symmetric</em>, which is what
+    reconciles T2's strong mediation with T1's null within pairs.</div>
+  </div>
+</section>
+
+<!-- ============================ ASSUMPTIONS ============================ -->
+<section>
+  <div class="section-head"><h2>Method assumptions</h2><span class="sub">what this session's conclusions rest on</span></div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Inherited from the pipeline</h3>
+      <ul class="tight">
+        <li>Training pairs are (model, label) only — the learner never sees the expression; sigmoid + BCE is symmetric under label complement.</li>
+        <li>Training models drawn by <code>generate_batch(M=12, X=16, inclusive=False)</code> with balanced classes (≤ 5,000 per class), per <code>conf/learn.yaml</code>.</li>
+        <li>Degrees are computed on the M4/X4 256-model universe — a different space from the training distribution.</li>
+        <li>Ease of learning = validation-loss AUC, averaged over trained runs per expression × architecture.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Introduced this session</h3>
+      <ul class="tight">
+        <li>Complementarity is verified on 20k sampled training-style models — overwhelming evidence, not logical proof (3 pairs did fail, proving the check is load-bearing).</li>
+        <li>Truth-set statistics estimated on 4,000 fixed models (seed 11); zone-count features are encoding-agnostic summaries, not the literal network input.</li>
+        <li>Regressions are per-expression OLS (runs averaged), matching prior sections — not mixed models; p-values are descriptive.</li>
+        <li>D-member of a pair = larger clipped max(down) − max(up); left/right senses are collapsed by max, as in all prior analyses.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ NEXT ============================ -->
+<section>
+  <div class="section-head"><h2>Next-steps queue</h2><span class="sub">highest information per hour first</span></div>
+  <div class="card">
+    <ol class="queue">
+      <li><strong>T5 — generalized-switches measure</strong> for all 2,000 expressions; re-run directional analyses. The mirror-check failures make this the top priority: if upward's effect appears under a cleaner measure, H4 was a major driver. Also answers Q3 item 4.</li>
+      <li><strong>Q1 Phase 0</strong> — add <code>M</code> leaf + integer constants to <code>grammar.yml</code>; re-derive anchor quantifiers (<em>all, some, no, most, an-even-number-of, at-least-3</em>); confirm expected degrees. Unblocks the whole Q1 design and T4.</li>
+      <li><strong>Q3 item 1</strong> — re-run the gap family simulation on the real model space with the actual <code>measures.py</code> (reuses Phase 0 machinery).</li>
+      <li><strong>Q2 residual</strong> — chase the small surviving direction effect (β −138) and the LSTM-only within-pair hint: does it correlate with the asymmetric (which-side-is-positive) stats? Cheap extension of T2's committed feature CSV.</li>
+      <li><strong>T4 — polarity-balanced regeneration</strong> (cluster; decision deferred until T5 + Phase 0 are in).</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================ PROVENANCE ============================ -->
+<section>
+  <div class="section-head"><h2>Provenance &amp; how to regenerate</h2></div>
+  <div class="card">
+    <ul class="tight">
+      <li><strong>Environment:</strong> conda env <code>altk</code>; run scripts from <code>src/examples/learn_quant/</code>.</li>
+      <li><strong>New this session:</strong> <code>scripts/negation_pair_test.py</code>, <code>scripts/truth_set_stats.py</code>, tables <code>11_*</code> / <code>12_*</code>, <code>analysis/truth_set_stats_features.csv</code>, ported <code>EXPERIMENT_PLAN.md</code>, status addendum in <code>HANDOFF.md</code> §8 — all in commit <span class="mono">8520fe9</span>.</li>
+      <li><strong>Regression test:</strong> all three pre-existing analysis scripts regenerate <code>analysis/tables/</code> byte-identically in this repo (verified 2026-07-26).</li>
+      <li><strong>External dependency:</strong> both new scripts need the original run archive (old <code>altk</code> checkout) for <code>M4/X4/d5/generated_expressions_xidx.pkl</code> + <code>master_universe.pkl</code>; pass <code>--altk-archive</code> if it moves.</li>
+      <li><strong>Data of record:</strong> <code>outputs/combined_runs_AOC_monotonicity_updated.csv</code>, verified against the MLflow Postgres backend.</li>
+      <li><strong>Prior review gallery:</strong> figure gallery with methodology vignettes from the 2026-07 reproduction review (link in HANDOFF §6).</li>
+    </ul>
+  </div>
+  <p class="footnote">Updating this dashboard: edit <code>analysis/research_dashboard.html</code>, commit, and republish
+  to the same artifact URL so the link stays stable across sessions.</p>
+</section>
+
+</div>

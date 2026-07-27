@@ -274,3 +274,8 @@ Done this session (details in `REPRODUCE.md` §4c and `analysis/tables/11*/12*`)
 Next in line: T5/generalized-switches (H4 now has direct supporting
 evidence), Q1 Phase 0, Q3 item 1. T3 (matched minimal pairs) is partly
 de-prioritized: T1 already bounds the boundary-level effect at ~12%.
+
+**Research dashboard** (questions / hypotheses / experiment ledger / findings,
+kept current across sessions): `analysis/research_dashboard.html`, published at
+https://claude.ai/code/artifact/46343659-5b6e-4f9c-8a89-8a481ee07d78 —
+edit the file and republish to the same URL to update.
