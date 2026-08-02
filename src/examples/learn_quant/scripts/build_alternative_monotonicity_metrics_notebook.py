@@ -35,6 +35,81 @@ A metric can fit one intuition and fail another. To avoid letting a metric
 define its own success, the notebook preregisters several qualitative tests
 before examining the scores.
 
+## Before comparing metrics: what "one-sided" and "two-sided" mean
+
+The manuscript's entropic measure is **one-sided in its choice of monotone
+approximation**. This does **not** mean that the manuscript measures only upward
+monotonicity: it computes right-upward, left-upward, right-downward, and
+left-downward scores. For each tested direction, however, it compares the
+quantifier with only the least monotone function lying **above** it.
+
+For upward monotonicity, let \(Q(x)\in\{0,1\}\) and let \(x\leq y\) mean that
+\(y\) enlarges the argument under test. Two canonical upward-monotone
+approximations bracket \(Q\):
+
+\[
+C^\uparrow Q(x)=1
+\quad\text{iff}\quad
+\text{some }y\leq x\text{ has }Q(y)=1,
+\]
+
+\[
+I^\uparrow Q(x)=1
+\quad\text{iff}\quad
+\text{every }y\geq x\text{ has }Q(y)=1.
+\]
+
+- **Majorant / upward closure \(C^\uparrow Q\):** the smallest
+  upward-monotone function greater than or equal to \(Q\). It repairs violations
+  only by changing false points to true.
+- **Minorant / upward interior \(I^\uparrow Q\):** the largest
+  upward-monotone function less than or equal to \(Q\). It repairs violations
+  only by changing true points to false.
+
+The manuscript score used in this notebook as the baseline is
+
+\[
+\operatorname{mon}_{\mathrm{majorant}}(Q)
+=
+1-\frac{H(Q\mid C^\uparrow Q)}{H(Q)}
+=
+\frac{I(Q;C^\uparrow Q)}{H(Q)}.
+\]
+
+It is therefore called **one-sided majorant entropy**: only the majorant side of
+the bracket contributes. The notebook's **two-sided entropy** variants also
+score the interior and combine the two values:
+
+\[
+s_C=\frac{I(Q;C^\uparrow Q)}{H(Q)},\qquad
+s_I=\frac{I(Q;I^\uparrow Q)}{H(Q)}.
+\]
+
+The mean, minimum, and maximum variants use
+\(\operatorname{mean}(s_C,s_I)\), \(\min(s_C,s_I)\), or
+\(\max(s_C,s_I)\), respectively. The benchmark emphasizes the **two-sided
+minimum**, the conservative choice: a high score requires both the majorant and
+the interior to preserve information about \(Q\). Symmetrically combining both
+sides also removes the majorant-only measure's asymmetry under Boolean
+complementation.
+
+### A four-point example
+
+Read each row as the truth values along a chain \(0<1<2<3\):
+
+| Quantifier pattern | \(Q\) | \(C^\uparrow Q\) | \(I^\uparrow Q\) | majorant score | interior score | two-sided minimum |
+|---|---|---|---|---:|---:|---:|
+| at least 2 | `0 0 1 1` | `0 0 1 1` | `0 0 1 1` | 1.000 | 1.000 | 1.000 |
+| between 1 and 2 | `0 1 1 0` | `0 1 1 1` | `0 0 0 0` | 0.311 | 0.000 | 0.000 |
+| even | `1 0 1 0` | `1 1 1 1` | `0 0 0 0` | 0.000 | 0.000 | 0.000 |
+
+The bounded interval illustrates the substantive choice. Its majorant adds only
+one true point, so the manuscript measure retains some information and scores
+`0.311`. Its interior is constant false: no true point is safe under every
+enlargement. The two-sided minimum therefore scores it `0`. Thus two-sidedness
+is not merely a technical correction; it imposes a stricter intuition about
+what should count as approximately monotone.
+
 ## Main findings
 
 - Pairwise preservation and counterfactual robustness are the same estimand
