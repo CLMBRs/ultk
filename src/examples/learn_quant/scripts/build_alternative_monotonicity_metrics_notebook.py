@@ -43,21 +43,64 @@ monotonicity: it computes right-upward, left-upward, right-downward, and
 left-downward scores. For each tested direction, however, it compares the
 quantifier with only the least monotone function lying **above** it.
 
-For upward monotonicity, let $Q(x)\in\{0,1\}$ and let $x\leq y$ mean that
-$y$ enlarges the argument under test. Two canonical upward-monotone
-approximations bracket $Q$:
+### First ignore the letters: use two repair recipes
+
+Here $Q$ is the **original quantifier**. A value of `1` means that the
+quantifier is true in a situation; `0` means false. The closure and interior are
+two new truth tables made from $Q$:
+
+1. **Closure: paint truth upward.** Start at every situation where $Q$ is true
+   and paint that situation and every enlargement above it true. Never erase an
+   original truth.
+2. **Interior: erase unsafe truths.** Keep an original true situation only when
+   every enlargement above it is also true in the original $Q$. Never add a new
+   truth.
+
+Why these recipes? Upward monotonicity says:
+
+> If the quantifier is true before enlargement, it must remain true after
+> enlargement.
+
+The closure enforces this rule by filling in missing truths above. The interior
+enforces the same rule by deleting any lower truth that would require a missing
+truth above.
+
+### Replace abstract $x$ and $y$ with actual sets
+
+For right-upward monotonicity, hold $A$ fixed and enlarge $B$. Let:
+
+- $B_{\mathrm{now}}$ be the particular set whose repaired truth value we are
+  deciding;
+- $B_{\mathrm{small}}$ be any subset of $B_{\mathrm{now}}$;
+- $B_{\mathrm{large}}$ be any superset of $B_{\mathrm{now}}$.
+
+Then the two recipes become:
 
 $$
-C^\uparrow Q(x)=1
+C^\uparrow Q(A,B_{\mathrm{now}})=1
 \quad\text{iff}\quad
-\text{some }y\leq x\text{ has }Q(y)=1,
+\text{at least one }B_{\mathrm{small}}\subseteq B_{\mathrm{now}}
+\text{ has }Q(A,B_{\mathrm{small}})=1.
 $$
 
+In words: **the closure calls the current set true if truth can reach it from
+any smaller set.**
+
 $$
-I^\uparrow Q(x)=1
+I^\uparrow Q(A,B_{\mathrm{now}})=1
 \quad\text{iff}\quad
-\text{every }y\geq x\text{ has }Q(y)=1.
+\text{every }B_{\mathrm{large}}\supseteq B_{\mathrm{now}}
+\text{ has }Q(A,B_{\mathrm{large}})=1.
 $$
+
+In words: **the interior keeps the current set true only if truth is safe at
+every larger set.**
+
+The abstract notation says exactly the same thing. The symbol $x$ means "the
+current situation." In the closure formula, $y$ ranges over situations below
+$x$ and asks whether **one witness** is true. In the interior formula, $y$
+ranges over situations above $x$ and asks whether **all possible challengers**
+are true.
 
 - **Majorant / upward closure $C^\uparrow Q$:** the smallest
   upward-monotone function greater than or equal to $Q$. It repairs violations
@@ -95,7 +138,32 @@ complementation.
 
 ### A four-point example
 
-Read each row as the truth values along a chain $0<1<2<3$:
+Suppose $Q$ means "`B` has one or two elements." Along the cardinality chain,
+the original truth pattern is:
+
+```text
+size of B:      0  ->  1  ->  2  ->  3
+original Q:     F      T      T      F
+```
+
+For the **closure**, the truth at size 1 paints every larger size true:
+
+```text
+closure:        F      T      T      T
+                              added ---^
+```
+
+For the **interior**, neither original truth is safe. From size 1 or size 2 we
+can enlarge to size 3, where the original $Q$ is false, so both truths are
+erased:
+
+```text
+interior:       F      F      F      F
+                       ^      ^
+                     erased truths
+```
+
+This gives the following score comparison:
 
 | Quantifier pattern | $Q$ | $C^\uparrow Q$ | $I^\uparrow Q$ | majorant score | interior score | two-sided minimum |
 |---|---|---|---|---:|---:|---:|
