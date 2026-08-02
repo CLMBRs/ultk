@@ -633,14 +633,15 @@ measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code>
 
     <p><strong>Full sensitivity rerun:</strong> the complement-dual alternative changed aggregate degree for
     1,283 of 2,000 expressions (mean change +0.071; largest 0.788). The manuscript
-    did use the old calculation: its Table 4 values match the old implementation in
-    all 12 auditable directional cells, and the old run table reproduces Table 6
+    used the majorant calculation: its Table 4 values match that implementation in
+    all 12 auditable directional cells, and the majorant run table reproduces Table 6
     coefficients to within 0.2%. See <code>FIGURES_TECHNICAL.ipynb</code> §6.</p>
 
     <div class="explain"><strong>See the full proof:</strong>
       <code>notebooks/monotonicity_measure_variants_walkthrough.ipynb</code> derives
       closure and interior, compares all variants on Table 4, tests all 44 pairs,
-      and recommends two-sided mean entropy for a revised analysis.
+      and identifies two-sided minimum entropy as the strongest current symmetric
+      candidate, while retaining the manuscript majorant for published-result reproduction.
     </div>
   </div>
 </section>

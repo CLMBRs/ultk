@@ -40,12 +40,16 @@ This notebook separates four questions that had become conflated:
 - The later replacement `down(Q) = up(not Q)` enforces complement invariance,
   but changes downward scoring from a majorant to a minorant. It is an
   **alternative measure**, not a neutral correction.
-- The two desired symmetries are **not impossible together**. A two-sided
-  entropy score can average closure and interior scores in every direction.
-- For a revised manuscript, this notebook recommends **two-sided mean entropy**
-  as the primary measure, with a direct violation-rate measure as a robustness
-  check. The manuscript-era measure should remain the published-result
-  reproduction.
+- The two desired symmetries are **not impossible together**. A symmetric
+  function of closure and interior scores can preserve both.
+- The arithmetic mean is not automatically the right symmetric function. It
+  can reward boundary agreement from an interior even when the closure score is
+  zero. The conservative **two-sided minimum** avoids that failure for the
+  comparability predicate while preserving both symmetries.
+- For the existing manuscript, retain the majorant as the primary published
+  measure. For a future symmetric metric, the two-sided minimum is the best
+  current candidate among the variants tested here, but it still needs broader
+  construct validation.
 
 The recommendation is justified step by step below rather than assumed.
 """
@@ -713,6 +717,77 @@ either the majorant or minorant can make a direction look monotone.
     ),
     md(
         r"""
+## 9b. A boundary artifact in the mean — and why it does not rule out every
+two-sided score
+
+`or(subset_eq(A,B), subset_eq(B,A))` is the **comparability predicate**: it is
+true exactly when A and B are comparable under inclusion. It is not monotone
+in any of the four directions.
+
+The table below distinguishes the manuscript's M6/X6 universe (the source of
+the quoted Table 4 value `0.201`) from the M4/X4 universe used for the 2,000
+learned expressions. The closure feature includes the point itself, so it is
+exactly constant 1 for this predicate in both universes. Its entropy score is
+therefore 0. The interior score is nonzero partly because an interior agrees
+with Q automatically at order boundaries.
+"""
+    ),
+    code(
+        r"""
+def comparability_diagnostic(universe, by_term, universe_label):
+    term = "or(subset_eq(A, B), subset_eq(B, A))"
+    q = np.fromiter(
+        (by_term[term].meaning.mapping[ref] for ref in universe.referents),
+        dtype=int,
+        count=len(universe.referents),
+    )
+    all_models = universe.binarize_referents(mode="set_vectors_w_padding")
+    ref_a = universe.binarize_referents(mode="A")
+    not_q = 1 - q
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        closure = measures.upward_monotonicity_entropy(
+            all_models, ref_a, q, cfg, False
+        )
+        interior = measures.upward_monotonicity_entropy(
+            all_models, ref_a, not_q, cfg, True
+        )
+    closure_feature = measures.get_true_predecessors(
+        all_models, ref_a, q, False
+    )
+    return {
+        "universe": universe_label,
+        "closure feature = 1": closure_feature.mean(),
+        "C_up score": closure,
+        "I_up score": interior,
+        "two-sided mean": (closure + interior) / 2,
+        "two-sided min": min(closure, interior),
+    }
+
+
+comparability = pd.DataFrame(
+    [
+        comparability_diagnostic(universe_m6, by_term_m6, "M6/X6 (Table 4)"),
+        comparability_diagnostic(universe_m4, by_term_m4, "M4/X4 (2k sample)"),
+    ]
+)
+comparability.round(4)
+"""
+    ),
+    md(
+        r"""
+The mean inherits half of the interior's boundary-driven information: `0.201`
+on M6/X6 and `0.216` on M4/X4. Calling that value “monotonicity” is hard to
+defend for this predicate.
+
+But this is a problem with the **mean**, not a proof that symmetric feature
+representations are impossible. The two-sided minimum gives 0 whenever either
+the closure or interior provides no directional evidence. Here it gives 0 in
+all four directions, while also passing all 44 complement-mirror tests.
+"""
+    ),
+    md(
+        r"""
 ## 10. Which measure is most in line with the intuition?
 
 There are two defensible intuitions:
@@ -732,9 +807,22 @@ intuition is especially relevant here because sigmoid + binary cross-entropy
 learning is symmetric under label complementation.
 
 The complement-dual alternative satisfies this second intuition, but mixes
-majorant and minorant constructions across directions. It is useful as a
-diagnostic showing what complement symmetry changes, but it is not the cleanest
-final definition.
+majorant and minorant constructions across directions. A symmetric combination
+of both features avoids that directional asymmetry:
+
+- **mean:** both features contribute additively, including boundary artifacts;
+- **max:** either feature can make the score high;
+- **min:** both must support the score, so one uninformative feature vetoes it.
+
+For the intuitions at issue here, the minimum is the most conservative choice.
+
+There is also a feature-free alternative: define degree from the minimum
+weighted Hamming distance between Q and any exactly monotone truth set
+(isotonic Boolean regression). That distance is 0 exactly for monotone
+functions, is preserved by order reversal, and maps upward(Q) to
+downward(not Q) under complementation. It avoids the existential-feature
+collapse entirely. Its unresolved design choice is normalization: the raw
+number of required label edits must be scaled before it becomes a 0--1 degree.
 """
     ),
     md(
@@ -746,30 +834,34 @@ final definition.
 1. **Published-result reproduction:** retain the manuscript-era majorant scores
    and describe them accurately as closure / least-majorant entropy. Do not call
    their lack of complement invariance an implementation bug.
-2. **Primary revised measure:** use **two-sided mean entropy**. It remains
-   information-theoretic, treats adding missing truths and removing offending
-   truths equally, gives all exactly monotone functions score 1, and satisfies
-   both order duality and complement invariance.
-3. **Sensitivity analysis:** report two-sided `min` and `max`. This exposes
-   whether conclusions depend on requiring both approximations to agree or
-   accepting the better approximation.
-4. **Transparent robustness check:** report direct violation rate, while
-   warning that its all-pairs denominator compresses this lattice's scores near
-   1.
-5. **Do not use the complement-dual replacement as the sole “corrected”
-   measure.** It enforces the desired mirror equation but achieves that by an
+2. **Symmetric revised candidate:** investigate **two-sided minimum entropy**.
+   It gives exactly monotone functions 1, preserves order duality and complement
+   invariance, mirrors all 44 tested complement pairs, and gives the
+   comparability predicate 0 in all four directions.
+3. **Sensitivity analysis:** report the majorant, two-sided mean/max, and direct
+   violation rate. This exposes whether conclusions depend on requiring both
+   approximations to agree, averaging them, or accepting the better one.
+4. **Do not use the complement-dual replacement as the sole “corrected”
+   measure.** It enforces the desired mirror equation by an
    upward-majorant/downward-minorant asymmetry.
 
-### Why the mean rather than max?
+### Why minimum rather than mean or max?
 
-`max` says a direction is highly monotone if *either* adding truths or removing
-truths gives a highly informative monotone approximation. That can reward a
-one-sided fit. The mean asks the two equally legitimate repairs to contribute
-equally. This is the least committal symmetric extension of the original
-entropy idea.
+`max` rewards a direction when either repair looks informative. `mean` still
+allows one feature to raise the score when the other contains no directional
+information. `min` asks the conservative question: **how strong is the weaker
+of the expansion-based and contraction-based signals?** Thus boundary agreement
+from an interior cannot rescue a zero closure score.
 
-This is a recommendation about construct validity, not about which variant
-produces the largest regression coefficient.
+This is a principled candidate, not a theorem that every intuitive calibration
+problem is solved. A scalar degree still requires choices about weighting,
+finite-universe boundaries, and what numerical value “maximally nonmonotone”
+should receive.
+
+If those calibration choices remain troubling, minimum edit distance to the
+set of monotone functions is the cleaner next family to investigate; it gives
+up the manuscript's feature-predictability interpretation in exchange for a
+direct “how many truth values must change?” interpretation.
 """
     ),
     md(
@@ -783,11 +875,13 @@ produces the largest regression coefficient.
 | Did `down(Q)=up(not Q)` simply fix the implementation? | No. It selected a different, complement-dual metric. |
 | Should Table 4 have RU=LD within every row? | Not as a general law. Those coincidences depend on the semantics of the listed expressions and the chosen approximation. |
 | Are order duality and complement invariance incompatible? | Only for a one-sided closure-only score. Two-sided entropy and direct violations can have both. |
-| Best revised entropy measure? | Two-sided mean, with min/max and violation-rate sensitivity checks. |
+| Does the mean's comparability score show that every two-sided feature measure fails? | No. The two-sided minimum gives this predicate 0 while preserving both symmetries. |
+| Best revised entropy candidate among those tested? | Two-sided minimum, with broader construct validation and mean/max/violation-rate sensitivity checks. |
 
 The practical lesson is to state the desired invariances **before** choosing
-the approximation operator. Entropy can score the resulting feature, but it
-cannot repair a symmetry that the feature construction does not have.
+both the approximation operators and their aggregation. Entropy cannot repair
+a symmetry absent from the features, and a symmetric aggregation can still be
+poorly calibrated if it rewards only one side.
 """
     ),
 ]

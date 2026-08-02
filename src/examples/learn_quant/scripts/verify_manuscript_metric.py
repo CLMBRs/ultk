@@ -5,7 +5,7 @@ This audit does two things:
 1. Refit the manuscript's Figure 2 Pearson correlation and Table 6 mixed model
    from the committed run tables.
 2. Recompute three identifiable Table 4 expressions on the manuscript's M6/X6
-   universe with both the manuscript-era and corrected implementations.
+   universe with explicit majorant and complement-dual variants.
 
 Run with the archived ``altk`` environment because the M6/X6 pickles reference
 its original class layout.
@@ -93,9 +93,7 @@ def load_fixed_measures():
 
 def table4_scores(archive: Path) -> pd.DataFrame:
     universe, by_term = load_m6_archive(archive)
-    import learn_quant.measures as original_measures
-
-    fixed_measures = load_fixed_measures()
+    measures = load_fixed_measures()
     all_models = universe.binarize_referents(mode="set_vectors_w_padding")
     reference_a = universe.binarize_referents(mode="A")
     reference_b = universe.binarize_referents(mode="B")
@@ -112,9 +110,9 @@ def table4_scores(archive: Path) -> pd.DataFrame:
             count=len(universe.referents),
         )
         results = {}
-        for label, measures in [
-            ("original", original_measures),
-            ("corrected", fixed_measures),
+        for label, variant in [
+            ("majorant", "majorant"),
+            ("complement_dual", "complement_dual"),
         ]:
             with warnings.catch_warnings(), redirect_stdout(io.StringIO()):
                 warnings.simplefilter("ignore", RuntimeWarning)
@@ -125,12 +123,13 @@ def table4_scores(archive: Path) -> pd.DataFrame:
                     quantifier,
                     measures.upward_monotonicity_entropy,
                     cfg,
+                    variant=variant,
                 )
         row = {"expression": term}
         for index, direction in enumerate(["RU", "LU", "RD", "LD"]):
             row[f"published_{direction}"] = published[index]
-            row[f"original_{direction}"] = results["original"][index]
-            row[f"corrected_{direction}"] = results["corrected"][index]
+            row[f"majorant_{direction}"] = results["majorant"][index]
+            row[f"complement_dual_{direction}"] = results["complement_dual"][index]
         rows.append(row)
     return pd.DataFrame(rows)
 
@@ -139,23 +138,23 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--altk-archive", type=Path, default=DEFAULT_ALTK_ARCHIVE)
     parser.add_argument(
-        "--original-csv",
+        "--majorant-csv",
         type=Path,
         default=repo_root() / "outputs/combined_runs_AOC_monotonicity_updated.csv",
     )
     parser.add_argument(
-        "--corrected-csv",
+        "--complement-dual-csv",
         type=Path,
         default=repo_root() / "outputs/combined_runs_AOC_monotonicity_corrected.csv",
     )
     args = parser.parse_args()
 
-    original_data, original_r, original_model = fit_manuscript_model(args.original_csv)
-    corrected_data, corrected_r, corrected_model = fit_manuscript_model(
-        args.corrected_csv
+    majorant_data, majorant_r, majorant_model = fit_manuscript_model(args.majorant_csv)
+    complement_data, complement_r, complement_model = fit_manuscript_model(
+        args.complement_dual_csv
     )
-    if len(corrected_data) != len(original_data):
-        raise ValueError("Original and corrected fits use different run counts")
+    if len(complement_data) != len(majorant_data):
+        raise ValueError("Majorant and complement-dual fits use different run counts")
 
     rows = []
     for term in PUBLISHED_TABLE6:
@@ -163,10 +162,10 @@ def main() -> None:
             {
                 "quantity": term,
                 "published": PUBLISHED_TABLE6[term],
-                "original_reproduction": original_model.params[term],
-                "corrected": corrected_model.params[term],
-                "original_abs_error": abs(
-                    original_model.params[term] - PUBLISHED_TABLE6[term]
+                "majorant_reproduction": majorant_model.params[term],
+                "complement_dual": complement_model.params[term],
+                "majorant_abs_error": abs(
+                    majorant_model.params[term] - PUBLISHED_TABLE6[term]
                 ),
             }
         )
@@ -192,14 +191,14 @@ def main() -> None:
 
         emit("MANUSCRIPT METRIC VERIFICATION")
         emit("=" * 72)
-        emit(f"rows in both fits: {len(original_data)}")
+        emit(f"rows in both fits: {len(majorant_data)}")
         emit()
         emit("Figure 2 Pearson correlation: degree vs validation-loss AUC")
         emit(f"  published:              {PUBLISHED_CORRELATION:+.4f}")
-        emit(f"  original CSV:           {original_r:+.4f}")
-        emit(f"  corrected metric:       {corrected_r:+.4f}")
+        emit(f"  majorant CSV:           {majorant_r:+.4f}")
+        emit(f"  complement-dual:        {complement_r:+.4f}")
         emit(
-            "  note: the committed original CSV is close but not identical to the "
+            "  note: the committed majorant CSV is close but not identical to the "
             "published correlation,"
         )
         emit("        consistent with the paper using an earlier run-table snapshot.")
@@ -217,7 +216,7 @@ def main() -> None:
             matches.append(
                 np.allclose(
                     table4[f"published_{direction}"],
-                    table4[f"original_{direction}"],
+                    table4[f"majorant_{direction}"],
                     atol=5e-4,
                 )
             )
@@ -226,12 +225,12 @@ def main() -> None:
             f"4 directions, rounded to 3 decimals): {all(matches)}"
         )
         emit(
-            "Conclusion: the manuscript's numerical analyses used the asymmetric "
-            "flip=True implementation."
+            "Conclusion: the manuscript's numerical analyses used the order-dual "
+            "majorant (flip=True for downward)."
         )
         emit(
-            "The prose's 'symmetric definition for downward monotonicity' does not "
-            "describe the code that generated those values."
+            "This is symmetric under order reversal but not under truth-label "
+            "complementation; the phrase 'symmetric definition' should specify which."
         )
 
 

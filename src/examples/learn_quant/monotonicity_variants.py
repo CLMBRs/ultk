@@ -17,7 +17,7 @@ downward. This is order-dual: reversing the order swaps the two computations.
 It is not generally complement-invariant because complementation swaps closure
 and interior:
 
-    C_up(not Q) = not I_down(Q), not not C_down(Q).
+    C_up(not Q) = not I_down(Q).
 
 The complement-dual implementation uses C_up for upward and I_down for
 downward, equivalently ``down(Q) = up(not Q)``. It is complement-invariant but
@@ -29,9 +29,11 @@ A two-sided score combines closure and interior for each direction:
     down_two_sided(Q) = combine(score(C_down(Q)), score(I_down(Q))).
 
 Any symmetric combination such as the arithmetic mean, minimum, or maximum
-preserves both order duality and complement invariance. The arithmetic mean is
-the most neutral default because it gives equal weight to adding missing truths
-and removing offending truths.
+preserves both order duality and complement invariance. They encode different
+constructs: the mean averages both approximations, the maximum accepts the
+better one, and the minimum requires both to support the directional score.
+The minimum is therefore the conservative choice when boundary agreement from
+an interior approximation should not by itself raise monotonicity.
 """
 
 from __future__ import annotations

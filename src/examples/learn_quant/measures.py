@@ -141,10 +141,10 @@ def measure_monotonicity(
     alternative for studying complement-invariant properties, not the primary measure.
 
     See ``monotonicity_variants.py`` and the variants walkthrough notebook for
-    order-dual and complement-invariant two-sided alternatives. Note that the
-    two-sided mean entropy variant inflates scores for non-monotone functions
-    (boundary elements where interior approximations coincide with Q produce
-    spurious mutual information); the majorant does not have this problem.
+    order-dual and complement-invariant two-sided alternatives. Interior
+    boundary agreement can inflate the two-sided mean for some non-monotone
+    functions. The conservative two-sided minimum prevents an interior score
+    from raising a direction whose closure score is zero.
 
     :param all_models: list of models
     :param quantifier: list of truth values
@@ -220,19 +220,19 @@ def calculate_measure(cfg, measure, expression, universe):
             set_reference_models_A,
             set_reference_models_B,
             quantifiers,
-            expression_names,
+            _expression_names,
         ) = get_verified_models([expression], universe)
-        monotonicity = measure_monotonicity(
+        directional_scores = measure_monotonicity(
             all_models,
             set_reference_models_A,
             set_reference_models_B,
             quantifiers[0],
             upward_monotonicity_entropy,
             cfg=cfg,
-            name=expression_names[0],
         )
+        monotonicity = float(np.max(np.clip(directional_scores, 0.0, 1.0)))
         print("Monotonicity: ", monotonicity)
-        mlflow.log_metric("monotonicity_entropic", float(monotonicity))
+        mlflow.log_metric("monotonicity_entropic", monotonicity)
     if measure == "expression_depth":
         expression_depth = calculate_term_expression_depth(expression.term_expression)
         print("Monotonicity: ", monotonicity)
