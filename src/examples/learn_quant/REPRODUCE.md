@@ -328,6 +328,26 @@ emptiness biconditional/XOR meanings. Treat it as the strongest symmetric
 candidate tested here, not as a validated replacement for the manuscript
 majorant.
 
+## 4g. Alternative monotonicity metrics
+
+```bash
+python scripts/alternative_monotonicity_metric_benchmark.py
+python scripts/build_alternative_monotonicity_metrics_notebook.py
+```
+
+This exhaustive M4/X4 benchmark compares the manuscript entropy score with
+pairwise and Hasse-edge preservation, nearest-monotone edit distance, closure
+costs, chain switches and inversions, distance-sensitive robustness,
+coordinatewise derivative signs, context and direction profiles, simple
+threshold fit, and an exception-code proxy. It writes
+`analysis/alternative_monotonicity_metric_benchmark.csv`.
+
+Open and run
+`notebooks/alternative_monotonicity_metrics_benchmark.ipynb` for the formulas,
+preregistered intuition tests, complement-symmetry audit, survival curves, and
+measure-by-measure limitations. The threshold and exception-code columns are
+restricted representation diagnostics, not general monotonicity measures.
+
 ---
 
 ## 5. One-shot reproduction
