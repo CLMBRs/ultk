@@ -80,6 +80,30 @@ The final row requires special caution. A real LoT score needs a specified
 grammar, rule probabilities or code lengths, and inference over expressions.
 Calling an exception count "LoT" would overstate what was measured, so the
 notebook reports it as a transparent proxy.
+
+## Data provenance: what generates what
+
+All source and generated artifacts live in this repository:
+
+1. `alternative_monotonicity_metrics.py` implements the metric formulas.
+2. `scripts/alternative_monotonicity_metric_benchmark.py` constructs the
+   exhaustive M4/X4 meaning suite, calls those formulas, and writes
+   `analysis/alternative_monotonicity_metric_benchmark.csv`.
+3. `scripts/build_alternative_monotonicity_metrics_notebook.py` generates this
+   notebook.
+4. This executed notebook reads the committed CSV for the M4/X4 comparison and
+   directly calls `cardinality_lattice_scores` for the exact `n=2...100`
+   parity-size sweep.
+
+To rebuild the data and notebook from `src/examples/learn_quant/`:
+
+```bash
+python scripts/alternative_monotonicity_metric_benchmark.py
+python scripts/build_alternative_monotonicity_metrics_notebook.py
+jupyter nbconvert --to notebook --execute \
+  notebooks/alternative_monotonicity_metrics_benchmark.ipynb \
+  --output alternative_monotonicity_metrics_benchmark.ipynb
+```
 """
     ),
     code(
