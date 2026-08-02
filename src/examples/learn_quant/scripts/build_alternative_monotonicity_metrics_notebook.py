@@ -95,6 +95,7 @@ ROOT = Path.cwd()
 if not (ROOT / "analysis").is_dir():
     ROOT = ROOT.parent
 sys.path.insert(0, str(ROOT))
+import alternative_monotonicity_metrics as alt_metrics
 
 CSV = ROOT / "analysis/alternative_monotonicity_metric_benchmark.csv"
 df = pd.read_csv(CSV)
@@ -273,6 +274,132 @@ The ladder is highly diagnostic:
   weighting.
 - Best simple-threshold fit tests only a small hand-built feature family. A high
   score means simple threshold representability, not monotonicity in general.
+"""
+    ),
+    md(
+        r"""
+## 4b. Larger model universes: does `|B| is even` approach zero?
+
+Yes for some measures, but **not for all of them**.
+
+The M4/X4 table has 256 `(A,B)` situations. Here we sweep domain sizes from
+`n=2` through `n=100`. The number of full situations would be
+`4^n`, so explicit enumeration quickly becomes impossible.
+
+For a predicate depending only on `|B|`, every fixed `A` context is identical.
+Repeating the same B-lattice once for every A multiplies every relevant count by
+the same factor. We can therefore calculate exact right-upward scores from the
+`n+1` cardinality layers, weighting layer `k` by `C(n,k)`. This is an exact
+compression of the full uniform M_n/X_n calculation for the displayed
+right-upward metrics, not a sample.
+
+One terminology correction: increasing `n` enlarges the **model universe**, not
+the meaning space. The meaning remains `Q(B) = 1` iff `|B|` is even.
+"""
+    ),
+    code(
+        r"""
+sizes = list(range(2, 101))
+parity_rows = []
+for n in sizes:
+    scores = alt_metrics.cardinality_lattice_scores(
+        [cardinality % 2 == 0 for cardinality in range(n + 1)]
+    )
+    parity_rows.append({"n": n, **scores})
+parity_scaling = pd.DataFrame(parity_rows).set_index("n")
+
+display_sizes = [2, 4, 6, 8, 10, 20, 50, 100]
+parity_columns = [
+    "majorant_entropy",
+    "two_sided_min",
+    "pairwise_preservation",
+    "edge_preservation",
+    "unconditional_pair",
+    "cardinality_threshold_edit",
+    "closure_inflation",
+    "closure_precision",
+    "chain_switch",
+    "chain_inversion",
+    "equal_distance_robustness",
+    "derivative_sign",
+]
+parity_scaling.loc[display_sizes, parity_columns].T.round(3)
+"""
+    ),
+    code(
+        r"""
+fig, axes = plt.subplots(1, 2, figsize=(12, 4), sharex=True)
+
+zero_or_decaying = {
+    "majorant_entropy": "majorant entropy",
+    "two_sided_min": "two-sided minimum",
+    "edge_preservation": "edge preservation",
+    "closure_inflation": "closure inflation",
+    "chain_switch": "switch simplicity",
+    "cardinality_threshold_edit": "best cardinality-threshold repair",
+}
+nonzero_limits = {
+    "pairwise_preservation": "all-pair preservation",
+    "unconditional_pair": "unconditional pair",
+    "closure_precision": "closure precision",
+    "chain_inversion": "chain inversion",
+    "equal_distance_robustness": "equal-distance robustness",
+    "derivative_sign": "derivative sign",
+}
+
+for column, label in zero_or_decaying.items():
+    axes[0].plot(parity_scaling.index, parity_scaling[column], label=label)
+for column, label in nonzero_limits.items():
+    axes[1].plot(parity_scaling.index, parity_scaling[column], label=label)
+
+axes[0].set_title("Scores that are zero or decay toward zero")
+axes[1].set_title("Scores with nonzero large-n limits")
+for ax in axes:
+    ax.set(xlabel="domain size n", ylabel="right-upward score", ylim=(-0.03, 1.03))
+    ax.legend(fontsize=8)
+plt.tight_layout()
+plt.show()
+"""
+    ),
+    md(
+        r"""
+### How to read the result
+
+Your zero intuition is exactly right for metrics that ask whether **one-element
+growth consistently preserves truth** or whether upward closure is useful:
+
+- majorant entropy = `0` for every `n`, because the empty set is true and its
+  upward closure is therefore the constant-true function;
+- two-sided minimum = `0` for every `n`;
+- edge preservation = `0` for every `n`, because adding one element always
+  flips even cardinality to odd;
+- closure inflation = `0` for every `n`;
+- switch simplicity = `0` for every `n` in this normalization, because parity
+  switches at every cardinality step.
+
+The **best cardinality-threshold repair** also approaches zero, but slowly:
+`0.375` at `n=4`, `0.246` at `n=10`, and `0.080` at `n=100`. This is the
+large-domain result closest to "parity becomes arbitrarily far from a monotone
+threshold." It is threshold-restricted in the sweep; at `n <= 12` it matches
+the exact nearest-monotone min-cut values in direct checks (with regression
+tests through `n=6`).
+
+Other scores do **not** approach zero:
+
+- all-pair preservation approaches `0.5`;
+- unconditional pair score approaches `0.75`;
+- closure precision, chain inversion, equal-distance robustness, and derivative
+  sign are `0.5` (apart from small-size parity effects where applicable).
+
+Those nonzero limits are not contradictions. They reveal different
+denominators. For example, half of parity's nonzero one-step derivatives point
+`0 -> 1` and half point `1 -> 0`, so derivative sign is exactly `0.5`; edge
+preservation conditions only on true sources, all of which make the bad
+`1 -> 0` transition, so it is exactly `0`.
+
+**Bottom line:** if the desired intuition is "alternation should become
+maximally nonmonotone," edge preservation, closure-based scores, switch
+simplicity, and threshold repair express it. A generic pair average need not.
 """
     ),
     code(

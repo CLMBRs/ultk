@@ -85,3 +85,50 @@ def test_simple_threshold_fits_familiar_monotone_features():
             universe.truth_values(predicate), universe, direction
         )
         assert accuracy == 1
+
+
+def test_cardinality_compression_matches_explicit_parity_lattice():
+    n = 4
+    subset_bits = np.arange(1 << n, dtype=np.int64)
+    cardinalities = np.asarray([int(value).bit_count() for value in subset_bits])
+    values = cardinalities % 2 == 0
+    relation = (subset_bits[:, None] & subset_bits[None, :]) == subset_bits[:, None]
+    strict = relation & ~np.eye(len(values), dtype=bool)
+    edge = relation & (cardinalities[None, :] == cardinalities[:, None] + 1)
+    distance = cardinalities[None, :] - cardinalities[:, None]
+    chain = np.asarray([[(1 << size) - 1 for size in range(n + 1)]])
+    compressed = metrics.cardinality_lattice_scores(
+        [size % 2 == 0 for size in range(n + 1)]
+    )
+
+    expected = {
+        "majorant_entropy": metrics.majorant_entropy_score(values, relation),
+        "two_sided_min": metrics.two_sided_min_score(values, relation),
+        "pairwise_preservation": metrics.pairwise_preservation_score(values, strict),
+        "edge_preservation": metrics.pairwise_preservation_score(values, edge),
+        "unconditional_pair": metrics.unconditional_pair_score(values, strict),
+        "closure_inflation": metrics.closure_inflation_score(values, relation),
+        "closure_precision": metrics.closure_precision_score(values, relation),
+        "chain_switch": metrics.switch_simplicity_score(values, chain),
+        "chain_inversion": metrics.chain_inversion_score(values, chain),
+        "equal_distance_robustness": metrics.equal_distance_robustness_score(
+            values, strict, distance, n
+        ),
+        "derivative_sign": metrics.derivative_sign_score(values, edge),
+    }
+    for name, score in expected.items():
+        assert compressed[name] == score
+
+
+def test_parity_threshold_repair_matches_exact_edit_through_n6():
+    for n in range(2, 7):
+        subset_bits = np.arange(1 << n, dtype=np.int64)
+        cardinalities = np.asarray([int(value).bit_count() for value in subset_bits])
+        values = cardinalities % 2 == 0
+        relation = (subset_bits[:, None] & subset_bits[None, :]) == subset_bits[:, None]
+        edge = relation & (cardinalities[None, :] == cardinalities[:, None] + 1)
+        _, exact_score = metrics.nearest_monotone_edit(values, edge)
+        compressed = metrics.cardinality_lattice_scores(
+            [size % 2 == 0 for size in range(n + 1)]
+        )
+        assert compressed["cardinality_threshold_edit"] == exact_score

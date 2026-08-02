@@ -388,3 +388,140 @@ def directional_profile(
         float(values.mean()),
         float(values.max() - values.mean()),
     )
+
+
+def cardinality_lattice_scores(
+    truth_by_size: Iterable[bool],
+) -> dict[str, float]:
+    """Score a cardinality-only predicate on an exact Boolean subset lattice.
+
+    ``truth_by_size[k]`` is the truth value for every set of cardinality ``k``.
+    Combinatorial weights account for every subset without constructing the
+    full pairwise relation matrix.
+    """
+
+    q = np.asarray(tuple(truth_by_size), dtype=bool)
+    n = len(q) - 1
+    weights = np.asarray([comb(n, size) for size in range(n + 1)], dtype=float)
+    point_count = 2**n
+
+    def weighted_entropy_score(feature: np.ndarray) -> float:
+        target_probability = float(weights[q].sum() / point_count)
+        if target_probability in (0.0, 1.0):
+            return 1.0
+        target_entropy = -target_probability * log2(target_probability) - (
+            1 - target_probability
+        ) * log2(1 - target_probability)
+        conditional_entropy = 0.0
+        for feature_value in (False, True):
+            selected_weight = weights[feature == feature_value].sum()
+            if selected_weight == 0:
+                continue
+            true_weight = weights[(feature == feature_value) & q].sum()
+            probability = float(true_weight / selected_weight)
+            entropy = (
+                0.0
+                if probability in (0.0, 1.0)
+                else -probability * log2(probability)
+                - (1 - probability) * log2(1 - probability)
+            )
+            conditional_entropy += selected_weight / point_count * entropy
+        return float(1 - conditional_entropy / target_entropy)
+
+    upward_closure = np.maximum.accumulate(q)
+    upward_interior = np.minimum.accumulate(q[::-1])[::-1]
+    majorant_entropy = weighted_entropy_score(upward_closure)
+    two_sided_min = min(majorant_entropy, weighted_entropy_score(upward_interior))
+
+    eligible_pairs = 0
+    violating_pairs = 0
+    eligible_edges = 0
+    violating_edges = 0
+    favorable_edges = 0
+    for source_size in range(n + 1):
+        source_count = comb(n, source_size)
+        if q[source_size]:
+            eligible_pairs += source_count * (2 ** (n - source_size) - 1)
+            if source_size < n:
+                edge_count = source_count * (n - source_size)
+                eligible_edges += edge_count
+                if not q[source_size + 1]:
+                    violating_edges += edge_count
+            for target_size in range(source_size + 1, n + 1):
+                if not q[target_size]:
+                    violating_pairs += source_count * comb(
+                        n - source_size, target_size - source_size
+                    )
+        elif source_size < n and q[source_size + 1]:
+            favorable_edges += source_count * (n - source_size)
+
+    pairwise_preservation = (
+        1.0 if eligible_pairs == 0 else 1 - violating_pairs / eligible_pairs
+    )
+    edge_preservation = (
+        1.0 if eligible_edges == 0 else 1 - violating_edges / eligible_edges
+    )
+    all_strict_pairs = 3**n - 2**n
+    unconditional_pair = (
+        1.0 if all_strict_pairs == 0 else 1 - violating_pairs / all_strict_pairs
+    )
+
+    false_count = weights[~q].sum()
+    additions = weights[upward_closure & ~q].sum()
+    closure_inflation = 1.0 if false_count == 0 else 1 - additions / false_count
+    closure_count = weights[upward_closure].sum()
+    closure_precision = 1.0 if closure_count == 0 else weights[q].sum() / closure_count
+
+    switches = int(np.count_nonzero(np.diff(q.astype(np.int8))))
+    switch_simplicity = 1 - max(switches - 1, 0) / max(n - 1, 1)
+    inversions = sum(
+        q[left] and not q[right]
+        for left in range(n + 1)
+        for right in range(left + 1, n + 1)
+    )
+    max_inversions = max(((n + 1) ** 2) // 4, 1)
+    chain_inversion = 1 - inversions / max_inversions
+
+    distance_scores = []
+    for distance in range(1, n + 1):
+        eligible = 0
+        violations = 0
+        for source_size in range(n - distance + 1):
+            if not q[source_size]:
+                continue
+            pair_count = comb(n, source_size) * comb(n - source_size, distance)
+            eligible += pair_count
+            if not q[source_size + distance]:
+                violations += pair_count
+        if eligible:
+            distance_scores.append(1 - violations / eligible)
+    equal_distance_robustness = (
+        1.0 if not distance_scores else float(np.mean(distance_scores))
+    )
+
+    changing_edges = favorable_edges + violating_edges
+    derivative_sign = 1.0 if changing_edges == 0 else favorable_edges / changing_edges
+
+    threshold_edit_count = min(
+        sum(comb(n, size) for size in range(n + 1) if q[size] != (size >= threshold))
+        for threshold in range(n + 2)
+    )
+    minority_count = min(weights[q].sum(), weights[~q].sum())
+    threshold_edit = (
+        1.0 if minority_count == 0 else 1 - threshold_edit_count / minority_count
+    )
+
+    return {
+        "majorant_entropy": majorant_entropy,
+        "two_sided_min": two_sided_min,
+        "pairwise_preservation": float(pairwise_preservation),
+        "edge_preservation": float(edge_preservation),
+        "unconditional_pair": float(unconditional_pair),
+        "cardinality_threshold_edit": float(threshold_edit),
+        "closure_inflation": float(closure_inflation),
+        "closure_precision": float(closure_precision),
+        "chain_switch": float(switch_simplicity),
+        "chain_inversion": float(chain_inversion),
+        "equal_distance_robustness": equal_distance_robustness,
+        "derivative_sign": float(derivative_sign),
+    }
