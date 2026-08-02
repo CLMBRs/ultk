@@ -22,13 +22,14 @@ pip install pandas numpy matplotlib plotnine statsmodels scikit-learn scipy
 
 ## 1. Data source and provenance
 
-The single source of truth for the figures is:
+There are now two deliberately separate run tables:
 
 ```
-outputs/combined_runs_AOC_monotonicity_updated.csv   (8005 rows, one per run)
+outputs/combined_runs_AOC_monotonicity_updated.csv    # manuscript-era metric
+outputs/combined_runs_AOC_monotonicity_corrected.csv  # complement-dual alternative
 ```
 
-This CSV was originally exported from the project's **MLflow PostgreSQL backend**
+The first CSV was originally exported from the project's **MLflow PostgreSQL backend**
 (experiments `40 expressions_shuffled_2k` + `42 repeated_runs` = LSTM, and
 `46 transformers_improved_1` + `47 transformers_improved_2` = Transformer),
 using the queries in `notebooks/get_AOC.ipynb` and
@@ -36,7 +37,27 @@ using the queries in `notebooks/get_AOC.ipynb` and
 
 **It has been verified byte-for-byte against the live database** (see step 2).
 So none of the figures require a running database — the CSV is sufficient and
-authoritative.
+authoritative for reproducing the *published* numbers.
+
+The second CSV has the identical 8,005 learning-run rows and AUC outcomes, but
+replaces the directional monotonicity values with a complement-dual alternative.
+It retains every manuscript-era score in `*_original` columns. Generate it with:
+
+```bash
+/path/to/altk/bin/python scripts/recalculate_corrected_monotonicity.py
+```
+
+The alternative computes downward monotonicity by identity:
+`down(Q) = up(not Q)`. The original code instead used a true-successor feature
+(`flip=True`) for downward while using a true-predecessor feature for upward.
+The original is a uniform **majorant** construction and preserves order duality,
+but it violates complement mirror symmetry. The alternative pairs an upward
+majorant with a downward **minorant**. It preserves complement symmetry but is
+not a neutral correction of the published definition.
+
+For the operator derivations, a property matrix, Table 4 examples, and a
+two-sided entropy alternative that preserves both symmetries, open
+`notebooks/monotonicity_measure_variants_walkthrough.ipynb`.
 
 Key columns:
 
@@ -46,8 +67,9 @@ Key columns:
 | `model` | `LSTM` or `Transformer` |
 | `run` | repeated-training index 1–4 |
 | `training` | `True` = converged/trained, `False` = untrained baseline |
-| `monotonicity_entropic`, `degree` | overall monotonicity (0–1) |
+| `monotonicity_entropic`, `degree` | overall monotonicity (0–1); `degree` uses the complement-dual alternative in the historically named `corrected` CSV |
 | `right_upward`, `left_upward`, `right_downward`, `left_downward` | directional monotonicity components (0–1) |
+| `*_original` | manuscript-era directional/degree values (alternative CSV only) |
 | `first_step` | training step at which `val_loss_running_avg50 < 0.05` (learning speed; converged runs only) |
 | `val_loss_step_AOC` | **Validation Loss AUC** = `SUM(val_loss_step)` = area under the validation-loss curve (learning difficulty). Higher = harder. |
 | `expression_depth` | max parenthesis nesting depth (1–4, mostly 4) |
@@ -107,6 +129,11 @@ python scripts/reproduce_from_postgres.py --dump-csv outputs/combined_from_postg
 
 ```bash
 python scripts/reproduce_figures.py
+
+# Complement-dual counterparts, preserving published reproductions:
+python scripts/reproduce_figures.py \
+  --csv outputs/combined_runs_AOC_monotonicity_corrected.csv \
+  --outdir figures/corrected_metric
 ```
 
 Writes to `figures/`:
@@ -159,33 +186,30 @@ Figures:
 
 ### Headline results
 
-- **#1** Monotonicity and length are *independent* signals. Controlling for each
-  other, both remain strong: monotonicity partial r ≈ −0.24, func_count partial
-  r ≈ +0.19 with AUC (both p < 1e-50). More monotone **and** shorter →
+These numbers are from the **manuscript-era majorant metric** (`updated.csv`).
+For complement-dual sensitivity results see `FIGURES_TECHNICAL.ipynb`.
+
+- **#1** Monotonicity and length remain *independent* signals.
+  Controlling for each other, monotonicity partial r = −0.264 and
+  func_count partial r = +0.155 with AUC. More monotone **and** shorter →
   independently easier to learn.
-- **#4** The monotonicity effect is **downward-driven**: in a joint model,
-  `downward` β ≈ −2184 (p ≈ 1e-160) while `upward` β ≈ +163. Downward-entailing
-  quantifiers are markedly easier; upward monotonicity barely matters.
+- **#4** The **downward** direction dominates. In a joint pooled model,
+  `downward` β = −1196 and `upward` β = −593; in the random-intercept model
+  they are −1193 (p = 1.3e−15) and −597 (p = 5.1e−6). Both directions predict
+  easier learning; the T2 truth-set analysis (§4d) shows this is substantially
+  mediated by corpus statistics.
 - **#6** Operator *identity* more than doubles explained variance over raw
   length (R² 0.10 → 0.25). `union` is a large difficulty outlier (+782 per SD),
   far worse than `intersection`/`difference`; `not` and `greater_than` are
   associated with *easier* learning.
-- **#7** Length and monotonicity each add unique, significant variance on top of
-  the other (nested F-tests p < 1e-50 both ways). **Monotonicity is the stronger
-  predictor**: standardized |β| ratio mono/length ≈ 1.8, and its unique R²
-  contribution (0.089) is ~3.4× length's unique R² (0.026). Adding monotonicity
-  on top of length raises R² from 0.10 to 0.19; adding length on top of
-  monotonicity raises it from 0.16 to 0.19. So both matter, but monotonicity
-  carries most of the explanatory weight.
-- **#8** Flipping the outcome to predict **monotonicity** (per-expression,
-  n≈1795): **learnability (AUC) explains monotonicity far better than length**.
-  AUC alone R²=0.127 vs length alone R²=0.032; in the joint model AUC's unique R²
-  (0.105) is ~10× length's unique R² (0.010), and its standardized |β| is ~3.3×
-  larger. Adding AUC on top of length lifts R² from 0.03 to 0.14; adding length
-  on top of AUC barely helps (+0.010). Caveat: this is descriptive —
-  monotonicity is intrinsic to the expression and AUC is a training *outcome*,
-  so the causal arrow is monotonicity → learnability; the analysis only reports
-  which covaries more strongly.
+- **#7** Length and monotonicity each add unique variance.
+  Standardized |β| ratio mono/length = 1.74; unique R² is 0.066 for
+  monotonicity and 0.022 for length. Full model R² is 0.167 (manuscript ~0.19).
+- **#8** Flipping the outcome to predict **monotonicity**
+  (per-expression, n=1795), AUC remains stronger than length:
+  AUC-alone R²=0.106 vs length-alone R²=0.062; unique R² is 0.076 vs 0.032.
+  Caveat: monotonicity is intrinsic; AUC is a training outcome. This reports
+  covariance strength, not causal direction.
 
 > Statistical notes: these are correlational and pooled across the 4 repeated
 > runs. For inference-grade p-values, add a random intercept per expression
@@ -228,11 +252,15 @@ pickles, plus the `altk` conda env:
 
 ```bash
 python scripts/negation_pair_test.py    # Q2-T1; --altk-archive PATH to override
+python scripts/negation_pair_test.py \
+  --csv outputs/combined_runs_AOC_monotonicity_corrected.csv --tag corrected
 python scripts/truth_set_stats.py       # Q2-T2
+python scripts/truth_set_stats.py \
+  --csv outputs/combined_runs_AOC_monotonicity_corrected.csv --tag corrected
 ```
 
 For a narrated, cell-by-cell version of T1, open
-`notebooks/negation_pair_test_walkthrough.ipynb` with the `altk` kernel.
+`notebooks/negation_pair_test_walkthrough_expanded.ipynb` with the `altk` kernel.
 The notebook makes the provenance explicit: **T1 trains no new neural
 network**. It evaluates symbolic grammar expressions on sampled set-theoretic
 scenes, then joins validation-loss AUCs from the already completed LSTM and
@@ -241,16 +269,54 @@ Transformer runs in `outputs/combined_runs_AOC_monotonicity_updated.csv`.
 | output | contents |
 |---|---|
 | `analysis/tables/11_negation_pair_test.txt` (+ `figures/negation_pair_test.png`) | **T1 negation-pair test.** 44 complement pairs found among the trained 2,000 (884 complement-closed meanings in the 9,550-meaning pool); 41 verified as *functional* complements on 20k training-style scenes (3 pairs are complements only on the 256-scene universe — a caveat for any universe-level analysis). Within pairs the decision boundary is identical and direction flips, yet AUC is statistically indistinguishable (mean-arch Δ = +16, Wilcoxon p = 0.59; polarity-contrast subset Δ = +66, p = 0.21). The population directional model predicts Δ = +182 (all pairs) / +558 (contrast pairs); observed/predicted ≈ **0.12**. So ~90% of the directional asymmetry is *not* boundary-level — it lives in sample composition / measure, not in the learner's treatment of a given boundary. Bonus (H4): the measure-mirror identity up(e) = down(¬e) fails badly for half the pairs (median |dev| 0.05, max 0.79, r = 0.71) — direct evidence of measure-side noise in the directional degrees. |
+| `analysis/tables/11_negation_pair_test_corrected.txt` (+ historically named corrected figure) | **Complement-dual T1.** Mirror error is exactly zero. Mean-architecture Δ = +22 (p=.29); among 21 strong-contrast pairs Δ = +32 (p=.23). Population prediction is +192 / +327, giving observed/predicted ≈ **0.10**. The substantive paired conclusion is unchanged. |
 | `analysis/tables/12_truth_set_stats.txt` (+ `figures/truth_set_stats.png`, `analysis/truth_set_stats_features.csv`) | **T2 truth-set-statistics mediation.** Per-expression class-conditional input statistics computed on 4,000 training-style models (M=12, X=16). Truth-set stats alone explain **R² = 0.54** of per-expression mean AUC (directions alone: 0.13); adding them shrinks the downward β by **80%** (−708 → −138/SD, still p = 0.002). Dominant mediator: **class separation** (L2 distance between mean zone-count vectors of positive vs negative examples), r = −0.68 with AUC, β = −1500/SD, p ≈ 1e-138 — and it correlates +0.48 with downward degree. Verdict: the downward advantage is mostly carried by input-statistic separability of the classes (H2 in generalized form), consistent with T1's small boundary-level residual. |
+| `analysis/tables/12_truth_set_stats_corrected.txt` (+ historically named corrected figure/features) | **Complement-dual T2.** Directions-only R² falls from 0.126 to **0.063**. Downward/upward β become −425/−256. After truth-set controls they are +61 (p=.13) and −32 (p=.38): neither supports a remaining negative directional advantage. Class separation remains dominant; the earlier claim of a specifically downward residual does not survive. |
+
+## 4d. Manuscript metric audit
+
+```bash
+/path/to/altk/bin/python scripts/verify_manuscript_metric.py
+```
+
+Writes `analysis/tables/14_manuscript_metric_verification.txt` and two CSVs.
+The audit shows that the manuscript used the intended order-dual majorant
+calculation, which is not complement invariant:
+
+- Three identifiable Table 4 expressions reproduce all 12 published directional
+  cells under the old code (to displayed precision), not the complement-dual code.
+- The committed old CSV reproduces Table 6 to within 0.2% (e.g. published
+  monotonicity β = −1789.666; reproduction = −1792.639).
+- The complement-dual Table 6 coefficients are not directly comparable in raw units
+  because the degree distribution changes; the standardized mixed-model effect
+  weakens from −640 to −561.
+- Published Figure 2 reports r = −0.3453; the committed manuscript-era export
+  gives −0.3326 (an earlier-data-snapshot discrepancy), while complement-dual r = −0.3045.
+
+## 4e. Monotonicity-measure variants
+
+```bash
+/path/to/altk/bin/python scripts/calculate_monotonicity_variants.py
+```
+
+This writes `analysis/monotonicity_measure_variants_2k.csv`, containing the
+four closure/interior primitives, manuscript majorant, complement-dual,
+two-sided mean/min/max entropy, and direct violation-rate scores for all 2,000
+expressions. Open
+`notebooks/monotonicity_measure_variants_walkthrough.ipynb` for the derivation,
+Table 4 comparison, 44-pair mirror audit, distribution comparison, and measure
+recommendation.
 
 ---
 
 ## 5. One-shot reproduction
 
-The notebook `notebooks/reproduce_figures_and_analysis.ipynb` runs steps 3, 4
-and 4b end-to-end and displays every figure inline — including all review
-figures. Open it with the `altk` kernel and Run All. (Verified clean on
-2026-07-23: 0 errors, every figure and `analysis/tables/*.txt` regenerated.)
+`FIGURES_TECHNICAL.ipynb` is the primary technical companion notebook. It
+loads both run tables, replicates every figure and statistic from the manuscript
+using the majorant metric (`updated.csv`), and runs all T1/T2 analyses with
+complement-dual as a sensitivity comparison. Open it with the `altk` kernel and
+Run All. The historical one-shot notebook remains at
+`notebooks/reproduce_figures_and_analysis.ipynb`.
 
 ---
 
@@ -265,3 +331,5 @@ figures. Open it with the `altk` kernel and Run All. (Verified clean on
 | `scripts/verify_postgres_matches_csv.py` | confirm the CSV equals the live DB (sampled) |
 | `scripts/negation_pair_test.py` | Q2-T1: complement-pair test of the up/down asymmetry; no new neural training (needs the altk run archive) |
 | `scripts/truth_set_stats.py` | Q2-T2: truth-set-statistics mediation of the downward advantage (needs the altk run archive) |
+| `scripts/calculate_monotonicity_variants.py` | calculate six documented metric variants for all 2,000 expressions |
+| `scripts/build_monotonicity_variants_notebook.py` | regenerate the pedagogical variants notebook source |

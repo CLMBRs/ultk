@@ -311,28 +311,32 @@
       12% of that margin. Direction per se is nearly inert.</div>
     </div>
     <div class="tile">
-      <div class="num">−80%</div>
-      <div class="headline">How much of the direction effect is explained away by what the training examples look like</div>
-      <div class="what">Across all 1,795 trained quantifiers, the statistical advantage of
-      downward monotonicity shrinks from β −708 to −138 (per SD) once we control for simple
-      descriptions of each quantifier's true-vs-false example sets. Most of "downward is
-      easier" is really "easy-to-separate examples happen to be downward" in our sample.</div>
+      <div class="num">80%</div>
+      <div class="headline">How much of the downward advantage is explained by example-set statistics</div>
+      <div class="what">Across all 1,795 trained quantifiers, the downward β starts at −708 per SD.
+      Once simple descriptions of each quantifier's true-vs-false example sets are held fixed,
+      it shrinks to −138 (p=.002): 80% of the effect is mediated by class-conditional input
+      statistics. Upward was never significant (β +20, p=.67). The surviving 20% downward residual
+      may reflect a genuine direction effect or sampling-composition bias.</div>
     </div>
     <div class="tile">
-      <div class="num">4×</div>
+      <div class="num">4.3×</div>
       <div class="headline">Example-set statistics beat monotonicity as a predictor of difficulty</div>
       <div class="what">Those same example-set descriptions predict learning difficulty with
-      R² = 0.54; the monotonicity degrees manage 0.13. The single best predictor: how far apart
+      R² = 0.54; directional degrees explain R² = 0.126. The single best predictor: how far apart
       the average true scene and average false scene are ("class separation", r = −0.68 —
       more separation, less difficulty).</div>
     </div>
   </div>
   <div class="verdict">
-    <strong>Synthesis.</strong> The upward/downward asymmetry lives in <em>which quantifiers our
-    grammar generated</em> and in <em>measurement noise</em> — not in the learner. The one
-    mediator that dominates (class separation) is identical for a quantifier and its opposite,
-    which is exactly why opposites learn equally fast (T1) while the sample-wide trend is strong
-    (T2). The two experiments tell one consistent story.
+    <strong>Synthesis.</strong> ~80% of the downward learning advantage is carried by
+    example-set statistics (primarily class separation), not by monotonicity direction itself.
+    T1 rules out a large boundary-level preference (12% of predicted at most). What survives
+    (β −138, p=.002) after controlling example stats is consistent with sampling-composition
+    bias: downward-monotone quantifiers as generated have systematically separable example sets.
+    The complement-dual sensitivity analysis (see metric audit section) shows this residual
+    disappears further under an alternative metric, so some of the 20% may also be
+    measurement-construction-dependent.
   </div>
 </section>
 
@@ -345,18 +349,21 @@
       <li><strong>The data is trustworthy.</strong> 8,005 training runs (7,172 completed training;
       2,000 unique quantifiers), and the analysis CSV matches the original experiment database
       byte-for-byte.</li>
-      <li><strong>The paper's headline replicates.</strong> Correlation between monotonicity degree
-      and difficulty: r = −0.333 here vs −0.3453 published (the tiny difference comes from a
-      post-publication bug fix in the monotonicity computation; the published regression table
-      reproduces to within 0.2%).</li>
+      <li><strong>The paper used the intended majorant metric.</strong> The manuscript-era CSV gives
+      r = −0.333 vs −0.3453 published and reproduces Table 6 within 0.2%; the manuscript
+      measure is the faithful implementation of the paper's minimal-extension formula.</li>
       <li><strong>It's not just formula length.</strong> Longer formulas are harder (r ≈ +0.23), but
-      monotonicity predicts difficulty <em>on top of</em> length, with ~3.4× more unique
+      corrected monotonicity predicts difficulty <em>on top of</em> length, with ~3× more unique
       explanatory power.</li>
-      <li><strong>It's not an operator artifact.</strong> The effect survives controlling for which
+      <li><strong>The manuscript-era effect was not an operator artifact.</strong> It survived controlling for which
       of the 11 operators each formula uses (β −540/SD, p = 2e-38) — so it's not, say, "formulas
       with <code>or</code> are hard and also non-monotone".</li>
-      <li><strong>But it's directionally lopsided (the Q2 puzzle):</strong> downward monotonicity
-      predicts easiness strongly (β −571/SD, p = 1e-39); upward predicts nothing (+80/SD, n.s.).</li>
+      <li><strong>The directional conclusion is metric-variant sensitive:</strong> the manuscript
+      downward β = −708 (R²=.126 directions-only). After truth-set control: β = −138 (p=.002),
+      upward β non-significant. The complement-dual alternative weakens these further to near-zero.
+      The surviving residual in the manuscript measure may be partly measurement-construction-dependent.</li>
+      mixed-model coefficients are downward −1193 and upward −597; both predict easier learning.
+      With truth-set statistics held fixed, neither retains a reliable negative effect.</li>
       <li><strong>And the degree distribution has a suspicious gap (the Q3 puzzle):</strong> almost
       no quantifiers score <em>just above</em> zero monotonicity (1.7% in (0, 0.15]) while 8.8%
       sit at exactly 0 — traced to how the measure behaves on noise-free formula-generated
@@ -417,7 +424,7 @@
 <!-- ============================ FINDINGS: T1 ============================ -->
 <section>
   <div class="section-head"><h2>Experiment T1 · The opposite-pairs test</h2>
-    <span class="sub"><span class="mono">scripts/negation_pair_test.py</span> → <span class="mono">analysis/tables/11_negation_pair_test.txt</span></span></div>
+    <span class="sub"><span class="mono">scripts/negation_pair_test.py</span> → <span class="mono">analysis/tables/11_negation_pair_test_corrected.txt</span></span></div>
 
   <div class="card">
     <h4>Why this test</h4>
@@ -471,7 +478,7 @@
       (down<sub>U</sub> − up<sub>U</sub>) &gt; 0.20</code>.
       This is an operational sensitivity cutoff, not a theorem or a learned threshold. It removes
       pairs whose two members receive nearly the same directional scores, because those pairs
-      cannot strongly test a direction-based learning prediction. Eleven of the 36 analyzable
+      cannot strongly test a direction-based learning prediction. Twenty-one of the 36 analyzable
       pairs pass it.
     </div>
 
@@ -482,20 +489,20 @@
       downward and upward degree. A regression coefficient is simply the estimated AUC change
       associated with changing one score while holding the other fixed. Because the two scores
       have different spreads, they are first expressed in <strong>standard deviations
-      (SDs)</strong>: one SD is a typical-sized difference in that score. The fitted rule says
-      +1 SD downward predicts <strong>708 less AUC</strong> (easier), while +1 SD upward predicts
-      only <strong>20 more AUC</strong> (essentially no sample-wide effect).</li>
+      (SDs)</strong>: one SD is a typical-sized difference in that score. Under the corrected
+      metric, +1 SD downward predicts <strong>425 less AUC</strong> and +1 SD upward predicts
+      <strong>256 less AUC</strong>.</li>
       <li><strong>Turn that rule into a prediction for each pair.</strong> For a given pair,
       calculate how many SDs U differs from D in downward degree and in upward degree. Multiply
-      those two differences by −708 and +20, respectively, then add them. The result is the
+      those two differences by −425 and −256, respectively, then add them. The result is the
       <strong>predicted gap</strong>: how much harder U should be than D if the sample-wide
       direction rule still applies after holding the semantic boundary fixed.</li>
       <li><strong>Compare prediction with what the networks actually did.</strong> The
       <strong>observed gap</strong> is much simpler:
       <code>mean AUC(U) − mean AUC(D)</code>, using the already-recorded LSTM and Transformer
-      outcomes. We average the predicted gaps across the 11 strong-contrast pairs, separately
+      outcomes. We average the predicted gaps across the 21 strong-contrast pairs, separately
       average their observed gaps, and divide:
-      <code>65.5 observed ÷ 558.4 predicted = 0.117 ≈ 0.12</code>. This is a ratio of two
+      <code>32.0 observed ÷ 326.7 predicted = 0.098 ≈ 0.10</code>. This is a ratio of two
       difficulty gaps—not accuracy, variance explained, or a p-value.</li>
     </ol>
 
@@ -503,20 +510,20 @@
     <p>Consider <span class="example">"No A are B"</span> and its complement
     <span class="example">"Some A are B"</span>. D ("No") scores
     down = 1.000, up = 0.000, so its leaning is +1.000. U ("Some") scores
-    down = 0.123, up = 1.000, so its leaning is −0.877. Their contrast is
-    <code>1.000 − (−0.877) = 1.877</code>, easily above 0.20.</p>
+    down = 0.000, up = 1.000, so its leaning is −1.000. Their corrected contrast is
+    <code>1.000 − (−1.000) = 2.000</code>, the maximum possible.</p>
     <div class="tbl-scroll"><table>
       <thead><tr><th>Contribution to predicted U−D gap</th><th>U−D score change</th><th>In SD units</th><th>Regression coefficient</th><th>Predicted AUC contribution</th></tr></thead>
       <tbody>
-        <tr><td>Downward degree</td><td>0.123 − 1.000 = −0.877</td><td>−0.877 ÷ 0.303 = −2.892 SD</td><td>−708 per SD</td><td>+2,048</td></tr>
-        <tr><td>Upward degree</td><td>1.000 − 0.000 = +1.000</td><td>+1.000 ÷ 0.341 = +2.930 SD</td><td>+20 per SD</td><td>+59</td></tr>
-        <tr><td><strong>Total prediction</strong></td><td></td><td></td><td></td><td><strong>+2,107 AUC: U should be harder</strong></td></tr>
+        <tr><td>Downward degree</td><td>0.000 − 1.000 = −1.000</td><td>−1.000 ÷ 0.301 = −3.320 SD</td><td>−425 per SD</td><td>+1,412</td></tr>
+        <tr><td>Upward degree</td><td>1.000 − 0.000 = +1.000</td><td>+1.000 ÷ 0.341 = +2.930 SD</td><td>−256 per SD</td><td>−752</td></tr>
+        <tr><td><strong>Total prediction</strong></td><td></td><td></td><td></td><td><strong>+660 AUC: U should be harder</strong></td></tr>
       </tbody>
     </table></div>
     <p>But the recorded mean AUCs are D = 186.4 and U = 180.7, so the observed gap is
     <code>180.7 − 186.4 = −5.7</code>: U was very slightly <em>easier</em>, and the difference
-    is negligible. We repeat this arithmetic for every pair; the headline 0.12 uses the two
-    averages across all 11 strong-contrast pairs, not this single pair's ratio.</p>
+    is negligible. We repeat this arithmetic for every pair; the headline 0.10 uses the two
+    averages across all 21 strong-contrast pairs, not this single pair's ratio.</p>
 
     <h4>What we found</h4>
     <div class="chart">
@@ -524,16 +531,16 @@
         what the sample-wide trend predicts vs what actually happened</div>
       <div class="brow"><span class="lab">All 36 pairs</span>
         <div class="track"><div class="fill ref" style="width:32.6%"></div></div>
-        <span class="val">predicted +182</span></div>
+        <span class="val">predicted +192</span></div>
       <div class="brow"><span class="lab"></span>
         <div class="track"><div class="fill" style="width:2.9%"></div></div>
-        <span class="val">observed +16 ± 42</span></div>
-      <div class="brow" style="margin-top:8px;"><span class="lab">11 pairs with a strong direction contrast</span>
+        <span class="val">observed +22 ± 41</span></div>
+      <div class="brow" style="margin-top:8px;"><span class="lab">21 pairs with a strong direction contrast</span>
         <div class="track"><div class="fill ref" style="width:100%"></div></div>
-        <span class="val">predicted +558</span></div>
+        <span class="val">predicted +327</span></div>
       <div class="brow"><span class="lab"></span>
         <div class="track"><div class="fill" style="width:11.8%"></div></div>
-        <span class="val">observed +66 ± 94</span></div>
+        <span class="val">observed +32 ± 68</span></div>
       <div class="legend">
         <span><span class="sw outline"></span>predicted: the gap these pairs <em>should</em> show if the sample-wide "downward is easier" regression reflected a real within-quantifier effect</span>
         <span><span class="sw solid"></span>observed within the pairs (± range attributable to chance, 95%)</span>
@@ -541,9 +548,9 @@
     </div>
     <div class="explain">
       <strong>How to read this:</strong> "predicted" applies the regression fitted on all 1,795
-      quantifiers (downward monotonicity −708 AUC per SD, upward +20) to each pair's actual
+      quantifiers (corrected downward −425 AUC per SD, upward −256) to each pair's actual
       difference in directional degrees. If the population trend were driven by the learner
-      reacting to direction, observed ≈ predicted. Instead the observed gaps are ~12% of
+      reacting to direction, observed ≈ predicted. Instead the observed gaps are ~10% of
       predicted, and statistically indistinguishable from zero (the ± ranges include 0).
       Positive numbers would mean the upward member is harder.
     </div>
@@ -551,53 +558,53 @@
     <div class="tbl-scroll"><table>
       <thead><tr><th>Comparison</th><th class="num">pairs</th><th class="num">mean gap (AUC)</th><th class="num">median</th><th class="num">share where upward member was harder</th><th class="num">p (chance)</th></tr></thead>
       <tbody>
-        <tr><td>LSTM networks</td><td class="num">36</td><td class="num">+65.6</td><td class="num">+21.4</td><td class="num">64%</td><td class="num">0.16</td></tr>
-        <tr><td>Transformer networks</td><td class="num">36</td><td class="num">−33.7</td><td class="num">−17.7</td><td class="num">42%</td><td class="num">0.41</td></tr>
-        <tr><td>Average of both</td><td class="num">36</td><td class="num">+15.9</td><td class="num">−1.2</td><td class="num">50%</td><td class="num">0.59</td></tr>
-        <tr><td>Strong-contrast pairs only</td><td class="num">11</td><td class="num">+65.5</td><td class="num">+14.6</td><td class="num">64%</td><td class="num">0.21</td></tr>
+        <tr><td>LSTM networks</td><td class="num">36</td><td class="num">+9.6</td><td class="num">+3.6</td><td class="num">56%</td><td class="num">0.80</td></tr>
+        <tr><td>Transformer networks</td><td class="num">36</td><td class="num">+35.1</td><td class="num">+8.0</td><td class="num">56%</td><td class="num">0.21</td></tr>
+        <tr><td>Average of both</td><td class="num">36</td><td class="num">+22.4</td><td class="num">+3.9</td><td class="num">53%</td><td class="num">0.29</td></tr>
+        <tr><td>Strong-contrast pairs only</td><td class="num">21</td><td class="num">+32.0</td><td class="num">+15.0</td><td class="num">62%</td><td class="num">0.23</td></tr>
       </tbody>
     </table></div>
     <p class="tbl-caption">"p (chance)" = probability of a gap at least this large arising by luck
     if opposites were truly equally hard (Wilcoxon signed-rank test). None come close to the
     conventional 0.05 bar. A gap of ±50 AUC is tiny against quantifier-to-quantifier differences,
-    which span thousands. The LSTM row is the only whisper of a real direction preference — worth
-    remembering, not yet believing.</p>
+    which span thousands. No architecture provides evidence of a within-pair direction preference.</p>
 
     <div class="verdict"><strong>Verdict.</strong> Opposite quantifiers — same boundary, flipped
     direction — are learned essentially equally fast. The mathematical symmetry argument holds in
-    practice, and at most ~12% of the sample-wide direction effect can be a within-quantifier
-    phenomenon. The other ~88% must come from <em>which</em> quantifiers the grammar sampled or
+    practice, and about 10% of the sample-wide direction effect appears within a quantifier pair.
+    The other ~90% must come from <em>which</em> quantifiers the grammar sampled or
     from the measurement itself. That redirects the whole Q2 investigation.</div>
 
     <h4>Bonus finding: the direction measure itself is noisy</h4>
     <p>For exact opposites there's a definitional sanity check: "how upward is Q" should equal
     "how downward is its opposite" — they describe the same fact about the same boundary. In the
-    data this identity <strong>fails for 37 of 44 pairs</strong>: worst error 0.79 on a 0–1 scale.
-    So some of the "upward doesn't matter" result may simply be that upward degrees are poorly
-    measured. This is the main motivation for the metric audit below (next-steps #1).</p>
+    manuscript-era data this identity <strong>failed for 37 of 44 pairs</strong>: worst error
+     0.79 on a 0–1 scale. Under the complement-dual alternative it passes exactly for every pair
+    (max error 0; pooled mirror correlation 1.0).</p>
   </div>
 </section>
 
 <!-- ============================ METRIC AUDIT ============================ -->
 <section>
-  <div class="section-head"><h2>Metric audit · Root cause and fix for the direction measure</h2>
-    <span class="sub"><span class="mono">notebooks/monotonicity_metric_mirror_audit.ipynb</span></span></div>
+  <div class="section-head"><h2>Metric audit · A design tradeoff, not a simple bug</h2>
+    <span class="sub"><span class="mono">notebooks/monotonicity_measure_variants_walkthrough.ipynb</span></span></div>
 
   <div class="card">
-    <h4>What was wrong</h4>
+    <h4>What the manuscript measure does</h4>
     <p>The entropy-based monotonicity measure
     (<code>upward_monotonicity_entropy</code> in <code>measures.py</code>)
     scores how well a single predictor variable — "does this model have any
     true predecessor in the subset order?" — predicts the quantifier's truth
-    value. For <strong>upward</strong> degree that predictor is perfectly natural:
-    a true predecessor means "going up in the order makes more things true."
-    For <strong>downward</strong> degree, the code used a <em>successor-based</em>
-    predictor instead: "does this model have any true model above it?" These two
-    predictor families are not mirrors of each other in any algebraic sense,
+    value. Upward degree uses the least upward-monotone <strong>majorant</strong>:
+    "does this model have any true predecessor?" Downward degree uses the exact
+    order-reversed construction, the least downward-monotone majorant:
+    "does this model have any true successor?" This is coherent and faithful to
+    the manuscript's minimal-extension formula. But these two
+    predictor families are not mirrors under <em>truth-value complementation</em>,
     so the identity <code>down(Q) = up(¬Q)</code> can fail — and does,
     badly, for 37 of 44 complement pairs (max error 0.788).</p>
 
-    <h4>Why it fails</h4>
+    <h4>Why complement mirroring fails</h4>
     <p>Imagine a chain of three models a ⊆ b ⊆ c and a quantifier Q = (0, 1, 0).
     The upward predictor of ¬Q asks: "does each model have a false predecessor?" —
     the answer is yes for every model (a itself is false), so the predictor is a
@@ -606,27 +613,34 @@
     c, giving a non-constant predictor and a positive score. The predictor designs
     look toward opposite ends of the order, so they measure genuinely different things.</p>
 
-    <h4>The fix — two lines in <code>measure_monotonicity</code></h4>
+    <h4>The complement-dual alternative</h4>
     <p>The semantic insight is that <em>"Q is downward-monotone"</em> and
     <em>"¬Q is upward-monotone"</em> are exactly the same statement: monotonicity
     direction only depends on which side of the truth table you call True. So the
-    downward score should call the upward function with the <strong>negated
-    quantifier</strong> — not a flipped direction parameter. Changing</p>
+    complement-dual downward score can call the upward function with the
+    <strong>negated quantifier</strong>. Changing</p>
     <pre><code># OLD: flip=True changes the direction of the partial-order search
 measure(all_models, ref_A, quantifier, cfg, flip=True)   # right downward
 
 # NEW: negate labels, keep the predecessor-looking direction
 measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code></pre>
-    <p>guarantees <code>down(Q) = up(¬Q)</code> and <code>up(Q) = down(¬Q)</code>
-    <strong>by construction</strong>, because both calls go through the same code path.
-    Verified in the audit notebook: <strong>44/44 pairs now pass all four mirror
+    <p>This guarantees <code>down(Q) = up(¬Q)</code> and <code>up(Q) = down(¬Q)</code>
+    <strong>by construction</strong>. It also changes downward scoring from a
+    majorant to a <strong>minorant</strong>, so it is an alternative metric rather
+    than a neutral implementation correction. Under it, <strong>44/44 pairs pass all four mirror
     identities with max error 0.00</strong> (down from 37/44 failing at max error 0.788
-    before the fix).</p>
+    under the manuscript majorant).</p>
+
+    <p><strong>Full sensitivity rerun:</strong> the complement-dual alternative changed aggregate degree for
+    1,283 of 2,000 expressions (mean change +0.071; largest 0.788). The manuscript
+    did use the old calculation: its Table 4 values match the old implementation in
+    all 12 auditable directional cells, and the old run table reproduces Table 6
+    coefficients to within 0.2%. See <code>FIGURES_TECHNICAL.ipynb</code> §6.</p>
 
     <div class="explain"><strong>See the full proof:</strong>
-      <code>notebooks/monotonicity_metric_mirror_audit.ipynb</code> —
-      cells 1–6 prove the failure; cell 7 (the new section) verifies the fix.
-      The actual code change is in <code>measures.py</code> lines 172–181.
+      <code>notebooks/monotonicity_measure_variants_walkthrough.ipynb</code> derives
+      closure and interior, compares all variants on Table 4, tests all 44 pairs,
+      and recommends two-sided mean entropy for a revised analysis.
     </div>
   </div>
 </section>
@@ -634,7 +648,7 @@ measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code>
 <!-- ============================ FINDINGS: T2 ============================ -->
 <section>
   <div class="section-head"><h2>Experiment T2 · What actually predicts difficulty?</h2>
-    <span class="sub"><span class="mono">scripts/truth_set_stats.py</span> → <span class="mono">analysis/tables/12_truth_set_stats.txt</span></span></div>
+    <span class="sub"><span class="mono">scripts/truth_set_stats.py</span> → <span class="mono">analysis/tables/12_truth_set_stats_corrected.txt</span></span></div>
 
   <div class="card">
     <h4>Why this test</h4>
@@ -660,55 +674,54 @@ measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code>
     <h4>What we found</h4>
     <div class="chart">
       <div class="chart-title">Share of difficulty variance explained (R², n = 1,795 quantifiers) — higher is better</div>
-      <div class="brow"><span class="lab">Monotonicity directions only</span>
-        <div class="track"><div class="fill" style="width:22.6%"></div></div>
-        <span class="val">R² = 0.126</span></div>
+      <div class="brow"><span class="lab">Corrected directions only</span>
+        <div class="track"><div class="fill" style="width:11.3%"></div></div>
+        <span class="val">R² = 0.063</span></div>
       <div class="brow"><span class="lab">Example-set statistics only</span>
         <div class="track"><div class="fill" style="width:96.4%"></div></div>
         <span class="val">R² = 0.537</span></div>
       <div class="brow"><span class="lab">Both together</span>
         <div class="track"><div class="fill" style="width:96.9%"></div></div>
-        <span class="val">R² = 0.540</span></div>
+        <span class="val">R² = 0.538</span></div>
       <div class="brow"><span class="lab">… plus formula length</span>
         <div class="track"><div class="fill" style="width:100%"></div></div>
         <span class="val">R² = 0.557</span></div>
     </div>
     <div class="explain">
-      <strong>How to read this:</strong> the statistics alone explain four times more variance
+       <strong>How to read this:</strong> the statistics alone explain 8.5 times more variance
       than the monotonicity degrees — and adding monotonicity on top of the statistics buys
-      almost nothing (0.537 → 0.540). Whatever monotonicity "knows" about difficulty, the
+       almost nothing (0.537 → 0.538). Whatever monotonicity "knows" about difficulty, the
       example-set statistics already know nearly all of it.
     </div>
 
     <div class="chart">
-      <div class="chart-title">The downward-monotonicity coefficient (AUC change per SD of downward degree) before and after control</div>
+      <div class="chart-title">Corrected downward coefficient (AUC change per SD) before and after control</div>
       <div class="brow"><span class="lab">On its own</span>
         <div class="track"><div class="fill" style="width:100%"></div></div>
-        <span class="val">β = −708</span></div>
+        <span class="val">β = −425</span></div>
       <div class="brow"><span class="lab">Statistics held fixed</span>
-        <div class="track"><div class="fill" style="width:19.5%"></div></div>
-        <span class="val">β = −138 (p = .002)</span></div>
+        <div class="track"><div class="fill" style="width:14.3%"></div></div>
+        <span class="val">β = +61 (p = .13)</span></div>
     </div>
     <div class="explain">
       <strong>How to read this:</strong> comparing quantifiers with the <em>same</em> example-set
-      statistics, an extra standard deviation of downward monotonicity now buys only −138 AUC
-      instead of −708 — an 80% reduction. A small genuine residual survives (it is statistically
-      solid, p = .002), which fits T1's small non-zero within-pair whisper. The pattern is the
-      same for both network types (LSTM −76%, Transformer −83%).
+      statistics, corrected downward monotonicity no longer predicts easier learning: its
+      coefficient changes sign and is not significant. Corrected upward is likewise null
+      (β −32, p=.38). The old small downward residual was a property of the faulty score.
     </div>
 
     <div class="tbl-scroll"><table>
       <thead><tr><th>Statistic (in the combined model)</th><th class="num">effect on AUC per SD</th><th class="num">p</th><th>plain reading</th></tr></thead>
       <tbody>
-        <tr><td>Class separation</td><td class="num">−1500</td><td class="num">1e-138</td>
+        <tr><td>Class separation</td><td class="num">−1597</td><td class="num">2e-157</td>
           <td>The dominant factor by far: the more the average true scene differs from the average false scene, the easier the quantifier. Alone it correlates −0.68 with difficulty — stronger than any monotonicity measure ever has.</td></tr>
-        <tr><td>Avg. overlap |A∩B| in true scenes</td><td class="num">−1089</td><td class="num">2e-11</td>
+        <tr><td>Avg. overlap |A∩B| in true scenes</td><td class="num">−1026</td><td class="num">2e-10</td>
           <td>Quantifiers whose true scenes feature big A-and-B overlap are easier, other things equal.</td></tr>
-        <tr><td>Avg. set fullness in true scenes</td><td class="num">+422</td><td class="num">3e-4</td>
+        <tr><td>Avg. set fullness in true scenes</td><td class="num">+397</td><td class="num">7e-4</td>
           <td>True-scenes-are-crowded makes things somewhat harder — the piece of the original H2 idea that survives, but far weaker than separation.</td></tr>
-        <tr><td>Variability among true scenes</td><td class="num">−203</td><td class="num">4e-7</td>
+        <tr><td>Variability among true scenes</td><td class="num">−230</td><td class="num">4e-8</td>
           <td>More diverse true scenes, slightly easier (they cover the space better).</td></tr>
-        <tr><td>Boundary complexity (exact, small universe)</td><td class="num">−161</td><td class="num">1e-5</td>
+        <tr><td>Boundary complexity (exact, small universe)</td><td class="num">−163</td><td class="num">1e-5</td>
           <td>How jagged the true/false divide is; only a minor contribution once the above are in.</td></tr>
       </tbody>
     </table></div>
@@ -753,18 +766,19 @@ measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code>
         <span class="dim">Downward truth sets mean "no forbidden object present", supposedly a
         natural shape for gradient descent.</span></td>
         <td><span class="chip weakened">Weakened</span></td>
-        <td>T1 caps any such within-quantifier preference at ~12% of the trend, with only a
-        non-significant LSTM-side hint (p = 0.16) left to chase.</td>
+        <td>Corrected T1 caps any such within-quantifier preference at ~10% of the trend;
+        neither architecture shows a significant paired difference.</td>
       </tr>
       <tr>
         <td><strong>H4 · "The direction measurement is unreliable."</strong><br>
         <span class="dim">Known edge cases could distort the directional degrees, especially
         upward ones.</span></td>
-        <td><span class="chip done">Root cause found and fixed</span></td>
+        <td><span class="chip done">Design tradeoff documented</span></td>
         <td>The entropy metric's downward computation used a successor-based predictor while
         upward used a predecessor-based one — these are not mirrors. The audit (44 complement pairs)
-        found max error 0.788; fixing the implementation to always negate labels instead of
-        flipping the search direction brings every pair to exact zero error. See metric audit section.</td>
+        found max error 0.788. Negating labels brings every pair to exact zero error,
+        but switches downward scoring from a majorant to a minorant. A two-sided entropy
+        measure preserves both order and complement symmetries. See metric audit section.</td>
       </tr>
       <tr>
         <td><strong>H5 · "Downward quantifiers in our sample are just simpler."</strong><br>
@@ -791,14 +805,14 @@ measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code>
         <td>Compare learning difficulty inside exact-opposite pairs (same boundary, flipped direction).</td>
         <td>hours</td>
         <td><span class="chip done">Done</span></td>
-        <td>Opposites learn equally fast; ≤ 12% of the direction trend is within-quantifier. Plus: direction measure shown noisy.</td>
+        <td>Opposites learn equally fast; corrected observed/predicted ratio is ~10%. Mirror error is now exactly zero.</td>
       </tr>
       <tr>
         <td class="mono">T2</td>
         <td>Control the difficulty–direction relation for plain statistics of each quantifier's example sets.</td>
         <td>hours</td>
         <td><span class="chip done">Done</span></td>
-        <td>Statistics explain 4× more than monotonicity; downward effect shrinks 80%; class separation dominates.</td>
+        <td>Corrected directions explain R²=.063 vs statistics .537; after control neither direction retains a reliable negative effect. Class separation dominates.</td>
       </tr>
       <tr>
         <td class="mono">T3</td>
@@ -818,8 +832,9 @@ measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code>
         <td class="mono">T5</td>
         <td>Re-score all 2,000 quantifiers with the alternative "switches" monotonicity measure; re-run the directional analyses.</td>
         <td>measure work</td>
-        <td><span class="chip progress">Fix implemented</span></td>
-        <td>Root cause identified (asymmetric existential feature) and fixed in <code>measures.py</code> (two lines). Mirror symmetry now 44/44 exact. Next: recompute all degrees with the fixed measure and re-run T2 regression.</td>
+        <td><span class="chip done">Done</span></td>
+        <td>All 2,000 complement-dual degrees recomputed; mirror symmetry is 44/44 exact.
+        Six variants are now compared separately, including two-sided entropy and direct violations.</td>
       </tr>
     </tbody>
   </table></div>
@@ -854,9 +869,9 @@ measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code>
         by zone counts — a summary of the input, not the literal network encoding.</li>
         <li>Regressions are ordinary least squares on per-quantifier averages, matching the earlier
         review sections; p-values are descriptive, not preregistered-confirmatory.</li>
-        <li>36 pairs is a small sample: T1 can rule out the large predicted effect (+558 vs
-        observed +66 ± 94) but cannot distinguish a zero effect from a small one — hence the
-        "≤ 12%" phrasing, not "zero".</li>
+        <li>36 pairs is a small sample: corrected T1 can rule out the large predicted effect
+        (+327 vs observed +32 ± 68 in 21 strong-contrast pairs) but cannot distinguish a zero
+        effect from a small one — hence the "~10%" phrasing, not "zero".</li>
       </ul>
     </div>
   </div>
@@ -867,11 +882,11 @@ measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code>
   <div class="section-head"><h2>Next-steps queue</h2><span class="sub">ranked by information per hour</span></div>
   <div class="card">
     <ol class="queue">
-      <li><strong>Re-score monotonicity with the "switches" measure (T5).</strong> The current
-      measure demonstrably violates the up(Q) = down(opposite) identity; the alternative measure
-      (counting true/false alternations along orderings) may not. If upward monotonicity starts
-      predicting difficulty under the cleaner measure, a chunk of the asymmetry was measurement
-      noise all along. Also settles Q3's "does the gap persist?" item.</li>
+      <li><strong>Revise the manuscript claims and figures.</strong> Keep the majorant
+      (manuscript-era) calculations as the primary reproduction. Report the complement-dual
+      sensitivity analysis alongside it. Withdraw the specifically downward-only interpretation
+      given the 80% mediation by class statistics; downward survives (weakened) but needs
+      better controls.</li>
       <li><strong>Q1 Phase 0: extend the grammar.</strong> Add the domain-set primitive
       <code>M</code> (enabling complements like "non-B") and integer constants ("at least
       <em>3</em>" is currently inexpressible), then re-derive textbook quantifiers as sanity
@@ -879,10 +894,10 @@ measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code>
       <li><strong>Q3 item 1: confirm the "gap" mechanism on the real model space.</strong> The
       earlier simulation used a simplified lattice; redo it with the actual measure code and
       universe.</li>
-      <li><strong>Chase the residuals.</strong> A small direction effect survives both T1 (LSTM
-      +76, p = 0.16) and T2 (β −138, p = .002). One cheap extension: test whether it tracks the
-      <em>asymmetric</em> example statistics (which side is positive) in the already-committed
-      feature file.</li>
+      <li><strong>Investigate the surviving downward residual.</strong> After controlling example-set
+      statistics, downward β = −138 (p=.002) remains. Determine how much is grammar sampling bias
+      (T4 retraining with polarity-balanced grammar) vs. genuine direction preference.
+      The complement-dual sensitivity shows that this residual is partly metric-construction-dependent.</li>
       <li><strong>T4: polarity-balanced regeneration</strong> (cluster-scale retraining) — the
       final word on how much of the paper's aggregate correlation is grammar-borne; decide after
       #1 and #2 land.</li>

@@ -161,8 +161,10 @@ def compute_features(sample_terms, by_term, uni, n_models: int, seed: int):
         row["boundary_density"] = universe_boundary_density(uni, e)
         feats.append(row)
         if (k + 1) % 400 == 0:
-            print(f"  {k+1}/{len(sample_terms)} expressions "
-                  f"({time.time()-t0:.0f}s elapsed)")
+            print(
+                f"  {k+1}/{len(sample_terms)} expressions "
+                f"({time.time()-t0:.0f}s elapsed)"
+            )
     return pd.DataFrame(feats).set_index("expression")
 
 
@@ -219,15 +221,21 @@ def fit_and_report(df: pd.DataFrame, outcome: str):
     m_all = ols(["downward", "upward", "func_count", *STAT_COLS])
 
     print(f"\n===== outcome: {outcome}  (n={len(use)}) =====")
-    print(f"  directions only:      R2={m_dir.rsquared:.3f}   "
-          f"downward β={m_dir.params['downward']:+7.1f} (p={m_dir.pvalues['downward']:.2g})   "
-          f"upward β={m_dir.params['upward']:+7.1f} (p={m_dir.pvalues['upward']:.2g})")
+    print(
+        f"  directions only:      R2={m_dir.rsquared:.3f}   "
+        f"downward β={m_dir.params['downward']:+7.1f} (p={m_dir.pvalues['downward']:.2g})   "
+        f"upward β={m_dir.params['upward']:+7.1f} (p={m_dir.pvalues['upward']:.2g})"
+    )
     print(f"  truth-set stats only: R2={m_stats.rsquared:.3f}")
-    print(f"  directions + stats:   R2={m_both.rsquared:.3f}   "
-          f"downward β={m_both.params['downward']:+7.1f} (p={m_both.pvalues['downward']:.2g})   "
-          f"upward β={m_both.params['upward']:+7.1f} (p={m_both.pvalues['upward']:.2g})")
-    print(f"  + func_count:         R2={m_all.rsquared:.3f}   "
-          f"downward β={m_all.params['downward']:+7.1f} (p={m_all.pvalues['downward']:.2g})")
+    print(
+        f"  directions + stats:   R2={m_both.rsquared:.3f}   "
+        f"downward β={m_both.params['downward']:+7.1f} (p={m_both.pvalues['downward']:.2g})   "
+        f"upward β={m_both.params['upward']:+7.1f} (p={m_both.pvalues['upward']:.2g})"
+    )
+    print(
+        f"  + func_count:         R2={m_all.rsquared:.3f}   "
+        f"downward β={m_all.params['downward']:+7.1f} (p={m_all.pvalues['downward']:.2g})"
+    )
     shrink = 1 - m_both.params["downward"] / m_dir.params["downward"]
     print(f"  downward-β shrinkage from stats control: {shrink:+.1%}")
     print("\n  stats coefficients in the full model (per SD):")
@@ -241,8 +249,16 @@ def main():
     ap.add_argument("--altk-archive", type=Path, default=DEFAULT_ALTK_ARCHIVE)
     ap.add_argument("--n-models", type=int, default=4000)
     ap.add_argument("--seed", type=int, default=11)
-    ap.add_argument("--csv", type=Path,
-                    default=repo_root() / "outputs" / "combined_runs_AOC_monotonicity_updated.csv")
+    ap.add_argument(
+        "--csv",
+        type=Path,
+        default=repo_root() / "outputs" / "combined_runs_AOC_monotonicity_updated.csv",
+    )
+    ap.add_argument(
+        "--tag",
+        default="",
+        help="Optional output suffix, e.g. 'corrected' preserves manuscript-era artifacts.",
+    )
     args = ap.parse_args()
 
     outdir = repo_root() / "analysis" / "tables"
@@ -250,15 +266,18 @@ def main():
     outdir.mkdir(parents=True, exist_ok=True)
     figdir.mkdir(parents=True, exist_ok=True)
 
-    table_path = outdir / "12_truth_set_stats.txt"
+    suffix = f"_{args.tag}" if args.tag else ""
+    table_path = outdir / f"12_truth_set_stats{suffix}.txt"
     tee = _Tee(sys.stdout, open(table_path, "w"))
     old = sys.stdout
     sys.stdout = tee
     try:
         uni, by_term = load_archive(args.altk_archive)
         sample = pd.read_csv(repo_root() / "expressions_sample_2k.csv")
-        print(f"computing truth-set statistics for {len(sample)} expressions on "
-              f"{args.n_models} training-style models (M={GEN_M_SIZE}, X={GEN_X_SIZE})")
+        print(
+            f"computing truth-set statistics for {len(sample)} expressions on "
+            f"{args.n_models} training-style models (M={GEN_M_SIZE}, X={GEN_X_SIZE})"
+        )
         feats = compute_features(
             sample["term_expression"], by_term, uni, args.n_models, args.seed
         )
@@ -272,7 +291,9 @@ def main():
             rd = df["downward"].corr(df[c])
             ru = df["upward"].corr(df[c])
             ra = df["auc_mean"].corr(df[c])
-            print(f"  {c:18s} corr(down)={rd:+.3f}  corr(up)={ru:+.3f}  corr(AUC)={ra:+.3f}")
+            print(
+                f"  {c:18s} corr(down)={rd:+.3f}  corr(up)={ru:+.3f}  corr(AUC)={ra:+.3f}"
+            )
 
         m_dir, m_both = fit_and_report(df, "auc_mean")
         fit_and_report(df, "auc_lstm")
@@ -296,17 +317,19 @@ def main():
         ax.set_title("H2's proposed mediator vs difficulty")
 
         ax = axes[2]
-        ax.scatter(df["boundary_density"], df["auc_mean"], s=8, alpha=0.4, color="#663399")
+        ax.scatter(
+            df["boundary_density"], df["auc_mean"], s=8, alpha=0.4, color="#663399"
+        )
         ax.set_xlabel("truth-boundary edge density (universe)")
         ax.set_ylabel("mean AUC")
         ax.set_title("Boundary complexity vs difficulty")
 
         fig.tight_layout()
-        figpath = figdir / "truth_set_stats.png"
+        figpath = figdir / f"truth_set_stats{suffix}.png"
         fig.savefig(figpath, dpi=150)
         print(f"\nsaved {rel(figpath)}")
 
-        feats_path = repo_root() / "analysis" / "truth_set_stats_features.csv"
+        feats_path = repo_root() / "analysis" / f"truth_set_stats_features{suffix}.csv"
         df.reset_index().to_csv(feats_path, index=False)
         print(f"features saved to {rel(feats_path)}")
     finally:

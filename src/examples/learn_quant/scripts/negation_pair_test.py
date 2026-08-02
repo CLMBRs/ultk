@@ -314,7 +314,14 @@ def build_pair_table(pairs, terms, stats_df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Path):
+def analyze_pairs(
+    pairs,
+    terms,
+    stats_df: pd.DataFrame,
+    outdir: Path,
+    figdir: Path,
+    output_tag: str = "",
+):
     pairs_df = build_pair_table(pairs, terms, stats_df)
 
     def paired_report(col_d, col_u, label):
@@ -501,7 +508,8 @@ def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Pa
     ax.set_title("Measure-mirror check (H4)")
 
     fig.tight_layout()
-    figpath = figdir / "negation_pair_test.png"
+    suffix = f"_{output_tag}" if output_tag else ""
+    figpath = figdir / f"negation_pair_test{suffix}.png"
     fig.savefig(figpath, dpi=150)
     print(f"\nsaved {rel(figpath)}")
 
@@ -527,6 +535,11 @@ def main():
         type=Path,
         default=repo_root() / "outputs" / "combined_runs_AOC_monotonicity_updated.csv",
     )
+    ap.add_argument(
+        "--tag",
+        default="",
+        help="Optional output suffix, e.g. 'corrected' preserves manuscript-era artifacts.",
+    )
     args = ap.parse_args()
 
     outdir = repo_root() / "analysis" / "tables"
@@ -534,7 +547,8 @@ def main():
     outdir.mkdir(parents=True, exist_ok=True)
     figdir.mkdir(parents=True, exist_ok=True)
 
-    table_path = outdir / "11_negation_pair_test.txt"
+    suffix = f"_{args.tag}" if args.tag else ""
+    table_path = outdir / f"11_negation_pair_test{suffix}.txt"
     tee = _Tee(sys.stdout, open(table_path, "w"))
     old_stdout = sys.stdout
     sys.stdout = tee
@@ -550,7 +564,7 @@ def main():
         pairs, _sidx = find_pairs(terms, V, sample["term_expression"])
         verified, _failed = verify_pairs(pairs, exprs, args.altk_archive, args.n_verify)
         stats_df = per_expression_auc(runs)
-        analyze_pairs(verified, terms, stats_df, outdir, figdir)
+        analyze_pairs(verified, terms, stats_df, outdir, figdir, args.tag)
     finally:
         sys.stdout = old_stdout
     print(f"wrote {rel(table_path)}")

@@ -80,10 +80,12 @@ def rel(path):
         return Path(path)
 
 
-def load() -> pd.DataFrame:
-    df = pd.read_csv(
-        repo_root() / "outputs" / "combined_runs_AOC_monotonicity_updated.csv"
-    )
+def load(csv_path: Path | None = None) -> pd.DataFrame:
+    if csv_path is None:
+        csv_path = (
+            repo_root() / "outputs" / "combined_runs_AOC_monotonicity_updated.csv"
+        )
+    df = pd.read_csv(csv_path)
     df = df[df["expression"].notna()].copy()
     df["leaf_count"] = df["expression"].apply(count_leaves)
     df["func_count"] = df["expression"].apply(count_functions)

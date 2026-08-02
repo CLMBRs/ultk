@@ -124,16 +124,33 @@ def measure_monotonicity(
     quantifier,
     measure=upward_monotonicity_entropy,
     cfg=None,
+    variant="majorant",
 ):
-    """Measures degree of monotonicity, as max of the degree of
-    positive/negative monotonicty, for a given quantifier _and its negation_
-    (since truth values are symmetric for us).
+    """Return right/left upward/downward entropy scores.
+
+    ``variant="majorant"`` (default) is the manuscript construction: upward
+    directions use a least monotone majorant (true predecessors), and downward
+    directions use its order dual (true successors). This is a uniform closure
+    construction that preserves order duality. It does not satisfy complement
+    mirror symmetry (``down(Q) = up(not Q)``), which is a documented property
+    of all one-sided closure measures, not an implementation error.
+
+    ``variant="complement_dual"`` uses ``down(Q) = up(not Q)`` instead. It
+    enforces complement mirror symmetry but replaces the downward majorant with a
+    downward minorant, making the construction asymmetric. It is a legitimate
+    alternative for studying complement-invariant properties, not the primary measure.
+
+    See ``monotonicity_variants.py`` and the variants walkthrough notebook for
+    order-dual and complement-invariant two-sided alternatives. Note that the
+    two-sided mean entropy variant inflates scores for non-monotone functions
+    (boundary elements where interior approximations coincide with Q produce
+    spurious mutual information); the majorant does not have this problem.
 
     :param all_models: list of models
     :param quantifier: list of truth values
     :param measure: method for computing degree of upward monotonicity of a Q
-    :return: max of measure applied to all_models and quantifier, plus 1- each
-    of those
+    :param variant: ``"majorant"`` or ``"complement_dual"``
+    :return: right-up, left-up, right-down, and left-down scores
     """
 
     def swap_models(all_models):
@@ -155,7 +172,7 @@ def measure_monotonicity(
 
         return swapped
 
-    interpretations = [
+    upward = [
         # upward monotonicity
         measure(
             all_models,
@@ -169,17 +186,23 @@ def measure_monotonicity(
             quantifier,
             cfg,
         ),  # left upward monotonicity
-        # downward monotonicity = upward monotonicity of the complement
-        # "Q is downward-monotone" is semantically identical to "¬Q is upward-monotone".
-        # Using the same predecessor-based computation on the negated quantifier
-        # guarantees the mirror identity down(Q) = up(¬Q) exactly.
-        measure(
-            all_models, set_reference_models_A, 1 - quantifier, cfg
-        ),  # right downward monotonicity
-        measure(
-            all_models, set_reference_models_B, 1 - quantifier, cfg
-        ),  # left downward monotonicity
     ]
+    if variant == "majorant":
+        downward = [
+            measure(all_models, set_reference_models_A, quantifier, cfg, flip=True),
+            measure(all_models, set_reference_models_B, quantifier, cfg, flip=True),
+        ]
+    elif variant == "complement_dual":
+        downward = [
+            measure(all_models, set_reference_models_A, 1 - quantifier, cfg),
+            measure(all_models, set_reference_models_B, 1 - quantifier, cfg),
+        ]
+    else:
+        raise ValueError(
+            "variant must be either 'majorant' or 'complement_dual'; "
+            "use monotonicity_variants.entropy_variant_scores for two-sided variants"
+        )
+    interpretations = upward + downward
 
     # assert measure(all_models, quantifier, cfg,) == measure(1- all_models, quantifier, cfg, flip=True) == measure(flipped_models - both_models, quantifier, cfg, flip=True)
 
@@ -244,7 +267,6 @@ def num_preds(num_arr, ref_model_ints, num, r_num, flip=False):
 
 
 def get_true_predecessors(all_models, set_reference_models, quantifier, flip=False):
-
     # get integers corresponding to each model
     model_ints = binary_to_int(all_models)
     ref_model_ints = binary_to_int(set_reference_models)
@@ -386,7 +408,6 @@ import pandas as pd
 
 @hydra.main(version_base=None, config_path="conf", config_name="learn")
 def main(cfg: DictConfig) -> None:
-
     if not cfg.measures.monotonicity.create_universe:
         uni = load_universe(cfg)
     else:
