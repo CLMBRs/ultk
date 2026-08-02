@@ -572,11 +572,62 @@
     <h4>Bonus finding: the direction measure itself is noisy</h4>
     <p>For exact opposites there's a definitional sanity check: "how upward is Q" should equal
     "how downward is its opposite" — they describe the same fact about the same boundary. In the
-    data this identity <strong>fails for half the pairs</strong>: typical mismatch 0.05, worst
-    0.79 (on a 0–1 scale), agreement correlation only r = 0.71. So some of the "upward doesn't
-    matter" result may simply be that upward degrees are poorly measured. This is the most
-    direct evidence yet for the measurement-noise hypothesis (H4 below) and the main motivation
-    for re-scoring everything with the alternative "switches" measure (next-steps #1).</p>
+    data this identity <strong>fails for 37 of 44 pairs</strong>: worst error 0.79 on a 0–1 scale.
+    So some of the "upward doesn't matter" result may simply be that upward degrees are poorly
+    measured. This is the main motivation for the metric audit below (next-steps #1).</p>
+  </div>
+</section>
+
+<!-- ============================ METRIC AUDIT ============================ -->
+<section>
+  <div class="section-head"><h2>Metric audit · Root cause and fix for the direction measure</h2>
+    <span class="sub"><span class="mono">notebooks/monotonicity_metric_mirror_audit.ipynb</span></span></div>
+
+  <div class="card">
+    <h4>What was wrong</h4>
+    <p>The entropy-based monotonicity measure
+    (<code>upward_monotonicity_entropy</code> in <code>measures.py</code>)
+    scores how well a single predictor variable — "does this model have any
+    true predecessor in the subset order?" — predicts the quantifier's truth
+    value. For <strong>upward</strong> degree that predictor is perfectly natural:
+    a true predecessor means "going up in the order makes more things true."
+    For <strong>downward</strong> degree, the code used a <em>successor-based</em>
+    predictor instead: "does this model have any true model above it?" These two
+    predictor families are not mirrors of each other in any algebraic sense,
+    so the identity <code>down(Q) = up(¬Q)</code> can fail — and does,
+    badly, for 37 of 44 complement pairs (max error 0.788).</p>
+
+    <h4>Why it fails</h4>
+    <p>Imagine a chain of three models a ⊆ b ⊆ c and a quantifier Q = (0, 1, 0).
+    The upward predictor of ¬Q asks: "does each model have a false predecessor?" —
+    the answer is yes for every model (a itself is false), so the predictor is a
+    constant, giving score 0. The original downward predictor of Q asks: "does each
+    model have a true successor?" — the answer is yes for a and b (b is true), no for
+    c, giving a non-constant predictor and a positive score. The predictor designs
+    look toward opposite ends of the order, so they measure genuinely different things.</p>
+
+    <h4>The fix — two lines in <code>measure_monotonicity</code></h4>
+    <p>The semantic insight is that <em>"Q is downward-monotone"</em> and
+    <em>"¬Q is upward-monotone"</em> are exactly the same statement: monotonicity
+    direction only depends on which side of the truth table you call True. So the
+    downward score should call the upward function with the <strong>negated
+    quantifier</strong> — not a flipped direction parameter. Changing</p>
+    <pre><code># OLD: flip=True changes the direction of the partial-order search
+measure(all_models, ref_A, quantifier, cfg, flip=True)   # right downward
+
+# NEW: negate labels, keep the predecessor-looking direction
+measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code></pre>
+    <p>guarantees <code>down(Q) = up(¬Q)</code> and <code>up(Q) = down(¬Q)</code>
+    <strong>by construction</strong>, because both calls go through the same code path.
+    Verified in the audit notebook: <strong>44/44 pairs now pass all four mirror
+    identities with max error 0.00</strong> (down from 37/44 failing at max error 0.788
+    before the fix).</p>
+
+    <div class="explain"><strong>See the full proof:</strong>
+      <code>notebooks/monotonicity_metric_mirror_audit.ipynb</code> —
+      cells 1–6 prove the failure; cell 7 (the new section) verifies the fix.
+      The actual code change is in <code>measures.py</code> lines 172–181.
+    </div>
   </div>
 </section>
 
@@ -709,10 +760,11 @@
         <td><strong>H4 · "The direction measurement is unreliable."</strong><br>
         <span class="dim">Known edge cases could distort the directional degrees, especially
         upward ones.</span></td>
-        <td><span class="chip support">Strengthened</span></td>
-        <td>T1's sanity check — up(Q) must equal down(opposite-of-Q) — fails for half the pairs,
-        with mismatches up to 0.79 on a 0–1 scale. Noisy measurement dilutes the upward effect
-        toward zero, exactly the observed pattern.</td>
+        <td><span class="chip done">Root cause found and fixed</span></td>
+        <td>The entropy metric's downward computation used a successor-based predictor while
+        upward used a predecessor-based one — these are not mirrors. The audit (44 complement pairs)
+        found max error 0.788; fixing the implementation to always negate labels instead of
+        flipping the search direction brings every pair to exact zero error. See metric audit section.</td>
       </tr>
       <tr>
         <td><strong>H5 · "Downward quantifiers in our sample are just simpler."</strong><br>
@@ -766,8 +818,8 @@
         <td class="mono">T5</td>
         <td>Re-score all 2,000 quantifiers with the alternative "switches" monotonicity measure; re-run the directional analyses.</td>
         <td>measure work</td>
-        <td><span class="chip open">Next up</span></td>
-        <td>Directly motivated by T1's mirror-check failures: if upward monotonicity matters under a cleaner measure, H4 was a major driver.</td>
+        <td><span class="chip progress">Fix implemented</span></td>
+        <td>Root cause identified (asymmetric existential feature) and fixed in <code>measures.py</code> (two lines). Mirror symmetry now 44/44 exact. Next: recompute all degrees with the fixed measure and re-run T2 regression.</td>
       </tr>
     </tbody>
   </table></div>

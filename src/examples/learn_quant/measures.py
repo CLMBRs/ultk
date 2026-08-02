@@ -169,12 +169,15 @@ def measure_monotonicity(
             quantifier,
             cfg,
         ),  # left upward monotonicity
-        # downward monotonicity
+        # downward monotonicity = upward monotonicity of the complement
+        # "Q is downward-monotone" is semantically identical to "¬Q is upward-monotone".
+        # Using the same predecessor-based computation on the negated quantifier
+        # guarantees the mirror identity down(Q) = up(¬Q) exactly.
         measure(
-            all_models, set_reference_models_A, quantifier, cfg, flip=True
+            all_models, set_reference_models_A, 1 - quantifier, cfg
         ),  # right downward monotonicity
         measure(
-            all_models, set_reference_models_B, quantifier, cfg, flip=True
+            all_models, set_reference_models_B, 1 - quantifier, cfg
         ),  # left downward monotonicity
     ]
 
