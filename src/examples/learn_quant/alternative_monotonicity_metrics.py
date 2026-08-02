@@ -370,6 +370,35 @@ def best_simple_threshold_accuracy(
     return best_accuracy, best_description
 
 
+def best_cardinality_threshold_repair_score(
+    values: np.ndarray,
+    universe: FiniteSetUniverse,
+    direction: str,
+) -> float:
+    """Return the best minority-normalized repair to a varied-set threshold."""
+
+    q = np.asarray(values, dtype=bool)
+    varied = universe.b_bits if direction[0] == "R" else universe.a_bits
+    cardinalities = np.fromiter(
+        (int(value).bit_count() for value in varied),
+        dtype=np.int8,
+        count=universe.size,
+    )
+    edit_count = min(
+        np.count_nonzero(
+            q
+            != (
+                cardinalities >= threshold
+                if direction[1] == "U"
+                else cardinalities < threshold
+            )
+        )
+        for threshold in range(universe.n + 2)
+    )
+    minority_count = int(min(q.sum(), (~q).sum()))
+    return 1.0 if minority_count == 0 else float(1 - edit_count / minority_count)
+
+
 def exception_code_score(edit_count: int, point_count: int) -> float:
     """Enumerative exception-code proxy, not a complete LoT/MDL measure."""
 

@@ -131,6 +131,7 @@ METRICS = {
     "edge_preservation": "edge preservation",
     "unconditional_pair": "unconditional pair score",
     "nearest_monotone_edit": "nearest-monotone edit score",
+    "best_cardinality_threshold_repair": "best cardinality-threshold repair score",
     "closure_inflation": "closure inflation",
     "closure_precision": "closure precision",
     "chain_switch": "chain switch simplicity",
@@ -418,20 +419,40 @@ for n in sizes:
     parity_rows.append({"n": n, **scores})
 parity_scaling = pd.DataFrame(parity_rows).set_index("n")
 
+# Compute the general min-cut score where explicit subset-lattice optimization
+# remains practical. Keep the same column at larger n, but mark it unavailable.
+parity_scaling["nearest_monotone_edit"] = np.nan
+for n in range(2, 11):
+    subset_bits = np.arange(1 << n, dtype=np.int64)
+    cardinalities = np.asarray(
+        [int(value).bit_count() for value in subset_bits]
+    )
+    parity = cardinalities % 2 == 0
+    upward_edges = (
+        (subset_bits[:, None] & subset_bits[None, :]) == subset_bits[:, None]
+    ) & (cardinalities[None, :] == cardinalities[:, None] + 1)
+    _, score = alt_metrics.nearest_monotone_edit(parity, upward_edges)
+    parity_scaling.loc[n, "nearest_monotone_edit"] = score
+
+# Use the same public names as the ladder table. Snake-case names remain only
+# in implementation files and the generated CSV schema.
+parity_scaling = parity_scaling.rename(columns=METRICS)
+
 display_sizes = [2, 4, 6, 8, 10, 20, 50, 100]
 parity_columns = [
-    "majorant_entropy",
-    "two_sided_min",
-    "pairwise_preservation",
-    "edge_preservation",
-    "unconditional_pair",
-    "best_cardinality_threshold_repair",
-    "closure_inflation",
-    "closure_precision",
-    "chain_switch",
-    "chain_inversion",
-    "equal_distance_robustness",
-    "derivative_sign",
+    "manuscript majorant entropy",
+    "two-sided entropy minimum",
+    "all-pair preservation",
+    "edge preservation",
+    "unconditional pair score",
+    "nearest-monotone edit score",
+    "best cardinality-threshold repair score",
+    "closure inflation",
+    "closure precision",
+    "chain switch simplicity",
+    "chain inversion",
+    "equal-distance robustness",
+    "derivative sign",
 ]
 parity_scaling.loc[display_sizes, parity_columns].T.round(3)
 """
@@ -441,20 +462,21 @@ parity_scaling.loc[display_sizes, parity_columns].T.round(3)
 fig, axes = plt.subplots(1, 2, figsize=(12, 4), sharex=True)
 
 zero_or_decaying = {
-    "majorant_entropy": "majorant entropy",
-    "two_sided_min": "two-sided minimum",
-    "edge_preservation": "edge preservation",
-    "closure_inflation": "closure inflation",
-    "chain_switch": "switch simplicity",
-    "best_cardinality_threshold_repair": "best cardinality-threshold repair score",
+    "manuscript majorant entropy": "majorant entropy",
+    "two-sided entropy minimum": "two-sided minimum",
+    "edge preservation": "edge preservation",
+    "closure inflation": "closure inflation",
+    "chain switch simplicity": "switch simplicity",
+    "nearest-monotone edit score": "nearest-monotone edit score (n <= 10)",
+    "best cardinality-threshold repair score": "best cardinality-threshold repair score",
 }
 nonzero_limits = {
-    "pairwise_preservation": "all-pair preservation",
-    "unconditional_pair": "unconditional pair",
-    "closure_precision": "closure precision",
-    "chain_inversion": "chain inversion",
-    "equal_distance_robustness": "equal-distance robustness",
-    "derivative_sign": "derivative sign",
+    "all-pair preservation": "all-pair preservation",
+    "unconditional pair score": "unconditional pair",
+    "closure precision": "closure precision",
+    "chain inversion": "chain inversion",
+    "equal-distance robustness": "equal-distance robustness",
+    "derivative sign": "derivative sign",
 }
 
 for column, label in zero_or_decaying.items():
@@ -489,10 +511,20 @@ growth consistently preserves truth** or whether upward closure is useful:
 
 ### Is cardinality-threshold repair the same as nearest-monotone edit?
 
-No. The **nearest-monotone edit score** in the M4/X4 benchmark minimizes repair
+No. Both rows now appear in both `ladder` and `parity_scaling`, under the same
+names:
+
+- `nearest-monotone edit score`;
+- `best cardinality-threshold repair score`.
+
+The **nearest-monotone edit score** in the M4/X4 benchmark minimizes repair
 cost over *every* monotone Boolean function on the lattice. The large-`n` sweep
-cannot run that full `2^n`-node optimization at `n=100`. It instead reports a
-**best cardinality-threshold repair score**, minimizing only over:
+computes that same general min-cut score through `n=10`. Cells after `n=10` are
+shown as `NA` because the notebook does not run the full `2^n`-node optimization
+there.
+
+The **best cardinality-threshold repair score** is computed at every displayed
+size, but minimizes only over:
 
 \[
 g_t(B)=1\quad\text{iff}\quad |B|\ge t.

@@ -87,6 +87,19 @@ def test_simple_threshold_fits_familiar_monotone_features():
         assert accuracy == 1
 
 
+def test_cardinality_threshold_repair_is_restricted_edit_score():
+    universe = metrics.FiniteSetUniverse.create(3)
+    values = universe.truth_values(lambda _a, b: len(b) % 2 == 0)
+    edge = universe.relation("RU", immediate=True)
+    _, general_score = metrics.nearest_monotone_edit(values, edge)
+    restricted_score = metrics.best_cardinality_threshold_repair_score(
+        values, universe, "RU"
+    )
+
+    assert restricted_score <= general_score
+    assert restricted_score == general_score
+
+
 def test_cardinality_compression_matches_explicit_parity_lattice():
     n = 4
     subset_bits = np.arange(1 << n, dtype=np.int64)

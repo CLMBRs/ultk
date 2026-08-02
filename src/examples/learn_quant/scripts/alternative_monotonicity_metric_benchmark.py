@@ -182,6 +182,11 @@ def calculate(n: int = 4) -> pd.DataFrame:
                     "edge_preservation": metrics.pairwise_preservation_score(q, edge),
                     "unconditional_pair": metrics.unconditional_pair_score(q, strict),
                     "nearest_monotone_edit": edit_score,
+                    "best_cardinality_threshold_repair": (
+                        metrics.best_cardinality_threshold_repair_score(
+                            q, universe, direction
+                        )
+                    ),
                     "edit_count": edit_count,
                     "closure_inflation": metrics.closure_inflation_score(q, relation),
                     "closure_precision": metrics.closure_precision_score(q, relation),
