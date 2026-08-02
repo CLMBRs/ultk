@@ -307,6 +307,27 @@ expressions. Open
 Table 4 comparison, 44-pair mirror audit, distribution comparison, and measure
 recommendation.
 
+## 4f. Semantic benchmark for two-sided minimum
+
+```bash
+/path/to/altk/bin/python scripts/semantic_monotonicity_benchmark.py
+/path/to/altk/bin/python scripts/build_semantic_benchmark_notebook.py
+```
+
+The benchmark defines 34 familiar set-theoretic meanings independently of the
+grammar sample, verifies their expected exact directions by exhaustive
+comparable-pair checks on M6/X6, and writes
+`analysis/semantic_monotonicity_benchmark.csv`. Open and run
+`notebooks/two_sided_min_semantic_benchmark.ipynb` for the interpretation.
+
+Two-sided minimum gets all categorical endpoints right in this suite: all 45
+exact directions score 1 and none of 91 non-exact directions scores 1. Its
+graded values are not uniformly intuitive, however. Non-exact scores reach
+0.610 for `exactly five overlap` on the six-element universe and 0.423 for
+emptiness biconditional/XOR meanings. Treat it as the strongest symmetric
+candidate tested here, not as a validated replacement for the manuscript
+majorant.
+
 ---
 
 ## 5. One-shot reproduction

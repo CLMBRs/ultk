@@ -643,6 +643,29 @@ measure(all_models, ref_A, 1 - quantifier, cfg)          # right downward</code>
       and identifies two-sided minimum entropy as the strongest current symmetric
       candidate, while retaining the manuscript majorant for published-result reproduction.
     </div>
+
+    <h4>Does the two-sided minimum survive a broader semantic benchmark?</h4>
+    <p>We tested <strong>34 familiar meanings</strong> across Aristotelian
+      quantifiers, set relations, cardinal comparisons, overlap counts,
+      proportional quantifiers, and boundary cases. Expected exact directions
+      were stated first and then verified independently by exhaustive
+      comparable-pair checks over all 4,096 M6/X6 situations.</p>
+    <p><strong>Positive result:</strong> all 45 exactly monotone
+      meaning-direction combinations scored 1, and none of the 91 non-exact
+      combinations scored 1. Core cases such as all, no, some, proper subset,
+      greater/fewer, equality, and comparability have the expected patterns.</p>
+    <p><strong>Important limitation:</strong> the intermediate scale is not
+      uniformly intuitive. Among non-exact directions the median was 0, but
+      <code>exactly five overlap</code> received 0.610 upward on a six-element
+      universe; emptiness biconditional/XOR cases reached 0.423; proportional
+      meanings reached 0.148 in a non-exact direction. These values reveal
+      finite-boundary, prevalence, and entropy effects. The two-sided minimum is
+      therefore a promising symmetric candidate, <strong>not yet a validated
+      replacement</strong>.</p>
+    <div class="explain"><strong>Follow the benchmark:</strong>
+      <code>notebooks/two_sided_min_semantic_benchmark.ipynb</code>. Machine-readable
+      results are in <code>analysis/semantic_monotonicity_benchmark.csv</code>.
+    </div>
   </div>
 </section>
 
