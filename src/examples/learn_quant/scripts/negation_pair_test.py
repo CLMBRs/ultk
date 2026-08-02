@@ -1,5 +1,24 @@
 """Q2-T1: the negation-pair (complement-pair) test.
 
+What is run here
+----------------
+This script does NOT train a neural network. The words "model" and "run" occur
+in three distinct senses in this project:
+
+1. Neural learners (reused, not run here): an MV_LSTM and a Transformer were
+   trained previously for each expression. Their recorded validation-loss AUCs
+   are loaded from ``outputs/combined_runs_AOC_monotonicity_updated.csv``.
+2. QuantifierModel (evaluated here): despite its name, this is one set-theoretic
+   scene <M, A, B>, not a learned model. Each grammar expression is executed on
+   sampled scenes to confirm that a candidate pair always returns opposite
+   truth values.
+3. Statistical model (fit here): an OLS regression of mean AUC on upward and
+   downward degree supplies the sample-wide gap that the paired result is
+   compared against.
+
+See ``notebooks/negation_pair_test_walkthrough.ipynb`` for an executable,
+cell-by-cell version with intermediate tables.
+
 Motivation (HANDOFF.md section 4): training is sigmoid + BCE, which is symmetric
 under label complement, and the complement of an up-set is a down-set. So pure
 decision-boundary geometry cannot produce the observed upward/downward learning
@@ -152,16 +171,20 @@ def find_pairs(terms, V, sample_terms):
 # --------------------------------------------------------------------------- #
 # Stage 3: functional verification on the training-model distribution
 # --------------------------------------------------------------------------- #
-def verify_pairs(pairs, exprs, archive: Path, n_models: int, seed: int = 7):
-    """Check q1 == ~q2 on models drawn like the training data (M=12, X=16)."""
+def verify_pairs(pairs, exprs, archive: Path, n_scenes: int, seed: int = 7):
+    """Check q1 == ~q2 on scenes drawn like the training data (M=12, X=16).
+
+    ``QuantifierModel`` is the project's name for a set-theoretic scene. This
+    function executes symbolic expressions; it does not invoke a neural model.
+    """
     from learn_quant.sampling import generate_batch  # from the archive path
     from learn_quant.quantifier import QuantifierModel
 
     rng_state = np.random.get_state()
     np.random.seed(seed)
-    arrays = generate_batch(GEN_M_SIZE, GEN_X_SIZE, n_models, inclusive=GEN_INCLUSIVE)
+    arrays = generate_batch(GEN_M_SIZE, GEN_X_SIZE, n_scenes, inclusive=GEN_INCLUSIVE)
     np.random.set_state(rng_state)
-    models = [QuantifierModel(a) for a in arrays]
+    scenes = [QuantifierModel(a) for a in arrays]
 
     cache: dict[int, np.ndarray] = {}
 
@@ -169,7 +192,7 @@ def verify_pairs(pairs, exprs, archive: Path, n_models: int, seed: int = 7):
         if i not in cache:
             e = exprs[i]
             cache[i] = np.fromiter(
-                (bool(e(m)) for m in models), dtype=bool, count=len(models)
+                (bool(e(scene)) for scene in scenes), dtype=bool, count=len(scenes)
             )
         return cache[i]
 
@@ -177,18 +200,20 @@ def verify_pairs(pairs, exprs, archive: Path, n_models: int, seed: int = 7):
     for i, j in pairs:
         qi, qj = evaluate(i), evaluate(j)
         n_agree = int((qi == ~qj).sum())
-        if n_agree == len(models):
+        if n_agree == len(scenes):
             verified.append((i, j))
         else:
-            failed.append((i, j, len(models) - n_agree))
+            failed.append((i, j, len(scenes) - n_agree))
     print(
-        f"functional verification on {n_models} training-style models "
+        f"functional verification on {n_scenes} training-style scenes "
         f"(M={GEN_M_SIZE}, X={GEN_X_SIZE}): {len(verified)} verified, "
         f"{len(failed)} failed"
     )
     for i, j, bad in failed:
-        print(f"  FAILED ({bad} disagreements): {exprs[i].term_expression[:70]}"
-              f"  vs  {exprs[j].term_expression[:70]}")
+        print(
+            f"  FAILED ({bad} disagreements): {exprs[i].term_expression[:70]}"
+            f"  vs  {exprs[j].term_expression[:70]}"
+        )
     return verified, failed
 
 
@@ -199,6 +224,37 @@ def load_runs(csv_path: Path) -> pd.DataFrame:
     df = pd.read_csv(csv_path)
     df = df[df["expression"].notna() & (df["training"] == True)].copy()  # noqa: E712
     return df
+
+
+def print_model_provenance(runs: pd.DataFrame, csv_path: Path, n_scenes: int) -> None:
+    """State exactly which computations are reused and which run in this script."""
+    architectures = ", ".join(sorted(runs["model"].dropna().unique()))
+    print("--- what is (and is not) run in this test ---")
+    print("NEW NEURAL TRAINING: none")
+    print(
+        f"REUSED NEURAL RESULTS: {len(runs)} completed rows for {architectures}, "
+        f"loaded from {rel(csv_path)}"
+    )
+    print(
+        "  LSTM: MV_LSTM, 3 stacked layers, 20 hidden units; "
+        "Transformer: 2 encoder layers, d_model=12, 4 heads"
+    )
+    print(
+        "  original training: one-hot scenes of length 16, Adam (lr=0.001), "
+        "BCEWithLogitsLoss, up to 50 epochs, 5 splits"
+    )
+    print(
+        f"RECOMPUTED HERE: symbolic expressions evaluated on {n_scenes} newly "
+        "sampled set-theoretic scenes to verify exact label complements"
+    )
+    print(
+        "STATISTICAL MODEL FIT HERE: OLS(mean validation-loss AUC ~ "
+        "z(downward degree) + z(upward degree))"
+    )
+    print(
+        "IMPORTANT: QuantifierModel below means one <M,A,B> scene; it is not "
+        "an LSTM, Transformer, or fitted predictor.\n"
+    )
 
 
 def per_expression_auc(runs: pd.DataFrame) -> pd.DataFrame:
@@ -217,7 +273,8 @@ def per_expression_auc(runs: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Path):
+def build_pair_table(pairs, terms, stats_df: pd.DataFrame) -> pd.DataFrame:
+    """Build one transparent row per complement pair with labels and outcomes."""
     rows = []
     for i, j in pairs:
         ti, tj = terms[i], terms[j]
@@ -250,11 +307,15 @@ def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Pa
                 # measure-mirror checks: up(e) should equal down(~e)
                 "mirror_up_D_vs_down_U": d["upward"] - u["downward"],
                 "mirror_down_D_vs_up_U": d["downward"] - u["upward"],
-                "len_D": td.count("(") ,
+                "len_D": td.count("("),
                 "len_U": tu.count("("),
             }
         )
-    pairs_df = pd.DataFrame(rows)
+    return pd.DataFrame(rows)
+
+
+def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Path):
+    pairs_df = build_pair_table(pairs, terms, stats_df)
 
     def paired_report(col_d, col_u, label):
         sub = pairs_df[[col_d, col_u]].dropna()
@@ -269,9 +330,7 @@ def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Pa
             f"mean U={sub[col_u].mean():8.1f}  mean Δ(U-D)={delta.mean():+8.1f}  "
             f"median Δ={delta.median():+8.1f}  frac(U harder)={np.mean(delta > 0):.2f}"
         )
-        print(
-            f"      Wilcoxon p={w.pvalue:.4f}   paired-t p={t.pvalue:.4f}"
-        )
+        print(f"      Wilcoxon p={w.pvalue:.4f}   paired-t p={t.pvalue:.4f}")
 
     print("\n--- within-pair AUC comparison (D = downward-dominant member) ---")
     print("ALL verified pairs:")
@@ -280,8 +339,10 @@ def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Pa
     paired_report("auc_mean_D", "auc_mean_U", "mean arch  ")
 
     contrast = pairs_df["polarity_contrast"] > 0.2
-    print(f"\nPairs with real polarity contrast (Δ(down-up) gap > 0.2): "
-          f"n={int(contrast.sum())}")
+    print(
+        f"\nPairs with real polarity contrast (Δ(down-up) gap > 0.2): "
+        f"n={int(contrast.sum())}"
+    )
     sub = pairs_df[contrast]
     if len(sub) >= 3:
         for cd, cu, lab in [
@@ -303,7 +364,9 @@ def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Pa
     d = pairs_df[["auc_mean_D", "auc_mean_U", "polarity_contrast"]].dropna()
     if len(d) > 5:
         r, p = stats.pearsonr(d["auc_mean_U"] - d["auc_mean_D"], d["polarity_contrast"])
-        print(f"\ncorr( ΔAUC(U-D), polarity contrast ):  r={r:+.3f}  p={p:.4f}  n={len(d)}")
+        print(
+            f"\ncorr( ΔAUC(U-D), polarity contrast ):  r={r:+.3f}  p={p:.4f}  n={len(d)}"
+        )
 
     # ------------------------------------------------------------------ #
     # population-model prediction vs within-pair observation
@@ -359,8 +422,10 @@ def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Pa
 
     # length confound within pairs
     dl = pairs_df["len_U"] - pairs_df["len_D"]
-    print(f"length (func count) Δ(U-D): mean={dl.mean():+.2f}  "
-          f"(pairs need not be equal-length; check confound)")
+    print(
+        f"length (func count) Δ(U-D): mean={dl.mean():+.2f}  "
+        f"(pairs need not be equal-length; check confound)"
+    )
 
     # measure-mirror check (H4)
     print("\n--- measure-mirror check: up(e) vs down(~e) on identical boundaries ---")
@@ -386,8 +451,12 @@ def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Pa
             f"AUCmean D={row['auc_mean_D']:7.1f} U={row['auc_mean_U']:7.1f}  "
             f"Δ={row['auc_mean_U']-row['auc_mean_D']:+8.1f}"
         )
-        print(f"    D (down={row['down_D']:.2f}, up={row['up_D']:.2f}): {row['term_D'][:95]}")
-        print(f"    U (down={row['down_U']:.2f}, up={row['up_U']:.2f}): {row['term_U'][:95]}")
+        print(
+            f"    D (down={row['down_D']:.2f}, up={row['up_D']:.2f}): {row['term_D'][:95]}"
+        )
+        print(
+            f"    U (down={row['down_U']:.2f}, up={row['up_U']:.2f}): {row['term_U'][:95]}"
+        )
 
     # ---------------- figure ----------------
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.6))
@@ -396,8 +465,14 @@ def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Pa
         ("auc_lstm_D", "auc_lstm_U", "#e8a33d", "LSTM"),
         ("auc_tf_D", "auc_tf_U", "#4477aa", "Transformer"),
     ]:
-        ax.scatter(pairs_df[col_d], pairs_df[col_u], s=28, alpha=0.75, color=c, label=lab)
-    lim = [0, np.nanmax(pairs_df[["auc_lstm_U", "auc_lstm_D", "auc_tf_U", "auc_tf_D"]].values) * 1.05]
+        ax.scatter(
+            pairs_df[col_d], pairs_df[col_u], s=28, alpha=0.75, color=c, label=lab
+        )
+    lim = [
+        0,
+        np.nanmax(pairs_df[["auc_lstm_U", "auc_lstm_D", "auc_tf_U", "auc_tf_D"]].values)
+        * 1.05,
+    ]
     ax.plot(lim, lim, "k--", lw=1)
     ax.set_xlabel("AUC, downward-dominant member")
     ax.set_ylabel("AUC, upward/other member")
@@ -416,7 +491,9 @@ def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Pa
     ax.scatter(
         pd.concat([pairs_df["up_D"], pairs_df["down_D"]]),
         pd.concat([pairs_df["down_U"], pairs_df["up_U"]]),
-        s=30, color="#663399", alpha=0.8,
+        s=30,
+        color="#663399",
+        alpha=0.8,
     )
     ax.plot([0, 1], [0, 1], "k--", lw=1)
     ax.set_xlabel("up(e)  [resp. down(e)]")
@@ -433,12 +510,23 @@ def analyze_pairs(pairs, terms, stats_df: pd.DataFrame, outdir: Path, figdir: Pa
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--altk-archive", type=Path, default=DEFAULT_ALTK_ARCHIVE,
-                    help="path to the original altk repo's src/examples directory")
-    ap.add_argument("--n-verify", type=int, default=20000,
-                    help="number of training-style models for functional verification")
-    ap.add_argument("--csv", type=Path,
-                    default=repo_root() / "outputs" / "combined_runs_AOC_monotonicity_updated.csv")
+    ap.add_argument(
+        "--altk-archive",
+        type=Path,
+        default=DEFAULT_ALTK_ARCHIVE,
+        help="path to the original altk repo's src/examples directory",
+    )
+    ap.add_argument(
+        "--n-verify",
+        type=int,
+        default=20000,
+        help="number of training-style scenes for functional verification",
+    )
+    ap.add_argument(
+        "--csv",
+        type=Path,
+        default=repo_root() / "outputs" / "combined_runs_AOC_monotonicity_updated.csv",
+    )
     args = ap.parse_args()
 
     outdir = repo_root() / "analysis" / "tables"
@@ -455,11 +543,12 @@ def main():
             raise SystemExit(
                 f"altk archive not found at {args.altk_archive}; pass --altk-archive"
             )
+        runs = load_runs(args.csv)
+        print_model_provenance(runs, args.csv, args.n_verify)
         terms, V, _uni, exprs = load_archive(args.altk_archive)
         sample = pd.read_csv(repo_root() / "expressions_sample_2k.csv")
         pairs, _sidx = find_pairs(terms, V, sample["term_expression"])
         verified, _failed = verify_pairs(pairs, exprs, args.altk_archive, args.n_verify)
-        runs = load_runs(args.csv)
         stats_df = per_expression_auc(runs)
         analyze_pairs(verified, terms, stats_df, outdir, figdir)
     finally:

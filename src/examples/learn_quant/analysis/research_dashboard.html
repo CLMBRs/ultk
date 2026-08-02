@@ -285,6 +285,14 @@
         <span class="example">"all A are B" vs "not all A are B"</span>. Both members were
         independently trained, which is what makes the T1 experiment possible.</dd>
       </div>
+      <div>
+        <dt>What "model" means in T1</dt>
+        <dd>No new neural model was trained for this follow-up. The LSTM and Transformer
+        difficulty scores come from the original completed training runs. T1 newly executes
+        each symbolic quantifier on set-theoretic scenes (called <code>QuantifierModel</code>
+        objects in the code) and fits one ordinary linear regression for comparison.
+        A <code>QuantifierModel</code> is a scene, not a neural network.</dd>
+      </div>
     </dl>
   </div>
 </section>
@@ -420,6 +428,22 @@
     members of such a pair. If instead both members learn equally fast, direction itself is inert,
     and the sample-wide direction effect must come from elsewhere.</p>
 
+    <h4>Exactly what was run</h4>
+    <p><strong>No network was trained or retrained in T1.</strong> The experiment combines
+    two kinds of evidence. First, it recomputes semantics: each grammar formula is evaluated
+    as a deterministic Python function on 20,000 freshly sampled scenes to verify that the
+    two formulas always return opposite truth labels. Second, it reuses learning outcomes
+    already recorded for those formulas: validation-loss AUC from the original
+    <strong>3-layer, 20-hidden-unit LSTM</strong> and <strong>2-layer Transformer
+    (d_model 12, 4 heads)</strong> training runs. The only fitted model in this script is a
+    small OLS regression, used to ask how large a within-pair gap the sample-wide
+    upward/downward trend would predict.</p>
+    <div class="explain"><strong>Follow the computation:</strong>
+      <code>notebooks/negation_pair_test_walkthrough.ipynb</code> shows the source CSV,
+      architecture settings, one semantic complement check, the surviving pair table, the
+      paired AUC differences, and the predicted-versus-observed calculation in separate cells.
+    </div>
+
     <h4>What we did</h4>
     <p>Scanned all 2,000 trained quantifiers for pairs whose truth sets are exact complements:
     44 pairs found. One catch: truth sets were compared on the small 256-scene universe used for
@@ -428,6 +452,71 @@
     <strong>41 of 44 survived</strong>; 3 pairs are opposites only on the small universe (a
     warning that the measure's universe and the training distribution genuinely differ). 36 of
     the 41 have completed training runs for both members; those are the test set.</p>
+
+    <h4>First define the pair labels and "strong contrast"</h4>
+    <p>Every expression has two summary scores between 0 and 1:
+    <strong>downward degree</strong> says how close it is to perfectly downward-monotone, and
+    <strong>upward degree</strong> says how close it is to perfectly upward-monotone. We summarize
+    its directional leaning as <code>downward degree − upward degree</code>. This ranges from
+    +1 (completely downward, not upward) to −1 (completely upward, not downward).</p>
+    <p>Inside each complement pair, we call the member with the larger directional leaning
+    <strong>D</strong> (more downward-dominant) and the other member <strong>U</strong>. These are
+    relative labels: in a weak pair, neither member need be a clean textbook downward or upward
+    quantifier.</p>
+    <div class="explain">
+      <strong>Strong-contrast pair, defined:</strong> take D's directional leaning and subtract
+      U's directional leaning. We call the pair "strong contrast" when that difference is greater
+      than <strong>0.20</strong> on the 0–1 degree scale:
+      <code>(down<sub>D</sub> − up<sub>D</sub>) −
+      (down<sub>U</sub> − up<sub>U</sub>) &gt; 0.20</code>.
+      This is an operational sensitivity cutoff, not a theorem or a learned threshold. It removes
+      pairs whose two members receive nearly the same directional scores, because those pairs
+      cannot strongly test a direction-based learning prediction. Eleven of the 36 analyzable
+      pairs pass it.
+    </div>
+
+    <h4>How the predicted-versus-observed comparison is built</h4>
+    <ol>
+      <li><strong>Learn the sample-wide rule of thumb.</strong> Using all 1,795 expressions with
+      complete outcomes, fit a linear regression that predicts mean validation-loss AUC from
+      downward and upward degree. A regression coefficient is simply the estimated AUC change
+      associated with changing one score while holding the other fixed. Because the two scores
+      have different spreads, they are first expressed in <strong>standard deviations
+      (SDs)</strong>: one SD is a typical-sized difference in that score. The fitted rule says
+      +1 SD downward predicts <strong>708 less AUC</strong> (easier), while +1 SD upward predicts
+      only <strong>20 more AUC</strong> (essentially no sample-wide effect).</li>
+      <li><strong>Turn that rule into a prediction for each pair.</strong> For a given pair,
+      calculate how many SDs U differs from D in downward degree and in upward degree. Multiply
+      those two differences by −708 and +20, respectively, then add them. The result is the
+      <strong>predicted gap</strong>: how much harder U should be than D if the sample-wide
+      direction rule still applies after holding the semantic boundary fixed.</li>
+      <li><strong>Compare prediction with what the networks actually did.</strong> The
+      <strong>observed gap</strong> is much simpler:
+      <code>mean AUC(U) − mean AUC(D)</code>, using the already-recorded LSTM and Transformer
+      outcomes. We average the predicted gaps across the 11 strong-contrast pairs, separately
+      average their observed gaps, and divide:
+      <code>65.5 observed ÷ 558.4 predicted = 0.117 ≈ 0.12</code>. This is a ratio of two
+      difficulty gaps—not accuracy, variance explained, or a p-value.</li>
+    </ol>
+
+    <h4>One pair, with the arithmetic exposed</h4>
+    <p>Consider <span class="example">"No A are B"</span> and its complement
+    <span class="example">"Some A are B"</span>. D ("No") scores
+    down = 1.000, up = 0.000, so its leaning is +1.000. U ("Some") scores
+    down = 0.123, up = 1.000, so its leaning is −0.877. Their contrast is
+    <code>1.000 − (−0.877) = 1.877</code>, easily above 0.20.</p>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>Contribution to predicted U−D gap</th><th>U−D score change</th><th>In SD units</th><th>Regression coefficient</th><th>Predicted AUC contribution</th></tr></thead>
+      <tbody>
+        <tr><td>Downward degree</td><td>0.123 − 1.000 = −0.877</td><td>−0.877 ÷ 0.303 = −2.892 SD</td><td>−708 per SD</td><td>+2,048</td></tr>
+        <tr><td>Upward degree</td><td>1.000 − 0.000 = +1.000</td><td>+1.000 ÷ 0.341 = +2.930 SD</td><td>+20 per SD</td><td>+59</td></tr>
+        <tr><td><strong>Total prediction</strong></td><td></td><td></td><td></td><td><strong>+2,107 AUC: U should be harder</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p>But the recorded mean AUCs are D = 186.4 and U = 180.7, so the observed gap is
+    <code>180.7 − 186.4 = −5.7</code>: U was very slightly <em>easier</em>, and the difference
+    is negligible. We repeat this arithmetic for every pair; the headline 0.12 uses the two
+    averages across all 11 strong-contrast pairs, not this single pair's ratio.</p>
 
     <h4>What we found</h4>
     <div class="chart">

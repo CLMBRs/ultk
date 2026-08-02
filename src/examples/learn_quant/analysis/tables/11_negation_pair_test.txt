@@ -1,8 +1,17 @@
+--- what is (and is not) run in this test ---
+NEW NEURAL TRAINING: none
+REUSED NEURAL RESULTS: 7172 completed rows for LSTM, Transformer, loaded from outputs/combined_runs_AOC_monotonicity_updated.csv
+  LSTM: MV_LSTM, 3 stacked layers, 20 hidden units; Transformer: 2 encoder layers, d_model=12, 4 heads
+  original training: one-hot scenes of length 16, Adam (lr=0.001), BCEWithLogitsLoss, up to 50 epochs, 5 splits
+RECOMPUTED HERE: symbolic expressions evaluated on 20000 newly sampled set-theoretic scenes to verify exact label complements
+STATISTICAL MODEL FIT HERE: OLS(mean validation-loss AUC ~ z(downward degree) + z(upward degree))
+IMPORTANT: QuantifierModel below means one <M,A,B> scene; it is not an LSTM, Transformer, or fitted predictor.
+
 archive pool: 9550 unique meanings on 256 models
 pool meanings with complement in pool:        884
 trained expressions with complement in pool:  269 / 2000
 complement pairs within the trained 2000:     44
-functional verification on 20000 training-style models (M=12, X=16): 41 verified, 3 failed
+functional verification on 20000 training-style scenes (M=12, X=16): 41 verified, 3 failed
   FAILED (2757 disagreements): and(not(greater_than(cardinality(B), cardinality(A))), greater_than(ca  vs  or(equals(cardinality(intersection(A, B)), cardinality(difference(A, B
   FAILED (4422 disagreements): or(and(subset_eq(B, A), not(subset_eq(A, B))), greater_than(cardinalit  vs  or(and(not(subset_eq(B, A)), greater_than(cardinality(A), cardinality(
   FAILED (4463 disagreements): or(and(subset_eq(A, B), not(subset_eq(B, A))), greater_than(cardinalit  vs  or(and(not(subset_eq(A, B)), greater_than(cardinality(B), cardinality(

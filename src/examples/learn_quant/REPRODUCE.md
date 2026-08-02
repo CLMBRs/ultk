@@ -231,9 +231,16 @@ python scripts/negation_pair_test.py    # Q2-T1; --altk-archive PATH to override
 python scripts/truth_set_stats.py       # Q2-T2
 ```
 
+For a narrated, cell-by-cell version of T1, open
+`notebooks/negation_pair_test_walkthrough.ipynb` with the `altk` kernel.
+The notebook makes the provenance explicit: **T1 trains no new neural
+network**. It evaluates symbolic grammar expressions on sampled set-theoretic
+scenes, then joins validation-loss AUCs from the already completed LSTM and
+Transformer runs in `outputs/combined_runs_AOC_monotonicity_updated.csv`.
+
 | output | contents |
 |---|---|
-| `analysis/tables/11_negation_pair_test.txt` (+ `figures/negation_pair_test.png`) | **T1 negation-pair test.** 44 complement pairs found among the trained 2,000 (884 complement-closed meanings in the 9,550-meaning pool); 41 verified as *functional* complements on 20k training-style models (3 pairs are complements only on the 256-model universe — a caveat for any universe-level analysis). Within pairs the decision boundary is identical and direction flips, yet AUC is statistically indistinguishable (mean-arch Δ = +16, Wilcoxon p = 0.59; polarity-contrast subset Δ = +66, p = 0.21). The population directional model predicts Δ = +182 (all pairs) / +558 (contrast pairs); observed/predicted ≈ **0.12**. So ~90% of the directional asymmetry is *not* boundary-level — it lives in sample composition / measure, not in the learner's treatment of a given boundary. Bonus (H4): the measure-mirror identity up(e) = down(¬e) fails badly for half the pairs (median |dev| 0.05, max 0.79, r = 0.71) — direct evidence of measure-side noise in the directional degrees. |
+| `analysis/tables/11_negation_pair_test.txt` (+ `figures/negation_pair_test.png`) | **T1 negation-pair test.** 44 complement pairs found among the trained 2,000 (884 complement-closed meanings in the 9,550-meaning pool); 41 verified as *functional* complements on 20k training-style scenes (3 pairs are complements only on the 256-scene universe — a caveat for any universe-level analysis). Within pairs the decision boundary is identical and direction flips, yet AUC is statistically indistinguishable (mean-arch Δ = +16, Wilcoxon p = 0.59; polarity-contrast subset Δ = +66, p = 0.21). The population directional model predicts Δ = +182 (all pairs) / +558 (contrast pairs); observed/predicted ≈ **0.12**. So ~90% of the directional asymmetry is *not* boundary-level — it lives in sample composition / measure, not in the learner's treatment of a given boundary. Bonus (H4): the measure-mirror identity up(e) = down(¬e) fails badly for half the pairs (median |dev| 0.05, max 0.79, r = 0.71) — direct evidence of measure-side noise in the directional degrees. |
 | `analysis/tables/12_truth_set_stats.txt` (+ `figures/truth_set_stats.png`, `analysis/truth_set_stats_features.csv`) | **T2 truth-set-statistics mediation.** Per-expression class-conditional input statistics computed on 4,000 training-style models (M=12, X=16). Truth-set stats alone explain **R² = 0.54** of per-expression mean AUC (directions alone: 0.13); adding them shrinks the downward β by **80%** (−708 → −138/SD, still p = 0.002). Dominant mediator: **class separation** (L2 distance between mean zone-count vectors of positive vs negative examples), r = −0.68 with AUC, β = −1500/SD, p ≈ 1e-138 — and it correlates +0.48 with downward degree. Verdict: the downward advantage is mostly carried by input-statistic separability of the classes (H2 in generalized form), consistent with T1's small boundary-level residual. |
 
 ---
@@ -256,5 +263,5 @@ figures. Open it with the `altk` kernel and Run All. (Verified clean on
 | `scripts/review_extensions.py` | 2026-07 review figures/diagnostics: clarified redraws, per-architecture operator analysis (with within-architecture rescaling), directional diagnostics, operator prevalence, polarity-counterbalance test |
 | `scripts/reproduce_from_postgres.py` | rebuild the run table directly from the live MLflow Postgres DB (needs tunnel) |
 | `scripts/verify_postgres_matches_csv.py` | confirm the CSV equals the live DB (sampled) |
-| `scripts/negation_pair_test.py` | Q2-T1: complement-pair test of the up/down asymmetry (needs the altk run archive) |
+| `scripts/negation_pair_test.py` | Q2-T1: complement-pair test of the up/down asymmetry; no new neural training (needs the altk run archive) |
 | `scripts/truth_set_stats.py` | Q2-T2: truth-set-statistics mediation of the downward advantage (needs the altk run archive) |
