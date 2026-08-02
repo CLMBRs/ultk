@@ -43,61 +43,61 @@ monotonicity: it computes right-upward, left-upward, right-downward, and
 left-downward scores. For each tested direction, however, it compares the
 quantifier with only the least monotone function lying **above** it.
 
-For upward monotonicity, let \(Q(x)\in\{0,1\}\) and let \(x\leq y\) mean that
-\(y\) enlarges the argument under test. Two canonical upward-monotone
-approximations bracket \(Q\):
+For upward monotonicity, let $Q(x)\in\{0,1\}$ and let $x\leq y$ mean that
+$y$ enlarges the argument under test. Two canonical upward-monotone
+approximations bracket $Q$:
 
-\[
+$$
 C^\uparrow Q(x)=1
 \quad\text{iff}\quad
 \text{some }y\leq x\text{ has }Q(y)=1,
-\]
+$$
 
-\[
+$$
 I^\uparrow Q(x)=1
 \quad\text{iff}\quad
 \text{every }y\geq x\text{ has }Q(y)=1.
-\]
+$$
 
-- **Majorant / upward closure \(C^\uparrow Q\):** the smallest
-  upward-monotone function greater than or equal to \(Q\). It repairs violations
+- **Majorant / upward closure $C^\uparrow Q$:** the smallest
+  upward-monotone function greater than or equal to $Q$. It repairs violations
   only by changing false points to true.
-- **Minorant / upward interior \(I^\uparrow Q\):** the largest
-  upward-monotone function less than or equal to \(Q\). It repairs violations
+- **Minorant / upward interior $I^\uparrow Q$:** the largest
+  upward-monotone function less than or equal to $Q$. It repairs violations
   only by changing true points to false.
 
 The manuscript score used in this notebook as the baseline is
 
-\[
+$$
 \operatorname{mon}_{\mathrm{majorant}}(Q)
 =
 1-\frac{H(Q\mid C^\uparrow Q)}{H(Q)}
 =
 \frac{I(Q;C^\uparrow Q)}{H(Q)}.
-\]
+$$
 
 It is therefore called **one-sided majorant entropy**: only the majorant side of
 the bracket contributes. The notebook's **two-sided entropy** variants also
 score the interior and combine the two values:
 
-\[
+$$
 s_C=\frac{I(Q;C^\uparrow Q)}{H(Q)},\qquad
 s_I=\frac{I(Q;I^\uparrow Q)}{H(Q)}.
-\]
+$$
 
 The mean, minimum, and maximum variants use
-\(\operatorname{mean}(s_C,s_I)\), \(\min(s_C,s_I)\), or
-\(\max(s_C,s_I)\), respectively. The benchmark emphasizes the **two-sided
+$\operatorname{mean}(s_C,s_I)$, $\min(s_C,s_I)$, or
+$\max(s_C,s_I)$, respectively. The benchmark emphasizes the **two-sided
 minimum**, the conservative choice: a high score requires both the majorant and
-the interior to preserve information about \(Q\). Symmetrically combining both
+the interior to preserve information about $Q$. Symmetrically combining both
 sides also removes the majorant-only measure's asymmetry under Boolean
 complementation.
 
 ### A four-point example
 
-Read each row as the truth values along a chain \(0<1<2<3\):
+Read each row as the truth values along a chain $0<1<2<3$:
 
-| Quantifier pattern | \(Q\) | \(C^\uparrow Q\) | \(I^\uparrow Q\) | majorant score | interior score | two-sided minimum |
+| Quantifier pattern | $Q$ | $C^\uparrow Q$ | $I^\uparrow Q$ | majorant score | interior score | two-sided minimum |
 |---|---|---|---|---:|---:|---:|
 | at least 2 | `0 0 1 1` | `0 0 1 1` | `0 0 1 1` | 1.000 | 1.000 | 1.000 |
 | between 1 and 2 | `0 1 1 0` | `0 1 1 1` | `0 0 0 0` | 0.311 | 0.000 | 0.000 |
@@ -260,10 +260,10 @@ For an oriented strict order `x < y`, an upward violation is `Q(x)=1`,
 
 ### All-pair preservation
 
-\[
+$$
 1-\frac{\#\{x<y:Q(x)=1,Q(y)=0\}}
         {\#\{x<y:Q(x)=1\}}.
-\]
+$$
 
 ### Edge preservation
 
@@ -272,9 +272,9 @@ added one element and truth broke."
 
 ### Unconditional pair score
 
-\[
+$$
 1-\frac{\#\text{violations}}{\#\text{all comparable pairs}}.
-\]
+$$
 
 This has complement mirror symmetry but can dilute violations with irrelevant
 pairs.
@@ -285,10 +285,10 @@ The numerator is the exact minimum number of truth values that must be flipped.
 The notebook normalizes by `min(#true,#false)`, the cost of replacing `Q` by
 the closer constant function:
 
-\[
+$$
 1-\frac{\min_{g\in Mon}d_H(Q,g)}
         {\min(|Q|,|\neg Q|)}.
-\]
+$$
 
 Thus `1` is exact and `0` means no better than a constant. The minimization is
 solved as a minimum cut; order edges receive effectively infinite capacity.
@@ -299,11 +299,11 @@ to a cardinality threshold.
 
 ### Closure scores
 
-\[
+$$
 1-\frac{|C_\uparrow Q|-|Q|}{|\neg Q|}
 \quad\text{and}\quad
 \frac{|Q|}{|C_\uparrow Q|}.
-\]
+$$
 
 The first asks what fraction of currently false situations need **not** be
 added. The second asks what fraction of closure truths were already true.
@@ -337,9 +337,9 @@ An **independently exact direction** is a direction proven monotone by directly
 checking the logical condition over every comparable pair, without consulting
 any graded metric:
 
-\[
+$$
 Q(x)=1\ \&\ x\le y \quad\Longrightarrow\quad Q(y)=1.
-\]
+$$
 
 Example: `all A are B` is exactly right-upward. If `A` is already a subset of
 `B`, enlarging `B` cannot make that false. Therefore every candidate advertised
@@ -379,12 +379,12 @@ truth patterns:
 
 The hypothesized ranking is therefore:
 
-\[
+$$
 \text{exact threshold} >
 \text{one exception} >
 \text{bounded interval} >
 \text{parity}.
-\]
+$$
 
 This ordering is a stated geometric/learnability intuition, **not a theorem of
 monotonicity**. The scorecard column **ladder comparisons passed** counts the
@@ -397,9 +397,9 @@ Negating a predicate exchanges truth and falsity. It also exchanges upward and
 downward violations. A complement-invariant score should therefore satisfy,
 for the same argument:
 
-\[
+$$
 RU(Q)=RD(\neg Q),\qquad RD(Q)=RU(\neg Q),
-\]
+$$
 
 and likewise for `LU`/`LD`.
 
@@ -601,9 +601,9 @@ there.
 The **best cardinality-threshold repair score** is computed at every displayed
 size, but minimizes only over:
 
-\[
+$$
 g_t(B)=1\quad\text{iff}\quad |B|\ge t.
-\]
+$$
 
 Because threshold functions are only a subset of all monotone functions, this
 restricted score can never exceed the general nearest-monotone edit score for
@@ -918,9 +918,9 @@ evidence against treating threshold fit as a general monotonicity score.
 
 For minimum edit count `e` among `N` situations, the proxy code length is:
 
-\[
+$$
 \log_2\sum_{i=0}^{e}\binom{N}{i}.
-\]
+$$
 
 The reported score is one minus this code length divided by `N`. It rewards a
 monotone base plus a short list of exceptions. It is **not** a full LoT result:
