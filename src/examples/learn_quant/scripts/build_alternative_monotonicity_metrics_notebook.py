@@ -42,7 +42,7 @@ before examining the scores.
 - Edge preservation is the one-step version. It gives the clearest local
   interpretation and is a plausible **learnability hypothesis**, but this
   notebook does not establish a correlation with neural AUC.
-- Nearest-monotone edit distance is the cleanest global "minimal repair"
+- The nearest-monotone edit score is the cleanest global "minimal repair"
   measure and performs well on the preregistered near-monotone ladder.
 - Closure inflation is a transparent one-sided repair cost; closure precision
   can be misleading for highly prevalent truth sets.
@@ -130,7 +130,7 @@ METRICS = {
     "pairwise_preservation": "all-pair preservation",
     "edge_preservation": "edge preservation",
     "unconditional_pair": "unconditional pair score",
-    "nearest_monotone_edit": "nearest-monotone edit",
+    "nearest_monotone_edit": "nearest-monotone edit score",
     "closure_inflation": "closure inflation",
     "closure_precision": "closure precision",
     "chain_switch": "chain switch simplicity",
@@ -166,7 +166,7 @@ The suite includes:
   `(A,B)` situation;
 - equality, difference, comparability, incomparability, and boundary meanings.
 
-M4/X4 is used because exact nearest-monotone distance is then easy to audit.
+M4/X4 is used because the exact nearest-monotone edit score is then easy to audit.
 Its scores are finite-universe properties, not claims about all domain sizes.
 """
     ),
@@ -203,7 +203,7 @@ added one element and truth broke."
 This has complement mirror symmetry but can dilute violations with irrelevant
 pairs.
 
-### Nearest-monotone edit
+### Nearest-monotone edit score (general)
 
 The numerator is the exact minimum number of truth values that must be flipped.
 The notebook normalizes by `min(#true,#false)`, the cost of replacing `Q` by
@@ -216,6 +216,10 @@ the closer constant function:
 
 Thus `1` is exact and `0` means no better than a constant. The minimization is
 solved as a minimum cut; order edges receive effectively infinite capacity.
+
+The word **nearest** means nearest among **all upward-monotone Boolean
+functions on the finite lattice**. It does not restrict the repaired function
+to a cardinality threshold.
 
 ### Closure scores
 
@@ -242,27 +246,109 @@ added. The second asks what fraction of closure truths were already true.
     ),
     md(
         r"""
-## 4. Preregistered intuition tests
+## 4. Intuition tests: what each test actually asks
 
-The score table will be judged by five tests:
+Before comparing graded scores, we need independent judgments about what should
+happen in easy cases. These judgments are the **tests**. The metric values are
+then compared with them; the metrics do not supply their own answer key.
 
-1. **Exact endpoint:** every independently exact direction should score `1`.
-2. **No categorical false positives:** a non-exact direction should not score
-   exactly `1` if the measure claims to detect directional monotonicity.
-3. **Near-monotone ladder, right-upward:**
+### Test 1: exact monotonicity must receive the top score
 
-   `B >= 2` > `B >= 2 with one exception` >
-   `1 <= |B| <= 3` > `|B| even`.
+Here **endpoint** means the top endpoint, `1`, of a score ranging from `0` to
+`1`. It does not mean an endpoint of the set lattice.
 
-   This is an explicit geometric intuition, not a logical theorem.
-4. **Complement mirror:** scores should match under `Q -> not Q` and direction
-   reversal when complement invariance is desired.
-5. **Diagnostic transparency:** the score should reveal whether a high value
-   comes from rare violations, local regularity, context averaging, or a
-   restricted hypothesis class.
+An **independently exact direction** is a direction proven monotone by directly
+checking the logical condition over every comparable pair, without consulting
+any graded metric:
 
-Tests 1-4 are computed below. Test 5 is assessed from the decompositions and
-curves rather than collapsed into a subjective total.
+\[
+Q(x)=1\ \&\ x\le y \quad\Longrightarrow\quad Q(y)=1.
+\]
+
+Example: `all A are B` is exactly right-upward. If `A` is already a subset of
+`B`, enlarging `B` cannot make that false. Therefore every candidate advertised
+as a directional monotonicity score should return exactly `1` for the RU
+direction of `all`.
+
+The scorecard column **all exact directions = 1** asks whether this holds for
+every meaning/direction independently verified as exact in the benchmark.
+
+### Test 2: a non-exact direction must not receive the top score
+
+Now reverse the check. If direct pair enumeration finds even one true-to-false
+counterexample, that direction is not exactly monotone. A graded metric may
+still give partial credit such as `0.8`; that is its purpose. But a score of
+exactly `1` would make the non-exact case indistinguishable from an exact one.
+
+Example: `B has even cardinality` is not right-upward. Starting with an even
+`B` and adding one element produces an odd `B`, changing truth from `1` to `0`.
+Thus a directional monotonicity metric should give it a value below `1`.
+
+The scorecard column **non-exact directions < 1** reports the *proportion* of
+non-exact benchmark directions that stay below `1`. A value of `1.000` means
+all passed this test. This test does **not** require every non-exact case to
+score `0`.
+
+### Test 3: the right-upward near-monotone ladder
+
+This test asks whether a metric distinguishes four increasingly irregular
+truth patterns:
+
+1. `|B| >= 2`: exactly right-upward; once true, it stays true.
+2. `|B| >= 2` with one exceptional false model: almost the same monotone
+   threshold, but with one deliberately introduced violation.
+3. `1 <= |B| <= 3`: an organized interval. It first turns on, then turns off at
+   the upper boundary, so it is clearly nonmonotone but not alternating.
+4. `|B| is even`: it flips truth at every one-element step.
+
+The hypothesized ranking is therefore:
+
+\[
+\text{exact threshold} >
+\text{one exception} >
+\text{bounded interval} >
+\text{parity}.
+\]
+
+This ordering is a stated geometric/learnability intuition, **not a theorem of
+monotonicity**. The scorecard column **ladder comparisons passed** counts the
+three adjacent inequalities that hold. `3` means the full ranking is recovered;
+`2` means one pair tied or reversed.
+
+### Test 4: complement-mirror consistency
+
+Negating a predicate exchanges truth and falsity. It also exchanges upward and
+downward violations. A complement-invariant score should therefore satisfy,
+for the same argument:
+
+\[
+RU(Q)=RD(\neg Q),\qquad RD(Q)=RU(\neg Q),
+\]
+
+and likewise for `LU`/`LD`.
+
+Example: `some A are B` and `no A are B` are exact complements. The RU score of
+`some` should equal the RD score of `no` if the metric is intended to ignore
+which truth label is called positive.
+
+The scorecard reports the largest absolute mismatch across the listed
+complement pairs. `0` means perfect mirror consistency. This property is
+desirable for some scientific questions, but a conditional score such as
+"preservation among true sources" can coherently fail it because complementation
+changes the conditioning population.
+
+### Test 5: can we explain why the score is high or low?
+
+This is a transparency test rather than a single number. For example:
+
+- Was the score high because violations were rare among all comparable pairs?
+- Because only one-element transitions were regular?
+- Because few truth values needed repair?
+- Because most fixed-`A` contexts were easy?
+- Because the meaning fit a restricted threshold family?
+
+The later pair, distance, context, and threshold decompositions answer these
+questions. We do not collapse transparency into a subjective pass/fail total.
 """
     ),
     code(
@@ -287,7 +373,7 @@ ladder.round(3)
         r"""
 The ladder is highly diagnostic:
 
-- Nearest edit, closure inflation, chain switches, and the exception-code proxy
+- Nearest-monotone edit score, closure inflation, chain switches, and the exception-code proxy
   express the intended spacing well.
 - Edge preservation also ranks the examples correctly and gives the
   near-monotone exception `0.984`.
@@ -339,7 +425,7 @@ parity_columns = [
     "pairwise_preservation",
     "edge_preservation",
     "unconditional_pair",
-    "cardinality_threshold_edit",
+    "best_cardinality_threshold_repair",
     "closure_inflation",
     "closure_precision",
     "chain_switch",
@@ -360,7 +446,7 @@ zero_or_decaying = {
     "edge_preservation": "edge preservation",
     "closure_inflation": "closure inflation",
     "chain_switch": "switch simplicity",
-    "cardinality_threshold_edit": "best cardinality-threshold repair",
+    "best_cardinality_threshold_repair": "best cardinality-threshold repair score",
 }
 nonzero_limits = {
     "pairwise_preservation": "all-pair preservation",
@@ -401,12 +487,27 @@ growth consistently preserves truth** or whether upward closure is useful:
 - switch simplicity = `0` for every `n` in this normalization, because parity
   switches at every cardinality step.
 
-The **best cardinality-threshold repair** also approaches zero, but slowly:
+### Is cardinality-threshold repair the same as nearest-monotone edit?
+
+No. The **nearest-monotone edit score** in the M4/X4 benchmark minimizes repair
+cost over *every* monotone Boolean function on the lattice. The large-`n` sweep
+cannot run that full `2^n`-node optimization at `n=100`. It instead reports a
+**best cardinality-threshold repair score**, minimizing only over:
+
+\[
+g_t(B)=1\quad\text{iff}\quad |B|\ge t.
+\]
+
+Because threshold functions are only a subset of all monotone functions, this
+restricted score can never exceed the general nearest-monotone edit score for
+the same normalization. The two scores happen to agree for the checked parity
+cases (`n <= 12`, with regression tests through `n=6`), but that empirical
+agreement does not make their definitions identical.
+
+The best cardinality-threshold repair score approaches zero slowly:
 `0.375` at `n=4`, `0.246` at `n=10`, and `0.080` at `n=100`. This is the
 large-domain result closest to "parity becomes arbitrarily far from a monotone
-threshold." It is threshold-restricted in the sweep; at `n <= 12` it matches
-the exact nearest-monotone min-cut values in direct checks (with regression
-tests through `n=6`).
+threshold."
 
 Other scores do **not** approach zero:
 
@@ -478,8 +579,9 @@ scorecard.round(3)
 
 ### Strong general-purpose candidates
 
-**Nearest-monotone edit** is the cleanest global repair measure in this test:
-it gets exact endpoints, the full intuition ladder, and complement symmetry.
+**Nearest-monotone edit score** is the cleanest global repair measure in this
+test: it gives `1` to all independently exact directions, recovers the full
+intuition ladder, and has complement symmetry.
 Its interpretation is direct. Its costs are computational optimization and
 dependence on the situation weights and chosen normalization.
 
@@ -740,7 +842,7 @@ df[(df.direction == "RU") & df.meaning.isin(representatives)][
 
 1. **Edge preservation** for the hypothesis that learners exploit local
    one-element regularities.
-2. **Nearest-monotone edit distance** for global truth-table repair cost.
+2. **Nearest-monotone edit score** for global truth-table repair cost.
 3. **Majorant entropy** as the manuscript baseline, preserving comparability
    with the published analysis.
 
@@ -765,7 +867,7 @@ It does **not** show which metric predicts neural learnability best. That
 requires computing these features for the 2,000 grammar-generated quantifiers
 and comparing held-out model fit or predictive performance against AUC. The
 best next experiment is a preregistered model comparison with manuscript
-entropy, edge preservation, nearest edit, switch simplicity, and context
+entropy, edge preservation, nearest-monotone edit score, switch simplicity, and context
 stability entered as separate predictors.
 """
     ),

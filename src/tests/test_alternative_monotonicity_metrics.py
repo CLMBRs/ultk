@@ -131,4 +131,4 @@ def test_parity_threshold_repair_matches_exact_edit_through_n6():
         compressed = metrics.cardinality_lattice_scores(
             [size % 2 == 0 for size in range(n + 1)]
         )
-        assert compressed["cardinality_threshold_edit"] == exact_score
+        assert compressed["best_cardinality_threshold_repair"] == exact_score

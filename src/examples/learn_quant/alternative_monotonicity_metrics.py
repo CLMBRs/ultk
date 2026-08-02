@@ -502,13 +502,13 @@ def cardinality_lattice_scores(
     changing_edges = favorable_edges + violating_edges
     derivative_sign = 1.0 if changing_edges == 0 else favorable_edges / changing_edges
 
-    threshold_edit_count = min(
+    threshold_repair_count = min(
         sum(comb(n, size) for size in range(n + 1) if q[size] != (size >= threshold))
         for threshold in range(n + 2)
     )
     minority_count = min(weights[q].sum(), weights[~q].sum())
-    threshold_edit = (
-        1.0 if minority_count == 0 else 1 - threshold_edit_count / minority_count
+    threshold_repair_score = (
+        1.0 if minority_count == 0 else 1 - threshold_repair_count / minority_count
     )
 
     return {
@@ -517,7 +517,7 @@ def cardinality_lattice_scores(
         "pairwise_preservation": float(pairwise_preservation),
         "edge_preservation": float(edge_preservation),
         "unconditional_pair": float(unconditional_pair),
-        "cardinality_threshold_edit": float(threshold_edit),
+        "best_cardinality_threshold_repair": float(threshold_repair_score),
         "closure_inflation": float(closure_inflation),
         "closure_precision": float(closure_precision),
         "chain_switch": float(switch_simplicity),
