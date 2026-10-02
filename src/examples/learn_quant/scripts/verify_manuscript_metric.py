@@ -28,7 +28,6 @@ import pandas as pd
 import statsmodels.formula.api as smf
 from scipy import stats
 
-
 PUBLISHED_CORRELATION = -0.3453
 PUBLISHED_TABLE6 = {
     "Intercept": 3403.436,

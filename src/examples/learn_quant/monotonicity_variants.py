@@ -43,7 +43,6 @@ from typing import Literal
 
 import numpy as np
 
-
 DirectionScores = np.ndarray
 EntropyScorer = Callable[..., float]
 Combine = Literal["mean", "min", "max"]

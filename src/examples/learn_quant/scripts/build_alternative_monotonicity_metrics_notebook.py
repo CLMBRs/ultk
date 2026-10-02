@@ -4,7 +4,6 @@ from pathlib import Path
 
 import nbformat as nbf
 
-
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "notebooks/alternative_monotonicity_metrics_benchmark.ipynb"
 
@@ -18,8 +17,7 @@ def code(text: str):
 
 
 cells = [
-    md(
-        r"""
+    md(r"""
 # Which alternative monotonicity metrics match which intuitions?
 
 This notebook implements and stress-tests the twelve proposals in the prompt on
@@ -198,10 +196,8 @@ what should count as approximately monotone.
   not competing scalar definitions.
 - Threshold and LoT scores test restricted representational hypotheses. They
   should not be sold as general monotonicity measures.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 1. What is actually distinct among the twelve proposals?
 
 | Prompt proposal | Implementation here | Status |
@@ -247,10 +243,8 @@ jupyter nbconvert --to notebook --execute \
   notebooks/alternative_monotonicity_metrics_benchmark.ipynb \
   --output alternative_monotonicity_metrics_benchmark.ipynb
 ```
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 from pathlib import Path
 import sys
 
@@ -290,10 +284,8 @@ print(
     f"{df.meaning.nunique()} meanings x {df.direction.nunique()} directions "
     f"= {len(df)} directional cases"
 )
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 2. Benchmark universe and meanings
 
 The universe is M4/X4: every ordered pair `(A,B)` of subsets of a four-element
@@ -312,15 +304,11 @@ The suite includes:
 
 M4/X4 is used because the exact nearest-monotone edit score is then easy to audit.
 Its scores are finite-universe properties, not claims about all domain sizes.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 df[["family", "meaning", "formula"]].drop_duplicates().reset_index(drop=True)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 3. Formulas and denominator choices
 
 For an oriented strict order `x < y`, an upward violation is `Q(x)=1`,
@@ -386,10 +374,8 @@ added. The second asks what fraction of closure truths were already true.
   zeros; this is the denominator used here.
 - Derivative sign is the fraction of nonzero cover-edge changes that are
   favorable (`0 -> 1` rather than `1 -> 0`).
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 4. Intuition tests: what each test actually asks
 
 Before comparing graded scores, we need independent judgments about what should
@@ -493,10 +479,8 @@ This is a transparency test rather than a single number. For example:
 
 The later pair, distance, context, and threshold decompositions answer these
 questions. We do not collapse transparency into a subjective pass/fail total.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 ladder_names = [
     "B has at least two elements",
     "B threshold with one exception",
@@ -511,10 +495,8 @@ ladder = (
 )
 ladder.index = [METRICS[name] for name in ladder.index]
 ladder.round(3)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 The ladder is highly diagnostic:
 
 - Nearest-monotone edit score, closure inflation, chain switches, and the exception-code proxy
@@ -528,10 +510,8 @@ The ladder is highly diagnostic:
   weighting.
 - Best simple-threshold fit tests only a small hand-built feature family. A high
   score means simple threshold representability, not monotonicity in general.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 4b. Larger model universes: does `|B| is even` approach zero?
 
 Yes for some measures, but **not for all of them**.
@@ -549,10 +529,8 @@ right-upward metrics, not a sample.
 
 One terminology correction: increasing `n` enlarges the **model universe**, not
 the meaning space. The meaning remains `Q(B) = 1` iff `|B|` is even.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 sizes = list(range(2, 101))
 parity_rows = []
 for n in sizes:
@@ -598,10 +576,8 @@ parity_columns = [
     "derivative sign",
 ]
 parity_scaling.loc[display_sizes, parity_columns].T.round(3)
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 fig, axes = plt.subplots(1, 2, figsize=(12, 4), sharex=True)
 
 zero_or_decaying = {
@@ -634,10 +610,8 @@ for ax in axes:
     ax.legend(fontsize=8)
 plt.tight_layout()
 plt.show()
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ### How to read the result
 
 Your zero intuition is exactly right for metrics that ask whether **one-element
@@ -700,10 +674,8 @@ preservation conditions only on true sources, all of which make the bad
 **Bottom line:** if the desired intuition is "alternation should become
 maximally nonmonotone," edge preservation, closure-based scores, switch
 simplicity, and threshold repair express it. A generic pair average need not.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 complement_pairs = [
     ("all A are B", "not all A are B"),
     ("some A are B", "no A are B"),
@@ -746,10 +718,8 @@ for metric, label in METRICS.items():
 
 scorecard = pd.DataFrame(scorecard_rows).set_index("metric")
 scorecard.round(3)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 5. What the scorecard says
 
 ### Strong general-purpose candidates
@@ -792,17 +762,13 @@ a directional monotonicity score.
 **Best simple-threshold fit** answers whether a meaning resembles one
 restricted cardinality-feature family. Exact monotone meanings outside that
 family can still be penalized.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 6. Local versus global behavior
 
 The next table compares cases that expose denominator and locality effects.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 representatives = [
     "all A are B",
     "most A are B",
@@ -827,10 +793,8 @@ columns = [
     "derivative_sign",
 ]
 df[(df.direction == "RU") & df.meaning.isin(representatives)][columns].round(3)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 Three warnings emerge:
 
 1. `between one and three overlap` is non-exact but receives very high local,
@@ -843,10 +807,8 @@ Three warnings emerge:
 3. `A equals B` gets high closure precision and switch simplicity despite zero
    upward preservation. Those measures reward a sparse organized boundary, not
    robust upward entailment.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 7. Robustness curves: proposal 7 becomes distinct only after weighting
 
 If `(x,y)` is sampled uniformly from all comparable pairs with `Q(x)=1`, then
@@ -856,10 +818,8 @@ only after choosing a transformation distribution.
 Here every expansion distance `k` receives equal weight. Undefined distances,
 where no true source has such an expansion, are shown as missing rather than
 vacuously scored `1`.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 curve_names = [
     "B threshold with one exception",
     "B has one to three elements",
@@ -883,28 +843,22 @@ ax.set(
     ylim=(-0.05, 1.05),
 )
 plt.show()
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 The parity predicate alternates: survival is `0` at odd distances and `1` at
 even distances. A single scalar conceals exactly the pattern that makes parity
 intuitively irregular. For a learnability study, the curve or its first few
 values may be more informative than an average.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 8. Context-sensitive profiles
 
 Global pairwise preservation weights contexts according to how many eligible
 pairs they contribute. The context mean instead gives every fixed `A` equal
 weight, but excludes contexts with no true-source prediction; `context_coverage`
 reports how much of the context space was defined.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 context_names = [
     "most A are B",
     "exactly two overlap",
@@ -921,26 +875,20 @@ df[(df.direction == "RU") & df.meaning.isin(context_names)][
         "context_coverage",
     ]
 ].round(3)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 The standard deviation is not "more monotonicity"; it is a second axis:
 **stability across restrictor contexts**. Reporting `(mean, SD, coverage)` is
 more honest than folding all three into an undocumented scalar.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 9. Directional profiles instead of a maximum
 
 The maximum asks whether *some* direction is strong. It cannot distinguish one
 clean direction from diffuse partial scores. The following uses edge
 preservation because its units are easy to interpret.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 profile_names = [
     "all A are B",
     "most A are B",
@@ -957,17 +905,13 @@ profiles["max"] = profiles.max(axis=1)
 profiles["mean"] = profiles[["RU", "LU", "RD", "LD"]].mean(axis=1)
 profiles["purity = max - mean"] = profiles["max"] - profiles["mean"]
 profiles.round(3)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 `purity` is not automatically desirable. A quantifier can be exactly monotone
 in multiple directions. The scientifically useful object is the four-vector;
 max, mean, and purity are optional hypotheses about what learners exploit.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 10. Threshold and LoT proposals
 
 ### Threshold fit
@@ -994,10 +938,8 @@ The reported score is one minus this code length divided by `N`. It rewards a
 monotone base plus a short list of exceptions. It is **not** a full LoT result:
 the monotone base itself is treated as free, all exception locations have the
 same cost, and grammar/inference costs are omitted.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 df[(df.direction == "RU") & df.meaning.isin(representatives)][
     [
         "meaning",
@@ -1007,10 +949,8 @@ df[(df.direction == "RU") & df.meaning.isin(representatives)][
         "exception_code_proxy",
     ]
 ].round(3)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 11. Recommendations for a learnability follow-up
 
 ### Primary candidates
@@ -1044,8 +984,7 @@ and comparing held-out model fit or predictive performance against AUC. The
 best next experiment is a preregistered model comparison with manuscript
 entropy, edge preservation, nearest-monotone edit score, switch simplicity, and context
 stability entered as separate predictors.
-"""
-    ),
+"""),
 ]
 
 

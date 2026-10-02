@@ -23,7 +23,6 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
-
 DEFAULT_ALTK_ARCHIVE = Path.home() / "Documents/UWLing/altk/src/examples"
 DIRECTIONS = ("RU", "LU", "RD", "LD")
 Predicate = Callable[[frozenset, frozenset], bool]

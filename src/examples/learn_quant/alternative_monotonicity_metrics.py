@@ -11,7 +11,6 @@ import numpy as np
 from scipy.sparse import lil_matrix
 from scipy.sparse.csgraph import maximum_flow
 
-
 Predicate = Callable[[frozenset[int], frozenset[int]], bool]
 DIRECTIONS = ("RU", "LU", "RD", "LD")
 

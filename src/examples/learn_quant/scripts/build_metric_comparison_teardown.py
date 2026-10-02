@@ -4,7 +4,6 @@ from pathlib import Path
 
 import nbformat as nbf
 
-
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "notebooks/metric_comparison_teardown.ipynb"
 
@@ -18,8 +17,7 @@ def code(text: str):
 
 
 cells = [
-    md(
-        r"""
+    md(r"""
 # Graded monotonicity measures: what each calculates, and what can go wrong
 
 This notebook compares the measures **by the question each one answers**. That
@@ -40,10 +38,8 @@ The central conclusions are:
 
 The notebook first calculates every ingredient on a three-point chain, then
 uses four M6/X6 benchmark meanings to expose the tradeoffs.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 1. Start with the property, not the score
 
 Fix one argument of a quantifier and let `x <= y` mean that the other argument
@@ -67,10 +63,8 @@ A graded score must answer an additional question, for example:
 
 Different goals can rank the same predicate differently without any
 implementation being faulty.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 2. The four monotone approximations
 
 For Boolean `Q` on a partial order:
@@ -94,10 +88,8 @@ repairs it by changing some `1`s to `0`s.
 The implementation phrase "has a true predecessor" is exactly
 `C_up(Q)(x)`. There is not a second independent predictor built after the
 closure. Closure is idempotent: `C_up(C_up(Q)) = C_up(Q)`.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -128,10 +120,8 @@ toy = pd.DataFrame(
     }
 )
 toy
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 The middle-only predicate is neither upward nor downward monotone.
 
 - `C_up(Q) = (0,1,1)`: change the final `0` to `1`.
@@ -141,10 +131,8 @@ The middle-only predicate is neither upward nor downward monotone.
 
 The closure retains some structure; the interior retains none. This simple
 case will distinguish the variants.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 3. The entropy score
 
 For approximation `F`, the code calculates normalized mutual information:
@@ -164,10 +152,8 @@ Interpretation:
 This is **not** percent truth preservation, percent agreement, or percent of
 violations avoided. It depends on the complete `2 x 2` table of `(Q,F)` and on
 the distribution over situations.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 def entropy(bits):
     p = np.asarray(bits, dtype=float).mean()
     if p in (0.0, 1.0):
@@ -192,10 +178,8 @@ toy_scores = {
     for name in ["C_up(Q)", "I_up(Q)", "C_down(Q)", "I_down(Q)"]
 }
 pd.Series(toy_scores, name="entropy score").round(3).to_frame()
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 For the upward direction, the majorant score is about `0.274`, while the
 interior score is `0`. Neither number is an error:
 
@@ -206,10 +190,8 @@ The normalized score is well suited to an **informativeness-of-approximation**
 question. Its main limitations are that it is sensitive to truth prevalence,
 the chosen universe distribution, and how balanced the approximation feature
 is.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 4. How the entropy variants combine the ingredients
 
 Write `s(Q,F)` as `s(F)` below:
@@ -230,10 +212,8 @@ C_\uparrow(\neg Q)=\neg I_\downarrow(Q).
 That identity explains the tradeoff. A closure-only score can use the same
 construction after reversing the order, or it can mirror truth-value
 complements, but it cannot do both without also incorporating interiors.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 up_closure = toy_scores["C_up(Q)"]
 up_interior = toy_scores["I_up(Q)"]
 pd.Series(
@@ -244,10 +224,8 @@ pd.Series(
     },
     name="toy upward score",
 ).round(3).to_frame()
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 This toy example shows the aggregation choice clearly:
 
 - **Majorant** preserves the one-sided approximation signal.
@@ -258,10 +236,8 @@ This toy example shows the aggregation choice clearly:
 Therefore the minimum is conservative, not automatically more correct. It is
 better if the construct means "supported from both sides"; it is worse if the
 construct means "quality of the least monotone majorant."
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 5. Two pair-counting measures that must not be conflated
 
 The repository contains two related but distinct diagnostics.
@@ -293,10 +269,8 @@ the conditioning population.
 
 The benchmark CSV columns named `preservation_*` use the second denominator.
 They are not the unconditional violation-rate score.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 # The three proper ordered pairs are x0<x1, x0<x2, and x1<x2.
 pairs = [(0, 1), (0, 2), (1, 2)]
 violations = [(i, j) for i, j in pairs if q[i] == 1 and q[j] == 0]
@@ -309,25 +283,19 @@ pair_scores = pd.Series(
     }
 )
 pair_scores.round(3).to_frame("toy upward score")
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 For the same predicate, the two pair scores are `2/3` and `0`. The difference
 comes entirely from the denominator. This is why a label such as "violation
 rate" is incomplete unless the eligible population is stated.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 6. Four M6/X6 cases: what the disagreements really mean
 
 The following table comes from the exhaustive semantic benchmark. `Preservation`
 is the **conditional** pair score just defined.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 ROOT = Path.cwd()
 if not (ROOT / "analysis").is_dir():
     ROOT = ROOT.parent
@@ -357,10 +325,8 @@ for _, row in benchmark[benchmark.meaning.isin(names)].iterrows():
     )
 cases = pd.DataFrame(rows).set_index("meaning")
 cases.round(3)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ### Case A: `A != B`
 
 Conditional preservation is `0.984`, but the majorant and two-sided minimum are
@@ -413,10 +379,8 @@ region. The rare empty-set violation receives little weight.
 
 The score is not mathematically wrong. It is unsuitable if the intended
 criterion is worst-case sensitivity, where one counterexample should dominate.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 7. Defects and limitations, stated precisely
 
 | Measure | What it genuinely measures | Main defect if used as a general "degree" |
@@ -432,10 +396,8 @@ criterion is worst-case sensitivity, where one counterexample should dominate.
 All graded variants are sensitive to the finite universe and its probability
 measure. None should be interpreted as an intrinsic, scale-free percentage of
 monotonicity.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 8. Recommendation
 
 For the manuscript, retain the **majorant entropy measure** because it matches
@@ -459,8 +421,7 @@ For future work:
 The pedagogical lesson is not that one measure wins. It is that each number must
 be named after its estimand: **exactness, approximation information, pairwise
 preservation, or repair distance**.
-"""
-    ),
+"""),
 ]
 
 

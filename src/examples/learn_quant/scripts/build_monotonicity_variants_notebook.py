@@ -4,7 +4,6 @@ from pathlib import Path
 
 import nbformat as nbf
 
-
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "notebooks/monotonicity_measure_variants_walkthrough.ipynb"
 
@@ -18,8 +17,7 @@ def code(text: str):
 
 
 cells = [
-    md(
-        r"""
+    md(r"""
 # Which graded monotonicity measure do we want?
 
 ## A walkthrough of closures, interiors, complement symmetry, and order duality
@@ -52,10 +50,8 @@ This notebook separates four questions that had become conflated:
   construct validation.
 
 The recommendation is justified step by step below rather than assumed.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 1. The two symmetries are different claims
 
 Let `Q(A,B)` be a Boolean quantifier. For one argument, write `x <= y` when the
@@ -78,10 +74,8 @@ RU(Q)=RD(\neg Q),\qquad LU(Q)=LD(\neg Q).
 It does **not** entail the within-expression statement `RU(Q) = LD(Q)`.
 Table 4 happens to contain meanings with additional semantic symmetries, which
 is why some within-row values match there.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 2. Four monotone approximations
 
 For a Boolean function `Q` on a partial order, there are four natural
@@ -107,10 +101,8 @@ I_\downarrow Q(x) &= \bigwedge_{y\le x} Q(y)
 
 Both equal `Q` when `Q` is exactly monotone in the relevant direction. Away
 from exact monotonicity they are different approximations.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 import numpy as np
 import pandas as pd
 
@@ -134,10 +126,8 @@ toy = pd.DataFrame(
     }
 )
 toy
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 At `x1`, for example, `C_up(Q)=1` because a true predecessor (`x0`) exists,
 while `I_down(Q)=0` because not **all** predecessors are true. Existence and
 universality are not interchangeable.
@@ -150,10 +140,8 @@ ordering constraint. It constructs a binary feature:
 
 That feature is `C_up(Q)`. With `flip=True`, it asks for at least one true
 successor, which is `C_down(Q)`.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 3. Why closure does not commute with negation
 
 Now do the algebra explicitly:
@@ -179,10 +167,8 @@ C_\uparrow(\neg Q)\ne\neg C_\downarrow Q.
 Negation changes OR to AND (De Morgan's law), so it swaps **closure** and
 **interior**. This is what breaks complement invariance in a closure-only
 measure.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 not_q = 1 - q
 demorgan = pd.DataFrame(
     {
@@ -199,16 +185,12 @@ demorgan["incorrect_closure_identity_holds"] = (
     demorgan["C_up(not Q)"] == demorgan["not C_down(Q)"]
 )
 demorgan
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 The first identity holds at every point. The proposed closure-to-closure
 identity fails. This is a logical difference, not a floating-point problem.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 4. Where entropy enters
 
 The manuscript score is normalized mutual information between `Q` and one of
@@ -227,10 +209,8 @@ Entropy is **not itself** the source of the asymmetry. Mutual information is
 invariant under complementing either binary variable. The asymmetry arises
 before entropy is calculated: complementation sends a closure to an interior,
 but the manuscript compares closures in both order directions.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 5. The measure variants
 
 ### A. Manuscript-era majorant measure
@@ -286,10 +266,8 @@ For upward monotonicity, count comparable pairs `x < y` for which
 This is transparent and has both symmetries. Its drawback is scaling: a large
 lattice can contain many irrelevant nonviolating pairs, making scores cluster
 near 1.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 properties = pd.DataFrame(
     [
         {
@@ -331,19 +309,15 @@ properties = pd.DataFrame(
     ]
 )
 properties
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ### Important pushback on “both properties are impossible”
 
 They are impossible for a **one-sided closure-only** score. They are not
 impossible for monotonicity metrics in general. Two-sided entropy works because
 it includes the interior that complementation necessarily introduces.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 6. Load the actual manuscript universes and implementations
 
 The next cells are executable rather than copied result tables. They load the
@@ -351,10 +325,8 @@ archived expression pools needed by the original pickles, then load the current
 metric source under private module names.
 
 Use the `altk` conda environment. No neural network is trained here.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 from pathlib import Path
 from types import SimpleNamespace
 import importlib.util
@@ -403,10 +375,8 @@ cfg = SimpleNamespace(
 )
 print("Current analysis root:", LEARN_ROOT)
 print("Archived pools:", ALTK_ARCHIVE)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 7. The three identifiable Table 4 expressions
 
 This table explains the apparent new RU/LD asymmetry.
@@ -419,10 +389,8 @@ within-expression coincidences such as `RU(Q)=LD(Q)`.
 The two-sided variants restore both structural symmetries. A within-row match
 can still fail for an arbitrary expression; it appears here because these
 particular meanings have extra left/right and order symmetries.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 M6_BASE = ALTK_ARCHIVE / "learn_quant/outputs/M6/X6/d3"
 with open(M6_BASE / "master_universe.pkl", "rb") as handle:
     universe_m6 = pkl.load(handle)
@@ -498,10 +466,8 @@ table4[["RU", "LU", "RD", "LD"]] = table4[
     ["RU", "LU", "RD", "LD"]
 ].round(3)
 table4
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ### Reading the table
 
 For `not(subset_eq(A,B))`, the published majorant score has `RU=LD=.059`.
@@ -518,19 +484,15 @@ majorant construction.
 The direct violation scores are high even for nonmonotone directions because
 most comparable pairs are nonviolations. This illustrates their transparent
 numerator but awkward scale.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 8. Test all 44 complement pairs in the trained sample
 
 The next cell identifies exact truth-vector complements among the 2,000
 trained expressions. For each pair it checks all four mirror equations. “Exact
 mirrored pairs” means all four errors are below `1e-12`.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 M4_BASE = ALTK_ARCHIVE / "learn_quant/outputs/M4/X4/d5"
 with open(M4_BASE / "master_universe.pkl", "rb") as handle:
     universe_m4 = pkl.load(handle)
@@ -613,10 +575,8 @@ mirror_summary[["mean pair error", "maximum error"]] = mirror_summary[
     ["mean pair error", "maximum error"]
 ].round(6)
 mirror_summary
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 # The ten largest failures under the manuscript-era measure.
 (
     pd.DataFrame(detail_rows)
@@ -625,10 +585,8 @@ mirror_summary
     .head(10)
     .assign(max_mirror_error=lambda frame: frame["max_mirror_error"].round(3))
 )
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 The result is decisive:
 
 - The manuscript majorant measure mirrors exactly for only **2 of 44** pairs.
@@ -637,10 +595,8 @@ The result is decisive:
 
 This establishes a property of the metrics. It does not by itself decide which
 property should define the scientific construct.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 9. What changes over all 2,000 expressions?
 
 `degree` below is the maximum of RU, LU, RD, and LD, matching the manuscript's
@@ -650,10 +606,8 @@ with available outcomes.
 The correlation is descriptive, **not a criterion for choosing a metric**. A
 metric should be chosen from its semantics and invariances, not because it
 maximizes association with the dependent variable.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 from scipy.stats import pearsonr
 
 runs = pd.read_csv(
@@ -689,10 +643,8 @@ distribution_summary[
     ["all-2k mean degree", "all-2k SD", "Pearson r(degree, AUC)"]
 ].round(3)
 distribution_summary
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 import matplotlib.pyplot as plt
 
 fig, axes = plt.subplots(2, 3, figsize=(13, 7), sharex=True, sharey=True)
@@ -704,19 +656,15 @@ for ax, metric in zip(axes.flat, metric_names):
 fig.suptitle("Degree distributions for the 2,000 sampled expressions", fontsize=14)
 fig.tight_layout()
 plt.show()
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 The direct violation score clusters near 1 because its denominator includes
 all comparable pairs. The entropy variants use more of the 0--1 range.
 `two_sided_max` has the strongest raw AUC correlation here, but selecting it
 for that reason would be outcome-driven. Its substantive meaning is permissive:
 either the majorant or minorant can make a direction look monotone.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 9b. A boundary artifact in the mean — and why it does not rule out every
 two-sided score
 
@@ -730,10 +678,8 @@ learned expressions. The closure feature includes the point itself, so it is
 exactly constant 1 for this predicate in both universes. Its entropy score is
 therefore 0. The interior score is nonzero partly because an interior agrees
 with Q automatically at order boundaries.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 def comparability_diagnostic(universe, by_term, universe_label):
     term = "or(subset_eq(A, B), subset_eq(B, A))"
     q = np.fromiter(
@@ -772,10 +718,8 @@ comparability = pd.DataFrame(
     ]
 )
 comparability.round(4)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 The mean inherits half of the interior's boundary-driven information: `0.201`
 on M6/X6 and `0.216` on M4/X4. Calling that value “monotonicity” is hard to
 defend for this predicate.
@@ -784,10 +728,8 @@ But this is a problem with the **mean**, not a proof that symmetric feature
 representations are impossible. The two-sided minimum gives 0 whenever either
 the closure or interior provides no directional evidence. Here it gives 0 in
 all four directions, while also passing all 44 complement-mirror tests.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 10. Which measure is most in line with the intuition?
 
 There are two defensible intuitions:
@@ -823,10 +765,8 @@ functions, is preserved by order reversal, and maps upward(Q) to
 downward(not Q) under complementation. It avoids the existential-feature
 collapse entirely. Its unresolved design choice is normalization: the raw
 number of required label edits must be scaled before it becomes a 0--1 degree.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 11. Recommendation for the manuscript
 
 ### What I would report
@@ -862,10 +802,8 @@ If those calibration choices remain troubling, minimum edit distance to the
 set of monotone functions is the cleaner next family to investigate; it gives
 up the manuscript's feature-predictability interpretation in exchange for a
 direct “how many truth values must change?” interpretation.
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 12. Final conceptual map
 
 | Question | Answer |
@@ -882,8 +820,7 @@ The practical lesson is to state the desired invariances **before** choosing
 both the approximation operators and their aggregation. Entropy cannot repair
 a symmetry absent from the features, and a symmetric aggregation can still be
 poorly calibrated if it rewards only one side.
-"""
-    ),
+"""),
 ]
 
 

@@ -4,7 +4,6 @@ from pathlib import Path
 
 import nbformat as nbf
 
-
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "notebooks/two_sided_min_semantic_benchmark.ipynb"
 
@@ -18,8 +17,7 @@ def code(text: str):
 
 
 cells = [
-    md(
-        r"""
+    md(r"""
 # Does two-sided minimum match familiar monotonicity intuitions?
 
 This notebook stress-tests the proposed symmetric measure on **34 familiar
@@ -34,10 +32,8 @@ The test is deliberately theory-first:
 4. only then inspect the entropy scores.
 
 Thus the metric does not choose its own test cases or gold labels.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -52,10 +48,8 @@ df = pd.read_csv(CSV)
 DIRECTIONS = ["RU", "LU", "RD", "LD"]
 print(f"{len(df)} benchmark meanings across {df.category.nunique()} semantic families")
 df.groupby("category").size().rename("meanings").to_frame()
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 1. What the four columns mean
 
 - **RU:** preserve truth when B grows.
@@ -68,10 +62,8 @@ expectation means the meaning has at least one counterexample in the finite
 universe. That does **not** require a graded score of exactly zero: a graded
 measure may reasonably say that a nonmonotone meaning is close to monotone.
 The question is whether the amount and pattern of partial credit are persuasive.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 display_cols = [
     "category", "meaning", "formula", "expected_exact_directions",
     "min_RU", "min_LU", "min_RD", "min_LD",
@@ -81,10 +73,8 @@ table[["min_RU", "min_LU", "min_RD", "min_LD"]] = table[
     ["min_RU", "min_LU", "min_RD", "min_LD"]
 ].round(3)
 table
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 2. First result: exact monotonicity is recovered perfectly
 
 For every direction independently verified as exactly monotone, two-sided
@@ -92,10 +82,8 @@ minimum returns 1. No non-exact direction returns 1. This is the strongest
 positive result: the measure gets the categorical endpoints right throughout
 this benchmark, including all/no/some, proper subset, cardinal comparisons,
 overlap thresholds, proportional meanings, and constants.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 direction_rows = []
 for _, row in df.iterrows():
     for direction in DIRECTIONS:
@@ -114,10 +102,8 @@ summary = directions.groupby("expected_exact").score.agg(
 )
 summary.index = ["non-exact", "exact"]
 summary.round(3)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 3. Clear successes on familiar meanings
 
 The following cases fit ordinary semantic judgments especially well:
@@ -132,10 +118,8 @@ The following cases fit ordinary semantic judgments especially well:
 
 These are not isolated expressions harvested from the grammar. They are direct
 semantic predicates evaluated over all 4,096 M6/X6 situations.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 success_names = [
     "all A are B", "no A are B", "some A are B",
     "A proper-subset B", "more A than B",
@@ -143,10 +127,8 @@ success_names = [
     "A and B are comparable", "A and B are incomparable",
 ]
 table[table.meaning.isin(success_names)].reset_index(drop=True)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 4. The important counterexamples
 
 Two-sided minimum is **not** uniformly intuitive as a graded scale.
@@ -166,10 +148,8 @@ Three patterns matter:
    amount depends on the finite universe and threshold convention.
 
 These are genuine limitations, not implementation errors.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 nonexact = directions[~directions.expected_exact].sort_values(
     "score", ascending=False
 )
@@ -177,10 +157,8 @@ nonexact.head(20).assign(
     score=lambda x: x.score.round(3),
     preservation=lambda x: x.preservation.round(3),
 )
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 fig, ax = plt.subplots(figsize=(8, 4.5))
 ax.scatter(nonexact.preservation, nonexact.score, alpha=0.65)
 ax.set(
@@ -194,19 +172,15 @@ print(
     "Spearman correlation:",
     nonexact[["preservation", "score"]].corr(method="spearman").iloc[0, 1].round(3),
 )
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 The transparent preservation rate asks: among comparable changes beginning at
 a true situation, how often is truth preserved? It is not proposed here as the
 new primary measure; it is a diagnostic. The imperfect relationship shows that
 entropy scores also depend on truth prevalence and feature balance. Therefore a
 number such as 0.61 cannot be read directly as “61% monotone.”
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 5. Comparison with the majorant and two-sided mean
 
 Two-sided minimum fixes two concrete problems:
@@ -218,10 +192,8 @@ Two-sided minimum fixes two concrete problems:
 But taking the minimum does not remove every finite-boundary effect when **both**
 closure and interior are informative. Exact high overlap counts demonstrate
 this remaining issue.
-"""
-    ),
-    code(
-        r"""
+"""),
+    code(r"""
 comparison_names = [
     "A and B are comparable",
     "A equals B",
@@ -245,10 +217,8 @@ for _, row in df[df.meaning.isin(comparison_names)].iterrows():
                 }
             )
 pd.DataFrame(rows).round(3)
-"""
-    ),
-    md(
-        r"""
+"""),
+    md(r"""
 ## 6. Judgment
 
 **Does two-sided minimum match intuition better than the two-sided mean? Yes.**
@@ -272,8 +242,7 @@ violations.
 - In parallel, evaluate a direct distance-to-nearest-monotone-function measure.
   Its interpretation (“minimum weighted truth-value changes”) may align more
   directly with the intended graded construct.
-"""
-    ),
+"""),
 ]
 
 

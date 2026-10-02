@@ -24,7 +24,6 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 
-
 DIRS = ["right_upward", "left_upward", "right_downward", "left_downward"]
 DEFAULT_ALTK_ARCHIVE = Path.home() / "Documents/UWLing/altk/src/examples"
 POOL_REL = Path("learn_quant/outputs/M4/X4/d5")
