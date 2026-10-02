@@ -1,0 +1,112 @@
+Corrected complement-symmetric monotonicity metric
+
+
+========================================================================
+1. JOINT MODEL + PARTIAL CORRELATIONS
+========================================================================
+
+Correlations with val_loss_step_AOC (learning difficulty):
+predictor            raw r   partial r  (partial controls for the other)
+degree              -0.304      -0.264   (n=7170, p=9.6e-115)
+func_count           0.219       0.155   (n=7170, p=5.9e-40)
+leaf_count           0.234       0.183   (n=7170, p=5.9e-55)
+
+Joint OLS  (standardized):  val_loss_step_AOC ~ degree + func_count + C(model)
+===========================================================================================
+                              coef    std err          t      P>|t|      [0.025      0.975]
+-------------------------------------------------------------------------------------------
+Intercept                  -0.2287      0.015    -15.001      0.000      -0.259      -0.199
+C(model)[T.Transformer]     0.4575      0.022     21.217      0.000       0.415       0.500
+mono_z                     -0.2661      0.011    -23.891      0.000      -0.288      -0.244
+func_z                      0.1526      0.011     13.698      0.000       0.131       0.174
+===========================================================================================
+  R^2 = 0.167   n = 7170
+
+  saved figures/corrected_metric/partial_corr_heatmap.png
+
+========================================================================
+4. DIRECTIONAL MONOTONICITY
+========================================================================
+
+(n = 7170 trained runs with AUC)
+
+Correlation of each directional monotonicity with val_loss_step_AOC:
+(negative = that kind of monotonicity is associated with EASIER learning)
+  right_upward     raw r=-0.065  partial(func) r=-0.050   (n=7170)
+  left_upward      raw r=-0.101  partial(func) r=-0.080   (n=7170)
+  right_downward   raw r=-0.106  partial(func) r=-0.087   (n=7170)
+  left_downward    raw r=-0.092  partial(func) r=-0.079   (n=7170)
+
+Joint OLS: val_loss_step_AOC ~ upward + downward + func_count + C(model)
+  n = 7170   R^2 = 0.137   adj R^2 = 0.136
+===========================================================================================
+                              coef    std err          t      P>|t|      [0.025      0.975]
+-------------------------------------------------------------------------------------------
+Intercept                1656.2863    128.651     12.874      0.000    1404.092    1908.481
+C(model)[T.Transformer]   965.4036     46.304     20.849      0.000     874.634    1056.174
+upward                   -593.2661     68.544     -8.655      0.000    -727.632    -458.900
+downward                -1195.5266     78.239    -15.280      0.000   -1348.898   -1042.155
+func_count                161.0227     10.388     15.501      0.000     140.660     181.385
+===========================================================================================
+
+  saved figures/corrected_metric/directional_monotonicity.png
+
+========================================================================
+7. NESTED-MODEL COMPARISON  (does adding monotonicity improve fit?)
+========================================================================
+
+Models (n=7170), controlling for model type:
+  base: model only             R^2= 0.053   AIC=   129724   BIC=   129738
+  L:    + length               R^2= 0.101   AIC=   129353   BIC=   129374
+  M:    + monotonicity         R^2= 0.145   AIC=   128989   BIC=   129010
+  LM:   + length + monotonicity R^2= 0.167   AIC=   128806   BIC=   128833
+
+Incremental contribution (nested F-tests):
+  add MONOTONICITY on top of length:  ΔR^2=+0.066  F=570.8  p=1.95e-121
+  add LENGTH on top of monotonicity:  ΔR^2=+0.022  F=187.6  p=3.56e-42
+
+Standardized coefficients in the full model LM (|beta| = strength):
+  length (per +1 SD)        :   +321.8
+  monotonicity (per +1 SD)  :   -561.2
+  => monotonicity is the stronger predictor (|beta| ratio mono/length = 1.74)
+
+Commonality analysis (variance beyond model-type baseline):
+  total explained by length+monotonicity : 0.114
+    unique to length                     : 0.022
+    unique to monotonicity               : 0.066
+    shared (common)                      : 0.026
+
+  saved figures/corrected_metric/nested_model_comparison.png
+
+========================================================================
+8. PREDICTING MONOTONICITY  (complexity vs learnability -- which explains it?)
+========================================================================
+
+Aggregated to 1795 unique expressions (mean AUC across trained runs).
+
+Simple correlations with monotonicity (degree):
+  length (func_count)        r=-0.249   (p=1.02e-26)
+  learnability (mean AUC)    r=-0.325   (p=1.46e-45)
+
+Nested models (outcome = monotonicity):
+  base: intercept only       R^2= 0.000   AIC=     -339
+  L:    + length             R^2= 0.062   AIC=     -452
+  A:    + learnability (AUC) R^2= 0.106   AIC=     -538
+  LA:   + length + AUC       R^2= 0.137   AIC=     -601
+
+Incremental contribution (nested F-tests):
+  add LEARNABILITY on top of length:  ΔR^2=+0.076  F=157.0  p=1.39e-34
+  add LENGTH on top of learnability:  ΔR^2=+0.032  F=65.4  p=1.09e-15
+
+Standardized coefficients in the full model (|beta| = strength):
+  length (per +1 SD)        :  -0.040
+  learnability (per +1 SD)  :  -0.062
+  => learnability (AUC) is the stronger predictor of monotonicity (|beta| ratio AUC/length = 1.55)
+
+Commonality analysis (variance in monotonicity explained):
+  total explained by length+AUC : 0.137
+    unique to length            : 0.032
+    unique to learnability      : 0.076
+    shared                      : 0.030
+
+  saved figures/corrected_metric/predict_monotonicity.png

@@ -1,0 +1,75 @@
+computing truth-set statistics for 2000 expressions on 4000 training-style models (M=12, X=16)
+  400/2000 expressions (10s elapsed)
+  800/2000 expressions (21s elapsed)
+  1200/2000 expressions (33s elapsed)
+  1600/2000 expressions (45s elapsed)
+  2000/2000 expressions (58s elapsed)
+joined: 1795 expressions with trained runs + features
+
+--- correlation of truth-set stats with directional degrees ---
+  p_true             corr(down)=-0.274  corr(up)=-0.046  corr(AUC)=+0.156
+  pos_sizeA          corr(down)=-0.213  corr(up)=+0.114  corr(AUC)=+0.134
+  pos_sizeB          corr(down)=-0.212  corr(up)=+0.099  corr(AUC)=+0.121
+  pos_both           corr(down)=-0.334  corr(up)=+0.202  corr(AUC)=+0.106
+  pos_activity       corr(down)=-0.382  corr(up)=+0.190  corr(AUC)=+0.228
+  pos_var            corr(down)=-0.200  corr(up)=-0.338  corr(AUC)=+0.060
+  neg_activity       corr(down)=+0.225  corr(up)=-0.182  corr(AUC)=+0.149
+  class_sep          corr(down)=+0.475  corr(up)=+0.151  corr(AUC)=-0.678
+  boundary_density   corr(down)=-0.070  corr(up)=-0.056  corr(AUC)=+0.164
+
+===== outcome: auc_mean  (n=1795) =====
+  directions only:      R2=0.126   downward β= -708.0 (p=4.9e-48)   upward β=  +20.1 (p=0.67)
+  truth-set stats only: R2=0.537
+  directions + stats:   R2=0.540   downward β= -138.2 (p=0.0022)   upward β=  +33.7 (p=0.41)
+  + func_count:         R2=0.557   downward β= -117.5 (p=0.008)
+  downward-β shrinkage from stats control: +80.5%
+
+  stats coefficients in the full model (per SD):
+    p_true             β=   +28.9  p=0.63
+    pos_sizeA          β=  +238.3  p=0.00027
+    pos_sizeB          β=  +232.2  p=0.00081
+    pos_both           β= -1088.6  p=1.6e-11
+    pos_activity       β=  +422.3  p=0.00028
+    pos_var            β=  -202.5  p=3.5e-07
+    neg_activity       β=   -36.1  p=0.39
+    class_sep          β= -1500.4  p=1.2e-138
+    boundary_density   β=  -161.4  p=1.1e-05
+
+===== outcome: auc_lstm  (n=1792) =====
+  directions only:      R2=0.107   downward β= -548.2 (p=3.1e-40)   upward β=  +16.1 (p=0.69)
+  truth-set stats only: R2=0.441
+  directions + stats:   R2=0.444   downward β= -129.7 (p=0.0019)   upward β=  +39.1 (p=0.3)
+  + func_count:         R2=0.470   downward β= -108.2 (p=0.0081)
+  downward-β shrinkage from stats control: +76.3%
+
+  stats coefficients in the full model (per SD):
+    p_true             β=   -58.4  p=0.3
+    pos_sizeA          β=  +256.9  p=2.3e-05
+    pos_sizeB          β=  +261.1  p=4.4e-05
+    pos_both           β= -1019.8  p=8.9e-12
+    pos_activity       β=  +467.5  p=1.5e-05
+    pos_var            β=   -94.8  p=0.0099
+    neg_activity       β=    -6.7  p=0.86
+    class_sep          β= -1103.9  p=1.2e-93
+    boundary_density   β=  -170.7  p=5.3e-07
+
+===== outcome: auc_tf  (n=1795) =====
+  directions only:      R2=0.134   downward β= -867.2 (p=4.8e-51)   upward β=  +24.5 (p=0.66)
+  truth-set stats only: R2=0.583
+  directions + stats:   R2=0.585   downward β= -144.7 (p=0.0044)   upward β=  +27.3 (p=0.55)
+  + func_count:         R2=0.596   downward β= -125.0 (p=0.013)
+  downward-β shrinkage from stats control: +83.3%
+
+  stats coefficients in the full model (per SD):
+    p_true             β=  +112.7  p=0.097
+    pos_sizeA          β=  +224.1  p=0.0024
+    pos_sizeB          β=  +206.8  p=0.0082
+    pos_both           β= -1164.7  p=1.7e-10
+    pos_activity       β=  +386.2  p=0.0032
+    pos_var            β=  -311.1  p=5e-12
+    neg_activity       β=   -65.6  p=0.16
+    class_sep          β= -1895.2  p=1.6e-166
+    boundary_density   β=  -154.2  p=0.00019
+
+saved figures/truth_set_stats.png
+features saved to analysis/truth_set_stats_features.csv

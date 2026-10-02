@@ -1,0 +1,5 @@
+  upward>0.5=True  downward>0.5=True   mean AUC=   2466  n=1955
+  upward>0.5=True  downward>0.5=False  mean AUC=   3098  n=507
+  upward>0.5=False downward>0.5=True   mean AUC=   2212  n=1992
+  upward>0.5=False downward>0.5=False  mean AUC=   3526  n=2716
+  saved figures/directional_panelB_redraw.png

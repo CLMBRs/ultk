@@ -1,0 +1,21 @@
+per-expression directional degrees (n=2000 unique expressions):
+degree             mean     sd  median  % == 0  % >= .99
+right_upward      0.198  0.290   0.000   57.2%      2.8%
+left_upward       0.200  0.296   0.000   57.7%      3.5%
+right_downward    0.367  0.338   0.327   29.6%      7.4%
+left_downward     0.367  0.337   0.330   29.1%      7.2%
+upward            0.352  0.334   0.352   37.5%      6.1%
+downward          0.562  0.304   0.563    9.2%     13.5%
+degree            0.599  0.301   0.620    8.8%     15.6%
+
+corr(upward, downward) = +0.397
+degree attained by downward sense: 82.6% of expressions
+
+AUC correlations by architecture:
+  LSTM         n= 3586  r(upward)=-0.116  r(downward)=-0.323
+  Transformer  n= 3584  r(upward)=-0.131  r(downward)=-0.362
+  upward                                 beta=    +151  p=1.32e-01
+  downward                               beta=   -1661  p=4.17e-48
+  upward:C(model)[T.Transformer]         beta=     +24  p=8.66e-01
+  downward:C(model)[T.Transformer]       beta=   -1048  p=5.57e-11
+=> the downward advantage holds in both architectures and is larger for the Transformer.

@@ -1,0 +1,4 @@
+expression,published_RU,majorant_RU,complement_dual_RU,published_LU,majorant_LU,complement_dual_LU,published_RD,majorant_RD,complement_dual_RD,published_LD,majorant_LD,complement_dual_LD
+"subset_eq(A, B)",1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.058837310765675666,1.0,1.0,1.0
+"not(subset_eq(A, B))",0.059,0.058837310765675666,0.058837310765675666,1.0,1.0,1.0,1.0,1.0,1.0,0.059,0.058837310765675666,0.0
+"or(subset_eq(A, B), subset_eq(B, A))",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.40284800172732615,0.0,0.0,0.40284800172732615

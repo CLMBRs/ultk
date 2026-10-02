@@ -1,0 +1,27 @@
+
+========================================================================
+7. NESTED-MODEL COMPARISON  (does adding monotonicity improve fit?)
+========================================================================
+
+Models (n=7170), controlling for model type:
+  base: model only             R^2= 0.053   AIC=   129724   BIC=   129738
+  L:    + length               R^2= 0.101   AIC=   129353   BIC=   129374
+  M:    + monotonicity         R^2= 0.163   AIC=   128836   BIC=   128857
+  LM:   + length + monotonicity R^2= 0.189   AIC=   128610   BIC=   128637
+
+Incremental contribution (nested F-tests):
+  add MONOTONICITY on top of length:  ΔR^2=+0.089  F=785.0  p=5.35e-164
+  add LENGTH on top of monotonicity:  ΔR^2=+0.026  F=232.1  p=1.34e-51
+
+Standardized coefficients in the full model LM (|beta| = strength):
+  length (per +1 SD)        :   +347.4
+  monotonicity (per +1 SD)  :   -639.0
+  => monotonicity is the stronger predictor (|beta| ratio mono/length = 1.84)
+
+Commonality analysis (variance beyond model-type baseline):
+  total explained by length+monotonicity : 0.137
+    unique to length                     : 0.026
+    unique to monotonicity               : 0.089
+    shared (common)                      : 0.022
+
+  saved figures/nested_model_comparison.png

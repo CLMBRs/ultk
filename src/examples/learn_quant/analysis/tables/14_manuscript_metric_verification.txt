@@ -1,0 +1,27 @@
+MANUSCRIPT METRIC VERIFICATION
+========================================================================
+rows in both fits: 7170
+
+Figure 2 Pearson correlation: degree vs validation-loss AUC
+  published:              -0.3453
+  majorant CSV:           -0.3326
+  complement-dual:        -0.3045
+  note: the committed majorant CSV is close but not identical to the published correlation,
+        consistent with the paper using an earlier run-table snapshot.
+
+Table 6 mixed model: AUC ~ degree * model + (1|expression)
+                      quantity  published  majorant_reproduction  complement_dual  majorant_abs_error
+                     Intercept   3403.436               3402.036         3815.138               1.400
+       C(model)[T.Transformer]   1583.381               1583.155         1926.028               0.226
+                        degree  -1789.666              -1792.639        -2190.698               2.973
+degree:C(model)[T.Transformer]  -1058.114              -1058.615        -1441.434               0.501
+
+Table 4 M6/X6 directional examples
+                          expression  published_RU  majorant_RU  complement_dual_RU  published_LU  majorant_LU  complement_dual_LU  published_RD  majorant_RD  complement_dual_RD  published_LD  majorant_LD  complement_dual_LD
+                     subset_eq(A, B)         1.000        1.000               1.000         0.000        0.000               0.000         0.000        0.000               0.059         1.000        1.000               1.000
+                not(subset_eq(A, B))         0.059        0.059               0.059         1.000        1.000               1.000         1.000        1.000               1.000         0.059        0.059               0.000
+or(subset_eq(A, B), subset_eq(B, A))         0.000        0.000               0.000         0.000        0.000               0.000         0.000        0.000               0.403         0.000        0.000               0.403
+
+Published Table 4 matches manuscript-era implementation (3 expressions, 4 directions, rounded to 3 decimals): True
+Conclusion: the manuscript's numerical analyses used the order-dual majorant (flip=True for downward).
+This is symmetric under order reversal but not under truth-label complementation; the phrase 'symmetric definition' should specify which.

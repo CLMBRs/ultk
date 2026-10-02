@@ -1,0 +1,27 @@
+
+========================================================================
+4. DIRECTIONAL MONOTONICITY
+========================================================================
+
+(n = 7170 trained runs with AUC)
+
+Correlation of each directional monotonicity with val_loss_step_AOC:
+(negative = that kind of monotonicity is associated with EASIER learning)
+  right_upward     raw r=-0.065  partial(func) r=-0.050   (n=7170)
+  left_upward      raw r=-0.101  partial(func) r=-0.080   (n=7170)
+  right_downward   raw r=-0.215  partial(func) r=-0.198   (n=7170)
+  left_downward    raw r=-0.211  partial(func) r=-0.198   (n=7170)
+
+Joint OLS: val_loss_step_AOC ~ upward + downward + func_count + C(model)
+  n = 7170   R^2 = 0.192   adj R^2 = 0.191
+===========================================================================================
+                              coef    std err          t      P>|t|      [0.025      0.975]
+-------------------------------------------------------------------------------------------
+Intercept                1918.6112    117.213     16.369      0.000    1688.840    2148.383
+C(model)[T.Transformer]   965.8423     44.811     21.553      0.000     877.999    1053.686
+upward                    163.0149     71.464      2.281      0.023      22.925     303.105
+downward                -2184.2979     80.590    -27.104      0.000   -2342.279   -2026.317
+func_count                159.3203      9.948     16.015      0.000     139.819     178.822
+===========================================================================================
+
+  saved figures/directional_monotonicity.png

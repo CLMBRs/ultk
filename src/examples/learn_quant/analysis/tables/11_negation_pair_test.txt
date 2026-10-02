@@ -1,0 +1,156 @@
+--- what is (and is not) run in this test ---
+NEW NEURAL TRAINING: none
+REUSED NEURAL RESULTS: 7172 completed rows for LSTM, Transformer, loaded from outputs/combined_runs_AOC_monotonicity_updated.csv
+  LSTM: MV_LSTM, 3 stacked layers, 20 hidden units; Transformer: 2 encoder layers, d_model=12, 4 heads
+  original training: one-hot scenes of length 16, Adam (lr=0.001), BCEWithLogitsLoss, up to 50 epochs, 5 splits
+RECOMPUTED HERE: symbolic expressions evaluated on 20000 newly sampled set-theoretic scenes to verify exact label complements
+STATISTICAL MODEL FIT HERE: OLS(mean validation-loss AUC ~ z(downward degree) + z(upward degree))
+IMPORTANT: QuantifierModel below means one <M,A,B> scene; it is not an LSTM, Transformer, or fitted predictor.
+
+archive pool: 9550 unique meanings on 256 models
+pool meanings with complement in pool:        884
+trained expressions with complement in pool:  269 / 2000
+complement pairs within the trained 2000:     44
+functional verification on 20000 training-style scenes (M=12, X=16): 41 verified, 3 failed
+  FAILED (2757 disagreements): and(not(greater_than(cardinality(B), cardinality(A))), greater_than(ca  vs  or(equals(cardinality(intersection(A, B)), cardinality(difference(A, B
+  FAILED (4422 disagreements): or(and(subset_eq(B, A), not(subset_eq(A, B))), greater_than(cardinalit  vs  or(and(not(subset_eq(B, A)), greater_than(cardinality(A), cardinality(
+  FAILED (4463 disagreements): or(and(subset_eq(A, B), not(subset_eq(B, A))), greater_than(cardinalit  vs  or(and(not(subset_eq(A, B)), greater_than(cardinality(B), cardinality(
+
+--- within-pair AUC comparison (D = downward-dominant member) ---
+ALL verified pairs:
+  LSTM       : n=36  mean D=  1024.1  mean U=  1089.7  mean Δ(U-D)=   +65.6  median Δ=   +21.4  frac(U harder)=0.64
+      Wilcoxon p=0.1615   paired-t p=0.0754
+  Transformer: n=36  mean D=  1623.0  mean U=  1589.3  mean Δ(U-D)=   -33.7  median Δ=   -17.7  frac(U harder)=0.42
+      Wilcoxon p=0.4051   paired-t p=0.4375
+  mean arch  : n=36  mean D=  1323.5  mean U=  1339.5  mean Δ(U-D)=   +15.9  median Δ=    -1.2  frac(U harder)=0.50
+      Wilcoxon p=0.5920   paired-t p=0.4597
+
+Pairs with real polarity contrast (Δ(down-up) gap > 0.2): n=11
+  LSTM       : n=11  mean Δ(U-D)=   +76.0  median=   +15.5  frac(U harder)=0.73  Wilcoxon p=0.2061
+  Transformer: n=11  mean Δ(U-D)=   +55.0  median=    +0.4  frac(U harder)=0.55  Wilcoxon p=0.6377
+  mean arch  : n=11  mean Δ(U-D)=   +65.5  median=   +14.6  frac(U harder)=0.64  Wilcoxon p=0.2061
+
+corr( ΔAUC(U-D), polarity contrast ):  r=+0.069  p=0.6885  n=36
+
+--- population prediction vs within-pair observation ---
+population OLS (n=1795 expressions): AUC ~ downward -708.0/SD  upward +20.1/SD
+within pairs (n=36): predicted mean ΔAUC(U-D) =   +181.9   observed =    +15.9  (95% CI ±41.8)
+contrast>0.2 pairs (n=11): predicted =   +558.4   observed =    +65.5  (95% CI ±94.2)
+  observed / predicted ratio: +0.12 (1 = fully boundary-level, 0 = fully composition/measure-side)
+length (func count) Δ(U-D): mean=+0.56  (pairs need not be equal-length; check confound)
+
+--- measure-mirror check: up(e) vs down(~e) on identical boundaries ---
+  |up(e) - down(~e)|: mean=0.1815  median=0.0482  max=0.7885  frac>0.05=0.50
+  corr(up(e), down(~e)) pooled both directions: r=0.709 p=3.3e-12
+
+--- pair listing (sorted by polarity contrast) ---
+  contrast=+1.88  AUCmean D=  186.4 U=  180.7  Δ=    -5.7
+    D (down=1.00, up=0.00): subset_eq(A, difference(A, B))
+    U (down=0.12, up=1.00): not(subset_eq(A, difference(A, B)))
+  contrast=+1.38  AUCmean D=  624.4 U=  612.4  Δ=   -12.0
+    D (down=1.00, up=0.00): or(subset_eq(B, difference(A, A)), greater_than(cardinality(difference(B, A)), cardinality(A)))
+    U (down=0.62, up=1.00): and(not(subset_eq(B, difference(A, A))), subset_eq(index(cardinality(A), difference(B, A)), A))
+  contrast=+1.24  AUCmean D=  953.2 U=  794.1  Δ=  -159.2
+    D (down=0.96, up=0.38): and(and(not(subset_eq(B, A)), subset_eq(A, difference(A, B))), subset_eq(index(cardinality(A), 
+    U (down=0.28, up=0.94): subset_eq(index(cardinality(intersection(A, B)), index(cardinality(A), union(A, B))), A)
+  contrast=+1.21  AUCmean D=  428.8 U=  512.1  Δ=   +83.3
+    D (down=1.00, up=0.00): subset_eq(index(cardinality(B), A), index(cardinality(difference(A, A)), A))
+    U (down=0.79, up=1.00): and(greater_than(cardinality(A), cardinality(B)), not(subset_eq(B, difference(A, A))))
+  contrast=+0.79  AUCmean D= 4090.6 U= 4540.0  Δ=  +449.4
+    D (down=0.49, up=0.00): subset_eq(intersection(A, B), difference(A, index(cardinality(A), union(A, B))))
+    U (down=0.46, up=0.77): and(not(subset_eq(B, A)), subset_eq(index(cardinality(A), union(A, B)), intersection(A, B)))
+  contrast=+0.58  AUCmean D= 4324.8 U= 4339.8  Δ=   +15.0
+    D (down=0.70, up=0.44): not(subset_eq(index(cardinality(B), union(A, B)), intersection(A, B)))
+    U (down=0.33, up=0.65): subset_eq(index(cardinality(B), union(A, B)), intersection(A, B))
+  contrast=+0.51  AUCmean D=  206.9 U=  221.5  Δ=   +14.6
+    D (down=1.00, up=0.61): subset_eq(difference(B, A), index(cardinality(A), difference(B, A)))
+    U (down=0.88, up=1.00): not(subset_eq(difference(B, A), index(cardinality(A), difference(B, A))))
+  contrast=+0.51  AUCmean D=  193.5 U=  201.5  Δ=    +8.0
+    D (down=1.00, up=0.61): subset_eq(difference(A, B), index(cardinality(B), difference(A, B)))
+    U (down=0.88, up=1.00): not(subset_eq(difference(A, B), index(cardinality(B), difference(A, B))))
+  contrast=+0.29  AUCmean D= 1358.5 U= 1323.8  Δ=   -34.6
+    D (down=0.00, up=0.00): or(or(subset_eq(A, B), subset_eq(B, A)), subset_eq(A, difference(A, B)))
+    U (down=0.37, up=0.66): not(or(or(subset_eq(A, B), subset_eq(B, A)), subset_eq(A, difference(A, B))))
+  contrast=+0.28  AUCmean D= 1558.1 U= 1746.7  Δ=  +188.6
+    D (down=1.00, up=0.92): subset_eq(index(cardinality(B), union(A, B)), index(cardinality(A), difference(B, A)))
+    U (down=0.80, up=1.00): not(subset_eq(index(cardinality(B), union(A, B)), index(cardinality(A), difference(B, A))))
+  contrast=+0.22  AUCmean D= 3327.4 U= 3500.1  Δ=  +172.7
+    D (down=0.22, up=0.01): and(not(equals(cardinality(A), cardinality(B))), subset_eq(index(cardinality(A), B), difference
+    U (down=0.36, up=0.36): and(not(greater_than(cardinality(A), cardinality(B))), subset_eq(index(cardinality(A), B), A))
+  contrast=+0.15  AUCmean D= 3478.0 U= 3502.9  Δ=   +24.9
+    D (down=0.57, up=0.57): subset_eq(union(index(cardinality(A), B), index(cardinality(B), A)), difference(A, B))
+    U (down=0.29, up=0.44): and(not(equals(cardinality(A), cardinality(B))), subset_eq(index(cardinality(B), A), B))
+  contrast=+0.11  AUCmean D= 4940.1 U= 4717.7  Δ=  -222.4
+    D (down=0.53, up=0.42): not(subset_eq(index(cardinality(A), union(A, B)), B))
+    U (down=0.00, up=0.00): subset_eq(index(cardinality(A), union(A, B)), B)
+  contrast=+0.08  AUCmean D= 1039.2 U=  966.8  Δ=   -72.4
+    D (down=0.71, up=0.63): and(not(subset_eq(A, B)), greater_than(cardinality(difference(B, A)), cardinality(A)))
+    U (down=0.00, up=0.00): or(subset_eq(A, B), subset_eq(index(cardinality(A), difference(B, A)), A))
+  contrast=+0.06  AUCmean D=  500.4 U=  626.9  Δ=  +126.5
+    D (down=0.56, up=0.56): or(and(subset_eq(A, B), subset_eq(B, A)), greater_than(cardinality(difference(B, A)), cardinali
+    U (down=0.64, up=0.70): and(not(and(subset_eq(A, B), subset_eq(B, A))), subset_eq(index(cardinality(A), difference(B, A
+  contrast=+0.06  AUCmean D= 4215.2 U= 3898.6  Δ=  -316.6
+    D (down=0.66, up=0.61): subset_eq(index(cardinality(B), union(A, B)), B)
+    U (down=0.71, up=0.71): not(subset_eq(index(cardinality(B), union(A, B)), B))
+  contrast=+0.00  AUCmean D=  206.6 U=  238.7  Δ=   +32.1
+    D (down=1.00, up=1.00): or(not(subset_eq(B, A)), subset_eq(A, difference(A, A)))
+    U (down=1.00, up=1.00): and(subset_eq(B, A), not(subset_eq(A, difference(A, A))))
+  contrast=+0.00  AUCmean D=  210.8 U=  198.2  Δ=   -12.6
+    D (down=1.00, up=1.00): and(subset_eq(A, B), or(not(subset_eq(B, A)), subset_eq(A, difference(A, A))))
+    U (down=1.00, up=1.00): and(or(subset_eq(B, A), not(subset_eq(A, B))), not(subset_eq(A, difference(A, A))))
+  contrast=+0.00  AUCmean D= 2364.9 U= 2598.4  Δ=  +233.5
+    D (down=0.60, up=0.60): equals(cardinality(intersection(A, B)), cardinality(difference(B, A)))
+    U (down=0.15, up=0.15): not(equals(cardinality(intersection(A, B)), cardinality(difference(B, A))))
+  contrast=+0.00  AUCmean D= 1325.2 U= 1275.6  Δ=   -49.6
+    D (down=1.00, up=1.00): subset_eq(index(cardinality(A), difference(B, A)), index(cardinality(B), union(A, B)))
+    U (down=1.00, up=1.00): not(subset_eq(index(cardinality(A), difference(B, A)), index(cardinality(B), union(A, B))))
+  contrast=+0.00  AUCmean D=  429.7 U=  436.1  Δ=    +6.4
+    D (down=1.00, up=1.00): subset_eq(index(cardinality(A), difference(B, A)), A)
+    U (down=1.00, up=1.00): greater_than(cardinality(difference(B, A)), cardinality(A))
+  contrast=+0.00  AUCmean D=  182.9 U=  250.8  Δ=   +67.9
+    D (down=1.00, up=1.00): and(subset_eq(B, A), not(subset_eq(A, B)))
+    U (down=1.00, up=1.00): or(subset_eq(A, B), not(subset_eq(B, A)))
+  contrast=+0.00  AUCmean D=  432.5 U=  521.7  Δ=   +89.2
+    D (down=1.00, up=1.00): or(subset_eq(B, A), greater_than(cardinality(A), cardinality(B)))
+    U (down=1.00, up=1.00): not(or(subset_eq(B, A), greater_than(cardinality(A), cardinality(B))))
+  contrast=+0.00  AUCmean D= 2026.0 U= 1946.7  Δ=   -79.4
+    D (down=0.26, up=0.26): equals(cardinality(A), cardinality(B))
+    U (down=0.01, up=0.01): not(equals(cardinality(A), cardinality(B)))
+  contrast=+0.00  AUCmean D=  240.8 U=  184.8  Δ=   -56.0
+    D (down=1.00, up=1.00): subset_eq(A, B)
+    U (down=1.00, up=1.00): not(subset_eq(A, B))
+  contrast=+0.00  AUCmean D=  218.1 U=  195.0  Δ=   -23.0
+    D (down=1.00, up=1.00): subset_eq(B, A)
+    U (down=1.00, up=1.00): not(subset_eq(B, A))
+  contrast=+0.00  AUCmean D= 1105.2 U= 1211.9  Δ=  +106.7
+    D (down=0.00, up=0.00): subset_eq(index(cardinality(B), union(A, B)), index(cardinality(B), A))
+    U (down=0.44, up=0.44): not(subset_eq(index(cardinality(B), union(A, B)), index(cardinality(B), A)))
+  contrast=+0.00  AUCmean D=  535.3 U=  503.0  Δ=   -32.2
+    D (down=1.00, up=1.00): subset_eq(index(cardinality(B), difference(A, B)), B)
+    U (down=1.00, up=1.00): greater_than(cardinality(difference(A, B)), cardinality(B))
+  contrast=+0.00  AUCmean D= 1263.3 U= 1302.9  Δ=   +39.6
+    D (down=0.00, up=0.00): subset_eq(index(cardinality(A), union(A, B)), index(cardinality(A), B))
+    U (down=0.44, up=0.44): not(subset_eq(index(cardinality(A), union(A, B)), index(cardinality(A), B)))
+  contrast=+0.00  AUCmean D=  362.4 U=  358.6  Δ=    -3.9
+    D (down=1.00, up=1.00): or(subset_eq(A, difference(A, A)), greater_than(cardinality(B), cardinality(A)))
+    U (down=1.00, up=1.00): not(or(subset_eq(A, difference(A, A)), greater_than(cardinality(B), cardinality(A))))
+  contrast=+0.00  AUCmean D=  467.1 U=  439.2  Δ=   -27.9
+    D (down=0.00, up=0.00): or(subset_eq(A, B), subset_eq(B, A))
+    U (down=0.43, up=0.43): not(or(subset_eq(A, B), subset_eq(B, A)))
+  contrast=+0.00  AUCmean D=  256.2 U=  257.6  Δ=    +1.4
+    D (down=1.00, up=1.00): and(subset_eq(A, B), not(subset_eq(B, A)))
+    U (down=1.00, up=1.00): or(subset_eq(B, A), not(subset_eq(A, B)))
+  contrast=+0.00  AUCmean D= 1270.5 U= 1367.0  Δ=   +96.5
+    D (down=0.00, up=0.00): subset_eq(index(cardinality(B), A), index(cardinality(B), union(A, B)))
+    U (down=0.62, up=0.62): not(subset_eq(index(cardinality(B), A), index(cardinality(B), union(A, B))))
+  contrast=+0.00  AUCmean D= 2534.5 U= 2527.5  Δ=    -7.0
+    D (down=1.00, up=1.00): subset_eq(index(cardinality(A), B), index(cardinality(B), union(A, B)))
+    U (down=1.00, up=1.00): not(subset_eq(index(cardinality(A), B), index(cardinality(B), union(A, B))))
+  contrast=+0.00  AUCmean D=  351.9 U=  338.5  Δ=   -13.4
+    D (down=1.00, up=1.00): greater_than(cardinality(A), cardinality(B))
+    U (down=1.00, up=1.00): not(greater_than(cardinality(A), cardinality(B)))
+  contrast=+0.00  AUCmean D=  437.6 U=  382.8  Δ=   -54.8
+    D (down=1.00, up=1.00): greater_than(cardinality(B), cardinality(A))
+    U (down=1.00, up=1.00): not(greater_than(cardinality(B), cardinality(A)))
+
+saved figures/negation_pair_test.png

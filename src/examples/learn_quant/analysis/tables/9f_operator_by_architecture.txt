@@ -1,0 +1,18 @@
+LSTM        n=3586  mean AUC=   2358  SD=   1680  R^2=0.229
+Transformer n=3584  mean AUC=   3325  SD=   2368  R^2=0.212
+coefficient-profile correlation: r = 0.990
+
+operator          LSTM    Tfmr    diff        diff 95% CI sig  LSTM/SD  Tfmr/SD
+greater_than      -139    -247    -108   [  -164,   -53]   *   -0.083   -0.104
+not               -185    -201     -16   [  -112,    82]       -0.110   -0.085
+difference         -55    -102     -47   [  -135,    35]       -0.033   -0.043
+index                6     -25     -31   [  -106,    52]        0.004   -0.011
+subset_eq           36      -9     -45   [  -105,    20]        0.021   -0.004
+or                  47      26     -22   [   -97,    45]        0.028    0.011
+and                 41      36      -5   [   -83,    75]        0.025    0.015
+cardinality         64      61      -3   [   -67,    64]        0.038    0.026
+intersection       188     248      60   [   -41,   160]        0.112    0.105
+equals             268     462     194   [   126,   269]   *    0.159    0.195
+union              672     888     215   [    94,   347]   *    0.400    0.375
+
+  saved figures/operator_by_architecture.png

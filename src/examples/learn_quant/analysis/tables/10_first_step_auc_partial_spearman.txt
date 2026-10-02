@@ -1,0 +1,5 @@
+First Step vs. AUC (appendix figure)
+n = 4068 converged runs ({'LSTM': 2530, 'Transformer': 1538})
+raw Spearman r(first_step, val_loss_step_AOC)      = 0.8950
+partial Spearman controlling for model (binary)    = 0.8926
+published caption value                             = 0.892

@@ -1,0 +1,3 @@
+n=7170  R^2: base=0.053  L=0.101  M=0.163  LM=0.189
+add mono on L: dR2=+0.089 (p=5.4e-164);  add length on M: dR2=+0.026 (p=1.3e-51)
+  saved figures/nested_model_redraw.png

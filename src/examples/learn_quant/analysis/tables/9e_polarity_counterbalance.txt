@@ -1,0 +1,22 @@
+op               r(up)  r(down) r(down-up gap)
+and             +0.169   +0.100         -0.074
+or              -0.226   -0.100         +0.129
+not             +0.157   +0.055         -0.102
+cardinality     -0.087   -0.166         -0.060
+subset_eq       -0.106   +0.003         +0.103
+equals          -0.042   -0.119         -0.063
+greater_than    +0.081   +0.065         -0.021
+union           -0.076   -0.131         -0.041
+intersection    -0.084   -0.057         +0.030
+difference      -0.043   -0.048         -0.001
+index           -0.116   -0.120         +0.006
+
+overall mean gap (down-up): 0.210
+gap among difference==0 (n=312): 0.178   -> difference does NOT drive the surplus
+
+mean degrees by `not` count (negation is the polarity flipper):
+        upward  downward
+op_not                  
+0        0.330     0.554
+1        0.467     0.604
+2        0.653     0.525
