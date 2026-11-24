@@ -603,6 +603,61 @@ class Grammar:
             pass
         return unique_dict[lhs]
 
+    def get_minimal_expressions(
+        self,
+        universe: Universe,
+        max_cost: int,
+        lhs: Any = None,
+        cost: Callable[[Rule], int] | None = None,
+        max_meanings: int | None = None,
+        semantics: Any = None,
+        ignore_errors: bool = False,
+    ) -> dict[Meaning, GrammaticalExpression]:
+        """Get a minimal-cost expression for every meaning expressible with cost at most `max_cost`.
+
+        Unlike `get_unique_expressions`, which enumerates expressions by depth and compares them with
+        an arbitrary `compare_func`, this method enumerates _meanings_, in order of increasing cost, and builds
+        larger expressions only from the cheapest representative of each meaning.  The result is
+        exact: every meaning with an expression of cost at most `max_cost` is found, together with an
+        expression of minimal cost.  With the default cost (1 per rule), the cost of an expression is its
+        length (`len`), so this is the analog of calling `get_unique_expressions` with
+        `unique_key=lambda expr: expr.evaluate(universe)` and `compare_func=lambda e1, e2: len(e1) < len(e2)`.
+
+        This is a wrapper around `ultk.language.grammar.enumeration.SemanticEnumerator`; see that class for
+        more details, including how to continue an enumeration to a higher cost.
+
+        Args:
+            universe: the universe over which to evaluate expressions
+            max_cost: the maximum cost of expressions to consider
+            lhs: left hand side to start from; defaults to the grammar's start symbol
+            cost: a function assigning a positive integer cost to each rule; defaults to 1 for every rule
+            max_meanings: stop once this many meanings of `lhs` have been found
+            semantics: a `ultk.language.grammar.enumeration.Semantics`, for computing meanings
+                more efficiently than the default, which applies each rule's `func` referent-by-referent
+            ignore_errors: if True, skip expressions whose evaluation raises an Exception
+
+        Returns:
+            dictionary of {Meaning: GrammaticalExpression}, in order of increasing cost, where each
+            expression has minimal cost among all expressions of `lhs` with its meaning
+        """
+        # imported here to avoid a circular import
+        from ultk.language.grammar.enumeration import (
+            PointwiseSemantics,
+            SemanticEnumerator,
+            unit_cost,
+        )
+
+        if lhs is None:
+            lhs = self._start
+        enumerator = SemanticEnumerator(
+            self,
+            semantics or PointwiseSemantics(universe),
+            cost=cost or unit_cost,
+            ignore_errors=ignore_errors,
+        )
+        enumerator.run(max_cost, lhs=lhs, max_meanings=max_meanings)
+        return enumerator.get_expressions(lhs)
+
     def get_all_rules(self) -> list[Rule]:
         """Get all rules as a list."""
         rules = []

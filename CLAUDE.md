@@ -35,7 +35,7 @@ Tests are discovered automatically by pytest from `src/tests/`. The CI workflow 
 - `semantics.py`: `Referent` (immutable semantic object), `Universe` (collection of Referents with a prior distribution), `Meaning` (mapping from Universe to arbitrary type T — e.g., booleans for truth values)
 - `language.py`: `Expression` (form + meaning pair), `Language` (frozenset of Expressions sharing a Universe). Helper `aggregate_expression_complexity()` bridges language and effcomm.
 - `sampling.py`: Generators for all meanings, expressions, and languages from a universe — used to enumerate the full hypothesis space.
-- `grammar/`: A probabilistic context-free grammar (PCFG) framework for building expressions as programs in a Language of Thought. `grammar.py` defines `Rule` and `Grammar`/`GrammaticalExpression`; `likelihood.py` provides scoring functions; `inference.py` handles MDL/Bayesian inference.
+- `grammar/`: A probabilistic context-free grammar (PCFG) framework for building expressions as programs in a Language of Thought. `grammar.py` defines `Rule` and `Grammar`/`GrammaticalExpression`; `likelihood.py` provides scoring functions; `inference.py` handles MDL/Bayesian inference. `enumeration.py` provides `SemanticEnumerator`, which enumerates meanings (not expressions) in order of cost to find a minimal expression for each meaning; `Grammar.get_minimal_expressions` wraps it.
 
 **`ultk.effcomm`** — Efficient communication analysis tools:
 - `agent.py`: RSA (Rational Speech Act) agents — `LiteralSpeaker`, `LiteralListener`, `PragmaticSpeaker`, `PragmaticListener` — represented as weight matrices.
@@ -62,3 +62,4 @@ Tests are discovered automatically by pytest from `src/tests/`. The CI workflow 
 - `indefinites/` — efficient communication analysis of indefinite pronouns
 - `modals/` — semantic universals for modals
 - `learn_quant/` — quantifier learning
+- `crasp/` — minimal C-RASP programs; a multi-type grammar with a custom vectorized `Semantics`
