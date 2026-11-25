@@ -1,6 +1,6 @@
 # Modals Optimize the Simplicity/Informativeness Trade-Off
 
-This example is a ULTK version of the analysis in Imel & Steinert-Threlkeld (2022), "Modals in natural language optimize the simplicity/informativeness trade-off" (SALT 32), whose original code is at [nathimel/modals-effcomm](https://github.com/nathimel/modals-effcomm).  It follows that project's main setup: a meaning space of 2 forces and 3 flavors, communicative need estimated from a corpus, literal agents with a half-credit utility, and the Independence of Force and Flavor (IFF) universal.  Unlike the original, complexity is the length of the shortest expression in a Boolean language of thought (see `data/grammar.yaml`), found exactly with `Grammar.get_minimal_expressions`.
+This example is a ULTK version of the analysis of modals by [Imel & Steinert-Threlkeld](https://doi.org/10.1162/OPMI.a.313), whose original code is at [nathimel/modals-effcomm](https://github.com/nathimel/modals-effcomm).  It follows that project's main setup: a meaning space of 2 forces and 3 flavors, communicative need estimated from a corpus, literal agents with a half-credit utility, and the Independence of Force and Flavor (IFF) universal.  Unlike the original, complexity is the length of the shortest expression in a Boolean language of thought (see `data/grammar.yaml`), found exactly with `Grammar.get_minimal_expressions`.
 
 ## Contents
 

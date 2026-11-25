@@ -6,13 +6,10 @@ from ..grammar import indefinites_grammar
 from ..meaning import universe as indefinites_universe
 
 if __name__ == "__main__":
+    # a shortest expression for every meaning; with this grammar, every meaning is expressible
+    # well within this size, and enumeration stops on its own once no new meanings can be found
     expressions_by_meaning: dict[Meaning, GrammaticalExpression] = (
-        indefinites_grammar.get_unique_expressions(
-            5,
-            max_size=2 ** len(indefinites_universe),
-            unique_key=lambda expr: expr.evaluate(indefinites_universe),
-            compare_func=lambda e1, e2: len(e1) < len(e2),
-        )
+        indefinites_grammar.get_minimal_expressions(indefinites_universe, max_cost=100)
     )
 
     # filter out the trivial meaning, results in NaNs
