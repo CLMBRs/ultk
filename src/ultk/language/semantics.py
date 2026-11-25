@@ -19,7 +19,7 @@ Examples:
 
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Any, Generic, TypeVar, Union
+from typing import Any, Callable, Generic, TypeVar, Union
 from ultk.util.frozendict import FrozenDict
 
 import numpy as np
@@ -163,28 +163,104 @@ class Meaning(Generic[T]):
 
         universe: a Universe object.  The `Referent`s in the keys of `mapping` are expected to be exactly those in `universe`.
 
-        _dist: a mapping representing a probability distribution over referents to associate with the meaning. By default, will be assumed to be uniform over the "true-like" `Referent`s in `mapping` (see `.dist`).
+        dist: a probability distribution over referents to associate with the meaning, as a tuple parallel to `mapping`.  By default, it is uniform over the "true-like" `Referent`s in `mapping`, and is only computed when it is first used.
     """
 
     mapping: tuple[T, ...]
     # With the mapping, `universe` is not conceptually needed, but it is very useful to have it lying around.
     # `universe` should be the keys to `mapping`.
     universe: Universe
-    dist: tuple[float, ...]
-    # _dist: FrozenDict[Referent, float] = FrozenDict({})
-    # _dist = False  # TODO: clean up
 
-    def __init__(self, mapping: tuple[T, ...], universe: Universe, dist=None):
+    def __init__(
+        self,
+        mapping: tuple[T, ...],
+        universe: Universe,
+        dist: tuple[float, ...] | None = None,
+    ):
         # use of __setattr__ is to work around the issues with @dataclass(frozen=True)
         object.__setattr__(self, "mapping", mapping)
         object.__setattr__(self, "universe", universe)
-        # if no dist given, make it uniform over `true-like` referents
+        # an explicitly given distribution; if None, `dist` is uniform over `true-like` referents
+        object.__setattr__(self, "_dist", dist or None)
+
+    @cached_property
+    def dist(self) -> tuple[float, ...]:
+        """A probability distribution over referents, as a tuple parallel to `mapping`: either the distribution
+        given at initialization, or else uniform over the "true-like" referents."""
+        explicit_dist = getattr(self, "_dist", None)
+        if explicit_dist is not None:
+            return explicit_dist
         num_true_like = sum(1 for value in self.mapping if value)
-        object.__setattr__(
-            self,
-            "dist",
-            dist or tuple(1 / num_true_like if value else 0 for value in self.mapping),
+        return tuple(1 / num_true_like if value else 0 for value in self.mapping)
+
+    @classmethod
+    def from_function(
+        cls, func: Callable[[Referent], T], universe: Universe
+    ) -> "Meaning[T]":
+        """Get the meaning which maps every referent in a universe to the value of a function at that referent.
+
+        Args:
+            func: a function from referents to values
+            universe: the universe of referents
+
+        Returns:
+            the meaning that maps each `referent` of `universe` to `func(referent)`
+        """
+        return cls(tuple(func(referent) for referent in universe.referents), universe)
+
+    @classmethod
+    def apply(cls, func: Callable[..., T], *meanings: "Meaning") -> "Meaning[T]":
+        """Apply a function referent-by-referent to the values of one or more meanings.
+
+        That is, the resulting meaning maps each referent `r` to `func(meaning_1[r], ..., meaning_n[r])`.
+        This is how the meaning of a complex expression is computed from the meanings of its parts
+        (see `ultk.language.grammar.grammar.GrammaticalExpression.evaluate`).
+
+        Args:
+            func: a function with one argument for each meaning
+            meanings: one or more meanings, all over the same universe
+
+        Returns:
+            the meaning computed by applying `func` at each referent
+        """
+        if not meanings:
+            raise ValueError("Meaning.apply requires at least one meaning.")
+        universe = meanings[0].universe
+        if any(
+            meaning.universe is not universe and meaning.universe != universe
+            for meaning in meanings[1:]
+        ):
+            raise ValueError("Meaning.apply requires meanings over the same universe.")
+        return cls(
+            tuple(map(func, *(meaning.mapping for meaning in meanings))), universe
         )
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Meaning):
+            return NotImplemented
+        # compare the cheapest properties first, and only compare universes if they are different objects
+        return (
+            self.mapping == other.mapping
+            and self._has_same_dist(other)
+            and (self.universe is other.universe or self.universe == other.universe)
+        )
+
+    def _has_same_dist(self, other: "Meaning") -> bool:
+        """Whether two meanings with the same mapping have the same `dist`, without computing default distributions."""
+        if (
+            getattr(self, "_dist", None) is None
+            and getattr(other, "_dist", None) is None
+            and "dist" not in self.__dict__
+            and "dist" not in other.__dict__
+        ):
+            # both are the default distribution for the same mapping
+            return True
+        return self.dist == other.dist
+
+    def __hash__(self) -> int:
+        # Equal meanings have equal mappings, so hashing the mapping alone is consistent with `__eq__`,
+        # and much cheaper than also hashing the universe (which would hash every referent).
+        return hash(self.mapping)
 
     @cached_property
     def is_uniformly_false(self) -> bool:

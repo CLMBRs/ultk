@@ -23,6 +23,35 @@ from ultk.util.frozendict import FrozenDict
 T = TypeVar("T")
 
 
+def _is_terminal_type(annotation: Any, terminal_types: tuple[Any, ...]) -> bool:
+    """Whether a type annotation is one of `terminal_types`, or a subclass of one.
+
+    Protocols are only matched exactly, because `issubclass` cannot be used with most protocols.
+    """
+    for terminal_type in terminal_types:
+        if annotation is terminal_type:
+            return True
+        if (
+            inspect.isclass(annotation)
+            and inspect.isclass(terminal_type)
+            and not getattr(terminal_type, "_is_protocol", False)
+            and issubclass(annotation, terminal_type)
+        ):
+            return True
+    return False
+
+
+def _constant_terminal(func: Callable[[], Any]) -> Callable[[Any], Any]:
+    """Turn a function of no arguments into the function of a terminal rule, which takes the referent and ignores it."""
+
+    def terminal(referent: Any) -> Any:
+        return func()
+
+    terminal.__name__ = func.__name__
+    terminal.__doc__ = func.__doc__
+    return terminal
+
+
 @dataclass(frozen=True)
 class Rule:
     """Basic class for a grammar rule.  Grammar rules in ULTK correspond
@@ -59,7 +88,9 @@ class Rule:
         return out_str
 
     @classmethod
-    def from_callable(cls, func: Callable) -> "Rule":
+    def from_callable(
+        cls, func: Callable, terminal_types: tuple[Any, ...] = (Referent,)
+    ) -> "Rule":
         """Create a Rule from the type-annotations of a function.
 
         For example, given the following method definition:
@@ -76,6 +107,21 @@ class Rule:
         There are two special kwargs that can be used in the function definition:
         - `weight`: a float, which will be used as the weight of the rule
         - `name`: a string, which will be used as the name of the rule, if you want it to be different than the name of the method
+
+        A function whose only argument is annotated with one of `terminal_types` (or a subclass of one) becomes a
+        terminal rule (with `rhs=None`): when an expression is evaluated, its function is applied to the referent.  By
+        default, these are functions of a `Referent`.  A grammar whose terminals take something else (e.g. a protocol
+        that referents implement) can pass its own `terminal_types`.
+
+        A function with no arguments (other than `weight` and `name`), such as `def one() -> int: return 1`, is a
+        constant: it also becomes a terminal rule, whose `func` takes the referent and ignores it.
+
+        Args:
+            func: a type-annotated function
+            terminal_types: the argument types which make a function of one argument a terminal rule
+
+        Returns:
+            the Rule
         """
         annotations = inspect.signature(func)
         if annotations.return_annotation is inspect.Signature.empty:
@@ -98,20 +144,19 @@ class Rule:
         # parameters = {'name': Parameter} ordereddict, so we want the values
         # each value is a Paramter, with .annotation being the actual annotation
         rhs: tuple[Any, ...] | None = tuple(arg.annotation for arg in args.values())
-        # if one type annotation is class, a type of Referent, treat this as a terminal, no children = None RHS
-        # TODO: make this more general?
-        if (
-            rhs
-            and len(rhs) == 1
-            and inspect.isclass(rhs[0])
-            and issubclass(rhs[0], Referent)
-        ):
+        # a function of one argument, annotated with a terminal type, is a terminal: no children = None RHS
+        if rhs and len(rhs) == 1 and _is_terminal_type(rhs[0], terminal_types):
             rhs = None
+        # a function of no arguments is a constant, i.e. a terminal which does not depend on the referent
+        rule_func = func
+        if rhs == ():
+            rhs = None
+            rule_func = _constant_terminal(func)
         return cls(
             name=rule_name,
             lhs=annotations.return_annotation,
             rhs=rhs,
-            func=func,
+            func=rule_func,
             weight=weight,
         )
 
@@ -153,12 +198,35 @@ class GrammaticalExpression(Expression[T]):
         return "".join(child.yield_string() for child in self.children)
 
     def evaluate(self, universe: Universe) -> Meaning:
+        """Get the meaning of this expression over a universe.
+
+        The meaning is computed compositionally: the meaning of a terminal maps each referent to the value
+        of its function at that referent, and the meaning of any other expression applies its function,
+        referent-by-referent, to the meanings of its children (see `Meaning.apply`).  The meaning of every
+        sub-expression is stored in its `meaning` attribute, and reused by later calls with the same universe.
+
+        Args:
+            universe: the universe over which to evaluate this expression
+
+        Returns:
+            the meaning of this expression
+        """
         # NB: important to use `not self.meaning` and not `self.meaning is None` because of how
         # Expression.__init__ initializes an "empty" meaning if `None` is passed
-        if not self.meaning:
+        if self.meaning and (
+            self.meaning.universe is universe or self.meaning.universe == universe
+        ):
+            return self.meaning
+        if self.children is None:
+            self.meaning = Meaning.from_function(self.func, universe)
+        elif self.children:
+            self.meaning = Meaning.apply(
+                self.func, *(child.evaluate(universe) for child in self.children)
+            )
+        else:
+            # a function of no arguments
             self.meaning = Meaning(
-                tuple(self(referent) for referent in universe.referents),
-                universe,
+                tuple(self.func() for _ in universe.referents), universe
             )
         return self.meaning
 
@@ -603,6 +671,58 @@ class Grammar:
             pass
         return unique_dict[lhs]
 
+    def get_minimal_expressions(
+        self,
+        universe: Universe,
+        max_cost: int,
+        lhs: Any = None,
+        cost: Callable[[Rule], int] | None = None,
+        max_meanings: int | None = None,
+        representation: Any = None,
+        ignore_errors: bool = False,
+    ) -> dict[Meaning, GrammaticalExpression]:
+        """Get a minimal-cost expression for every meaning expressible with cost at most `max_cost`.
+
+        Unlike `get_unique_expressions`, which enumerates expressions by depth and compares them with
+        an arbitrary `compare_func`, this method enumerates _meanings_, in order of increasing cost, and builds
+        larger expressions only from the cheapest representative of each meaning.  The result is
+        exact: every meaning with an expression of cost at most `max_cost` is found, together with an
+        expression of minimal cost.  With the default cost (1 per rule), the cost of an expression is its
+        length (`len`), so this is the analog of calling `get_unique_expressions` with
+        `unique_key=lambda expr: expr.evaluate(universe)` and `compare_func=lambda e1, e2: len(e1) < len(e2)`.
+
+        This is a wrapper around `ultk.language.grammar.enumeration.SemanticEnumerator`; see that class for
+        more details, including how to continue an enumeration to a higher cost.
+
+        Args:
+            universe: the universe over which to evaluate expressions
+            max_cost: the maximum cost of expressions to consider
+            lhs: left hand side to start from; defaults to the grammar's start symbol
+            cost: a function assigning a positive integer cost to each rule; defaults to 1 for every rule
+            max_meanings: stop once this many meanings of `lhs` have been found
+            representation: a `ultk.language.grammar.enumeration.MeaningRepresentation`, for representing
+                meanings more efficiently during enumeration; by default, `Meaning`s are used
+            ignore_errors: if True, skip expressions whose evaluation raises an Exception
+
+        Returns:
+            dictionary of {Meaning: GrammaticalExpression}, in order of increasing cost, where each
+            expression has minimal cost among all expressions of `lhs` with its meaning
+        """
+        # imported here to avoid a circular import
+        from ultk.language.grammar.enumeration import SemanticEnumerator, unit_cost
+
+        if lhs is None:
+            lhs = self._start
+        enumerator = SemanticEnumerator(
+            self,
+            universe,
+            cost=cost or unit_cost,
+            representation=representation,
+            ignore_errors=ignore_errors,
+        )
+        enumerator.run(max_cost, lhs=lhs, max_meanings=max_meanings)
+        return enumerator.get_expressions(lhs)
+
     def get_all_rules(self) -> list[Rule]:
         """Get all rules as a list."""
         rules = []
@@ -655,7 +775,9 @@ class Grammar:
         return grammar
 
     @classmethod
-    def from_module(cls, module_name: str) -> "Grammar":
+    def from_module(
+        cls, module_name: str, terminal_types: tuple[Any, ...] = (Referent,)
+    ) -> "Grammar":
         """Read a grammar from a module.
 
         The module should have a list of type-annotated method definitions, each of which will correspond to one Rule in the new Grammar.
@@ -669,6 +791,8 @@ class Grammar:
 
         Arguments:
             module_name: name of the module
+            terminal_types: the argument types which make a function of one argument a terminal rule (see
+                `Rule.from_callable`)
         """
         module = import_module(module_name)
         grammar = cls(None)
@@ -679,7 +803,7 @@ class Grammar:
         for value in possible_rules:
             # functions become rules
             if inspect.isfunction(value):
-                grammar.add_rule(Rule.from_callable(value))
+                grammar.add_rule(Rule.from_callable(value, terminal_types))
         # set start symbol if module specifies it
         if hasattr(module, "start") and module.start in grammar._rules:
             grammar._start = module.start

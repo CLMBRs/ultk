@@ -1,10 +1,11 @@
 from ultk.effcomm.optimization import EvolutionaryOptimizer
 from ultk.language.sampling import random_languages
-from ultk.util.io import read_grammatical_expressions, write_languages
+from ultk.util.io import read_grammatical_expressions
 
 from ..grammar import modals_grammar
 from ..meaning import universe as modals_universe
 from ..measures import comm_cost, complexity, iff
+from ..util import write_languages
 
 if __name__ == "__main__":
     expressions, expressions_by_meaning = read_grammatical_expressions(

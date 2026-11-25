@@ -1,0 +1,150 @@
+{
+ "named_languages": {
+  "ends in b": {
+   "size": 2,
+   "program": "accept(Q_b)",
+   "correct_up_to_verify_length": true
+  },
+  "starts with a": {
+   "size": 9,
+   "program": "accept(<=(1, #(not(<=(1, #(Q_b))))))",
+   "correct_up_to_verify_length": true
+  },
+  "contains a b": {
+   "size": 5,
+   "program": "accept(<=(1, #(Q_b)))",
+   "correct_up_to_verify_length": true
+  },
+  "only a's (a*)": {
+   "size": 6,
+   "program": "accept(not(<=(1, #(Q_b))))",
+   "correct_up_to_verify_length": true
+  },
+  "exactly one b": {
+   "size": 10,
+   "program": "accept(and(<=(1, #(Q_b)), <=(#(Q_b), 1)))",
+   "correct_up_to_verify_length": true
+  },
+  "at most one b": {
+   "size": 5,
+   "program": "accept(<=(#(Q_b), 1))",
+   "correct_up_to_verify_length": true
+  },
+  "length at least 2": {
+   "size": 6,
+   "program": "accept(not(<=(#(true), 1)))",
+   "correct_up_to_verify_length": true
+  },
+  "length exactly 1": {
+   "size": 5,
+   "program": "accept(<=(#(true), 1))",
+   "correct_up_to_verify_length": true
+  },
+  "more a's than b's": {
+   "size": 7,
+   "program": "accept(not(<=(#(Q_a), #(Q_b))))",
+   "correct_up_to_verify_length": true
+  },
+  "at least as many a's as b's": {
+   "size": 6,
+   "program": "accept(<=(#(Q_b), #(Q_a)))",
+   "correct_up_to_verify_length": true
+  },
+  "equal numbers of a's and b's": {
+   "size": 12,
+   "program": "accept(and(<=(#(Q_a), #(Q_b)), <=(#(Q_b), #(Q_a))))",
+   "correct_up_to_verify_length": true
+  },
+  "at least twice as many a's as b's": {
+   "size": 9,
+   "program": "accept(<=(#(Q_b), -(#(Q_a), #(Q_b))))",
+   "correct_up_to_verify_length": true
+  },
+  "a*b*": {
+   "size": 9,
+   "program": "accept(<=(#(<=(1, #(Q_b))), #(Q_b)))",
+   "correct_up_to_verify_length": true
+  },
+  "b*a*": {
+   "size": 9,
+   "program": "accept(<=(#(<=(1, #(Q_a))), #(Q_a)))",
+   "correct_up_to_verify_length": true
+  },
+  "some a before some b": {
+   "size": 10,
+   "program": "accept(not(<=(#(<=(1, #(Q_a))), #(Q_a))))",
+   "correct_up_to_verify_length": true
+  },
+  "last symbol is a strict majority": {
+   "size": 14,
+   "program": "accept(not(<=(max(#(Q_a), #(Q_b)), ?(Q_a, #(Q_b), #(Q_a)))))",
+   "correct_up_to_verify_length": true
+  },
+  "every prefix has at least as many a's as b's": {
+   "size": 10,
+   "program": "accept(<=(#(true), #(<=(#(Q_b), #(Q_a)))))",
+   "correct_up_to_verify_length": true
+  },
+  "first symbol equals last symbol": {
+   "size": 16,
+   "program": "accept(<=(#(true), ?(Q_a, #(<=(1, #(Q_a))), #(<=(1, #(Q_b))))))",
+   "correct_up_to_verify_length": true
+  },
+  "a*b*a*": {
+   "size": 15,
+   "program": "accept(<=(#(Q_b), #(and(Q_b, <=(#(<=(1, #(Q_b))), #(Q_b))))))",
+   "correct_up_to_verify_length": true
+  },
+  "a^n b^n": {
+   "size": 15,
+   "program": "accept(and(<=(#(Q_a), #(Q_b)), <=(#(<=(1, #(Q_b))), #(Q_a))))",
+   "correct_up_to_verify_length": true
+  },
+  "Dyck-1 (a = open, b = close)": {
+   "size": 15,
+   "program": "accept(<=(max(#(Q_a), #(Q_b)), #(and(Q_b, <=(#(Q_b), #(Q_a))))))",
+   "correct_up_to_verify_length": true
+  },
+  "even number of a's (parity)": {
+   "size": null,
+   "program": null
+  }
+ },
+ "merges": [
+  {
+   "programs": [
+    "accept(true)",
+    "accept(<=(min(#(Q_a), #(Q_b)), +(1, 1)))"
+   ],
+   "shortest_difference": "aaabbb"
+  },
+  {
+   "programs": [
+    "accept(<=(#(Q_a), #(Q_b)))",
+    "accept(<=(#(Q_a), min(#(Q_b), +(1, 1))))"
+   ],
+   "shortest_difference": "aaabbb"
+  },
+  {
+   "programs": [
+    "accept(<=(#(Q_b), #(Q_a)))",
+    "accept(<=(#(Q_b), min(#(Q_a), +(1, 1))))"
+   ],
+   "shortest_difference": "aaabbb"
+  },
+  {
+   "programs": [
+    "accept(<=(#(Q_a), +(1, 1)))",
+    "accept(<=(#(Q_a), max(#(Q_b), +(1, 1))))"
+   ],
+   "shortest_difference": "aaabbb"
+  },
+  {
+   "programs": [
+    "accept(<=(#(Q_b), +(1, 1)))",
+    "accept(<=(#(Q_b), max(#(Q_a), +(1, 1))))"
+   ],
+   "shortest_difference": "aaabbb"
+  }
+ ]
+}

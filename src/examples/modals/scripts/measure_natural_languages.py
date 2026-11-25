@@ -1,8 +1,9 @@
-from ultk.util.io import read_grammatical_expressions, write_languages
-from modals.grammar import modals_grammar
-from modals.meaning import universe as modals_universe
-from modals.measures import comm_cost, complexity, iff
-from modals.util import load_natural_languages
+from ultk.util.io import read_grammatical_expressions
+
+from ..grammar import modals_grammar
+from ..meaning import universe as modals_universe
+from ..measures import comm_cost, complexity, iff
+from ..util import load_natural_languages, write_languages
 
 if __name__ == "__main__":
     natural_languages = load_natural_languages()
