@@ -19,22 +19,25 @@ Each rule is defined by one function, whose type annotations give the rule's arg
 are applied to a `values.HasPositions`: a `meaning.StringReferent`, or a stand-in for all strings at once.  See
 `values.py` for how these interfaces fit together.
 
-The rules follow Definition 3.1 exactly:
+The rules follow Definition 3.1 exactly.  Each rule is written `name: argument types -> return type`, as in the
+signature of its function (a terminal rule has no arguments of these types):
 
-| C-RASP operation                | rule                                   |
-|---------------------------------|----------------------------------------|
-| P(i) := Q_a(i)                  | `Q_a : Booleans`                       |
-| P(i) := not P1(i)               | `not : Booleans -> Booleans`           |
-| P(i) := P1(i) and P2(i)         | `and : Booleans -> Booleans, Booleans` |
-| P(i) := C1(i) <= C2(i)          | `<= : Booleans -> Counts, Counts`      |
-| P(i) := 1                       | `true : Booleans`                      |
-| C(i) := #[j <= i] P(j)          | `# : Counts -> Booleans`               |
-| C(i) := P(i) ? C1(i) : C2(i)    | `? : Counts -> Booleans, Counts, Counts` |
-| C(i) := C1(i) + C2(i)           | `+ : Counts -> Counts, Counts`         |
-| C(i) := C1(i) - C2(i)           | `- : Counts -> Counts, Counts`         |
-| C(i) := min(C1(i), C2(i))       | `min : Counts -> Counts, Counts`       |
-| C(i) := max(C1(i), C2(i))       | `max : Counts -> Counts, Counts`       |
-| C(i) := 1                       | `1 : Counts`                           |
+| C-RASP operation                | rule                                     |
+|---------------------------------|------------------------------------------|
+| P(i) := Q_a(i)                  | `Q_a: Booleans`                          |
+| P(i) := not P1(i)               | `not: Booleans -> Booleans`              |
+| P(i) := P1(i) and P2(i)         | `and: Booleans, Booleans -> Booleans`    |
+| P(i) := C1(i) <= C2(i)          | `<=: Counts, Counts -> Booleans`         |
+| P(i) := 1                       | `true: Booleans`                         |
+| C(i) := #[j <= i] P(j)          | `#: Booleans -> Counts`                  |
+| C(i) := P(i) ? C1(i) : C2(i)    | `?: Booleans, Counts, Counts -> Counts`  |
+| C(i) := C1(i) + C2(i)           | `+: Counts, Counts -> Counts`            |
+| C(i) := C1(i) - C2(i)           | `-: Counts, Counts -> Counts`            |
+| C(i) := min(C1(i), C2(i))       | `min: Counts, Counts -> Counts`          |
+| C(i) := max(C1(i), C2(i))       | `max: Counts, Counts -> Counts`          |
+| C(i) := 1                       | `1: Counts`                              |
+
+The start rule `accept: Booleans -> bool` turns a Boolean-valued operation into a whole program.
 """
 
 from collections.abc import Callable, Sequence
