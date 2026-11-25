@@ -94,3 +94,17 @@ class TestSemantics:
             Universe((TestSemantics.ref1,)),
         )
         assert len({meaning, Meaning(mapping, TestSemantics.universe)}) == 1
+
+    def test_meaning_dist(self):
+        meaning = Meaning((True, False, True, False), TestSemantics.universe)
+        # the default distribution is only computed when it is used
+        assert "dist" not in meaning.__dict__
+        assert meaning.dist == (0.5, 0, 0.5, 0)
+        assert meaning == Meaning(
+            (True, False, True, False), TestSemantics.universe, dist=(0.5, 0, 0.5, 0)
+        )
+        explicit = Meaning(
+            (True, False, True, False), TestSemantics.universe, dist=(0.9, 0, 0.1, 0)
+        )
+        assert explicit.dist == (0.9, 0, 0.1, 0)
+        assert explicit != meaning
