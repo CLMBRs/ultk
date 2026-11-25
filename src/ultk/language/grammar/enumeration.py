@@ -44,8 +44,9 @@ Examples:
 
 from collections import defaultdict
 from collections.abc import Hashable, Iterator, Sequence
+from dataclasses import dataclass
 from itertools import product
-from typing import Any, Callable, Generic, NamedTuple, TypeVar
+from typing import Any, Callable, Generic, TypeVar
 
 from ultk.language.grammar.grammar import Grammar, GrammaticalExpression, Rule
 from ultk.language.semantics import Meaning, Universe
@@ -126,7 +127,8 @@ class _DefaultRepresentation(MeaningRepresentation[Meaning]):
         return value
 
 
-class SemanticState(NamedTuple):
+@dataclass(frozen=True, slots=True)
+class SemanticState:
     """The minimal-cost representative of one meaning of one LHS, found during enumeration.
 
     Attributes:
