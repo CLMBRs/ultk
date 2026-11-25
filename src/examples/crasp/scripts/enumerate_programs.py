@@ -1,32 +1,18 @@
-"""Enumerate C-RASP programs in order of size, and report the minimal programs for some example languages.
+"""Enumerate C-RASP programs in order of size, and report the minimal programs for some named languages.
 
 From the `src/examples` directory, e.g.:
     python -m crasp.scripts.enumerate_programs --max_length 6 --max_cost 14
 """
 
 import argparse
-import re
 import time
 
 from ultk.language.grammar.enumeration import SemanticEnumerator
 
 from ..grammar import build_crasp_grammar
+from ..languages import NAMED_LANGUAGES
 from ..meaning import build_string_universe
-from ..representation import CRASPRepresentation
-
-# example languages from Yang & Chiang (2024), over the alphabet {a, b}, as regular expressions or predicates
-EXAMPLE_LANGUAGES = {
-    "a*b*": lambda string: re.fullmatch("a*b*", string) is not None,
-    "a*b*a*": lambda string: re.fullmatch("a*b*a*", string) is not None,
-    "Dyck-1 (a = open, b = close)": lambda string: all(
-        string[:end].count("a") >= string[:end].count("b")
-        for end in range(1, len(string) + 1)
-    )
-    and string.count("a") == string.count("b"),
-    "a^n b^n": lambda string: re.fullmatch("a*b*", string) is not None
-    and string.count("a") == string.count("b"),
-    "more a's than b's": lambda string: string.count("a") > string.count("b"),
-}
+from ..representations import REPRESENTATIONS
 
 
 def get_args() -> argparse.Namespace:
@@ -38,9 +24,11 @@ def get_args() -> argparse.Namespace:
         "--max_cost", type=int, default=13, help="maximum size of programs"
     )
     parser.add_argument(
-        "--default_representation",
-        action="store_true",
-        help="represent meanings as `Meaning`s (slower), instead of with `CRASPRepresentation`",
+        "--representation",
+        choices=["meaning", *REPRESENTATIONS],
+        default="packed",
+        help="how meanings are represented during enumeration: as `Meaning`s (slowest), "
+        "or with `BasicCRASPRepresentation` or `PackedCRASPRepresentation`",
     )
     return parser.parse_args()
 
@@ -50,7 +38,9 @@ if __name__ == "__main__":
     grammar = build_crasp_grammar(("a", "b"))
     universe = build_string_universe(("a", "b"), args.max_length)
     representation = (
-        None if args.default_representation else CRASPRepresentation(universe)
+        None
+        if args.representation == "meaning"
+        else REPRESENTATIONS[args.representation](universe)
     )
     enumerator = SemanticEnumerator(grammar, universe, representation=representation)
 
@@ -72,7 +62,7 @@ if __name__ == "__main__":
         f"expressible by programs of size <= {args.max_cost}\n"
     )
     meanings_by_mapping = {meaning.mapping: meaning for meaning in expressions}
-    for name, in_language in EXAMPLE_LANGUAGES.items():
+    for name, in_language in NAMED_LANGUAGES.items():
         mapping = tuple(in_language(referent.name) for referent in universe.referents)
         if mapping in meanings_by_mapping:
             expression = expressions[meanings_by_mapping[mapping]]

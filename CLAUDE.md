@@ -62,4 +62,4 @@ Tests are discovered automatically by pytest from `src/tests/`. The CI workflow 
 - `indefinites/` — efficient communication analysis of indefinite pronouns
 - `modals/` — semantic universals for modals
 - `learn_quant/` — quantifier learning
-- `crasp/` — minimal C-RASP programs; a multi-type grammar with a custom vectorized `MeaningRepresentation`
+- `crasp/` — minimal C-RASP programs; a multi-type grammar with custom vectorized `MeaningRepresentation`s (`representations/basic.py`, `representations/packed.py`), and benchmarks (`BENCHMARKS.md`)

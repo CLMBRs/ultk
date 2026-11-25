@@ -365,6 +365,20 @@ class SemanticEnumerator:
             lhs = self.grammar._start
         return dict(self._states[lhs])
 
+    def get_state(self, meaning: Hashable, lhs: Any = None) -> SemanticState:
+        """Get the state of one meaning found so far.
+
+        Args:
+            meaning: the meaning, as represented during enumeration (a key of `get_states(lhs)`)
+            lhs: defaults to the grammar's start symbol
+
+        Returns:
+            the `SemanticState` of the meaning
+        """
+        if lhs is None:
+            lhs = self.grammar._start
+        return self._states[lhs][meaning]
+
     def get_costs(self, lhs: Any = None) -> dict[Meaning, int]:
         """Get the minimal cost of every meaning found so far for an LHS.
 

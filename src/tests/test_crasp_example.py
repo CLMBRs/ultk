@@ -6,9 +6,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
 
 from crasp.grammar import build_crasp_grammar  # noqa: E402
 from crasp.meaning import build_string_universe  # noqa: E402
-from crasp.representation import CRASPRepresentation  # noqa: E402
+from crasp.representations import (  # noqa: E402
+    BasicCRASPRepresentation,
+    PackedCRASPRepresentation,
+)
 
 from ultk.language.grammar.enumeration import SemanticEnumerator  # noqa: E402
+from ultk.language.semantics import Referent, Universe  # noqa: E402
 
 
 def is_dyck(string: str) -> bool:
@@ -40,7 +44,7 @@ class TestCRASPExample:
         vectorized = SemanticEnumerator(
             self.grammar,
             self.universe,
-            representation=CRASPRepresentation(self.universe),
+            representation=BasicCRASPRepresentation(self.universe),
         )
         default.run(9)
         vectorized.run(9)
@@ -59,9 +63,37 @@ class TestCRASPExample:
         expressions = self.grammar.get_minimal_expressions(
             self.universe,
             max_cost=len(paper_program),
-            representation=CRASPRepresentation(self.universe),
+            representation=BasicCRASPRepresentation(self.universe),
         )
         minimal = expressions[meaning]
         assert len(minimal) <= len(paper_program)
         # the minimal program is a real program with the right meaning
         assert self.grammar.parse(str(minimal)).evaluate(self.universe) == meaning
+
+    def test_packed_representation_agrees_with_basic(self):
+        # a universe with every string up to length 4, and one which is missing many strings and prefixes
+        incomplete = Universe(
+            tuple(Referent(name) for name in ("b", "ab", "bba", "aab", "abab", "bbbb"))
+        )
+        for universe in (self.universe, incomplete):
+            basic = SemanticEnumerator(
+                self.grammar,
+                universe,
+                representation=BasicCRASPRepresentation(universe),
+            )
+            packed = SemanticEnumerator(
+                self.grammar,
+                universe,
+                representation=PackedCRASPRepresentation(universe),
+            )
+            basic.run(9)
+            packed.run(9)
+            for lhs in (bool, "P", "C"):
+                assert basic.get_costs(lhs) == packed.get_costs(lhs)
+            assert {
+                meaning: str(expression)
+                for meaning, expression in basic.get_expressions().items()
+            } == {
+                meaning: str(expression)
+                for meaning, expression in packed.get_expressions().items()
+            }

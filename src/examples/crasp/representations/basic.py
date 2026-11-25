@@ -1,4 +1,4 @@
-"""A vectorized `MeaningRepresentation` for C-RASP, for fast enumeration.
+"""The basic vectorized `MeaningRepresentation` for C-RASP, for fast enumeration.
 
 By default, `SemanticEnumerator` represents the meaning of a C-RASP operation as a `Meaning`, mapping each string to
 a tuple of values (one per position), and applies each rule's Python function string by string.  Here, instead, the value of
@@ -25,7 +25,7 @@ class PrefixValue:
     """The value of a C-RASP operation at every prefix: a numpy array, made hashable so it can be its own key.
 
     Attributes:
-        array: one value per prefix, in the order of `CRASPRepresentation.prefixes`
+        array: one value per prefix, in the order of `BasicCRASPRepresentation.prefixes`
     """
 
     __slots__ = ("array", "_hash")
@@ -45,7 +45,7 @@ class PrefixValue:
         )
 
 
-class CRASPRepresentation(MeaningRepresentation[PrefixValue]):
+class BasicCRASPRepresentation(MeaningRepresentation[PrefixValue]):
     """Computes the values of C-RASP operations at every prefix of every string in a universe.
 
     The value of an expression of type `"P"` is a boolean array, and of type `"C"` an integer array, each with
@@ -57,7 +57,7 @@ class CRASPRepresentation(MeaningRepresentation[PrefixValue]):
     """
 
     def __init__(self, universe: Universe):
-        """Create a CRASPRepresentation.
+        """Create a BasicCRASPRepresentation.
 
         Args:
             universe: a universe whose referents are named by non-empty strings (see `meaning.py`)

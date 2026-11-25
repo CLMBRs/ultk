@@ -8,8 +8,16 @@ It is also an example of a grammar with several types (Boolean-valued operations
 
 - `grammar.py`: the C-RASP grammar, with one rule per operation in Definition 3.1 of the paper, plus a start rule `accept`, which accepts a string iff a Boolean-valued operation is true at its last position.  Non-terminal `"P"` is for Boolean-valued operations and `"C"` for count-valued operations.  The value of an operation at a string is a tuple, with one entry per position.
 - `meaning.py`: the universe, whose referents are all non-empty strings up to a maximum length.
-- `representation.py`: `CRASPRepresentation`, which represents the meanings of operations as numpy arrays during enumeration.  Because C-RASP operations only look at the current and earlier positions, the value of an operation at position `i` of a string `w` is its value at the last position of the prefix `w[:i]`, so it stores one value per distinct prefix, instead of one per position of every string.
-- `scripts/enumerate_programs.py`: enumerates programs by size, and reports the minimal programs for some example languages from the paper.
+- `languages.py`: named formal languages (a\*b\*, Dyck-1, majority, ...) as predicates on strings, for looking up their minimal programs.
+- `representations/`: faster ways of representing meanings during enumeration.  Because C-RASP operations only look at the current and earlier positions, the value of an operation at position `i` of a string `w` is its value at the last position of the prefix `w[:i]`, so both store one value per distinct prefix, instead of one per position of every string.
+    - `basic.py`: `BasicCRASPRepresentation`, which stores each meaning as a numpy array.
+    - `packed.py`: `PackedCRASPRepresentation`, which bit-packs Boolean values and stores counts in the smallest integer type that holds them.  It uses much less memory, which is what limits enumeration over large universes.
+- `scripts/`:
+    - `enumerate_programs.py`: enumerates programs by size, and reports the minimal programs for the named languages.
+    - `benchmark.py`: records the time, memory and number of meanings found at each size, and can save every program found.
+    - `find_named_languages.py`: finds the minimal programs for the named languages among saved programs, and checks them on longer strings.
+- `outputs/benchmarks/`: results of the benchmarks.
+- `BENCHMARKS.md`: how far enumeration goes, with universes of up to 2 million strings, and how the results were produced.
 
 ## Usage
 
@@ -19,7 +27,7 @@ From the `src/examples` directory:
 python -m crasp.scripts.enumerate_programs --max_length 6 --max_cost 15
 ```
 
-With strings up to length 6, this finds all 15,478 languages expressible by programs of size at most 15 in about 20 seconds.  Some of the minimal programs found:
+With strings up to length 6, this finds all 15,478 languages expressible by programs of size at most 15.  Some of the minimal programs found:
 
 | language | size | minimal program |
 |---|---|---|
@@ -28,6 +36,8 @@ With strings up to length 6, this finds all 15,478 languages expressible by prog
 | a\*b\*a\* | 15 | `accept(<=(#(Q_b), #(and(Q_b, <=(#(<=(1, #(Q_b))), #(Q_b))))))` |
 | aⁿbⁿ | 15 | `accept(and(<=(#(Q_a), #(Q_b)), <=(#(<=(1, #(Q_b))), #(Q_a))))` |
 | Dyck-1 (a = open, b = close) | 15 | `accept(<=(max(#(Q_a), #(Q_b)), #(and(Q_b, <=(#(Q_b), #(Q_a))))))` |
+
+See `BENCHMARKS.md` for larger universes and more languages.
 
 ## Notes
 
