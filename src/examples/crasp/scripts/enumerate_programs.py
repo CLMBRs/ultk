@@ -8,11 +8,11 @@ import argparse
 import re
 import time
 
-from ultk.language.grammar.enumeration import PointwiseSemantics, SemanticEnumerator
+from ultk.language.grammar.enumeration import SemanticEnumerator
 
 from ..grammar import build_crasp_grammar
 from ..meaning import build_string_universe
-from ..semantics import CRASPSemantics
+from ..representation import CRASPRepresentation
 
 # example languages from Yang & Chiang (2024), over the alphabet {a, b}, as regular expressions or predicates
 EXAMPLE_LANGUAGES = {
@@ -38,9 +38,9 @@ def get_args() -> argparse.Namespace:
         "--max_cost", type=int, default=13, help="maximum size of programs"
     )
     parser.add_argument(
-        "--pointwise",
+        "--default_representation",
         action="store_true",
-        help="use the (slower) default semantics, instead of the vectorized one",
+        help="represent meanings as `Meaning`s (slower), instead of with `CRASPRepresentation`",
     )
     return parser.parse_args()
 
@@ -49,10 +49,10 @@ if __name__ == "__main__":
     args = get_args()
     grammar = build_crasp_grammar(("a", "b"))
     universe = build_string_universe(("a", "b"), args.max_length)
-    semantics = (
-        PointwiseSemantics(universe) if args.pointwise else CRASPSemantics(universe)
+    representation = (
+        None if args.default_representation else CRASPRepresentation(universe)
     )
-    enumerator = SemanticEnumerator(grammar, semantics)
+    enumerator = SemanticEnumerator(grammar, universe, representation=representation)
 
     start = time.time()
     for cost in range(1, args.max_cost + 1):

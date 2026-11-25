@@ -4,11 +4,7 @@ from typing import Any, Callable
 
 import pytest
 
-from ultk.language.grammar.enumeration import (
-    PointwiseSemantics,
-    SemanticEnumerator,
-    unit_cost,
-)
+from ultk.language.grammar.enumeration import SemanticEnumerator, unit_cost
 from ultk.language.grammar.grammar import Grammar, Rule
 from ultk.language.semantics import Referent, Universe
 
@@ -51,7 +47,9 @@ def brute_force_costs(
 
 
 def enumerated_costs(enumerator: SemanticEnumerator, lhs: Any) -> dict[tuple, int]:
-    return {state.value: state.cost for state in enumerator.get_states(lhs).values()}
+    return {
+        meaning.mapping: cost for meaning, cost in enumerator.get_costs(lhs).items()
+    }
 
 
 class TestEnumeration:
@@ -83,17 +81,13 @@ class TestEnumeration:
         numbers_grammar.add_rule(Rule(f"{num}", int, None, lambda *args, num=num: num))
 
     def test_minimal_costs_boolean(self):
-        enumerator = SemanticEnumerator(
-            self.boolean_grammar, PointwiseSemantics(self.boolean_universe)
-        )
+        enumerator = SemanticEnumerator(self.boolean_grammar, self.boolean_universe)
         enumerator.run(7)
         expected = brute_force_costs(self.boolean_grammar, self.boolean_universe, 7)
         assert enumerated_costs(enumerator, bool) == expected[bool]
 
     def test_minimal_costs_multiple_types(self):
-        enumerator = SemanticEnumerator(
-            self.numbers_grammar, PointwiseSemantics(self.numbers_universe)
-        )
+        enumerator = SemanticEnumerator(self.numbers_grammar, self.numbers_universe)
         enumerator.run(7)
         expected = brute_force_costs(self.numbers_grammar, self.numbers_universe, 7)
         for lhs in (bool, int):
@@ -104,7 +98,7 @@ class TestEnumeration:
             return {"and": 3, "or": 2, "not": 2}.get(rule.name, 1)
 
         enumerator = SemanticEnumerator(
-            self.boolean_grammar, PointwiseSemantics(self.boolean_universe), cost=cost
+            self.boolean_grammar, self.boolean_universe, cost=cost
         )
         enumerator.run(9)
         expected = brute_force_costs(
@@ -136,9 +130,7 @@ class TestEnumeration:
             assert len(minimal[meaning]) <= len(expression)
 
     def test_saturation(self):
-        enumerator = SemanticEnumerator(
-            self.boolean_grammar, PointwiseSemantics(self.boolean_universe)
-        )
+        enumerator = SemanticEnumerator(self.boolean_grammar, self.boolean_universe)
         enumerator.run(1000)
         assert enumerator.is_saturated
         assert enumerator.completed_cost < 1000
@@ -146,18 +138,16 @@ class TestEnumeration:
         assert len(enumerator.get_states()) == 2**8
 
     def test_resume(self):
-        semantics = PointwiseSemantics(self.numbers_universe)
-        resumed = SemanticEnumerator(self.numbers_grammar, semantics)
+        resumed = SemanticEnumerator(self.numbers_grammar, self.numbers_universe)
         resumed.run(4)
         resumed.run(7)
-        fresh = SemanticEnumerator(self.numbers_grammar, semantics)
+        fresh = SemanticEnumerator(self.numbers_grammar, self.numbers_universe)
         fresh.run(7)
         for lhs in (bool, int):
             assert enumerated_costs(resumed, lhs) == enumerated_costs(fresh, lhs)
 
     def test_max_meanings(self):
-        semantics = PointwiseSemantics(self.boolean_universe)
-        enumerator = SemanticEnumerator(self.boolean_grammar, semantics)
+        enumerator = SemanticEnumerator(self.boolean_grammar, self.boolean_universe)
         enumerator.run(1000, max_meanings=50)
         assert len(enumerator.get_states()) == 50
         # the meanings found so far still have minimal costs, and resuming finds the rest
@@ -186,6 +176,6 @@ class TestEnumeration:
         with pytest.raises(ValueError):
             SemanticEnumerator(
                 self.boolean_grammar,
-                PointwiseSemantics(self.boolean_universe),
+                self.boolean_universe,
                 cost=lambda rule: 0.5,
             )

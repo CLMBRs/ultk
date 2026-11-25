@@ -2,13 +2,13 @@
 
 This example enumerates programs of C-RASP, the RASP variant defined in [Yang & Chiang (2024), "Counting Like Transformers: Compiling Temporal Counting Logic Into Softmax Transformers"](https://openreview.net/forum?id=FmhPg4UJ9K), in order of size.  For every formal language (restricted to a finite set of strings) that is expressible by a C-RASP program, it finds a program of minimal size.
 
-It is also an example of a grammar with several types (Boolean-valued operations, count-valued operations, and whole programs), and of using a custom `Semantics` to speed up enumeration (see `ultk.language.grammar.enumeration`).
+It is also an example of a grammar with several types (Boolean-valued operations, count-valued operations, and whole programs), and of using a custom `MeaningRepresentation` to speed up enumeration (see `ultk.language.grammar.enumeration`).
 
 ## Contents
 
 - `grammar.py`: the C-RASP grammar, with one rule per operation in Definition 3.1 of the paper, plus a start rule `accept`, which accepts a string iff a Boolean-valued operation is true at its last position.  Non-terminal `"P"` is for Boolean-valued operations and `"C"` for count-valued operations.  The value of an operation at a string is a tuple, with one entry per position.
 - `meaning.py`: the universe, whose referents are all non-empty strings up to a maximum length.
-- `semantics.py`: `CRASPSemantics`, which computes the values of operations with numpy.  Because C-RASP operations only look at the current and earlier positions, the value of an operation at position `i` of a string `w` is its value at the last position of the prefix `w[:i]`, so it stores one value per distinct prefix, instead of one per position of every string.
+- `representation.py`: `CRASPRepresentation`, which represents the meanings of operations as numpy arrays during enumeration.  Because C-RASP operations only look at the current and earlier positions, the value of an operation at position `i` of a string `w` is its value at the last position of the prefix `w[:i]`, so it stores one value per distinct prefix, instead of one per position of every string.
 - `scripts/enumerate_programs.py`: enumerates programs by size, and reports the minimal programs for some example languages from the paper.
 
 ## Usage

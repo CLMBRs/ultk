@@ -53,3 +53,11 @@ class TestGrammar:
         print(enumed_grammar)
         for rule in enumed_grammar:
             print(rule)
+
+    def test_evaluate_new_universe(self):
+        parsed_expression = TestGrammar.grammar.parse(TestGrammar.geq2_expr_str)
+        parsed_expression.evaluate(TestGrammar.universe)
+        smaller_universe = Universe(tuple(TestGrammar.referents[2:]))
+        meaning = parsed_expression.evaluate(smaller_universe)
+        assert meaning.universe is smaller_universe
+        assert meaning.mapping == (False, True)

@@ -1,7 +1,7 @@
-"""A vectorized `Semantics` for C-RASP, for fast enumeration.
+"""A vectorized `MeaningRepresentation` for C-RASP, for fast enumeration.
 
-The default `PointwiseSemantics` represents the value of a C-RASP operation as a tuple (over strings) of
-tuples (over positions), and applies each rule's Python function string by string.  Here, instead, the value of
+By default, `SemanticEnumerator` represents the meaning of a C-RASP operation as a `Meaning`, mapping each string to
+a tuple of values (one per position), and applies each rule's Python function string by string.  Here, instead, the value of
 an operation is a single numpy array, and each rule is one numpy operation.
 
 Because C-RASP operations only look at positions up to the current one, the value of an operation at position `i`
@@ -16,7 +16,7 @@ from typing import Any, Sequence
 
 import numpy as np
 
-from ultk.language.grammar.enumeration import Semantics
+from ultk.language.grammar.enumeration import MeaningRepresentation
 from ultk.language.grammar.grammar import Rule
 from ultk.language.semantics import Meaning, Universe
 
@@ -25,7 +25,7 @@ class PrefixValue:
     """The value of a C-RASP operation at every prefix: a numpy array, made hashable so it can be its own key.
 
     Attributes:
-        array: one value per prefix, in the order of `CRASPSemantics.prefixes`
+        array: one value per prefix, in the order of `CRASPRepresentation.prefixes`
     """
 
     __slots__ = ("array", "_hash")
@@ -45,7 +45,7 @@ class PrefixValue:
         )
 
 
-class CRASPSemantics(Semantics[PrefixValue]):
+class CRASPRepresentation(MeaningRepresentation[PrefixValue]):
     """Computes the values of C-RASP operations at every prefix of every string in a universe.
 
     The value of an expression of type `"P"` is a boolean array, and of type `"C"` an integer array, each with
@@ -57,7 +57,7 @@ class CRASPSemantics(Semantics[PrefixValue]):
     """
 
     def __init__(self, universe: Universe):
-        """Create a CRASPSemantics.
+        """Create a CRASPRepresentation.
 
         Args:
             universe: a universe whose referents are named by non-empty strings (see `meaning.py`)

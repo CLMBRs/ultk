@@ -5,9 +5,9 @@ a _minimal_ expression that expresses it (e.g. to measure the complexity of a me
 length of its shortest expression).  Many syntactically distinct expressions share the same meaning,
 so this module searches over _meanings_ rather than over expressions.
 
-The core observation is that meanings in ULTK are compositional: the value of an expression
-`f(e1, ..., en)` at a referent depends only on the values of `e1, ..., en` at that same referent.
-Consequently, if two expressions of the same type (LHS) have the same meaning, one can be substituted
+The core observation is that meanings in ULTK are compositional: the meaning of an expression
+`f(e1, ..., en)` is `Meaning.apply(f, meaning(e1), ..., meaning(en))`, i.e. it depends only on the meanings of
+`e1, ..., en`.  Consequently, if two expressions of the same type (LHS) have the same meaning, one can be substituted
 for the other inside any larger expression without changing the larger expression's meaning.  So it
 suffices to keep a single, cheapest representative of every (LHS, meaning) pair, and to build larger
 expressions only out of those representatives.
@@ -20,9 +20,12 @@ whose minimal cost is less than `c` are already known, so a meaning that is firs
 grammars, specialized to integer costs (where the priority queue becomes a sequence of cost levels).
 
 Rather than build an expression tree for every candidate, the enumerator stores, for each new meaning,
-a back-pointer (the rule used and the meanings of its children).  The meaning of a candidate is computed
-directly from the meanings of its children, via a `Semantics` object.  `GrammaticalExpression`s are built
+a back-pointer (the rule used and the meanings of its children).  `GrammaticalExpression`s are built
 only at the end, and only for the minimal representatives.
+
+By default, meanings are `Meaning` objects, computed with `Meaning.from_function` and `Meaning.apply`, exactly as in
+`GrammaticalExpression.evaluate`.  For speed, a `MeaningRepresentation` can instead represent meanings in some other way
+during enumeration (e.g. as numpy arrays); see `src/examples/crasp` for an example.
 
 Examples:
 
@@ -34,7 +37,7 @@ Examples:
     >>> grammar.add_rule(Rule("+", int, (int, int), lambda x, y: x + y))
     >>> grammar.add_rule(Rule("n", int, None, lambda referent: referent.num))
     >>> grammar.add_rule(Rule("1", int, None, lambda *args: 1))
-    >>> enumerator = SemanticEnumerator(grammar, PointwiseSemantics(universe))
+    >>> enumerator = SemanticEnumerator(grammar, universe)
     >>> enumerator.run(max_cost=5)
     >>> expressions = enumerator.get_expressions()
 """
@@ -47,7 +50,7 @@ from typing import Any, Callable, Generic, NamedTuple, TypeVar
 from ultk.language.grammar.grammar import Grammar, GrammaticalExpression, Rule
 from ultk.language.semantics import Meaning, Universe
 
-V = TypeVar("V")
+V = TypeVar("V", bound=Hashable)
 
 # returned by `SemanticEnumerator._evaluate` when evaluation fails and errors are ignored
 _FAILED = object()
@@ -59,88 +62,68 @@ def unit_cost(rule: Rule) -> int:
     return 1
 
 
-class Semantics(Generic[V]):
-    """Computes the meanings of expressions compositionally, from the meanings of their children.
+class MeaningRepresentation(Generic[V]):
+    """An alternative representation of meanings, for faster enumeration with `SemanticEnumerator`.
 
-    A `Semantics` determines how the value of an expression over a whole universe is represented
-    during enumeration (type `V`).  Subclasses can use whatever representation is most efficient for
-    their domain (e.g. numpy arrays or bitsets), as long as `apply_rule` agrees with evaluating
-    the corresponding `GrammaticalExpression` referent-by-referent.
+    By default, `SemanticEnumerator` represents meanings as `Meaning` objects.  A `MeaningRepresentation`
+    can instead represent them in a more efficient domain-specific way (e.g. as numpy arrays), as long as
+    - values are hashable, and two values are equal iff they represent the same meaning, and
+    - `evaluate_terminal` and `apply_rule` agree with `GrammaticalExpression.evaluate`, as checked by `to_meaning`.
 
     Subclasses must implement `evaluate_terminal`, `apply_rule`, and `to_meaning`.
     """
 
     def evaluate_terminal(self, rule: Rule) -> V:
-        """Get the value of a terminal rule (one with no children).
+        """Get the meaning of a terminal rule (one with no children).
 
         Args:
             rule: a terminal rule
 
         Returns:
-            the value of the rule over the whole universe
+            the value representing the meaning of the rule
         """
         raise NotImplementedError
 
     def apply_rule(self, rule: Rule, children: Sequence[V]) -> V:
-        """Get the value of a non-terminal rule applied to children with the given values.
+        """Get the meaning of a non-terminal rule applied to children with the given meanings.
 
         Args:
             rule: a non-terminal rule
-            children: the values of the children, one per element of `rule.rhs`
+            children: the values representing the meanings of the children, one per element of `rule.rhs`
 
         Returns:
-            the value of the rule over the whole universe
+            the value representing the meaning of the rule applied to the children
         """
         raise NotImplementedError
-
-    def key(self, value: V) -> Hashable:
-        """Get a hashable key for a value; two values with the same key are treated as the same meaning.
-
-        Args:
-            value: a value computed by `evaluate_terminal` or `apply_rule`
-
-        Returns:
-            a hashable key, by default the value itself
-        """
-        return value  # type: ignore[return-value]
 
     def to_meaning(self, value: V, lhs: Any) -> Meaning:
         """Convert a value into a `Meaning`.
 
         Args:
             value: a value computed by `evaluate_terminal` or `apply_rule`
-            lhs: the LHS of the expressions with this value (for semantics whose representation depends on the type)
+            lhs: the LHS of the expressions with this value (for representations that depend on the type)
 
         Returns:
             the corresponding `Meaning`, which should equal `expression.evaluate(universe)` for
-            any expression with this value
+            any expression whose meaning is represented by this value
         """
         raise NotImplementedError
 
 
-class PointwiseSemantics(Semantics[tuple]):
-    """The default `Semantics`: values are tuples, parallel to `universe.referents`, and each rule's
-    `func` is applied referent-by-referent, exactly as in `GrammaticalExpression.__call__`.
-
-    Values (the outputs of each rule's `func`) must be hashable.
-    """
+class _DefaultRepresentation(MeaningRepresentation[Meaning]):
+    """Represents meanings as `Meaning` objects, computed as in `GrammaticalExpression.evaluate`."""
 
     def __init__(self, universe: Universe):
-        """Create a PointwiseSemantics.
-
-        Args:
-            universe: the universe over which expressions will be evaluated
-        """
         self.universe = universe
 
-    def evaluate_terminal(self, rule: Rule) -> tuple:
-        return tuple(rule.func(referent) for referent in self.universe.referents)
+    def evaluate_terminal(self, rule: Rule) -> Meaning:
+        return Meaning.from_function(rule.func, self.universe)
 
-    def apply_rule(self, rule: Rule, children: Sequence[tuple]) -> tuple:
-        return tuple(map(rule.func, *children))
+    def apply_rule(self, rule: Rule, children: Sequence[Meaning]) -> Meaning:
+        return Meaning.apply(rule.func, *children)
 
-    def to_meaning(self, value: tuple, lhs: Any) -> Meaning:
-        return Meaning(value, self.universe)
+    def to_meaning(self, value: Meaning, lhs: Any) -> Meaning:
+        return value
 
 
 class SemanticState(NamedTuple):
@@ -149,15 +132,13 @@ class SemanticState(NamedTuple):
     Attributes:
         cost: the minimal cost of an expression with this meaning
         rule: the top-most rule of a minimal expression
-        children: the keys (see `Semantics.key`) of the meanings of the children, one per element of
-            `rule.rhs`, or None if `rule` is terminal
-        value: the value of the meaning (see `Semantics`)
+        children: the meanings of the children (as represented during enumeration), one per element of `rule.rhs`,
+            or None if `rule` is terminal
     """
 
     cost: int
     rule: Rule
     children: tuple[Hashable, ...] | None
-    value: Any
 
 
 class SemanticEnumerator:
@@ -179,21 +160,26 @@ class SemanticEnumerator:
     def __init__(
         self,
         grammar: Grammar,
-        semantics: Semantics,
+        universe: Universe,
         cost: Callable[[Rule], int] = unit_cost,
+        representation: MeaningRepresentation | None = None,
         ignore_errors: bool = False,
     ):
         """Create a SemanticEnumerator.
 
         Args:
             grammar: the grammar whose expressions will be enumerated
-            semantics: computes meanings, e.g. `PointwiseSemantics(universe)`
+            universe: the universe over which expressions are evaluated
             cost: a function assigning a positive integer cost to each rule; defaults to 1 for every rule
+            representation: an alternative representation of meanings, for speed; by default, `Meaning`s are used
             ignore_errors: if True, candidate expressions whose evaluation raises an Exception are skipped;
                 if False (the default), the Exception is raised
         """
         self.grammar = grammar
-        self.semantics = semantics
+        self.universe = universe
+        self.representation: MeaningRepresentation[Any] = (
+            representation or _DefaultRepresentation(universe)
+        )
         self.ignore_errors = ignore_errors
         self._rules: list[Rule] = grammar.get_all_rules()
         self._rule_costs: dict[str, int] = {}
@@ -204,10 +190,10 @@ class SemanticEnumerator:
                     f"Rule costs must be positive integers, but rule {rule.name} has cost {rule_cost}."
                 )
             self._rule_costs[rule.name] = int(rule_cost)
-        # lhs -> key -> state
+        # lhs -> meaning -> state
         self._states: dict[Any, dict[Hashable, SemanticState]] = defaultdict(dict)
-        # lhs -> cost -> list of (key, value) of the states with that minimal cost, in order of discovery
-        self._levels: dict[Any, dict[int, list[tuple[Hashable, Any]]]] = defaultdict(
+        # lhs -> cost -> the meanings with that minimal cost, in order of discovery
+        self._levels: dict[Any, dict[int, list[Hashable]]] = defaultdict(
             lambda: defaultdict(list)
         )
         # all cost levels up to and including this one have been completely processed
@@ -261,7 +247,7 @@ class SemanticEnumerator:
             if self.is_saturated:
                 return
             for rule in self._rules:
-                for state_key in self._expand_rule(rule, cost):
+                for _ in self._expand_rule(rule, cost):
                     if (
                         max_meanings is not None
                         and rule.lhs == lhs
@@ -280,16 +266,16 @@ class SemanticEnumerator:
             cost: the total cost of the expressions
 
         Yields:
-            the key of each new meaning, as soon as it is added
+            each new meaning, as soon as it is added
         """
         budget = cost - self._rule_costs[rule.name]
         if budget < 0:
             return
         if rule.rhs is None:
             if budget == 0:
-                value = self._evaluate(rule, None)
-                if value is not _FAILED and self._add(rule, cost, None, value):
-                    yield self.semantics.key(value)
+                meaning = self._evaluate(rule, None)
+                if meaning is not _FAILED and self._add(rule, cost, None, meaning):
+                    yield meaning
             return
         child_levels = [self._levels[child_lhs] for child_lhs in rule.rhs]
         for child_costs in self._split_cost(child_levels, budget):
@@ -298,11 +284,9 @@ class SemanticEnumerator:
                 for levels, child_cost in zip(child_levels, child_costs)
             ]
             for children in product(*pools):
-                value = self._evaluate(rule, [child[1] for child in children])
-                if value is not _FAILED and self._add(
-                    rule, cost, tuple(child[0] for child in children), value
-                ):
-                    yield self.semantics.key(value)
+                meaning = self._evaluate(rule, children)
+                if meaning is not _FAILED and self._add(rule, cost, children, meaning):
+                    yield meaning
 
     @staticmethod
     def _split_cost(
@@ -330,16 +314,16 @@ class SemanticEnumerator:
             for rest_costs in SemanticEnumerator._split_cost(rest, budget - first_cost):
                 yield (first_cost,) + rest_costs
 
-    def _evaluate(self, rule: Rule, children: list | None) -> Any:
-        """Compute the value of a rule applied to children, handling errors according to `self.ignore_errors`.
+    def _evaluate(self, rule: Rule, children: tuple | None) -> Any:
+        """Compute the meaning of a rule applied to children, handling errors according to `self.ignore_errors`.
 
         Returns:
-            the value, or `_FAILED` if evaluation raised an Exception and errors are ignored
+            the meaning, or `_FAILED` if evaluation raised an Exception and errors are ignored
         """
         try:
             if children is None:
-                return self.semantics.evaluate_terminal(rule)
-            return self.semantics.apply_rule(rule, children)
+                return self.representation.evaluate_terminal(rule)
+            return self.representation.apply_rule(rule, children)
         except Exception:
             if self.ignore_errors:
                 return _FAILED
@@ -350,19 +334,18 @@ class SemanticEnumerator:
         rule: Rule,
         cost: int,
         children: tuple[Hashable, ...] | None,
-        value: Any,
+        meaning: Hashable,
     ) -> bool:
         """Record a meaning of `rule.lhs`, if it is new.
 
         Returns:
             whether the meaning was new
         """
-        key = self.semantics.key(value)
         states = self._states[rule.lhs]
-        if key in states:
+        if meaning in states:
             return False
-        states[key] = SemanticState(cost, rule, children, value)
-        self._levels[rule.lhs][cost].append((key, value))
+        states[meaning] = SemanticState(cost, rule, children)
+        self._levels[rule.lhs][cost].append(meaning)
         self._last_productive_cost = cost
         return True
 
@@ -373,7 +356,8 @@ class SemanticEnumerator:
             lhs: defaults to the grammar's start symbol
 
         Returns:
-            a dictionary from keys (see `Semantics.key`) to `SemanticState`s, in order of increasing cost
+            a dictionary from meanings (as represented during enumeration) to `SemanticState`s,
+            in order of increasing cost
         """
         if lhs is None:
             lhs = self.grammar._start
@@ -391,8 +375,8 @@ class SemanticEnumerator:
         if lhs is None:
             lhs = self.grammar._start
         return {
-            self.semantics.to_meaning(state.value, lhs): state.cost
-            for state in self._states[lhs].values()
+            self.representation.to_meaning(meaning, lhs): state.cost
+            for meaning, state in self._states[lhs].items()
         }
 
     def get_expressions(self, lhs: Any = None) -> dict[Meaning, GrammaticalExpression]:
@@ -413,42 +397,43 @@ class SemanticEnumerator:
         return {
             expression.meaning: expression
             for expression in (
-                self._build_expression(lhs, key, built) for key in self._states[lhs]
+                self._build_expression(lhs, meaning, built)
+                for meaning in self._states[lhs]
             )
         }
 
     def _build_expression(
         self,
         lhs: Any,
-        key: Hashable,
+        meaning: Hashable,
         built: dict[tuple[Any, Hashable], GrammaticalExpression],
     ) -> GrammaticalExpression:
         """Build the minimal expression for a meaning by following back-pointers.
 
         Args:
             lhs: the LHS of the meaning
-            key: the key of the meaning
-            built: a cache of expressions already built, keyed by (LHS, key)
+            meaning: the meaning, as represented during enumeration
+            built: a cache of expressions already built, keyed by (LHS, meaning)
 
         Returns:
             the minimal expression, with its meaning set
         """
-        if (lhs, key) in built:
-            return built[(lhs, key)]
-        state = self._states[lhs][key]
+        if (lhs, meaning) in built:
+            return built[(lhs, meaning)]
+        state = self._states[lhs][meaning]
         children = (
             None
             if state.children is None or state.rule.rhs is None
             else tuple(
-                self._build_expression(child_lhs, child_key, built)
-                for child_lhs, child_key in zip(state.rule.rhs, state.children)
+                self._build_expression(child_lhs, child_meaning, built)
+                for child_lhs, child_meaning in zip(state.rule.rhs, state.children)
             )
         )
         expression: GrammaticalExpression = GrammaticalExpression(
             rule_name=state.rule.name,
             func=state.rule.func,
             children=children,
-            meaning=self.semantics.to_meaning(state.value, lhs),
+            meaning=self.representation.to_meaning(meaning, lhs),
         )
-        built[(lhs, key)] = expression
+        built[(lhs, meaning)] = expression
         return expression

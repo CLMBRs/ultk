@@ -52,3 +52,45 @@ class TestSemantics:
     def test_universe_mismatch(self):
         refs = (TestSemantics.ref1,)
         assert Universe(refs) != TestSemantics.universe
+
+    def test_meaning_from_function(self):
+        meaning = Meaning.from_function(
+            lambda referent: referent.force == "weak", TestSemantics.universe
+        )
+        assert meaning.mapping == tuple(
+            referent.force == "weak" for referent in TestSemantics.universe.referents
+        )
+
+    def test_meaning_apply(self):
+        weak = Meaning.from_function(
+            lambda referent: referent.force == "weak", TestSemantics.universe
+        )
+        epistemic = Meaning.from_function(
+            lambda referent: referent.flavor == "epistemic", TestSemantics.universe
+        )
+        both = Meaning.apply(lambda p, q: p and q, weak, epistemic)
+        assert both.universe is TestSemantics.universe
+        assert both.mapping == tuple(
+            referent.name == "weak+epistemic"
+            for referent in TestSemantics.universe.referents
+        )
+        with pytest.raises(ValueError):
+            Meaning.apply(lambda p: p)
+        other_universe = Universe((TestSemantics.ref1,))
+        with pytest.raises(ValueError):
+            Meaning.apply(lambda p, q: p, weak, Meaning((True,), other_universe))
+
+    def test_meaning_equality_and_hash(self):
+        mapping = (True, False, True, False)
+        meaning = Meaning(mapping, TestSemantics.universe)
+        # an equal, but distinct, universe
+        equal_universe = Universe.from_dataframe(pd.DataFrame(TestSemantics.points))
+        assert meaning == Meaning(mapping, equal_universe)
+        assert hash(meaning) == hash(Meaning(mapping, equal_universe))
+        assert meaning != Meaning((True, True, True, False), TestSemantics.universe)
+        assert meaning != Meaning(mapping, TestSemantics.universe, dist=(1, 0, 0, 0))
+        assert meaning != Meaning(
+            (True,) * len(TestSemantics.ref1.__dict__),
+            Universe((TestSemantics.ref1,)),
+        )
+        assert len({meaning, Meaning(mapping, TestSemantics.universe)}) == 1

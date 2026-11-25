@@ -153,12 +153,35 @@ class GrammaticalExpression(Expression[T]):
         return "".join(child.yield_string() for child in self.children)
 
     def evaluate(self, universe: Universe) -> Meaning:
+        """Get the meaning of this expression over a universe.
+
+        The meaning is computed compositionally: the meaning of a terminal maps each referent to the value
+        of its function at that referent, and the meaning of any other expression applies its function,
+        referent-by-referent, to the meanings of its children (see `Meaning.apply`).  The meaning of every
+        sub-expression is stored in its `meaning` attribute, and reused by later calls with the same universe.
+
+        Args:
+            universe: the universe over which to evaluate this expression
+
+        Returns:
+            the meaning of this expression
+        """
         # NB: important to use `not self.meaning` and not `self.meaning is None` because of how
         # Expression.__init__ initializes an "empty" meaning if `None` is passed
-        if not self.meaning:
+        if self.meaning and (
+            self.meaning.universe is universe or self.meaning.universe == universe
+        ):
+            return self.meaning
+        if self.children is None:
+            self.meaning = Meaning.from_function(self.func, universe)
+        elif self.children:
+            self.meaning = Meaning.apply(
+                self.func, *(child.evaluate(universe) for child in self.children)
+            )
+        else:
+            # a function of no arguments
             self.meaning = Meaning(
-                tuple(self(referent) for referent in universe.referents),
-                universe,
+                tuple(self.func() for _ in universe.referents), universe
             )
         return self.meaning
 
@@ -610,7 +633,7 @@ class Grammar:
         lhs: Any = None,
         cost: Callable[[Rule], int] | None = None,
         max_meanings: int | None = None,
-        semantics: Any = None,
+        representation: Any = None,
         ignore_errors: bool = False,
     ) -> dict[Meaning, GrammaticalExpression]:
         """Get a minimal-cost expression for every meaning expressible with cost at most `max_cost`.
@@ -632,8 +655,8 @@ class Grammar:
             lhs: left hand side to start from; defaults to the grammar's start symbol
             cost: a function assigning a positive integer cost to each rule; defaults to 1 for every rule
             max_meanings: stop once this many meanings of `lhs` have been found
-            semantics: a `ultk.language.grammar.enumeration.Semantics`, for computing meanings
-                more efficiently than the default, which applies each rule's `func` referent-by-referent
+            representation: a `ultk.language.grammar.enumeration.MeaningRepresentation`, for representing
+                meanings more efficiently during enumeration; by default, `Meaning`s are used
             ignore_errors: if True, skip expressions whose evaluation raises an Exception
 
         Returns:
@@ -641,18 +664,15 @@ class Grammar:
             expression has minimal cost among all expressions of `lhs` with its meaning
         """
         # imported here to avoid a circular import
-        from ultk.language.grammar.enumeration import (
-            PointwiseSemantics,
-            SemanticEnumerator,
-            unit_cost,
-        )
+        from ultk.language.grammar.enumeration import SemanticEnumerator, unit_cost
 
         if lhs is None:
             lhs = self._start
         enumerator = SemanticEnumerator(
             self,
-            semantics or PointwiseSemantics(universe),
+            universe,
             cost=cost or unit_cost,
+            representation=representation,
             ignore_errors=ignore_errors,
         )
         enumerator.run(max_cost, lhs=lhs, max_meanings=max_meanings)
