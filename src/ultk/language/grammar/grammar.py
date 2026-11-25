@@ -41,6 +41,17 @@ def _is_terminal_type(annotation: Any, terminal_types: tuple[Any, ...]) -> bool:
     return False
 
 
+def _constant_terminal(func: Callable[[], Any]) -> Callable[[Any], Any]:
+    """Turn a function of no arguments into the function of a terminal rule, which takes the referent and ignores it."""
+
+    def terminal(referent: Any) -> Any:
+        return func()
+
+    terminal.__name__ = func.__name__
+    terminal.__doc__ = func.__doc__
+    return terminal
+
+
 @dataclass(frozen=True)
 class Rule:
     """Basic class for a grammar rule.  Grammar rules in ULTK correspond
@@ -102,6 +113,9 @@ class Rule:
         default, these are functions of a `Referent`.  A grammar whose terminals take something else (e.g. a protocol
         that referents implement) can pass its own `terminal_types`.
 
+        A function with no arguments (other than `weight` and `name`), such as `def one() -> int: return 1`, is a
+        constant: it also becomes a terminal rule, whose `func` takes the referent and ignores it.
+
         Args:
             func: a type-annotated function
             terminal_types: the argument types which make a function of one argument a terminal rule
@@ -133,11 +147,16 @@ class Rule:
         # a function of one argument, annotated with a terminal type, is a terminal: no children = None RHS
         if rhs and len(rhs) == 1 and _is_terminal_type(rhs[0], terminal_types):
             rhs = None
+        # a function of no arguments is a constant, i.e. a terminal which does not depend on the referent
+        rule_func = func
+        if rhs == ():
+            rhs = None
+            rule_func = _constant_terminal(func)
         return cls(
             name=rule_name,
             lhs=annotations.return_annotation,
             rhs=rhs,
-            func=func,
+            func=rule_func,
             weight=weight,
         )
 

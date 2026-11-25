@@ -82,3 +82,39 @@ class TestGrammar:
         # by default, only functions of a Referent are terminals
         assert not Rule.from_callable(num_protocol).is_terminal()
         assert Rule.from_callable(num_protocol, terminal_types=(HasNum,)).is_terminal()
+
+    def test_constant_rules(self):
+        # a function of no arguments is a constant: a terminal which ignores the referent
+        def num(referent: Referent) -> int:
+            return referent.num
+
+        def one() -> int:
+            return 1
+
+        def plus(x: int, y: int) -> int:
+            return x + y
+
+        grammar = Grammar(int)
+        for func in (num, one, plus):
+            grammar.add_rule(Rule.from_callable(func))
+        assert grammar._rules_by_name["one"].is_terminal()
+
+        expected = tuple(referent.num + 1 for referent in TestGrammar.referents)
+        assert (
+            grammar.parse("plus(num, one)").evaluate(TestGrammar.universe).mapping
+            == expected
+        )
+        minimal = grammar.get_minimal_expressions(TestGrammar.universe, max_cost=3)
+        assert {str(expression) for expression in minimal.values()} >= {
+            "one",
+            "plus(num, one)",
+        }
+        unique = grammar.get_unique_expressions(
+            2,
+            unique_key=lambda expression: expression.evaluate(TestGrammar.universe),
+            compare_func=lambda e1, e2: len(e1) < len(e2),
+        )
+        assert {str(expression) for expression in unique.values()} >= {
+            "one",
+            "plus(num, one)",
+        }
