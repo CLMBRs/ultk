@@ -1,17 +1,17 @@
+from ultk.effcomm.informativity import informativity
+from ultk.language.grammar.grammar import GrammaticalExpression
 from ultk.language.language import (
-    Language,
     Expression,
-    Meaning,
-    Referent,
+    Language,
     aggregate_expression_complexity,
 )
-from ultk.language.grammar.grammar import GrammaticalExpression
-from ultk.effcomm.informativity import informativity, build_pairwise_matrix
+from ultk.language.semantics import Meaning, Referent
 
 from .meaning import universe as modals_universe
 
 
 def half_credit_utility(m: Referent, m_: Referent) -> float:
+    """Half credit for guessing the right force, and half for guessing the right flavor."""
     score = 0.0
     if m.force == m_.force:
         score += 0.5
@@ -20,15 +20,10 @@ def half_credit_utility(m: Referent, m_: Referent) -> float:
     return score
 
 
-half_credit_util_matrix = build_pairwise_matrix(
-    modals_universe,
-    half_credit_utility,
-)
-
-
 def comm_cost(language: Language) -> float:
+    """Get C(L) := 1 - informativity(L), with literal agents and the half-credit utility."""
     return 1 - informativity(
-        language, modals_universe.prior_numpy, half_credit_util_matrix
+        language, modals_universe.prior_numpy, utility=half_credit_utility
     )
 
 
@@ -54,7 +49,13 @@ def iff(e: Expression) -> bool:
 
     The set of forces X that a modal lexical item m can express and the set of flavors be Y that m can express, then the full set of meaning points that m expresses is the Cartesian product of X and Y.
     """
-    points = {(ref.force, ref.flavor) for ref in e.meaning if e.meaning[ref]}
+    points = {
+        (referent.force, referent.flavor)
+        for referent, value in zip(e.meaning.universe.referents, e.meaning.mapping)
+        if value
+    }
+    if not points:
+        return True
     forces, flavors = zip(*points)
     return all(
         (force, flavor) in points for force in set(forces) for flavor in set(flavors)
