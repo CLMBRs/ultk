@@ -3,8 +3,9 @@
 Like `basic.py`, this stores the values of an operation at every prefix as a numpy array, but uses less memory:
 - Boolean values are bit-packed: one bit per prefix (or per string) instead of one byte.
 - Counts use the smallest integer type that holds them (`int8`, `int16` or `int32`).  The type is chosen from the values
-    themselves, so the same meaning is always stored with the same bytes.  Arithmetic is done in `int32` before
-    converting, so it cannot overflow.
+    themselves, so the same meaning is always stored with the same bytes.  Arithmetic is done in a type wide enough
+    that it cannot overflow before converting, so a result too large for `int32` raises an error instead of silently
+    overflowing.
 
 Memory is what limits enumeration over large universes (see `BENCHMARKS.md`), and almost all of it is used by the
 values of count-valued operations, so this makes much larger universes or programs feasible.
@@ -90,17 +91,19 @@ class PackedPrefixBooleans(Booleans):
         return PackedPrefixBooleans(np.bitwise_and(self.array, other.array), self.tree)
 
     def where(self, if_true: Counts, if_false: Counts) -> "PackedPrefixCounts":
-        return PackedPrefixCounts.from_int32(
+        return PackedPrefixCounts.from_integers(
             np.where(
                 self.unpack(),
-                if_true.array.astype(np.int32),
-                if_false.array.astype(np.int32),
+                if_true.array.astype(np.int64),
+                if_false.array.astype(np.int64),
             ),
             self.tree,
         )
 
     def count_so_far(self) -> "PackedPrefixCounts":
-        return PackedPrefixCounts.from_int32(self.tree.count(self.unpack()), self.tree)
+        return PackedPrefixCounts.from_integers(
+            self.tree.count(self.unpack()), self.tree
+        )
 
     def at_end(self) -> PackedAcceptance:
         accepted = self.unpack()[self.tree.string_indices]
@@ -130,17 +133,23 @@ class PackedPrefixCounts(Counts):
         self.tree = tree
 
     @classmethod
-    def from_int32(cls, values: np.ndarray, tree: PrefixTree) -> "PackedPrefixCounts":
+    def from_integers(
+        cls, values: np.ndarray, tree: PrefixTree
+    ) -> "PackedPrefixCounts":
         """Build from counts in any integer type, converting them to the smallest type that holds them."""
         return cls(_smallest_int(values), tree)
 
     def _arithmetic(
         self, operation: Callable[[np.ndarray, np.ndarray], np.ndarray], other: Counts
     ) -> "PackedPrefixCounts":
-        # in int32, so that the result cannot overflow before its type is chosen
-        return PackedPrefixCounts.from_int32(
-            operation(self.array.astype(np.int32), other.array.astype(np.int32)),
-            self.tree,
+        # Compute in a type wide enough that the result cannot overflow, so that a result out of the int32 range is
+        # caught by `_smallest_int`.  Values stored as int8 or int16 can be added or subtracted in int32 (the result has
+        # magnitude at most 2 * 32,768), which is faster; only an int32 operand needs int64.
+        wide = (
+            np.int64 if np.int32 in (self.array.dtype, other.array.dtype) else np.int32
+        )
+        return PackedPrefixCounts.from_integers(
+            operation(self.array.astype(wide), other.array.astype(wide)), self.tree
         )
 
     def __le__(self, other: Counts) -> PackedPrefixBooleans:
@@ -177,7 +186,7 @@ class PackedPrefixPositions(PrefixPositions):
         )
 
     def constant_counts(self, value: int) -> PackedPrefixCounts:
-        return PackedPrefixCounts.from_int32(
+        return PackedPrefixCounts.from_integers(
             np.full(len(self.tree), value, dtype=np.int32), self.tree
         )
 

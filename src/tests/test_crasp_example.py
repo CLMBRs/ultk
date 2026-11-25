@@ -51,7 +51,7 @@ def prefix_values(
     if isinstance(representation, PackedCRASPRepresentation):
         if array.dtype == bool:
             return PackedPrefixBooleans.pack(array, tree)
-        return PackedPrefixCounts.from_int32(array, tree)
+        return PackedPrefixCounts.from_integers(array, tree)
     if array.dtype == bool:
         return BasicPrefixBooleans(array, tree)
     return BasicPrefixCounts(array, tree)
@@ -215,3 +215,18 @@ class TestCRASPExample:
         with pytest.raises(ValueError):
             array[0] = 5
         assert value == HashableArray(np.array([1, 2, 3]))
+
+    def test_packed_counts_do_not_overflow(self):
+        # counts are stored in at most int32; a larger result must raise, not wrap around
+        tree = PackedCRASPRepresentation(self.universe).tree
+        largest = PackedPrefixCounts.from_integers(
+            np.full(len(tree), np.iinfo(np.int32).max, dtype=np.int64), tree
+        )
+        one = PackedPrefixCounts.from_integers(np.ones(len(tree), dtype=np.int64), tree)
+        with pytest.raises(OverflowError):
+            largest + one
+        smallest = PackedPrefixCounts.from_integers(
+            np.full(len(tree), np.iinfo(np.int32).min, dtype=np.int64), tree
+        )
+        with pytest.raises(OverflowError):
+            smallest - one
