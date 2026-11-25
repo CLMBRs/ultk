@@ -2,7 +2,7 @@
 
 These benchmarks measure enumerating C-RASP programs in order of size, over universes of *all* binary strings (alphabet {a, b}) up to some maximum length, with `ultk.language.grammar.enumeration.SemanticEnumerator`.
 
-**In short:** directly over all 2,097,150 strings up to length 20, enumeration reaches programs of size 10 in about 2.5 minutes, and then runs out of memory.  But up to the sizes we can reach, longer strings barely distinguish more programs: enumerating over strings up to length 12 reaches size 16 in under 4 minutes, and every named language's minimal program found that way is also correct, and minimal, on all strings up to length 20.
+**In short:** directly over all 2,097,150 strings up to length 20, enumeration reaches programs of size 10 in about 1.5 minutes, and then runs out of memory.  But up to the sizes we can reach, longer strings barely distinguish more programs: enumerating over strings up to length 12 reaches size 16 in under 3 minutes, and every named language's minimal program found that way is also correct, and minimal, on all strings up to length 20.
 
 ## Contents
 
@@ -21,7 +21,9 @@ These benchmarks measure enumerating C-RASP programs in order of size, over univ
 - **Universes**: all binary strings of length 1 to *L*, for *L* = 6, 8, 10, 12 and 20 (126 to 2,097,150 strings).
 - **Representations** (`representations/`):
     - `basic`: `BasicCRASPRepresentation`, one numpy value per distinct prefix (`bool` or `int64`).
-    - `packed`: `PackedCRASPRepresentation`, the same values with Booleans bit-packed and counts in the smallest integer type that holds them.  It gives exactly the same results as `basic` (checked in `src/tests/test_crasp_example.py`).
+    - `packed`: `PackedCRASPRepresentation`, the same values with Booleans bit-packed and counts in the smallest integer type that holds them.
+
+    Both compute values with the grammar's own rule functions (see `representations/prefix.py`), and give exactly the same results as each other and as `GrammaticalExpression.evaluate` (checked in `src/tests/test_crasp_example.py`).
 - **Machine**: a Linux cloud container with 4 vCPUs (Intel Xeon, 2.3 GHz) and 15 GB of memory, no swap; Python 3.13.18, numpy 2.3.5.  Enumeration is single-threaded.
 - **Limits**: each run was limited to 13.5 GB of virtual memory (`ulimit -v`), so running out of memory ends it cleanly.
 - **Measurements** (`scripts/benchmark.py`): for each size, the number of distinct meanings of each type found so far, the time spent enumerating (excluding setup, such as building the universe), and the peak memory of the process.  "Languages" counts distinct meanings of whole programs, i.e. distinct sets of accepted strings.
@@ -31,16 +33,16 @@ These benchmarks measure enumerating C-RASP programs in order of size, over univ
 
 ### Strings up to length 20
 
-All 2,097,150 binary strings of length 1 to 20.  Building the universe takes about 25 seconds and 1.5 GB, not included below.
+All 2,097,150 binary strings of length 1 to 20.  Building the universe takes about 20 seconds and 1.5 GB, not included below.
 
 | Size ≤ | Languages | Count-valued sub-programs | Time, packed | Peak memory, packed | Time, basic | Peak memory, basic |
 |---:|---:|---:|---:|---:|---:|---:|
-| 5 | 9 | 42 | 0.7 s | 1.5 GB | 2.7 s | 2.2 GB |
-| 6 | 16 | 92 | 2.1 s | 1.6 GB | 7.5 s | 3.0 GB |
-| 7 | 29 | 239 | 6.9 s | 1.9 GB | 20 s | 5.4 GB |
-| 8 | 71 | 624 | 19 s | 2.7 GB | 67 s | 11.7 GB |
-| 9 | 147 | 1,526 | 56 s | 4.5 GB | out of memory | |
-| 10 | 300 | 3,908 | 140 s | 9.3 GB | | |
+| 5 | 9 | 42 | 0.6 s | 1.5 GB | 1.6 s | 2.2 GB |
+| 6 | 16 | 92 | 1.5 s | 1.6 GB | 4.2 s | 3.0 GB |
+| 7 | 29 | 239 | 4.3 s | 1.9 GB | 13 s | 5.4 GB |
+| 8 | 71 | 624 | 13 s | 2.7 GB | 41 s | 11.6 GB |
+| 9 | 147 | 1,526 | 37 s | 4.5 GB | out of memory | |
+| 10 | 300 | 3,908 | 94 s | 9.3 GB | | |
 | 11 | | | out of memory | | | |
 
 Size 11 would need about 10,000 count-valued sub-programs of about 2 MB each, or about 21 GB.
@@ -65,11 +67,11 @@ Time and peak memory to reach each size:
 
 | Size ≤ | *L* = 6 | *L* = 8 | *L* = 10 | *L* = 12 | *L* = 20 |
 |---:|---:|---:|---:|---:|---:|
-| 10 | 0.15 s, 0.1 GB | 0.17 s, 0.1 GB | 0.29 s, 0.1 GB | 0.46 s, 0.1 GB | 140 s, 9.3 GB |
-| 12 | 1.4 s, 0.1 GB | 1.5 s, 0.1 GB | 1.8 s, 0.1 GB | 3.4 s, 0.3 GB | |
-| 14 | 9.7 s, 0.2 GB | 10.8 s, 0.2 GB | 14.1 s, 0.5 GB | 30 s, 1.5 GB | |
-| 15 | | | | 81 s, 3.9 GB | |
-| 16 | | | | 219 s, 10.1 GB | |
+| 10 | 0.15 s, 0.1 GB | 0.17 s, 0.1 GB | 0.21 s, 0.1 GB | 0.33 s, 0.1 GB | 94 s, 9.3 GB |
+| 12 | 1.1 s, 0.1 GB | 1.3 s, 0.1 GB | 1.6 s, 0.1 GB | 2.5 s, 0.3 GB | |
+| 14 | 8.8 s, 0.2 GB | 9.9 s, 0.3 GB | 12 s, 0.5 GB | 21 s, 1.5 GB | |
+| 15 | | | | 57 s, 3.9 GB | |
+| 16 | | | | 155 s, 10.1 GB | |
 | 17 | | | | out of memory | |
 
 Runs for *L* ≤ 10 were stopped at size 14; *L* = 12 ran until it ran out of memory.
@@ -124,7 +126,7 @@ For example, `min(#a, #b) <= 2` holds of every string up to length 5, but not of
 ## Main findings
 
 1. **Memory, not time, is the limit.**  Almost all memory holds the values of count-valued sub-programs (about 90% of all meanings found), at about one byte per prefix even when packed, and their number grows by a factor of about 2.6 per unit of size.  Enumeration is single-threaded, so more cores would not help; on this 15 GB machine, the limit is size 10 over strings up to length 20, and size 16 over strings up to length 12.
-2. **The packed representation is 3 to 4 times faster than the basic one, and uses much less memory**, over strings up to length 20 (e.g. 19 s and 2.7 GB versus 67 s and 11.7 GB to reach size 8, of which 1.5 GB is the universe itself).  It reaches size 10, where the basic one runs out of memory at size 9.
+2. **The packed representation is about 3 times faster than the basic one, and uses much less memory**, over strings up to length 20 (e.g. 13 s and 2.7 GB versus 41 s and 11.6 GB to reach size 8, of which 1.5 GB is the universe itself).  It reaches size 10, where the basic one runs out of memory at size 9.
 3. **For small programs, long strings add nothing.**  Over strings up to length 6 and up to length 20, enumeration finds exactly the same meanings, of every type, at every size up to 10.  A larger universe can only split meanings apart, never merge them, so equal counts mean the two universes group programs identically.  Up to size 14, strings up to length 10 and up to length 12 give the same languages.
 4. **The length needed grows slowly with program size**, roughly with the largest constant a program of that size can build: short strings cannot distinguish comparisons with constants that are larger than their counts can be (see the table above).
 5. **Recommended workflow for large universes**: enumerate over a moderate universe (strings up to length 10 or 12), and then check the programs of interest on the large one, as `find_named_languages --verify_length` does.  A program that passes the check is minimal for the large universe too.  This goes about 6 sizes further than enumerating over the large universe directly.

@@ -9,7 +9,7 @@
 {"size": 8, "languages": 71, "P": 147, "C": 624, "candidates": 2127, "level_seconds": 0.01, "total_seconds": 0.02, "peak_memory_gb": 0.07}
 {"size": 9, "languages": 147, "P": 300, "C": 1526, "candidates": 5924, "level_seconds": 0.04, "total_seconds": 0.06, "peak_memory_gb": 0.07}
 {"size": 10, "languages": 300, "P": 635, "C": 3908, "candidates": 16575, "level_seconds": 0.11, "total_seconds": 0.17, "peak_memory_gb": 0.07}
-{"size": 11, "languages": 635, "P": 1516, "C": 10113, "candidates": 44517, "level_seconds": 0.3, "total_seconds": 0.47, "peak_memory_gb": 0.08}
-{"size": 12, "languages": 1516, "P": 3378, "C": 26114, "candidates": 120789, "level_seconds": 1.0, "total_seconds": 1.47, "peak_memory_gb": 0.09}
-{"size": 13, "languages": 3378, "P": 7628, "C": 67484, "candidates": 332820, "level_seconds": 2.58, "total_seconds": 4.05, "peak_memory_gb": 0.13}
-{"size": 14, "languages": 7628, "P": 17940, "C": 176485, "candidates": 904213, "level_seconds": 6.76, "total_seconds": 10.81, "peak_memory_gb": 0.24}
+{"size": 11, "languages": 635, "P": 1516, "C": 10113, "candidates": 44517, "level_seconds": 0.29, "total_seconds": 0.46, "peak_memory_gb": 0.08}
+{"size": 12, "languages": 1516, "P": 3378, "C": 26114, "candidates": 120789, "level_seconds": 0.82, "total_seconds": 1.28, "peak_memory_gb": 0.09}
+{"size": 13, "languages": 3378, "P": 7628, "C": 67484, "candidates": 332820, "level_seconds": 2.31, "total_seconds": 3.59, "peak_memory_gb": 0.13}
+{"size": 14, "languages": 7628, "P": 17940, "C": 176485, "candidates": 904213, "level_seconds": 6.37, "total_seconds": 9.95, "peak_memory_gb": 0.25}

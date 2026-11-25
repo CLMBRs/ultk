@@ -1,9 +1,9 @@
-{"max_length": 20, "representation": "basic", "strings": 2097150, "setup_seconds": 25.23}
-{"size": 1, "languages": 0, "P": 3, "C": 1, "candidates": 4, "level_seconds": 0.06, "total_seconds": 0.06, "peak_memory_gb": 1.51}
-{"size": 2, "languages": 3, "P": 4, "C": 4, "candidates": 9, "level_seconds": 0.17, "total_seconds": 0.23, "peak_memory_gb": 1.52}
-{"size": 3, "languages": 4, "P": 4, "C": 6, "candidates": 17, "level_seconds": 0.14, "total_seconds": 0.37, "peak_memory_gb": 1.56}
-{"size": 4, "languages": 4, "P": 9, "C": 19, "candidates": 39, "level_seconds": 0.84, "total_seconds": 1.21, "peak_memory_gb": 1.79}
-{"size": 5, "languages": 9, "P": 16, "C": 42, "candidates": 100, "level_seconds": 1.5, "total_seconds": 2.71, "peak_memory_gb": 2.18}
-{"size": 6, "languages": 16, "P": 29, "C": 92, "candidates": 286, "level_seconds": 4.74, "total_seconds": 7.45, "peak_memory_gb": 3.0}
-{"size": 7, "languages": 29, "P": 71, "C": 239, "candidates": 863, "level_seconds": 12.43, "total_seconds": 19.88, "peak_memory_gb": 5.4}
-{"size": 8, "languages": 71, "P": 147, "C": 624, "candidates": 2127, "level_seconds": 46.62, "total_seconds": 66.5, "peak_memory_gb": 11.65}
+{"max_length": 20, "representation": "basic", "strings": 2097150, "setup_seconds": 20.43}
+{"size": 1, "languages": 0, "P": 3, "C": 1, "candidates": 4, "level_seconds": 0.02, "total_seconds": 0.02, "peak_memory_gb": 1.5}
+{"size": 2, "languages": 3, "P": 4, "C": 4, "candidates": 9, "level_seconds": 0.06, "total_seconds": 0.08, "peak_memory_gb": 1.5}
+{"size": 3, "languages": 4, "P": 4, "C": 6, "candidates": 17, "level_seconds": 0.1, "total_seconds": 0.18, "peak_memory_gb": 1.53}
+{"size": 4, "languages": 4, "P": 9, "C": 19, "candidates": 39, "level_seconds": 0.41, "total_seconds": 0.59, "peak_memory_gb": 1.76}
+{"size": 5, "languages": 9, "P": 16, "C": 42, "candidates": 100, "level_seconds": 1.02, "total_seconds": 1.61, "peak_memory_gb": 2.15}
+{"size": 6, "languages": 16, "P": 29, "C": 92, "candidates": 286, "level_seconds": 2.62, "total_seconds": 4.22, "peak_memory_gb": 2.97}
+{"size": 7, "languages": 29, "P": 71, "C": 239, "candidates": 863, "level_seconds": 8.72, "total_seconds": 12.94, "peak_memory_gb": 5.38}
+{"size": 8, "languages": 71, "P": 147, "C": 624, "candidates": 2127, "level_seconds": 28.11, "total_seconds": 41.05, "peak_memory_gb": 11.63}
