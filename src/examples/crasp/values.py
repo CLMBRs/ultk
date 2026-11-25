@@ -29,13 +29,19 @@ class HashableArray:
 
     Two `HashableArray`s are equal iff they have the same class, dtype and contents.
 
+    The hash is computed once, from the contents at construction, so the contents must never change afterwards.  A
+    `HashableArray` therefore takes ownership of its array and makes it read-only: writing to it, through this object or
+    any other reference to the same array, raises an error instead of silently invalidating the hash.  (Values are
+    always built from freshly computed arrays, so this does not need a copy.)
+
     Attributes:
-        array: the values
+        array: the values, read-only
     """
 
     __slots__ = ("array", "_hash")
 
     def __init__(self, array: np.ndarray):
+        array.flags.writeable = False
         self.array = array
         self._hash = hash((array.dtype.str, array.tobytes()))
 

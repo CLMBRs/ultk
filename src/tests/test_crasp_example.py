@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 # the C-RASP example lives in src/examples, which is not an installed package
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
@@ -23,7 +24,13 @@ from crasp.representations.packed import (  # noqa: E402
     PackedPrefixBooleans,
     PackedPrefixCounts,
 )
-from crasp.values import Booleans, Counts, StringBooleans, StringCounts  # noqa: E402
+from crasp.values import (  # noqa: E402
+    Booleans,
+    Counts,
+    HashableArray,
+    StringBooleans,
+    StringCounts,
+)
 
 from ultk.language.grammar.enumeration import SemanticEnumerator  # noqa: E402
 from ultk.language.semantics import Universe  # noqa: E402
@@ -198,3 +205,13 @@ class TestCRASPExample:
         assert len(minimal) <= len(paper_program)
         # the minimal program is a real program with the right meaning
         assert self.grammar.parse(str(minimal)).evaluate(self.universe) == meaning
+
+    def test_values_are_read_only(self):
+        # the hash of a value is computed once, so its array must not change afterwards
+        array = np.array([1, 2, 3])
+        value = HashableArray(array)
+        with pytest.raises(ValueError):
+            value.array[0] = 5
+        with pytest.raises(ValueError):
+            array[0] = 5
+        assert value == HashableArray(np.array([1, 2, 3]))
