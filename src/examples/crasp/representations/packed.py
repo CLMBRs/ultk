@@ -10,11 +10,13 @@ Memory is what limits enumeration over large universes (see `BENCHMARKS.md`), an
 values of count-valued operations, so this makes much larger universes or programs feasible.
 """
 
+from collections.abc import Callable
+
 import numpy as np
 
 from ultk.language.semantics import Universe
 
-from ..values import HashableArray, PositionValues, StringValues
+from ..values import Booleans, Counts, HashableArray, StringBooleans, StringCounts
 from .prefix import PrefixPositions, PrefixRepresentation, PrefixTree
 
 _INT_TYPES = (np.int8, np.int16, np.int32)
@@ -57,14 +59,11 @@ class PackedAcceptance(HashableArray):
         )
 
 
-class PackedPrefixValues(PositionValues):
-    """The values of a C-RASP operation at every prefix of the strings in a universe, stored compactly.
-
-    Boolean values are bit-packed into `uint8`s, and counts are stored as `int8`, `int16` or `int32`, so the two can
-    be told apart by their dtype.
+class PackedPrefixBooleans(Booleans):
+    """The values of a Boolean-valued C-RASP operation at every prefix of the strings in a universe, bit-packed.
 
     Attributes:
-        array: the values at every prefix (in the order of `tree.prefixes`)
+        array: one bit per prefix (in the order of `tree.prefixes`), packed into `uint8`s
         tree: the prefixes
     """
 
@@ -74,91 +73,112 @@ class PackedPrefixValues(PositionValues):
         super().__init__(array)
         self.tree = tree
 
-    @property
-    def is_boolean(self) -> bool:
-        return self.array.dtype == np.uint8
+    @classmethod
+    def pack(cls, values: np.ndarray, tree: PrefixTree) -> "PackedPrefixBooleans":
+        """Build from one unpacked `bool` per prefix."""
+        return cls(np.packbits(values), tree)
 
-    def _booleans(self) -> np.ndarray:
-        """The Boolean values, one per prefix, unpacked."""
+    def unpack(self) -> np.ndarray:
+        """One `bool` per prefix."""
         return np.unpackbits(self.array, count=len(self.tree)).astype(bool)
 
-    def _from_booleans(self, values: np.ndarray) -> "PackedPrefixValues":
-        return PackedPrefixValues(np.packbits(values), self.tree)
-
-    def _from_counts(self, values: np.ndarray) -> "PackedPrefixValues":
-        return PackedPrefixValues(_smallest_int(values), self.tree)
-
-    def _arithmetic(
-        self, operation, other: "PackedPrefixValues"
-    ) -> "PackedPrefixValues":
-        # in int32, so that the result cannot overflow before its type is chosen
-        return self._from_counts(
-            operation(self.array.astype(np.int32), other.array.astype(np.int32))
-        )
-
-    def __invert__(self) -> "PackedPrefixValues":
+    def __invert__(self) -> "PackedPrefixBooleans":
         # negate the unpacked values, so that the padding bits in the last byte stay 0
-        return self._from_booleans(np.logical_not(self._booleans()))
+        return PackedPrefixBooleans.pack(np.logical_not(self.unpack()), self.tree)
 
-    def __and__(self, other: "PackedPrefixValues") -> "PackedPrefixValues":
-        return PackedPrefixValues(np.bitwise_and(self.array, other.array), self.tree)
+    def __and__(self, other: Booleans) -> "PackedPrefixBooleans":
+        return PackedPrefixBooleans(np.bitwise_and(self.array, other.array), self.tree)
 
-    def __le__(self, other: "PackedPrefixValues") -> "PackedPrefixValues":
-        return self._from_booleans(self.array <= other.array)
-
-    def __add__(self, other: "PackedPrefixValues") -> "PackedPrefixValues":
-        return self._arithmetic(np.add, other)
-
-    def __sub__(self, other: "PackedPrefixValues") -> "PackedPrefixValues":
-        return self._arithmetic(np.subtract, other)
-
-    def minimum(self, other: "PackedPrefixValues") -> "PackedPrefixValues":
-        return self._arithmetic(np.minimum, other)
-
-    def maximum(self, other: "PackedPrefixValues") -> "PackedPrefixValues":
-        return self._arithmetic(np.maximum, other)
-
-    def where(
-        self, if_true: "PackedPrefixValues", if_false: "PackedPrefixValues"
-    ) -> "PackedPrefixValues":
-        return self._from_counts(
+    def where(self, if_true: Counts, if_false: Counts) -> "PackedPrefixCounts":
+        return PackedPrefixCounts.from_int32(
             np.where(
-                self._booleans(),
+                self.unpack(),
                 if_true.array.astype(np.int32),
                 if_false.array.astype(np.int32),
-            )
+            ),
+            self.tree,
         )
 
-    def count_so_far(self) -> "PackedPrefixValues":
-        return self._from_counts(self.tree.count(self._booleans()))
+    def count_so_far(self) -> "PackedPrefixCounts":
+        return PackedPrefixCounts.from_int32(self.tree.count(self.unpack()), self.tree)
 
     def at_end(self) -> PackedAcceptance:
-        accepted = self._booleans()[self.tree.string_indices]
+        accepted = self.unpack()[self.tree.string_indices]
         return PackedAcceptance(np.packbits(accepted), len(accepted))
 
-    def per_string(self) -> tuple[StringValues, ...]:
+    def per_string(self) -> tuple[StringBooleans, ...]:
         """The values at each position of each string in the universe."""
-        values = self._booleans() if self.is_boolean else self.array
+        values = self.unpack()
         return tuple(
-            StringValues(values[indices]) for indices in self.tree.position_indices
+            StringBooleans(values[indices]) for indices in self.tree.position_indices
+        )
+
+
+class PackedPrefixCounts(Counts):
+    """The values of a count-valued C-RASP operation at every prefix of the strings in a universe, in the smallest
+    integer type that holds them.
+
+    Attributes:
+        array: one count per prefix (in the order of `tree.prefixes`), as `int8`, `int16` or `int32`
+        tree: the prefixes
+    """
+
+    __slots__ = ("tree",)
+
+    def __init__(self, array: np.ndarray, tree: PrefixTree):
+        super().__init__(array)
+        self.tree = tree
+
+    @classmethod
+    def from_int32(cls, values: np.ndarray, tree: PrefixTree) -> "PackedPrefixCounts":
+        """Build from counts in any integer type, converting them to the smallest type that holds them."""
+        return cls(_smallest_int(values), tree)
+
+    def _arithmetic(
+        self, operation: Callable[[np.ndarray, np.ndarray], np.ndarray], other: Counts
+    ) -> "PackedPrefixCounts":
+        # in int32, so that the result cannot overflow before its type is chosen
+        return PackedPrefixCounts.from_int32(
+            operation(self.array.astype(np.int32), other.array.astype(np.int32)),
+            self.tree,
+        )
+
+    def __le__(self, other: Counts) -> PackedPrefixBooleans:
+        return PackedPrefixBooleans.pack(self.array <= other.array, self.tree)
+
+    def __add__(self, other: Counts) -> "PackedPrefixCounts":
+        return self._arithmetic(np.add, other)
+
+    def __sub__(self, other: Counts) -> "PackedPrefixCounts":
+        return self._arithmetic(np.subtract, other)
+
+    def minimum(self, other: Counts) -> "PackedPrefixCounts":
+        return self._arithmetic(np.minimum, other)
+
+    def maximum(self, other: Counts) -> "PackedPrefixCounts":
+        return self._arithmetic(np.maximum, other)
+
+    def per_string(self) -> tuple[StringCounts, ...]:
+        """The values at each position of each string in the universe."""
+        return tuple(
+            StringCounts(self.array[indices]) for indices in self.tree.position_indices
         )
 
 
 class PackedPrefixPositions(PrefixPositions):
-    """Builds the values of terminal rules as `PackedPrefixValues`."""
+    """Builds the values of terminal rules as `PackedPrefixBooleans` and `PackedPrefixCounts`."""
 
-    def symbol_is(self, symbol: str) -> PackedPrefixValues:
-        return PackedPrefixValues(
-            np.packbits(self.tree.last_symbols == symbol), self.tree
+    def symbol_is(self, symbol: str) -> PackedPrefixBooleans:
+        return PackedPrefixBooleans.pack(self.tree.last_symbols == symbol, self.tree)
+
+    def constant_booleans(self, value: bool) -> PackedPrefixBooleans:
+        return PackedPrefixBooleans.pack(
+            np.full(len(self.tree), value, dtype=bool), self.tree
         )
 
-    def constant(self, value: bool | int) -> PackedPrefixValues:
-        if isinstance(value, bool):
-            return PackedPrefixValues(
-                np.packbits(np.full(len(self.tree), value)), self.tree
-            )
-        return PackedPrefixValues(
-            _smallest_int(np.full(len(self.tree), value, dtype=np.int32)), self.tree
+    def constant_counts(self, value: int) -> PackedPrefixCounts:
+        return PackedPrefixCounts.from_int32(
+            np.full(len(self.tree), value, dtype=np.int32), self.tree
         )
 
 

@@ -15,14 +15,15 @@ from crasp.representations import (  # noqa: E402
 )
 from crasp.representations.basic import (  # noqa: E402
     BasicAcceptance,
-    BasicPrefixValues,
+    BasicPrefixBooleans,
+    BasicPrefixCounts,
 )
 from crasp.representations.packed import (  # noqa: E402
     PackedAcceptance,
-    PackedPrefixValues,
-    _smallest_int,
+    PackedPrefixBooleans,
+    PackedPrefixCounts,
 )
-from crasp.values import StringValues  # noqa: E402
+from crasp.values import Booleans, Counts, StringBooleans, StringCounts  # noqa: E402
 
 from ultk.language.grammar.enumeration import SemanticEnumerator  # noqa: E402
 from ultk.language.semantics import Universe  # noqa: E402
@@ -35,27 +36,51 @@ def is_dyck(string: str) -> bool:
     ) and string.count("a") == string.count("b")
 
 
-def prefix_values(representation: PrefixRepresentation, array: np.ndarray):
-    """Build the values at every prefix for a representation, from one value per prefix."""
+def prefix_values(
+    representation: PrefixRepresentation, array: np.ndarray
+) -> Booleans | Counts:
+    """Build the values at every prefix for a representation, from one value per prefix (`bool`s or integers)."""
     tree = representation.tree
     if isinstance(representation, PackedCRASPRepresentation):
-        stored = np.packbits(array) if array.dtype == bool else _smallest_int(array)
-        return PackedPrefixValues(stored, tree)
-    return BasicPrefixValues(array, tree)
+        if array.dtype == bool:
+            return PackedPrefixBooleans.pack(array, tree)
+        return PackedPrefixCounts.from_int32(array, tree)
+    if array.dtype == bool:
+        return BasicPrefixBooleans(array, tree)
+    return BasicPrefixCounts(array, tree)
 
 
-def canonical(representation: PrefixRepresentation, value):
-    """Rebuild a value from what it represents, so that it is stored canonically: equal meanings must be stored with
-    equal bytes, or the enumerator would treat them as different meanings."""
+def string_values(array: np.ndarray) -> StringBooleans | StringCounts:
+    """Build the values at each position of one string, from one value per position (`bool`s or integers)."""
+    return StringBooleans(array) if array.dtype == bool else StringCounts(array)
+
+
+def smallest_int_type(values: np.ndarray) -> type:
+    """The smallest of `int8`, `int16` and `int32` that holds all of `values`, computed independently of `packed.py`."""
+    for dtype in (np.int8, np.int16, np.int32):
+        if np.iinfo(dtype).min <= values.min() and values.max() <= np.iinfo(dtype).max:
+            return dtype
+    raise OverflowError
+
+
+def canonical(value):
+    """Rebuild a value from what it represents, in the canonical form described in `representations/`, independently of
+    the code that built it.  Equal meanings must be stored with equal bytes, or the enumerator would treat them as
+    different meanings."""
     if isinstance(value, BasicAcceptance):
-        return BasicAcceptance(np.array(value.per_string()))
+        return BasicAcceptance(np.array(value.per_string(), dtype=bool))
     if isinstance(value, PackedAcceptance):
-        accepted = np.array(value.per_string())
+        accepted = np.array(value.per_string(), dtype=bool)
         return PackedAcceptance(np.packbits(accepted), len(accepted))
-    if isinstance(value, PackedPrefixValues):
-        array = value._booleans() if value.is_boolean else value.array.astype(np.int64)
-        return prefix_values(representation, array)
-    return prefix_values(representation, value.array)
+    if isinstance(value, BasicPrefixBooleans):
+        return BasicPrefixBooleans(value.array.astype(bool), value.tree)
+    if isinstance(value, BasicPrefixCounts):
+        return BasicPrefixCounts(value.array.astype(np.int64), value.tree)
+    if isinstance(value, PackedPrefixBooleans):
+        bits = np.unpackbits(value.array, count=len(value.tree)).astype(bool)
+        return PackedPrefixBooleans(np.packbits(bits), value.tree)
+    values = value.array.astype(np.int64)
+    return PackedPrefixCounts(values.astype(smallest_int_type(values)), value.tree)
 
 
 class TestCRASPExample:
@@ -101,21 +126,21 @@ class TestCRASPExample:
                         )
                         value = representation.evaluate_terminal(rule)
                         assert value.per_string() == expected, rule.name
-                        assert value == canonical(representation, value), rule.name
+                        assert value == canonical(value), rule.name
                         continue
                     for _ in range(20):
                         # random values at every prefix: Booleans, or counts that can be negative and large
                         arrays = [
                             (
                                 rng.random(len(tree)) < 0.5
-                                if child_lhs == "P"
+                                if child_lhs is Booleans
                                 else rng.integers(-300, 300, len(tree))
                             )
                             for child_lhs in rule.rhs
                         ]
                         per_string_children = [
                             [
-                                StringValues(array[indices])
+                                string_values(array[indices])
                                 for indices in tree.position_indices
                             ]
                             for array in arrays
@@ -128,7 +153,7 @@ class TestCRASPExample:
                             *(prefix_values(representation, array) for array in arrays)
                         )
                         assert value.per_string() == expected, rule.name
-                        assert value == canonical(representation, value), rule.name
+                        assert value == canonical(value), rule.name
 
     def test_representations_agree_with_default(self):
         for universe in (self.universe, self.incomplete_universe):
@@ -148,7 +173,7 @@ class TestCRASPExample:
                     representation=representation_class(universe),
                 )
                 vectorized.run(9)
-                for lhs in (bool, "P", "C"):
+                for lhs in (bool, Booleans, Counts):
                     assert default.get_costs(lhs) == vectorized.get_costs(lhs)
                 assert {
                     meaning: str(expression)

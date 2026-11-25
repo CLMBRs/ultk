@@ -1,3 +1,5 @@
+from typing import Protocol
+
 from ultk.language.grammar.grammar import Grammar, GrammaticalExpression, Rule
 from ultk.language.semantics import Meaning, Referent, Universe
 
@@ -61,3 +63,22 @@ class TestGrammar:
         meaning = parsed_expression.evaluate(smaller_universe)
         assert meaning.universe is smaller_universe
         assert meaning.mapping == (False, True)
+
+    def test_from_callable_terminals(self):
+        def num(referent: Referent) -> int:
+            return referent.num
+
+        def double(x: int) -> int:
+            return 2 * x
+
+        class HasNum(Protocol):
+            num: int
+
+        def num_protocol(thing: HasNum) -> int:
+            return thing.num
+
+        assert Rule.from_callable(num).is_terminal()
+        assert not Rule.from_callable(double).is_terminal()
+        # by default, only functions of a Referent are terminals
+        assert not Rule.from_callable(num_protocol).is_terminal()
+        assert Rule.from_callable(num_protocol, terminal_types=(HasNum,)).is_terminal()

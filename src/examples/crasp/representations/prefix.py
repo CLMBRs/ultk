@@ -6,7 +6,7 @@ of every string, we store one value for every distinct prefix of a string in the
 and counting `#[j <= i] P(j)` at a prefix is the value of `P` there plus the count at its parent.
 
 The rules of the grammar (see `grammar.py`) compute these values directly: values at every prefix implement the same
-operations (`values.PositionValues`) as the values for one string, and terminal rules are given `AllStrings`, whose
+operations (`values.Booleans` and `values.Counts`) as the values for one string, and terminal rules are given `AllStrings`, whose
 `positions` build values at every prefix.  So `PrefixRepresentation` needs no knowledge of the individual rules.
 Subclasses only choose how values are stored: see `basic.py` and `packed.py`.
 """
@@ -103,7 +103,7 @@ class PrefixPositions(Positions):
     """The prefixes of the strings in a universe, as `Positions`: they build the values of terminal rules at every
     prefix.
 
-    Subclasses implement `symbol_is` and `constant`, which determine how values are stored (see `basic.py` and
+    Subclasses implement `symbol_is`, `constant_booleans` and `constant_counts`, which determine how values are stored (see `basic.py` and
     `packed.py`).
 
     Attributes:
@@ -132,7 +132,7 @@ class PrefixRepresentation(MeaningRepresentation[HashableArray]):
     """Represents the meanings of C-RASP operations by their values at every prefix of the strings in a universe.
 
     Values are computed by the functions of the grammar's rules themselves: terminal rules are applied to `AllStrings`,
-    and other rules to the values of their children.  The value of an expression of type `"P"` or `"C"` has one entry
+    and other rules to the values of their children.  The value of an expression of type `Booleans` or `Counts` has one entry
     per prefix, and the value of an expression of type `bool` (a whole program) has one entry per string.
 
     Values must implement `per_string`, which converts them back to one value per string in the universe.

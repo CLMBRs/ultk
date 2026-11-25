@@ -23,6 +23,24 @@ from ultk.util.frozendict import FrozenDict
 T = TypeVar("T")
 
 
+def _is_terminal_type(annotation: Any, terminal_types: tuple[Any, ...]) -> bool:
+    """Whether a type annotation is one of `terminal_types`, or a subclass of one.
+
+    Protocols are only matched exactly, because `issubclass` cannot be used with most protocols.
+    """
+    for terminal_type in terminal_types:
+        if annotation is terminal_type:
+            return True
+        if (
+            inspect.isclass(annotation)
+            and inspect.isclass(terminal_type)
+            and not getattr(terminal_type, "_is_protocol", False)
+            and issubclass(annotation, terminal_type)
+        ):
+            return True
+    return False
+
+
 @dataclass(frozen=True)
 class Rule:
     """Basic class for a grammar rule.  Grammar rules in ULTK correspond
@@ -59,7 +77,9 @@ class Rule:
         return out_str
 
     @classmethod
-    def from_callable(cls, func: Callable) -> "Rule":
+    def from_callable(
+        cls, func: Callable, terminal_types: tuple[Any, ...] = (Referent,)
+    ) -> "Rule":
         """Create a Rule from the type-annotations of a function.
 
         For example, given the following method definition:
@@ -76,6 +96,18 @@ class Rule:
         There are two special kwargs that can be used in the function definition:
         - `weight`: a float, which will be used as the weight of the rule
         - `name`: a string, which will be used as the name of the rule, if you want it to be different than the name of the method
+
+        A function whose only argument is annotated with one of `terminal_types` (or a subclass of one) becomes a
+        terminal rule (with `rhs=None`): when an expression is evaluated, its function is applied to the referent.  By
+        default, these are functions of a `Referent`.  A grammar whose terminals take something else (e.g. a protocol
+        that referents implement) can pass its own `terminal_types`.
+
+        Args:
+            func: a type-annotated function
+            terminal_types: the argument types which make a function of one argument a terminal rule
+
+        Returns:
+            the Rule
         """
         annotations = inspect.signature(func)
         if annotations.return_annotation is inspect.Signature.empty:
@@ -98,14 +130,8 @@ class Rule:
         # parameters = {'name': Parameter} ordereddict, so we want the values
         # each value is a Paramter, with .annotation being the actual annotation
         rhs: tuple[Any, ...] | None = tuple(arg.annotation for arg in args.values())
-        # if one type annotation is class, a type of Referent, treat this as a terminal, no children = None RHS
-        # TODO: make this more general?
-        if (
-            rhs
-            and len(rhs) == 1
-            and inspect.isclass(rhs[0])
-            and issubclass(rhs[0], Referent)
-        ):
+        # a function of one argument, annotated with a terminal type, is a terminal: no children = None RHS
+        if rhs and len(rhs) == 1 and _is_terminal_type(rhs[0], terminal_types):
             rhs = None
         return cls(
             name=rule_name,
@@ -730,7 +756,9 @@ class Grammar:
         return grammar
 
     @classmethod
-    def from_module(cls, module_name: str) -> "Grammar":
+    def from_module(
+        cls, module_name: str, terminal_types: tuple[Any, ...] = (Referent,)
+    ) -> "Grammar":
         """Read a grammar from a module.
 
         The module should have a list of type-annotated method definitions, each of which will correspond to one Rule in the new Grammar.
@@ -744,6 +772,8 @@ class Grammar:
 
         Arguments:
             module_name: name of the module
+            terminal_types: the argument types which make a function of one argument a terminal rule (see
+                `Rule.from_callable`)
         """
         module = import_module(module_name)
         grammar = cls(None)
@@ -754,7 +784,7 @@ class Grammar:
         for value in possible_rules:
             # functions become rules
             if inspect.isfunction(value):
-                grammar.add_rule(Rule.from_callable(value))
+                grammar.add_rule(Rule.from_callable(value, terminal_types))
         # set start symbol if module specifies it
         if hasattr(module, "start") and module.start in grammar._rules:
             grammar._start = module.start

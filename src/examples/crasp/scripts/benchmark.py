@@ -26,6 +26,7 @@ from ultk.language.semantics import Meaning
 from ..grammar import build_crasp_grammar
 from ..meaning import build_string_universe
 from ..representations import REPRESENTATIONS
+from ..values import Booleans, Counts
 
 
 class CountingRepresentation(MeaningRepresentation):
@@ -151,8 +152,8 @@ if __name__ == "__main__":
         result = {
             "size": cost,
             "languages": len(enumerator.get_states(bool)),
-            "P": len(enumerator.get_states("P")),
-            "C": len(enumerator.get_states("C")),
+            "P": len(enumerator.get_states(Booleans)),
+            "C": len(enumerator.get_states(Counts)),
             "candidates": counter.count - candidates_before,
             "level_seconds": round(level_seconds, 2),
             "total_seconds": round(enumeration_seconds, 2),

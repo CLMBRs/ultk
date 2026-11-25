@@ -1,14 +1,19 @@
 """Values of C-RASP operations, and the interfaces that the rules in `grammar.py` are written with.
 
-A C-RASP operation assigns a value (a Boolean or a count) to every position of a string.  The rules in `grammar.py` do
-not depend on how those values are stored, or on whether they are computed for one string or for many strings at once.
-They only use three interfaces, one for each step of computing the values of a program:
+A C-RASP operation assigns a value to every position of a string: a Boolean (for Boolean-valued operations) or an
+integer (for count-valued operations).  The rules in `grammar.py` do not depend on how those values are stored, or on
+whether they are computed for one string or for many strings at once.  They only use these interfaces, one for each
+step of computing the values of a program:
 
-| Interface        | What it is                                       | One string        | All strings at once (`representations/`) |
-|------------------|--------------------------------------------------|-------------------|------------------------------------------|
-| `HasPositions`   | what terminal rules are applied to               | `StringReferent`  | `AllStrings`                             |
-| `Positions`      | its `positions`, which build terminal values     | `StringPositions` | `PrefixPositions`                        |
-| `PositionValues` | values, which non-terminal rules combine         | `StringValues`    | `BasicPrefixValues`, `PackedPrefixValues`|
+| Interface             | What it is                                   | One string                       | All strings at once (`representations/`) |
+|-----------------------|----------------------------------------------|----------------------------------|------------------------------------------|
+| `HasPositions`        | what terminal rules are applied to           | `StringReferent`                 | `AllStrings`                             |
+| `Positions`           | its `positions`, which build terminal values | `StringPositions`                | `PrefixPositions`                        |
+| `Booleans`, `Counts`  | values, which non-terminal rules combine     | `StringBooleans`, `StringCounts` | e.g. `PackedPrefixBooleans`, `PackedPrefixCounts` |
+
+`Booleans` and `Counts` are also the non-terminals of the grammar: each rule's argument and return types (read from its
+function's annotations by `Rule.from_callable`) say which kinds of values it combines, and each kind only has the
+operations that apply to it.
 
 For one string, these are what `GrammaticalExpression.evaluate` uses (`StringReferent` is in `meaning.py`); for all
 strings at once, they are what the representations in `representations/` use.
@@ -46,55 +51,36 @@ class HashableArray:
         )
 
 
-class PositionValues(HashableArray):
-    """The values of a C-RASP operation at a sequence of positions: the interface that the rules in `grammar.py` use.
+class Booleans(HashableArray):
+    """The values of a Boolean-valued C-RASP operation (`P` in the paper) at a sequence of positions.
 
-    Each kind of values (e.g. for one string, or for every prefix in a universe) implements these operations.  Boolean
-    and count values are the same class; it is up to the grammar to only apply each operation to the right kind.
+    This is the interface that the rules in `grammar.py` use, and the grammar's non-terminal for Boolean-valued
+    operations.  Each kind of values (for one string, or for every prefix in a universe) implements it, together with
+    `Counts`.
 
-    `==` is not an operation on values: it compares two `PositionValues` as a whole (see `HashableArray`).
+    `==` is not an operation on values: it compares two values as a whole (see `HashableArray`).
     """
 
     __slots__ = ()
 
     def __invert__(self) -> Self:
-        """Negation of Boolean values: `not P(i)`."""
+        """Negation: `not P(i)`."""
         raise NotImplementedError
 
     def __and__(self, other: Self) -> Self:
-        """Conjunction of Boolean values: `P1(i) and P2(i)`."""
+        """Conjunction: `P1(i) and P2(i)`."""
         raise NotImplementedError
 
-    def __le__(self, other: Self) -> Self:
-        """Comparison of counts: `C1(i) <= C2(i)`, a Boolean value."""
+    def where(self, if_true: "Counts", if_false: "Counts") -> "Counts":
+        """Conditional: `P(i) ? C1(i) : C2(i)`."""
         raise NotImplementedError
 
-    def __add__(self, other: Self) -> Self:
-        """Addition of counts: `C1(i) + C2(i)`."""
-        raise NotImplementedError
-
-    def __sub__(self, other: Self) -> Self:
-        """Subtraction of counts: `C1(i) - C2(i)`."""
-        raise NotImplementedError
-
-    def minimum(self, other: Self) -> Self:
-        """Minimum of counts: `min(C1(i), C2(i))`."""
-        raise NotImplementedError
-
-    def maximum(self, other: Self) -> Self:
-        """Maximum of counts: `max(C1(i), C2(i))`."""
-        raise NotImplementedError
-
-    def where(self, if_true: Self, if_false: Self) -> Self:
-        """Conditional on Boolean values: `P(i) ? C1(i) : C2(i)`."""
-        raise NotImplementedError
-
-    def count_so_far(self) -> Self:
-        """Counting of Boolean values: `#[j <= i] P(j)`, the number of positions up to `i` at which `P` is true."""
+    def count_so_far(self) -> "Counts":
+        """Counting: `#[j <= i] P(j)`, the number of positions up to `i` at which `P` is true."""
         raise NotImplementedError
 
     def at_end(self) -> Any:
-        """Whether Boolean values are true at the last position, i.e. whether a program with these values accepts.
+        """Whether the values are true at the last position, i.e. whether a program with these values accepts.
 
         Returns:
             for one string, a `bool`; for many strings at once, a hashable value with one `bool` per string
@@ -102,54 +88,36 @@ class PositionValues(HashableArray):
         raise NotImplementedError
 
 
-class StringValues(PositionValues):
-    """The values of a C-RASP operation at each position of one string.
+class Counts(HashableArray):
+    """The values of a count-valued C-RASP operation (`C` in the paper) at a sequence of positions.
 
-    Attributes:
-        array: one value per position, as `bool` or `int64`
+    This is the interface that the rules in `grammar.py` use, and the grammar's non-terminal for count-valued operations.
+    Each kind of values (for one string, or for every prefix in a universe) implements it, together with `Booleans`.
+
+    `==` is not an operation on values: it compares two values as a whole (see `HashableArray`).
     """
 
     __slots__ = ()
 
-    def __init__(self, array: np.ndarray):
-        if array.dtype != bool:
-            array = array.astype(np.int64, copy=False)
-        super().__init__(array)
+    def __le__(self, other: "Counts") -> Booleans:
+        """Comparison: `C1(i) <= C2(i)`."""
+        raise NotImplementedError
 
-    def __invert__(self) -> "StringValues":
-        return StringValues(np.logical_not(self.array))
+    def __add__(self, other: Self) -> Self:
+        """Addition: `C1(i) + C2(i)`."""
+        raise NotImplementedError
 
-    def __and__(self, other: "StringValues") -> "StringValues":
-        return StringValues(np.logical_and(self.array, other.array))
+    def __sub__(self, other: Self) -> Self:
+        """Subtraction: `C1(i) - C2(i)`."""
+        raise NotImplementedError
 
-    def __le__(self, other: "StringValues") -> "StringValues":
-        return StringValues(self.array <= other.array)
+    def minimum(self, other: Self) -> Self:
+        """Minimum: `min(C1(i), C2(i))`."""
+        raise NotImplementedError
 
-    def __add__(self, other: "StringValues") -> "StringValues":
-        return StringValues(self.array + other.array)
-
-    def __sub__(self, other: "StringValues") -> "StringValues":
-        return StringValues(self.array - other.array)
-
-    def minimum(self, other: "StringValues") -> "StringValues":
-        return StringValues(np.minimum(self.array, other.array))
-
-    def maximum(self, other: "StringValues") -> "StringValues":
-        return StringValues(np.maximum(self.array, other.array))
-
-    def where(
-        self, if_true: "StringValues", if_false: "StringValues"
-    ) -> "StringValues":
-        return StringValues(np.where(self.array, if_true.array, if_false.array))
-
-    def count_so_far(self) -> "StringValues":
-        return StringValues(np.cumsum(self.array, dtype=np.int64))
-
-    def at_end(self) -> bool:
-        return bool(self.array[-1])
-
-    def __repr__(self) -> str:
-        return f"StringValues({self.array.tolist()})"
+    def maximum(self, other: Self) -> Self:
+        """Maximum: `max(C1(i), C2(i))`."""
+        raise NotImplementedError
 
 
 class Positions:
@@ -157,15 +125,19 @@ class Positions:
 
     Terminal rules get a `Positions` from what they are applied to (see `HasPositions`), and use it to build the values of
     the initial operations `Q_a(i)` and of constants.  Subclasses determine which positions these are (those of one
-    string, or the prefixes of all strings in a universe), and so which kind of `PositionValues` they build.
+    string, or the prefixes of all strings in a universe), and so which kind of `Booleans` and `Counts` they build.
     """
 
-    def symbol_is(self, symbol: str) -> PositionValues:
+    def symbol_is(self, symbol: str) -> Booleans:
         """The values of the initial operation `Q_symbol(i)`: whether `symbol` is at position `i`."""
         raise NotImplementedError
 
-    def constant(self, value: bool | int) -> PositionValues:
-        """The values of a constant operation, the same at every position."""
+    def constant_booleans(self, value: bool) -> Booleans:
+        """The values of a constant Boolean-valued operation, the same at every position."""
+        raise NotImplementedError
+
+    def constant_counts(self, value: int) -> Counts:
+        """The values of a constant count-valued operation, the same at every position."""
         raise NotImplementedError
 
 
@@ -183,6 +155,65 @@ class HasPositions(Protocol):
     def positions(self) -> Positions: ...
 
 
+class StringBooleans(Booleans):
+    """The values of a Boolean-valued C-RASP operation at each position of one string.
+
+    Attributes:
+        array: one `bool` per position
+    """
+
+    __slots__ = ()
+
+    def __invert__(self) -> "StringBooleans":
+        return StringBooleans(np.logical_not(self.array))
+
+    def __and__(self, other: Booleans) -> "StringBooleans":
+        return StringBooleans(np.logical_and(self.array, other.array))
+
+    def where(self, if_true: Counts, if_false: Counts) -> "StringCounts":
+        return StringCounts(np.where(self.array, if_true.array, if_false.array))
+
+    def count_so_far(self) -> "StringCounts":
+        return StringCounts(np.cumsum(self.array))
+
+    def at_end(self) -> bool:
+        return bool(self.array[-1])
+
+    def __repr__(self) -> str:
+        return f"StringBooleans({self.array.tolist()})"
+
+
+class StringCounts(Counts):
+    """The values of a count-valued C-RASP operation at each position of one string.
+
+    Attributes:
+        array: one count per position, as `int64`
+    """
+
+    __slots__ = ()
+
+    def __init__(self, array: np.ndarray):
+        super().__init__(array.astype(np.int64, copy=False))
+
+    def __le__(self, other: Counts) -> StringBooleans:
+        return StringBooleans(self.array <= other.array)
+
+    def __add__(self, other: Counts) -> "StringCounts":
+        return StringCounts(self.array + other.array)
+
+    def __sub__(self, other: Counts) -> "StringCounts":
+        return StringCounts(self.array - other.array)
+
+    def minimum(self, other: Counts) -> "StringCounts":
+        return StringCounts(np.minimum(self.array, other.array))
+
+    def maximum(self, other: Counts) -> "StringCounts":
+        return StringCounts(np.maximum(self.array, other.array))
+
+    def __repr__(self) -> str:
+        return f"StringCounts({self.array.tolist()})"
+
+
 class StringPositions(Positions):
     """The positions of one string, which build the values of terminal rules (see `StringReferent` in `meaning.py`).
 
@@ -193,13 +224,13 @@ class StringPositions(Positions):
     def __init__(self, string: str):
         self.string = string
 
-    def symbol_is(self, symbol: str) -> StringValues:
-        """The values of the initial operation `Q_symbol(i)`: whether `symbol` is at position `i`."""
-        return StringValues(
-            np.array([character == symbol for character in self.string])
+    def symbol_is(self, symbol: str) -> StringBooleans:
+        return StringBooleans(
+            np.array([character == symbol for character in self.string], dtype=bool)
         )
 
-    def constant(self, value: bool | int) -> StringValues:
-        """The values of a constant operation, the same at every position."""
-        dtype = bool if isinstance(value, bool) else np.int64
-        return StringValues(np.full(len(self.string), value, dtype=dtype))
+    def constant_booleans(self, value: bool) -> StringBooleans:
+        return StringBooleans(np.full(len(self.string), value, dtype=bool))
+
+    def constant_counts(self, value: int) -> StringCounts:
+        return StringCounts(np.full(len(self.string), value, dtype=np.int64))

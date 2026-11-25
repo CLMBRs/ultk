@@ -13,6 +13,7 @@ from ..grammar import build_crasp_grammar
 from ..languages import NAMED_LANGUAGES
 from ..meaning import build_string_universe
 from ..representations import REPRESENTATIONS
+from ..values import Booleans, Counts
 
 
 def get_args() -> argparse.Namespace:
@@ -47,7 +48,11 @@ if __name__ == "__main__":
     start = time.time()
     for cost in range(1, args.max_cost + 1):
         enumerator.run(cost)
-        counts = {str(lhs): len(enumerator.get_states(lhs)) for lhs in (bool, "P", "C")}
+        counts = {
+            "programs": len(enumerator.get_states(bool)),
+            "Booleans": len(enumerator.get_states(Booleans)),
+            "Counts": len(enumerator.get_states(Counts)),
+        }
         print(
             f"size {cost:3d}: {counts}, total time {time.time() - start:.1f}s",
             flush=True,
