@@ -4,14 +4,19 @@ C-RASP has two types of operations, which we represent with two non-terminals:
 - `"P"`: Boolean-valued operations, which assign a Boolean to every position of a string
 - `"C"`: count-valued operations, which assign an integer to every position of a string
 
-The referents of the universe are strings (see `meaning.py`), so the value of an operation at a referent
-is a tuple with one entry per position of the string.  Because every operation only looks at positions
-up to the current one, and in the same string, the semantics is compositional in the sense required by
-`ultk.language.grammar.enumeration`.
+The referents of the universe are strings (see `meaning.py`), so the value of an operation at a referent assigns a
+value to every position of the string.  Because every operation only looks at positions up to the current one, and in
+the same string, the semantics is compositional in the sense required by `ultk.language.grammar.enumeration`.
 
 A program accepts a string iff its last Boolean-valued operation is true at the last position of the string
 (Definition 3.1).  This is the job of the start rule `accept : bool -> P`.  Because programs are built as
 expressions (i.e. trees), an operation that is used several times in a program is counted every time it is used.
+
+The functions of the rules are written with the operations of `values.PositionValues`, so they do not depend on how
+values are stored.  The same functions compute the values of an operation for one string (as `values.StringValues`,
+in `GrammaticalExpression.evaluate`), or for every string in a universe at once (see `representations/`).  Likewise,
+terminal rules are given something with a `positions` attribute: a `meaning.StringReferent`, or a stand-in for all
+strings at once.
 
 The rules follow Definition 3.1 exactly:
 
@@ -31,73 +36,71 @@ The rules follow Definition 3.1 exactly:
 | C(i) := 1                       | `1 : C`                      |
 """
 
-from collections.abc import Sequence
-from itertools import accumulate
+from collections.abc import Callable, Sequence
+from typing import Any
 
 from ultk.language.grammar.grammar import Grammar, Rule
-from ultk.language.semantics import Referent
+
+from .values import PositionValues
 
 ALPHABET = ("a", "b")
 
-BoolVector = tuple[bool, ...]
-CountVector = tuple[int, ...]
+
+def accept(p: PositionValues) -> Any:
+    return p.at_end()
 
 
-def accept(p: BoolVector) -> bool:
-    return p[-1]
+def negation(p: PositionValues) -> PositionValues:
+    return ~p
 
 
-def negation(p: BoolVector) -> BoolVector:
-    return tuple(not value for value in p)
+def conjunction(p1: PositionValues, p2: PositionValues) -> PositionValues:
+    return p1 & p2
 
 
-def conjunction(p1: BoolVector, p2: BoolVector) -> BoolVector:
-    return tuple(value1 and value2 for value1, value2 in zip(p1, p2))
+def less_equal(c1: PositionValues, c2: PositionValues) -> PositionValues:
+    return c1 <= c2
 
 
-def less_equal(c1: CountVector, c2: CountVector) -> BoolVector:
-    return tuple(value1 <= value2 for value1, value2 in zip(c1, c2))
+def true(strings: Any) -> PositionValues:
+    return strings.positions.constant(True)
 
 
-def true(referent: Referent) -> BoolVector:
-    return (True,) * len(referent.name)
+def count(p: PositionValues) -> PositionValues:
+    return p.count_so_far()
 
 
-def count(p: BoolVector) -> CountVector:
-    return tuple(accumulate(int(value) for value in p))
+def conditional(
+    p: PositionValues, c1: PositionValues, c2: PositionValues
+) -> PositionValues:
+    return p.where(c1, c2)
 
 
-def conditional(p: BoolVector, c1: CountVector, c2: CountVector) -> CountVector:
-    return tuple(
-        value1 if condition else value2 for condition, value1, value2 in zip(p, c1, c2)
-    )
+def addition(c1: PositionValues, c2: PositionValues) -> PositionValues:
+    return c1 + c2
 
 
-def addition(c1: CountVector, c2: CountVector) -> CountVector:
-    return tuple(value1 + value2 for value1, value2 in zip(c1, c2))
+def subtraction(c1: PositionValues, c2: PositionValues) -> PositionValues:
+    return c1 - c2
 
 
-def subtraction(c1: CountVector, c2: CountVector) -> CountVector:
-    return tuple(value1 - value2 for value1, value2 in zip(c1, c2))
+def minimum(c1: PositionValues, c2: PositionValues) -> PositionValues:
+    return c1.minimum(c2)
 
 
-def minimum(c1: CountVector, c2: CountVector) -> CountVector:
-    return tuple(min(value1, value2) for value1, value2 in zip(c1, c2))
+def maximum(c1: PositionValues, c2: PositionValues) -> PositionValues:
+    return c1.maximum(c2)
 
 
-def maximum(c1: CountVector, c2: CountVector) -> CountVector:
-    return tuple(max(value1, value2) for value1, value2 in zip(c1, c2))
+def one(strings: Any) -> PositionValues:
+    return strings.positions.constant(1)
 
 
-def one(referent: Referent) -> CountVector:
-    return (1,) * len(referent.name)
-
-
-def symbol_predicate(symbol: str):
+def symbol_predicate(symbol: str) -> Callable[[Any], PositionValues]:
     """Get the function for the initial operation Q_symbol, which is true at the positions where `symbol` occurs."""
 
-    def predicate(referent: Referent) -> BoolVector:
-        return tuple(character == symbol for character in referent.name)
+    def predicate(strings: Any) -> PositionValues:
+        return strings.positions.symbol_is(symbol)
 
     return predicate
 
