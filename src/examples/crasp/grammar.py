@@ -15,8 +15,8 @@ expressions (i.e. trees), an operation that is used several times in a program i
 The functions of the rules are written with the operations of `values.PositionValues`, so they do not depend on how
 values are stored.  The same functions compute the values of an operation for one string (as `values.StringValues`,
 in `GrammaticalExpression.evaluate`), or for every string in a universe at once (see `representations/`).  Likewise,
-terminal rules are given something with a `positions` attribute: a `meaning.StringReferent`, or a stand-in for all
-strings at once.
+terminal rules are given a `values.HasPositions`: a `meaning.StringReferent`, or a stand-in for all strings at once.
+See `values.py` for how these interfaces fit together.
 
 The rules follow Definition 3.1 exactly:
 
@@ -41,7 +41,7 @@ from typing import Any
 
 from ultk.language.grammar.grammar import Grammar, Rule
 
-from .values import PositionValues
+from .values import HasPositions, PositionValues
 
 ALPHABET = ("a", "b")
 
@@ -62,7 +62,7 @@ def less_equal(c1: PositionValues, c2: PositionValues) -> PositionValues:
     return c1 <= c2
 
 
-def true(strings: Any) -> PositionValues:
+def true(strings: HasPositions) -> PositionValues:
     return strings.positions.constant(True)
 
 
@@ -92,14 +92,14 @@ def maximum(c1: PositionValues, c2: PositionValues) -> PositionValues:
     return c1.maximum(c2)
 
 
-def one(strings: Any) -> PositionValues:
+def one(strings: HasPositions) -> PositionValues:
     return strings.positions.constant(1)
 
 
-def symbol_predicate(symbol: str) -> Callable[[Any], PositionValues]:
+def symbol_predicate(symbol: str) -> Callable[[HasPositions], PositionValues]:
     """Get the function for the initial operation Q_symbol, which is true at the positions where `symbol` occurs."""
 
-    def predicate(strings: Any) -> PositionValues:
+    def predicate(strings: HasPositions) -> PositionValues:
         return strings.positions.symbol_is(symbol)
 
     return predicate

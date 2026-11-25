@@ -19,7 +19,7 @@ from ultk.language.grammar.enumeration import MeaningRepresentation
 from ultk.language.grammar.grammar import Rule
 from ultk.language.semantics import Meaning, Universe
 
-from ..values import HashableArray, PositionValues
+from ..values import HashableArray, Positions
 
 
 class PrefixTree:
@@ -99,10 +99,12 @@ class PrefixTree:
         return counts
 
 
-class PrefixPositions:
-    """The prefixes of the strings in a universe, which build the values of terminal rules at every prefix.
+class PrefixPositions(Positions):
+    """The prefixes of the strings in a universe, as `Positions`: they build the values of terminal rules at every
+    prefix.
 
-    Subclasses implement `symbol_is` and `constant`, which determine how values are stored.
+    Subclasses implement `symbol_is` and `constant`, which determine how values are stored (see `basic.py` and
+    `packed.py`).
 
     Attributes:
         tree: the prefixes
@@ -111,19 +113,12 @@ class PrefixPositions:
     def __init__(self, tree: PrefixTree):
         self.tree = tree
 
-    def symbol_is(self, symbol: str) -> PositionValues:
-        """The values of the initial operation `Q_symbol(i)` at every prefix."""
-        raise NotImplementedError
-
-    def constant(self, value: bool | int) -> PositionValues:
-        """The values of a constant operation at every prefix."""
-        raise NotImplementedError
-
 
 class AllStrings:
     """A stand-in for all strings in a universe at once, which terminal rules are applied to.
 
-    Like a `meaning.StringReferent`, it has `positions`, which build the values of terminal rules.
+    Like a `meaning.StringReferent`, it is a `values.HasPositions`: its `positions` build the values of terminal rules,
+    here at every prefix of every string.
 
     Attributes:
         positions: the prefixes of all the strings

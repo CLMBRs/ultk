@@ -12,7 +12,8 @@ MAX_LENGTH = 6
 class StringReferent(Referent):
     """A referent which is a string, named by the string itself.
 
-    Its `positions` build the values of the terminal rules of the C-RASP grammar (see `grammar.py`).
+    It is a `values.HasPositions`: its `positions` build the values of the terminal rules of the C-RASP grammar (see
+    `grammar.py`) for this string.
     """
 
     @property

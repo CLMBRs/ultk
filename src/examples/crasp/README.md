@@ -7,7 +7,7 @@ It is also an example of a grammar with several types (Boolean-valued operations
 ## Contents
 
 - `grammar.py`: the C-RASP grammar, with one rule per operation in Definition 3.1 of the paper, plus a start rule `accept`, which accepts a string iff a Boolean-valued operation is true at its last position.  Non-terminal `"P"` is for Boolean-valued operations and `"C"` for count-valued operations.  Each rule's function is the only definition of its operation: it is written with the operations of `values.PositionValues`, so the same function computes values for one string or for a whole universe at once.
-- `values.py`: the values of operations, and the operations on them (`PositionValues`), with `StringValues` for the values at each position of one string.
+- `values.py`: the three interfaces the rules are written with (`HasPositions`, what terminal rules are applied to; `Positions`, which build terminal values; and `PositionValues`, the values that other rules combine), and their implementations for one string (`StringPositions`, `StringValues`).
 - `meaning.py`: the universe, whose referents (`StringReferent`s) are all non-empty strings up to a maximum length.
 - `languages.py`: named formal languages (a\*b\*, Dyck-1, majority, ...) as predicates on strings, for looking up their minimal programs.
 - `representations/`: faster ways of representing meanings during enumeration.  Because C-RASP operations only look at the current and earlier positions, the value of an operation at position `i` of a string `w` is its value at the last position of the prefix `w[:i]`, so these store one value per distinct prefix, instead of one per position of every string.

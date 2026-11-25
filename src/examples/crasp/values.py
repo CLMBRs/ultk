@@ -1,16 +1,20 @@
-"""Values of C-RASP operations, and the operations on them that the rules in `grammar.py` are written with.
+"""Values of C-RASP operations, and the interfaces that the rules in `grammar.py` are written with.
 
 A C-RASP operation assigns a value (a Boolean or a count) to every position of a string.  The rules in `grammar.py` do
-not depend on how those values are stored: they only use the operations of `PositionValues`.  This lets the same rules
-compute the values of an operation for one string at a time (`StringValues`, used by
-`GrammaticalExpression.evaluate`), or for every string in a universe at once (see `representations/`).
+not depend on how those values are stored, or on whether they are computed for one string or for many strings at once.
+They only use three interfaces, one for each step of computing the values of a program:
 
-Similarly, terminal rules are given something with a `positions` attribute: either a `StringReferent` (see `meaning.py`),
-whose `positions` are those of one string, or a stand-in for all strings in a universe at once.  Either way, `positions`
-can build the values of the initial operations `Q_a(i)` and of constants.
+| Interface        | What it is                                       | One string        | All strings at once (`representations/`) |
+|------------------|--------------------------------------------------|-------------------|------------------------------------------|
+| `HasPositions`   | what terminal rules are applied to               | `StringReferent`  | `AllStrings`                             |
+| `Positions`      | its `positions`, which build terminal values     | `StringPositions` | `PrefixPositions`                        |
+| `PositionValues` | values, which non-terminal rules combine         | `StringValues`    | `BasicPrefixValues`, `PackedPrefixValues`|
+
+For one string, these are what `GrammaticalExpression.evaluate` uses (`StringReferent` is in `meaning.py`); for all
+strings at once, they are what the representations in `representations/` use.
 """
 
-from typing import Any, Self
+from typing import Any, Protocol, Self
 
 import numpy as np
 
@@ -148,7 +152,38 @@ class StringValues(PositionValues):
         return f"StringValues({self.array.tolist()})"
 
 
-class StringPositions:
+class Positions:
+    """The positions that values are assigned to, which build the values of terminal rules.
+
+    Terminal rules get a `Positions` from what they are applied to (see `HasPositions`), and use it to build the values of
+    the initial operations `Q_a(i)` and of constants.  Subclasses determine which positions these are (those of one
+    string, or the prefixes of all strings in a universe), and so which kind of `PositionValues` they build.
+    """
+
+    def symbol_is(self, symbol: str) -> PositionValues:
+        """The values of the initial operation `Q_symbol(i)`: whether `symbol` is at position `i`."""
+        raise NotImplementedError
+
+    def constant(self, value: bool | int) -> PositionValues:
+        """The values of a constant operation, the same at every position."""
+        raise NotImplementedError
+
+
+class HasPositions(Protocol):
+    """What terminal rules are applied to: anything with `positions`.
+
+    In ULTK, the function of a terminal rule is applied to a referent.  For C-RASP, that is a `StringReferent` (see
+    `meaning.py`), whose `positions` are those of one string.  To compute values for all strings at once, the
+    representations in `representations/` instead apply terminal rules to an `AllStrings`, whose `positions` are the
+    prefixes of all strings in the universe.  So that the same terminal functions work for both, they only use
+    `positions`.
+    """
+
+    @property
+    def positions(self) -> Positions: ...
+
+
+class StringPositions(Positions):
     """The positions of one string, which build the values of terminal rules (see `StringReferent` in `meaning.py`).
 
     Attributes:
