@@ -2,9 +2,19 @@ from collections import defaultdict
 from itertools import product
 from typing import Any, Callable
 
+import math
+
 import pytest
 
-from ultk.language.grammar.enumeration import SemanticEnumerator, unit_cost
+from ultk.language.grammar.enumeration import (
+    CostFunction,
+    KnuthEnumerator,
+    SemanticEnumerator,
+    additive_cost,
+    depth_cost,
+    negative_log_probability,
+    unit_cost,
+)
 from ultk.language.grammar.grammar import Grammar, Rule
 from ultk.language.semantics import Referent, Universe
 
@@ -46,7 +56,47 @@ def brute_force_costs(
     return min_costs
 
 
-def enumerated_costs(enumerator: SemanticEnumerator, lhs: Any) -> dict[tuple, int]:
+def brute_force_costs_by_size(
+    grammar: Grammar, universe: Universe, max_size: int, combine: CostFunction
+) -> dict[Any, dict[tuple, float]]:
+    """Get the minimal cost, under any cost function, of every meaning of every LHS among _all_ expressions with at most
+    `max_size` nodes, without any semantic deduplication."""
+    # lhs -> size -> list of (value, cost) of all expressions with that many nodes
+    expressions: dict[Any, dict[int, list[tuple[tuple, float]]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    for size in range(1, max_size + 1):
+        for rule in grammar.get_all_rules():
+            if rule.rhs is None:
+                if size == 1:
+                    value = tuple(
+                        rule.func(referent) for referent in universe.referents
+                    )
+                    expressions[rule.lhs][1].append((value, combine(rule, ())))
+                continue
+            for child_sizes in product(range(1, size), repeat=len(rule.rhs)):
+                if sum(child_sizes) != size - 1:
+                    continue
+                pools = [
+                    expressions[child_lhs][child_size]
+                    for child_lhs, child_size in zip(rule.rhs, child_sizes)
+                ]
+                for children in product(*pools):
+                    value = tuple(map(rule.func, *(child[0] for child in children)))
+                    cost = combine(rule, [child[1] for child in children])
+                    expressions[rule.lhs][size].append((value, cost))
+    min_costs: dict[Any, dict[tuple, float]] = defaultdict(dict)
+    for lhs, by_size in expressions.items():
+        for found in by_size.values():
+            for value, cost in found:
+                if cost < min_costs[lhs].get(value, math.inf):
+                    min_costs[lhs][value] = cost
+    return min_costs
+
+
+def enumerated_costs(
+    enumerator: SemanticEnumerator | KnuthEnumerator, lhs: Any
+) -> dict[tuple, float]:
     return {
         meaning.mapping: cost for meaning, cost in enumerator.get_costs(lhs).items()
     }
@@ -179,3 +229,139 @@ class TestEnumeration:
                 self.boolean_universe,
                 cost=lambda rule: 0.5,
             )
+
+
+class TestKnuthEnumeration:
+    boolean_grammar = TestEnumeration.boolean_grammar
+    boolean_universe = TestEnumeration.boolean_universe
+    numbers_grammar = TestEnumeration.numbers_grammar
+    numbers_universe = TestEnumeration.numbers_universe
+
+    @staticmethod
+    def assert_costs_match(
+        enumerated: dict[tuple, float], expected: dict[tuple, float], max_cost: float
+    ):
+        """The enumerated meanings are exactly the expected ones with cost at most `max_cost`, with the same costs."""
+        expected = {
+            value: cost for value, cost in expected.items() if cost <= max_cost + 1e-9
+        }
+        assert enumerated.keys() == expected.keys()
+        for value, cost in enumerated.items():
+            assert cost == pytest.approx(expected[value])
+
+    def test_unit_costs_agree_with_semantic_enumerator(self):
+        for grammar, universe in (
+            (self.boolean_grammar, self.boolean_universe),
+            (self.numbers_grammar, self.numbers_universe),
+        ):
+            levels = SemanticEnumerator(grammar, universe)
+            levels.run(8)
+            knuth = KnuthEnumerator(grammar, universe)
+            knuth.run(8)
+            for lhs in {rule.lhs for rule in grammar.get_all_rules()}:
+                assert enumerated_costs(knuth, lhs) == enumerated_costs(levels, lhs)
+
+    def test_real_valued_costs(self):
+        rule_costs = {
+            "and": 1.5,
+            "or": 0.75,
+            "not": 0.5,
+            "x0": 1.0,
+            "x1": 0.6,
+            "x2": 1.3,
+        }
+        combine = additive_cost(lambda rule: rule_costs[rule.name])
+        enumerator = KnuthEnumerator(
+            self.boolean_grammar, self.boolean_universe, combine=combine
+        )
+        enumerator.run(4.0)
+        # every rule costs at least 0.5, so every expression of cost at most 4 has at most 8 nodes
+        expected = brute_force_costs_by_size(
+            self.boolean_grammar, self.boolean_universe, 8, combine
+        )
+        self.assert_costs_match(enumerated_costs(enumerator, bool), expected[bool], 4.0)
+
+    def test_depth(self):
+        enumerator = KnuthEnumerator(
+            self.boolean_grammar, self.boolean_universe, combine=depth_cost
+        )
+        enumerator.run(3)
+        # every expression of depth at most 3 has at most 7 nodes
+        expected = brute_force_costs_by_size(
+            self.boolean_grammar, self.boolean_universe, 7, depth_cost
+        )
+        self.assert_costs_match(enumerated_costs(enumerator, bool), expected[bool], 3)
+
+    def test_negative_log_probability(self):
+        weights = {"and": 2, "or": 1, "not": 3, "x0": 4, "x1": 1, "x2": 1}
+        grammar = Grammar(bool)
+        for rule in self.boolean_grammar.get_all_rules():
+            grammar.add_rule(
+                Rule(rule.name, rule.lhs, rule.rhs, rule.func, weights[rule.name])
+            )
+        combine = additive_cost(negative_log_probability(grammar))
+        enumerator = KnuthEnumerator(grammar, self.boolean_universe, combine=combine)
+        enumerator.run(7.0)
+        # every rule costs at least -log(4/12) > 1, so every expression of cost at most 7 has at most 6 nodes
+        expected = brute_force_costs_by_size(grammar, self.boolean_universe, 6, combine)
+        self.assert_costs_match(enumerated_costs(enumerator, bool), expected[bool], 7.0)
+        # the minimal expression for each meaning is a most probable one
+        for meaning, expression in enumerator.get_expressions().items():
+            assert grammar.log_prior(expression) == pytest.approx(
+                -enumerator.get_costs()[meaning]
+            )
+
+    def test_zero_costs(self):
+        combine = additive_cost(lambda rule: 0 if rule.name == "not" else 1)
+        enumerator = KnuthEnumerator(
+            self.boolean_grammar, self.boolean_universe, combine=combine
+        )
+        enumerator.run(3)
+        costs = {
+            str(expression): enumerator.get_costs()[meaning]
+            for meaning, expression in enumerator.get_expressions().items()
+        }
+        assert costs["not(x0)"] == 1
+
+    def test_resume(self):
+        combine = additive_cost(lambda rule: 0.75 if rule.name == "or" else 1.0)
+        resumed = KnuthEnumerator(
+            self.boolean_grammar, self.boolean_universe, combine=combine
+        )
+        for max_cost in (1.0, 2.5, 3.0, 4.75, 6.0):
+            resumed.run(max_cost)
+        fresh = KnuthEnumerator(
+            self.boolean_grammar, self.boolean_universe, combine=combine
+        )
+        fresh.run(6.0)
+        assert enumerated_costs(resumed, bool) == enumerated_costs(fresh, bool)
+
+    def test_saturation(self):
+        enumerator = KnuthEnumerator(self.boolean_grammar, self.boolean_universe)
+        enumerator.run(5)
+        assert not enumerator.is_saturated
+        enumerator.run(math.inf)
+        assert enumerator.is_saturated
+        # every Boolean function of three variables is expressible
+        assert len(enumerator.get_states()) == 2**8
+
+    def test_max_meanings(self):
+        enumerator = KnuthEnumerator(self.boolean_grammar, self.boolean_universe)
+        enumerator.run(math.inf, max_meanings=50)
+        assert len(enumerator.get_states()) == 50
+        enumerator.run(7)
+        expected = brute_force_costs(self.boolean_grammar, self.boolean_universe, 7)
+        assert enumerated_costs(enumerator, bool) == {
+            value: cost for value, cost in expected[bool].items() if cost <= 7
+        }
+
+    def test_not_superior(self):
+        # `not` is cheaper than its child, so this is not a superior function
+        def combine(rule, child_costs):
+            return 1 if rule.name == "not" else 1 + sum(child_costs)
+
+        enumerator = KnuthEnumerator(
+            self.boolean_grammar, self.boolean_universe, combine=combine
+        )
+        with pytest.raises(ValueError):
+            enumerator.run(5)

@@ -32,7 +32,10 @@ from crasp.values import (  # noqa: E402
     StringCounts,
 )
 
-from ultk.language.grammar.enumeration import SemanticEnumerator  # noqa: E402
+from ultk.language.grammar.enumeration import (  # noqa: E402
+    KnuthEnumerator,
+    SemanticEnumerator,
+)
 from ultk.language.semantics import Universe  # noqa: E402
 
 
@@ -230,3 +233,21 @@ class TestCRASPExample:
         )
         with pytest.raises(OverflowError):
             smallest - one
+
+    def test_knuth_enumerator_agrees(self):
+        # with unit costs, the priority-queue enumerator finds the same minimal costs, for every type
+        for universe in (self.universe, self.incomplete_universe):
+            levels = SemanticEnumerator(
+                self.grammar,
+                universe,
+                representation=PackedCRASPRepresentation(universe),
+            )
+            knuth = KnuthEnumerator(
+                self.grammar,
+                universe,
+                representation=PackedCRASPRepresentation(universe),
+            )
+            levels.run(10)
+            knuth.run(10)
+            for lhs in (bool, Booleans, Counts):
+                assert knuth.get_costs(lhs) == levels.get_costs(lhs)

@@ -8,18 +8,21 @@ so this module searches over _meanings_ rather than over expressions.
 The core observation is that meanings in ULTK are compositional: the meaning of an expression
 `f(e1, ..., en)` is `Meaning.apply(f, meaning(e1), ..., meaning(en))`, i.e. it depends only on the meanings of
 `e1, ..., en`.  Consequently, if two expressions of the same type (LHS) have the same meaning, one can be substituted
-for the other inside any larger expression without changing the larger expression's meaning.  So it
-suffices to keep a single, cheapest representative of every (LHS, meaning) pair, and to build larger
-expressions only out of those representatives.
+for the other inside any larger expression without changing the larger expression's meaning.  So, as long as replacing
+a child by a cheaper one can only make an expression cheaper, it suffices to keep a single, cheapest representative of
+every (LHS, meaning) pair, and to build larger expressions only out of those representatives.
 
-`SemanticEnumerator` does this bottom-up, in order of increasing cost.  Costs are assigned to rules
-(by default, every rule costs 1, so that the cost of an expression is its number of nodes, i.e. `len`)
-and the cost of an expression is the sum of the costs of its rules.  At cost level `c`, all meanings
-whose minimal cost is less than `c` are already known, so a meaning that is first discovered at level
-`c` has minimal cost exactly `c`.  This is Knuth's (1977) generalization of Dijkstra's algorithm to
-grammars, specialized to integer costs (where the priority queue becomes a sequence of cost levels).
+Both enumerators here do this bottom-up, in order of increasing cost.  This is Knuth's (1977) generalization of
+Dijkstra's algorithm to grammars: the cheapest meaning not yet known to be minimal is always minimal.
+- `SemanticEnumerator` is specialized to costs that are sums of positive integer costs of rules (by default, every rule
+    costs 1, so that the cost of an expression is its number of nodes, i.e. `len`).  The priority queue then becomes a
+    sequence of cost levels: at level `c`, all meanings whose minimal cost is less than `c` are already known, so a
+    meaning that is first found at level `c` has minimal cost exactly `c`.
+- `KnuthEnumerator` allows any cost that is computed from the costs of the children by a "superior function" (see
+    `CostFunction`), including real-valued costs of rules (e.g. negative log probabilities) and depth, and uses a
+    priority queue.
 
-Rather than build an expression tree for every candidate, the enumerator stores, for each new meaning,
+Rather than build an expression tree for every candidate, the enumerators store, for each new meaning,
 a back-pointer (the rule used and the meanings of its children).  `GrammaticalExpression`s are built
 only at the end, and only for the minimal representatives.
 
@@ -40,12 +43,18 @@ Examples:
     >>> enumerator = SemanticEnumerator(grammar, universe)
     >>> enumerator.run(max_cost=5)
     >>> expressions = enumerator.get_expressions()
+    >>> # minimal depth instead of minimal size
+    >>> enumerator = KnuthEnumerator(grammar, universe, combine=depth_cost)
+    >>> enumerator.run(max_cost=3)
 """
 
+import heapq
+from bisect import bisect_left, bisect_right
 from collections import defaultdict
 from collections.abc import Hashable, Iterator, Sequence
 from dataclasses import dataclass
-from itertools import product
+from itertools import count, product
+from math import inf
 from typing import Any, Callable, Generic, TypeVar
 
 from ultk.language.grammar.grammar import Grammar, GrammaticalExpression, Rule
@@ -53,7 +62,17 @@ from ultk.language.semantics import Meaning, Universe
 
 V = TypeVar("V", bound=Hashable)
 
-# returned by `SemanticEnumerator._evaluate` when evaluation fails and errors are ignored
+CostFunction = Callable[[Rule, Sequence[float]], float]
+"""A function computing the cost of an expression from its top-most rule and the costs of its children (in the order
+of `rule.rhs`; empty for a terminal rule).
+
+`KnuthEnumerator` finds minimal costs exactly for any cost function which is a "superior function" in the sense of
+Knuth (1977): the cost of an expression is at least the cost of each of its children, and does not decrease when the
+cost of any child increases.  For example, `additive_cost(rule_cost)` (the sum of the costs of the rules, for
+non-negative rule costs) and `depth_cost` are superior functions.
+"""
+
+# returned by `_Enumerator._evaluate` when evaluation fails and errors are ignored
 _FAILED = object()
 
 
@@ -61,6 +80,47 @@ def unit_cost(rule: Rule) -> int:
     """The default cost function: every rule costs 1, so the cost of an expression is its
     number of nodes (i.e. `len` of the expression)."""
     return 1
+
+
+def additive_cost(rule_cost: Callable[[Rule], float]) -> CostFunction:
+    """Get the cost function under which the cost of an expression is the sum of the costs of its rules.
+
+    Args:
+        rule_cost: a function assigning a non-negative cost to each rule
+
+    Returns:
+        the cost function `rule_cost(rule) + sum(child_costs)`
+    """
+
+    def combine(rule: Rule, child_costs: Sequence[float]) -> float:
+        return rule_cost(rule) + sum(child_costs)
+
+    return combine
+
+
+def depth_cost(rule: Rule, child_costs: Sequence[float]) -> float:
+    """The cost function under which the cost of an expression is its depth: 1 for a terminal, and otherwise one more
+    than the depth of its deepest child."""
+    return 1 + max(child_costs, default=0)
+
+
+def negative_log_probability(grammar: Grammar) -> Callable[[Rule], float]:
+    """Get the rule costs under which the (additive) cost of an expression is its negative log probability under the
+    grammar's rule weights (see `Grammar.log_probability`).
+
+    Use with `additive_cost`, e.g. `KnuthEnumerator(grammar, universe, combine=additive_cost(negative_log_probability(grammar)))`.
+    The most probable expression for each meaning then has minimal cost.
+
+    Args:
+        grammar: a grammar, whose rules' weights define a probability distribution over the rules of each LHS
+
+    Returns:
+        a function from rules to non-negative costs
+    """
+    costs = {
+        rule.name: -grammar.log_probability(rule) for rule in grammar.get_all_rules()
+    }
+    return lambda rule: costs[rule.name]
 
 
 class MeaningRepresentation(Generic[V]):
@@ -138,13 +198,157 @@ class SemanticState:
             or None if `rule` is terminal
     """
 
-    cost: int
+    cost: float
     rule: Rule
     children: tuple[Hashable, ...] | None
 
 
-class SemanticEnumerator:
-    """Enumerate the meanings expressible by a `Grammar`, together with a minimal-cost expression for each.
+class _Enumerator:
+    """What the enumerators share: evaluating meanings, storing the minimal representative of each meaning, and
+    building `GrammaticalExpression`s and `Meaning`s from them.
+
+    Subclasses implement `run`, which finds the meanings and their minimal states, in order of increasing cost.
+    """
+
+    def __init__(
+        self,
+        grammar: Grammar,
+        universe: Universe,
+        representation: MeaningRepresentation | None = None,
+        ignore_errors: bool = False,
+    ):
+        self.grammar = grammar
+        self.universe = universe
+        self.representation: MeaningRepresentation[Any] = (
+            representation or _DefaultRepresentation(universe)
+        )
+        self.ignore_errors = ignore_errors
+        self._rules: list[Rule] = grammar.get_all_rules()
+        # lhs -> meaning -> state, in order of increasing cost
+        self._states: dict[Any, dict[Hashable, SemanticState]] = defaultdict(dict)
+
+    def _evaluate(self, rule: Rule, children: tuple | None) -> Any:
+        """Compute the meaning of a rule applied to children, handling errors according to `self.ignore_errors`.
+
+        Returns:
+            the meaning, or `_FAILED` if evaluation raised an Exception and errors are ignored
+        """
+        try:
+            if children is None:
+                return self.representation.evaluate_terminal(rule)
+            return self.representation.apply_rule(rule, children)
+        except Exception:
+            if self.ignore_errors:
+                return _FAILED
+            raise
+
+    def get_states(self, lhs: Any = None) -> dict[Hashable, SemanticState]:
+        """Get the states found so far for an LHS.
+
+        Args:
+            lhs: defaults to the grammar's start symbol
+
+        Returns:
+            a dictionary from meanings (as represented during enumeration) to `SemanticState`s,
+            in order of increasing cost
+        """
+        if lhs is None:
+            lhs = self.grammar._start
+        return dict(self._states[lhs])
+
+    def get_state(self, meaning: Hashable, lhs: Any = None) -> SemanticState:
+        """Get the state of one meaning found so far.
+
+        Args:
+            meaning: the meaning, as represented during enumeration (a key of `get_states(lhs)`)
+            lhs: defaults to the grammar's start symbol
+
+        Returns:
+            the `SemanticState` of the meaning
+        """
+        if lhs is None:
+            lhs = self.grammar._start
+        return self._states[lhs][meaning]
+
+    def get_costs(self, lhs: Any = None) -> dict[Meaning, float]:
+        """Get the minimal cost of every meaning found so far for an LHS.
+
+        Args:
+            lhs: defaults to the grammar's start symbol
+
+        Returns:
+            a dictionary from `Meaning`s to their minimal costs, in order of increasing cost
+        """
+        if lhs is None:
+            lhs = self.grammar._start
+        return {
+            self.representation.to_meaning(meaning, lhs): state.cost
+            for meaning, state in self._states[lhs].items()
+        }
+
+    def get_expressions(self, lhs: Any = None) -> dict[Meaning, GrammaticalExpression]:
+        """Get a minimal-cost expression for every meaning found so far for an LHS.
+
+        Every node of every returned expression has its `meaning` attribute set.  Expressions may share
+        sub-expressions (i.e. the same `GrammaticalExpression` object can be a child of several expressions).
+
+        Args:
+            lhs: defaults to the grammar's start symbol
+
+        Returns:
+            a dictionary from `Meaning`s to `GrammaticalExpression`s, in order of increasing cost
+        """
+        if lhs is None:
+            lhs = self.grammar._start
+        built: dict[tuple[Any, Hashable], GrammaticalExpression] = {}
+        return {
+            expression.meaning: expression
+            for expression in (
+                self._build_expression(lhs, meaning, built)
+                for meaning in self._states[lhs]
+            )
+        }
+
+    def _build_expression(
+        self,
+        lhs: Any,
+        meaning: Hashable,
+        built: dict[tuple[Any, Hashable], GrammaticalExpression],
+    ) -> GrammaticalExpression:
+        """Build the minimal expression for a meaning by following back-pointers.
+
+        Args:
+            lhs: the LHS of the meaning
+            meaning: the meaning, as represented during enumeration
+            built: a cache of expressions already built, keyed by (LHS, meaning)
+
+        Returns:
+            the minimal expression, with its meaning set
+        """
+        if (lhs, meaning) in built:
+            return built[(lhs, meaning)]
+        state = self._states[lhs][meaning]
+        children = (
+            None
+            if state.children is None or state.rule.rhs is None
+            else tuple(
+                self._build_expression(child_lhs, child_meaning, built)
+                for child_lhs, child_meaning in zip(state.rule.rhs, state.children)
+            )
+        )
+        expression: GrammaticalExpression = GrammaticalExpression(
+            rule_name=state.rule.name,
+            func=state.rule.func,
+            children=children,
+            meaning=self.representation.to_meaning(meaning, lhs),
+        )
+        built[(lhs, meaning)] = expression
+        return expression
+
+
+class SemanticEnumerator(_Enumerator):
+    """Enumerate the meanings expressible by a `Grammar`, together with a minimal-cost expression for each, where the
+    cost of an expression is the sum of the positive integer costs of its rules.
 
     Enumeration proceeds in order of increasing cost: `run(max_cost)` finds every meaning (of every LHS) that is
     expressible with cost at most `max_cost`, together with its minimal cost.  `run` can be called again
@@ -154,6 +358,7 @@ class SemanticEnumerator:
     - The semantics is compositional and pure: the value of a rule depends only on the values of its children
         (and, for terminals, on the referent).  Rules whose `func` is random or stateful break this assumption.
     - The cost of an expression is the sum of the costs of its rules, and every rule costs a positive integer.
+        For other costs, use `KnuthEnumerator`.
 
     Ties between expressions of equal cost are broken deterministically: by the order in which rules were added to
     the grammar, and then by the order in which the meanings of the children were discovered.
@@ -177,13 +382,7 @@ class SemanticEnumerator:
             ignore_errors: if True, candidate expressions whose evaluation raises an Exception are skipped;
                 if False (the default), the Exception is raised
         """
-        self.grammar = grammar
-        self.universe = universe
-        self.representation: MeaningRepresentation[Any] = (
-            representation or _DefaultRepresentation(universe)
-        )
-        self.ignore_errors = ignore_errors
-        self._rules: list[Rule] = grammar.get_all_rules()
+        super().__init__(grammar, universe, representation, ignore_errors)
         self._rule_costs: dict[str, int] = {}
         for rule in self._rules:
             rule_cost = cost(rule)
@@ -192,8 +391,6 @@ class SemanticEnumerator:
                     f"Rule costs must be positive integers, but rule {rule.name} has cost {rule_cost}."
                 )
             self._rule_costs[rule.name] = int(rule_cost)
-        # lhs -> meaning -> state
-        self._states: dict[Any, dict[Hashable, SemanticState]] = defaultdict(dict)
         # lhs -> cost -> the meanings with that minimal cost, in order of discovery
         self._levels: dict[Any, dict[int, list[Hashable]]] = defaultdict(
             lambda: defaultdict(list)
@@ -316,21 +513,6 @@ class SemanticEnumerator:
             for rest_costs in SemanticEnumerator._split_cost(rest, budget - first_cost):
                 yield (first_cost,) + rest_costs
 
-    def _evaluate(self, rule: Rule, children: tuple | None) -> Any:
-        """Compute the meaning of a rule applied to children, handling errors according to `self.ignore_errors`.
-
-        Returns:
-            the meaning, or `_FAILED` if evaluation raised an Exception and errors are ignored
-        """
-        try:
-            if children is None:
-                return self.representation.evaluate_terminal(rule)
-            return self.representation.apply_rule(rule, children)
-        except Exception:
-            if self.ignore_errors:
-                return _FAILED
-            raise
-
     def _add(
         self,
         rule: Rule,
@@ -351,105 +533,259 @@ class SemanticEnumerator:
         self._last_productive_cost = cost
         return True
 
-    def get_states(self, lhs: Any = None) -> dict[Hashable, SemanticState]:
-        """Get the states found so far for an LHS.
 
-        Args:
-            lhs: defaults to the grammar's start symbol
+@dataclass(frozen=True, slots=True)
+class _Tentative:
+    """The cheapest expression found so far for a meaning which is not yet known to be minimal."""
 
-        Returns:
-            a dictionary from meanings (as represented during enumeration) to `SemanticState`s,
-            in order of increasing cost
-        """
-        if lhs is None:
-            lhs = self.grammar._start
-        return dict(self._states[lhs])
+    cost: float
+    rule: Rule
+    children: tuple[Hashable, ...] | None
 
-    def get_state(self, meaning: Hashable, lhs: Any = None) -> SemanticState:
-        """Get the state of one meaning found so far.
 
-        Args:
-            meaning: the meaning, as represented during enumeration (a key of `get_states(lhs)`)
-            lhs: defaults to the grammar's start symbol
+class KnuthEnumerator(_Enumerator):
+    """Enumerate the meanings expressible by a `Grammar`, together with a minimal-cost expression for each, for any
+    cost which is a superior function of the costs of the children (see `CostFunction`).
 
-        Returns:
-            the `SemanticState` of the meaning
-        """
-        if lhs is None:
-            lhs = self.grammar._start
-        return self._states[lhs][meaning]
+    This is Knuth's (1977) generalization of Dijkstra's algorithm.  Meanings which are not yet known to be minimal are
+    kept in a priority queue, with the cost of the cheapest expression found for them so far.  The cheapest meaning in
+    the queue is always minimal: any other expression for it would contain a child which is not yet minimal, and so
+    (since costs are superior functions) would cost at least as much.  When a meaning becomes minimal, it is combined
+    with all minimal meanings found before it, by every rule in which it can be a child, and the results are added to
+    the queue.  Each combination of children is considered exactly once.
 
-    def get_costs(self, lhs: Any = None) -> dict[Meaning, int]:
-        """Get the minimal cost of every meaning found so far for an LHS.
+    Like `SemanticEnumerator`, `run(max_cost)` finds every meaning (of every LHS) that is expressible with cost at most
+    `max_cost`, together with its minimal cost, and can be called again with a larger `max_cost`.  Combinations which
+    would cost more than `max_cost` are not evaluated: minimal meanings are kept in order of cost, so that their
+    combinations can be cut off as soon as they get too expensive.
 
-        Args:
-            lhs: defaults to the grammar's start symbol
+    Exactness relies on two assumptions:
+    - The semantics is compositional and pure, as for `SemanticEnumerator`.
+    - The cost function is a superior function (see `CostFunction`).  In particular, costs must not be negative.
 
-        Returns:
-            a dictionary from `Meaning`s to their minimal costs, in order of increasing cost
-        """
-        if lhs is None:
-            lhs = self.grammar._start
-        return {
-            self.representation.to_meaning(meaning, lhs): state.cost
-            for meaning, state in self._states[lhs].items()
-        }
+    Ties between expressions of equal cost are broken deterministically, by the order in which they were found.
+    """
 
-    def get_expressions(self, lhs: Any = None) -> dict[Meaning, GrammaticalExpression]:
-        """Get a minimal-cost expression for every meaning found so far for an LHS.
-
-        Every node of every returned expression has its `meaning` attribute set.  Expressions may share
-        sub-expressions (i.e. the same `GrammaticalExpression` object can be a child of several expressions).
-
-        Args:
-            lhs: defaults to the grammar's start symbol
-
-        Returns:
-            a dictionary from `Meaning`s to `GrammaticalExpression`s, in order of increasing cost
-        """
-        if lhs is None:
-            lhs = self.grammar._start
-        built: dict[tuple[Any, Hashable], GrammaticalExpression] = {}
-        return {
-            expression.meaning: expression
-            for expression in (
-                self._build_expression(lhs, meaning, built)
-                for meaning in self._states[lhs]
-            )
-        }
-
-    def _build_expression(
+    def __init__(
         self,
-        lhs: Any,
-        meaning: Hashable,
-        built: dict[tuple[Any, Hashable], GrammaticalExpression],
-    ) -> GrammaticalExpression:
-        """Build the minimal expression for a meaning by following back-pointers.
+        grammar: Grammar,
+        universe: Universe,
+        combine: CostFunction = additive_cost(unit_cost),
+        representation: MeaningRepresentation | None = None,
+        ignore_errors: bool = False,
+    ):
+        """Create a KnuthEnumerator.
 
         Args:
-            lhs: the LHS of the meaning
-            meaning: the meaning, as represented during enumeration
-            built: a cache of expressions already built, keyed by (LHS, meaning)
-
-        Returns:
-            the minimal expression, with its meaning set
+            grammar: the grammar whose expressions will be enumerated
+            universe: the universe over which expressions are evaluated
+            combine: the cost of an expression, from its top-most rule and the costs of its children (see
+                `CostFunction`); defaults to the number of nodes, like `SemanticEnumerator`
+            representation: an alternative representation of meanings, for speed; by default, `Meaning`s are used
+            ignore_errors: if True, candidate expressions whose evaluation raises an Exception are skipped;
+                if False (the default), the Exception is raised
         """
-        if (lhs, meaning) in built:
-            return built[(lhs, meaning)]
-        state = self._states[lhs][meaning]
-        children = (
-            None
-            if state.children is None or state.rule.rhs is None
-            else tuple(
-                self._build_expression(child_lhs, child_meaning, built)
-                for child_lhs, child_meaning in zip(state.rule.rhs, state.children)
+        super().__init__(grammar, universe, representation, ignore_errors)
+        self.combine = combine
+        # for each LHS, the rules with a child of that LHS, and the positions of those children
+        self._uses: dict[Any, list[tuple[Rule, int]]] = defaultdict(list)
+        for rule in self._rules:
+            for position, child_lhs in enumerate(rule.rhs or ()):
+                self._uses[child_lhs].append((rule, position))
+        # meanings which are not yet known to be minimal, with their cheapest expressions so far
+        self._tentative: dict[Any, dict[Hashable, _Tentative]] = defaultdict(dict)
+        # entries (cost, order, lhs, meaning); `order` breaks ties, and an entry is out of date when its cost is no
+        # longer that of the tentative meaning
+        self._queue: list[tuple[float, int, Any, Hashable]] = []
+        self._order = count()
+        # for each LHS, the minimal meanings in the order in which they were found (so in order of cost), with their
+        # costs, and their indices in the order in which all minimal meanings (of all LHSs) were found
+        self._minimal: dict[Any, list[tuple[Hashable, float]]] = defaultdict(list)
+        self._minimal_indices: dict[Any, list[int]] = defaultdict(list)
+        self._minimal_order: list[tuple[Any, Hashable, float]] = []
+        # combinations costing at most this have been added to the queue
+        self._combined_up_to: float = -inf
+        # whether any combination was cut off for costing more than `_combined_up_to`
+        self._cut_off: bool = False
+        # all meanings with minimal cost at most this have been found
+        self._completed_cost: float = -inf
+        self._stopped_early: bool = False
+
+    @property
+    def completed_cost(self) -> float:
+        """All meanings with minimal cost at most this value have been found."""
+        return self._completed_cost
+
+    @property
+    def is_saturated(self) -> bool:
+        """Whether every expressible meaning has been found.
+
+        This is the case once the queue is empty and no combination was cut off for costing too much, e.g. after
+        `run(max_cost=math.inf)` has returned (which, for a finite number of expressible meanings, it does).
+        """
+        return not self._queue and not self._cut_off and not self._stopped_early
+
+    def run(
+        self,
+        max_cost: float,
+        lhs: Any = None,
+        max_meanings: int | None = None,
+    ) -> None:
+        """Enumerate all meanings with minimal cost up to `max_cost`.
+
+        Enumeration stops early if `max_meanings` meanings of `lhs` have been found.  In that case, every meaning found
+        so far still has its minimal cost, but not every meaning of that cost need have been found.
+
+        Args:
+            max_cost: the maximum cost of expressions to consider (may be `math.inf`)
+            lhs: the LHS whose meanings are counted for `max_meanings`; defaults to the grammar's start symbol
+            max_meanings: stop once this many meanings of `lhs` have been found
+        """
+        if lhs is None:
+            lhs = self.grammar._start
+        if max_cost > self._combined_up_to:
+            self._combine_up_to(max_cost)
+        self._stopped_early = False
+        while self._queue and self._queue[0][0] <= max_cost:
+            cost, _, meaning_lhs, meaning = heapq.heappop(self._queue)
+            tentative = self._tentative[meaning_lhs].get(meaning)
+            if tentative is None or tentative.cost != cost:
+                # out of date: the meaning is already minimal, or was found more cheaply
+                continue
+            del self._tentative[meaning_lhs][meaning]
+            self._make_minimal(meaning_lhs, meaning, tentative)
+            if (
+                max_meanings is not None
+                and meaning_lhs == lhs
+                and len(self._states[lhs]) >= max_meanings
+            ):
+                self._stopped_early = True
+                return
+        self._completed_cost = max(self._completed_cost, max_cost)
+
+    def _combine_up_to(self, max_cost: float) -> None:
+        """Add to the queue all combinations which cost more than `_combined_up_to` and at most `max_cost`, of terminals
+        and of the minimal meanings found so far."""
+        low = self._combined_up_to
+        self._combined_up_to = max_cost
+        self._cut_off = False
+        for rule in self._rules:
+            if rule.rhs is None:
+                cost = self._checked_cost(rule, ())
+                if low < cost <= max_cost:
+                    self._offer(rule, None, cost)
+                elif cost > max_cost:
+                    self._cut_off = True
+        for index, (meaning_lhs, meaning, cost) in enumerate(self._minimal_order):
+            self._combine_with(index, meaning_lhs, meaning, cost, low)
+
+    def _make_minimal(self, lhs: Any, meaning: Hashable, tentative: _Tentative) -> None:
+        """Record that a meaning is minimal, and add its combinations with earlier minimal meanings to the queue."""
+        self._states[lhs][meaning] = SemanticState(
+            tentative.cost, tentative.rule, tentative.children
+        )
+        index = len(self._minimal_order)
+        self._minimal_order.append((lhs, meaning, tentative.cost))
+        self._minimal[lhs].append((meaning, tentative.cost))
+        self._minimal_indices[lhs].append(index)
+        self._combine_with(index, lhs, meaning, tentative.cost, -inf)
+
+    def _combine_with(
+        self, index: int, lhs: Any, meaning: Hashable, cost: float, low: float
+    ) -> None:
+        """Add to the queue every combination in which the `index`-th minimal meaning is a child, and all other children
+        are minimal meanings found no later than it, which costs more than `low` and at most `_combined_up_to`.
+
+        To consider each combination exactly once, the combination is attributed to its child found last, at the first
+        position where that child occurs: children at earlier positions were found strictly before it, and children at
+        later positions were found no later than it.
+        """
+        for rule, position in self._uses[lhs]:
+            assert rule.rhs is not None
+            # each pool is the first `end` minimal meanings of a child's LHS (not copied, since these lists are long)
+            pools: list[tuple[list[tuple[Hashable, float]], int]] = []
+            for other_position, child_lhs in enumerate(rule.rhs):
+                if other_position == position:
+                    pools.append(([(meaning, cost)], 1))
+                    continue
+                indices = self._minimal_indices[child_lhs]
+                end = (
+                    bisect_left(indices, index)
+                    if other_position < position
+                    else bisect_right(indices, index)
+                )
+                pools.append((self._minimal[child_lhs], end))
+            if all(end > 0 for _, end in pools):
+                self._combine_pools(rule, pools, low)
+
+    def _combine_pools(
+        self,
+        rule: Rule,
+        pools: list[tuple[list[tuple[Hashable, float]], int]],
+        low: float,
+    ) -> None:
+        """Add to the queue every combination of one child from each pool which costs more than `low` and at most
+        `_combined_up_to`.  Each pool is the first `end` elements of a list of (meaning, cost) pairs.
+
+        Each pool is in order of cost, and costs are superior functions, so the cost of a combination does not decrease
+        along a pool: as soon as a child is too expensive even with the cheapest remaining children, so are all
+        later children in its pool.
+        """
+        high = self._combined_up_to
+        combine = self.combine
+        cheapest = [items[0][1] for items, _ in pools]
+        children: list[Hashable] = [None] * len(pools)
+        costs: list[float] = list(cheapest)
+        last = len(pools) - 1
+
+        def choose(position: int) -> None:
+            items, end = pools[position]
+            for item in range(end):
+                child, child_cost = items[item]
+                costs[position] = child_cost
+                # with the cheapest children at later positions: at the last position, this is the cost itself
+                cost = combine(rule, costs)
+                if cost > high:
+                    self._cut_off = True
+                    break
+                children[position] = child
+                if position < last:
+                    choose(position + 1)
+                    continue
+                if cost < 0 or cost < max(costs):
+                    raise ValueError(
+                        f"Costs must be superior functions (see `CostFunction`), but rule {rule.name} with children "
+                        f"of cost {costs} costs {cost}."
+                    )
+                if low < cost:
+                    self._offer(rule, tuple(children), cost)
+            costs[position] = cheapest[position]
+
+        choose(0)
+
+    def _checked_cost(self, rule: Rule, child_costs: Sequence[float]) -> float:
+        """Compute the cost of an expression, checking that the cost function behaves like a superior function here.
+
+        Raises:
+            ValueError: if the cost is negative, or less than the cost of a child, in which case minimal costs would
+                not be found correctly
+        """
+        cost = self.combine(rule, child_costs)
+        if cost < 0 or cost < max(child_costs, default=0):
+            raise ValueError(
+                f"Costs must be superior functions (see `CostFunction`), but rule {rule.name} with children of cost "
+                f"{list(child_costs)} costs {cost}."
             )
-        )
-        expression: GrammaticalExpression = GrammaticalExpression(
-            rule_name=state.rule.name,
-            func=state.rule.func,
-            children=children,
-            meaning=self.representation.to_meaning(meaning, lhs),
-        )
-        built[(lhs, meaning)] = expression
-        return expression
+        return cost
+
+    def _offer(
+        self, rule: Rule, children: tuple[Hashable, ...] | None, cost: float
+    ) -> None:
+        """Evaluate a candidate expression, and add its meaning to the queue if it is new or cheaper than before."""
+        meaning = self._evaluate(rule, children)
+        if meaning is _FAILED or meaning in self._states[rule.lhs]:
+            return
+        tentative = self._tentative[rule.lhs].get(meaning)
+        if tentative is None or cost < tentative.cost:
+            self._tentative[rule.lhs][meaning] = _Tentative(cost, rule, children)
+            heapq.heappush(self._queue, (cost, next(self._order), rule.lhs, meaning))
